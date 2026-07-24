@@ -3,33 +3,52 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta name="theme-color" content="#f6f4ef" />
+  <meta name="theme-color" content="#1C1D21">
   <meta name="description" content="Toolisto reúne herramientas rápidas para comprimir, convertir y preparar imágenes y PDF directamente en tu dispositivo." />
   <title>Toolisto · Herramientas directas para tus archivos</title>
+  <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="./assets/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="icon" href="./assets/favicon-16.png" sizes="16x16" type="image/png">
+  <link rel="apple-touch-icon" href="./assets/icon-192.png">
+  <link rel="manifest" href="./assets/manifest.webmanifest">
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="preload" href="./assets/toolisto-mark.svg" as="image" type="image/svg+xml" />
+  <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
+  <div class="intro-splash" id="introSplash" aria-hidden="true">
+    <img class="intro-mark" src="./assets/toolisto-mark.svg" alt="" width="100" height="100" />
+    <span class="intro-name">Toolisto</span>
+    <span class="intro-accent"></span>
+  </div>
+
+  <a class="skip-link" href="#contenido">Saltar al contenido principal</a>
+
   <header class="site-header">
     <div class="header-inner">
-      <a class="brand" href="#inicio" aria-label="Toolisto, inicio">
-        <span class="brand-mark" aria-hidden="true">
-          <i></i><i></i><i></i>
-        </span>
-        <strong>Toolisto</strong>
+      <a class="brand" href="/" aria-label="Ir al inicio de Toolisto">
+        <img class="brand-mark-img" src="./assets/toolisto-mark.svg" alt="" width="36" height="36" />
+        <span class="brand-text">Toolisto</span>
       </a>
 
       <nav class="desktop-nav" aria-label="Categorías de herramientas">
         <a href="#herramientas" data-nav-filter="images">Imágenes</a>
         <a href="#herramientas" data-nav-filter="pdf">PDF</a>
         <a href="#herramientas" data-nav-filter="signatures">Firmas</a>
-        <a href="#herramientas" data-nav-filter="all">Todas las herramientas</a>
+        <a href="#herramientas" data-nav-filter="all">Todas</a>
       </nav>
 
       <div class="header-actions">
-        <a class="header-search-link" href="#herramientas" aria-label="Buscar herramientas">⌕</a>
-        <button class="icon-button" id="themeToggle" type="button" aria-label="Cambiar tema">◐</button>
-        <button class="menu-button" id="menuToggle" type="button" aria-expanded="false" aria-controls="mobileNav">Menú</button>
+        <a class="header-action-btn" href="#herramientas" aria-label="Buscar herramientas">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
+        </a>
+        <button class="header-action-btn" id="themeToggle" type="button" aria-label="Cambiar tema">
+          <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+          <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+        <button class="menu-button" id="menuToggle" type="button" aria-expanded="false" aria-controls="mobileNav">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
       </div>
     </div>
   </header>
@@ -41,73 +60,68 @@
     <a href="#herramientas" data-nav-filter="all">Todas las herramientas</a>
   </nav>
 
-  <main>
+  <main id="contenido">
     <section class="hero" id="inicio">
-      <div class="hero-copy-block">
-        <span class="kicker">Caja de herramientas digital</span>
-        <h1>¿Qué quieres hacer con tu archivo?</h1>
-        <p>Sube una imagen o un PDF. Toolisto detectará el formato y te mostrará una acción compatible.</p>
+      <div class="hero-inner">
+        <div class="hero-left">
+          <h1>¿Qué quieres hacer con tu archivo?</h1>
+          <p>Sube una imagen o PDF y Toolisto te mostrará las acciones disponibles.</p>
+          <p class="privacy-note">🔒 Tus archivos se quedan contigo. Se procesan en tu navegador.</p>
+        </div>
+        <div class="hero-right">
+          <input id="intentInput" type="hidden" value="" />
+          <div class="drop-zone" id="dropZone" tabindex="0" role="button" aria-label="Seleccionar o arrastrar archivos">
+            <input id="fileInput" type="file" multiple accept="image/jpeg,image/png,image/webp,application/pdf" hidden />
+            <div class="drop-icon" aria-hidden="true">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            </div>
+            <strong>Arrastra una imagen o PDF</strong>
+            <span>O selecciona desde tu dispositivo</span>
+            <button class="primary-button" id="browseButton" type="button">Seleccionar archivo</button>
+          </div>
+
+          <div class="file-strip" id="fileStrip" hidden></div>
+
+          <div class="smart-result" id="smartResult" hidden>
+            <div class="smart-icon" id="smartIcon">↘</div>
+            <div class="smart-copy">
+              <span>Acción recomendada</span>
+              <strong id="smartTitle">Reducir imagen</strong>
+              <p id="smartDescription">Aplicaremos una configuración equilibrada para este archivo.</p>
+            </div>
+            <button class="text-button" id="changeToolButton" type="button">Elegir otra</button>
+          </div>
+
+          <details class="advanced-panel" id="advancedPanel" hidden>
+            <summary>Opciones de la herramienta <span>Ajustes avanzados</span></summary>
+            <div id="advancedControls" class="advanced-controls"></div>
+          </details>
+
+          <div class="flow-actions" id="flowActions" hidden>
+            <button class="primary-button run-button" id="runButton" type="button" disabled>
+              <span>Procesar archivo</span><span aria-hidden="true">→</span>
+            </button>
+            <button class="quiet-button" id="clearFilesButton" type="button" hidden>Quitar archivos</button>
+          </div>
+        </div>
       </div>
-
-      <section class="workspace" aria-label="Seleccionar y procesar archivos">
-        <input id="intentInput" type="hidden" value="" />
-
-        <div class="drop-zone" id="dropZone" tabindex="0" role="button" aria-label="Seleccionar o arrastrar archivos">
-          <input id="fileInput" type="file" multiple accept="image/jpeg,image/png,image/webp,application/pdf" hidden />
-          <div class="drop-tool-icon" aria-hidden="true">
-            <span>＋</span>
-          </div>
-          <div class="drop-copy">
-            <strong>Arrastra aquí tu imagen o PDF</strong>
-            <span>También puedes pegar una imagen desde el portapapeles.</span>
-          </div>
-          <button class="primary-button" id="browseButton" type="button">Seleccionar archivo</button>
-          <small class="privacy-note">🔒 Se procesa en este dispositivo · hasta 25 MB por archivo</small>
-        </div>
-
-        <div class="file-strip" id="fileStrip" hidden></div>
-
-        <div class="smart-result" id="smartResult" hidden>
-          <div class="smart-icon" id="smartIcon">↘</div>
-          <div class="smart-copy">
-            <span>Acción recomendada</span>
-            <strong id="smartTitle">Reducir imagen</strong>
-            <p id="smartDescription">Aplicaremos una configuración equilibrada para este archivo.</p>
-          </div>
-          <button class="text-button" id="changeToolButton" type="button">Elegir otra</button>
-        </div>
-
-        <details class="advanced-panel" id="advancedPanel" hidden>
-          <summary>Opciones de la herramienta <span>Ajustes avanzados</span></summary>
-          <div id="advancedControls" class="advanced-controls"></div>
-        </details>
-
-        <div class="flow-actions" id="flowActions" hidden>
-          <button class="primary-button run-button" id="runButton" type="button" disabled>
-            <span>Procesar archivo</span><span aria-hidden="true">→</span>
-          </button>
-          <button class="quiet-button" id="clearFilesButton" type="button" hidden>Quitar archivos</button>
-        </div>
-      </section>
     </section>
 
     <section class="tools-section" id="herramientas">
-      <div class="tools-heading">
-        <div>
-          <span class="section-overline">Herramientas disponibles</span>
-          <h2>Elige y empieza</h2>
+      <div class="tools-header">
+        <h2>Herramientas</h2>
+        <div class="tools-controls">
+          <div class="filter-bar" role="group" aria-label="Filtrar herramientas">
+            <button class="filter-chip active" type="button" data-filter="all">Todas</button>
+            <button class="filter-chip" type="button" data-filter="images">Imágenes</button>
+            <button class="filter-chip" type="button" data-filter="pdf">PDF</button>
+            <button class="filter-chip" type="button" data-filter="signatures">Firmas</button>
+          </div>
+          <label class="tool-search" for="toolSearch">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
+            <input id="toolSearch" type="search" placeholder="Buscar herramientas" autocomplete="off" />
+          </label>
         </div>
-        <label class="tool-search" for="toolSearch">
-          <span aria-hidden="true">⌕</span>
-          <input id="toolSearch" type="search" placeholder="Buscar una herramienta" autocomplete="off" />
-        </label>
-      </div>
-
-      <div class="filter-bar" role="group" aria-label="Filtrar herramientas">
-        <button class="filter-chip active" type="button" data-filter="all">Todas</button>
-        <button class="filter-chip" type="button" data-filter="images">Imágenes</button>
-        <button class="filter-chip" type="button" data-filter="pdf">PDF</button>
-        <button class="filter-chip" type="button" data-filter="signatures">Firmas</button>
       </div>
 
       <div class="tool-grid" id="toolGrid">
@@ -142,7 +156,7 @@
         </button>
 
         <button class="tool-card" data-tool="imagesPdf" data-category="pdf" type="button">
-          <span class="tool-icon icon-yellow">▤</span>
+          <span class="tool-icon icon-amber">▤</span>
           <span class="tool-body"><strong>Imágenes a PDF</strong><small>Crea un documento con fotos o escaneos.</small></span>
           <span class="tool-arrow" aria-hidden="true">→</span>
         </button>
@@ -182,26 +196,27 @@
     <div class="picker-grid" id="pickerGrid"></div>
   </dialog>
 
-  <footer>
-    <div class="footer-main">
-      <a class="brand" href="#inicio">
-        <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
-        <strong>Toolisto</strong>
-      </a>
-      <p>Herramientas directas para preparar imágenes y PDF.</p>
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <a class="brand" href="/" aria-label="Ir al inicio de Toolisto">
+          <img class="brand-mark-img" src="./assets/toolisto-mark.svg" alt="" width="28" height="28" />
+          <span class="brand-text">Toolisto</span>
+        </a>
+      </div>
+      <nav aria-label="Enlaces del pie de página">
+        <a href="#herramientas">Herramientas</a>
+        <a href="#privacidad">Privacidad</a>
+        <a href="mailto:contacto@toolisto.com">Contacto</a>
+      </nav>
+      <small>© 2026 Toolisto · Tus archivos se quedan contigo.</small>
     </div>
-    <nav aria-label="Enlaces del pie de página">
-      <a href="#herramientas">Herramientas</a>
-      <a href="#privacidad">Privacidad</a>
-      <a href="mailto:contacto@toolisto.com">Contacto</a>
-    </nav>
-    <small>© 2026 Toolisto.</small>
   </footer>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
-  <script src="app.js"></script>
+  <script type="module" src="./js/app.js"></script>
 </body>
 </html>

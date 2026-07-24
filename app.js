@@ -85,6 +85,26 @@
 
   init();
 
+  const splashEl = document.getElementById('introSplash');
+  if (splashEl) {
+    let shown = false;
+    try { shown = sessionStorage.getItem('toolistoIntroShown'); } catch (_) {}
+    if (!shown) {
+      document.body.classList.add('intro-active');
+      try { sessionStorage.setItem('toolistoIntroShown', '1'); } catch (_) {}
+      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const exitDelay = reducedMotion ? 150 : 700;
+      const cleanupDelay = reducedMotion ? 250 : 1050;
+      setTimeout(() => { splashEl.classList.add('intro-out'); }, exitDelay);
+      setTimeout(() => {
+        document.body.classList.remove('intro-active');
+        splashEl.remove();
+      }, cleanupDelay);
+    } else {
+      splashEl.remove();
+    }
+  }
+
   function init() {
     let savedTheme = null;
     try { savedTheme = localStorage.getItem('toolisto-theme'); } catch (_) { /* storage may be blocked */ }
@@ -93,6 +113,16 @@
     els.themeToggle.addEventListener('click', toggleTheme);
     els.menuToggle.addEventListener('click', toggleMenu);
     $$('.mobile-nav a').forEach((a) => a.addEventListener('click', closeMenu));
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && !els.mobileNav.hidden) closeMenu();
+    });
+
+    document.addEventListener('click', (event) => {
+      if (!els.mobileNav.hidden && !els.mobileNav.contains(event.target) && !els.menuToggle.contains(event.target)) {
+        closeMenu();
+      }
+    });
 
     els.browseButton.addEventListener('click', (event) => {
       event.stopPropagation();
@@ -142,9 +172,13 @@
 
     $$('.tool-card').forEach((card) => card.addEventListener('click', () => {
       chooseTool(card.dataset.tool, true);
-      document.querySelector('#inicio').scrollIntoView({ behavior: 'smooth' });
+      const target = document.querySelector('#inicio');
+      target.scrollIntoView({ behavior: 'smooth' });
       if (!state.files.length) {
-        setTimeout(() => els.fileInput.click(), 450);
+        setTimeout(() => {
+          els.fileInput.click();
+          els.dropZone.focus();
+        }, 450);
       }
     }));
   }
@@ -194,6 +228,7 @@
   function closeMenu() {
     els.mobileNav.hidden = true;
     els.menuToggle.setAttribute('aria-expanded', 'false');
+    els.menuToggle.focus();
   }
 
   function handlePaste(event) {
