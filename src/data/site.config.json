@@ -1,0 +1,10 @@
+{
+  "siteName": "Toolisto",
+  "siteUrl": "https://toolisto.invalid",
+  "productionDomain": "https://toolisto.com",
+  "defaultLocale": "es-419",
+  "defaultOgImage": "/assets/toolisto-og.png",
+  "themeColor": "#1C1D21",
+  "maxFileSize": 26214400,
+  "buildDate": "2026-07-24"
+}

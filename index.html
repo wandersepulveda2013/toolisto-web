@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="es" data-theme="light">
+<html lang="es" data-theme="light" class="intro-pending">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -11,19 +11,95 @@
   <link rel="icon" href="./assets/favicon-16.png" sizes="16x16" type="image/png">
   <link rel="apple-touch-icon" href="./assets/icon-192.png">
   <link rel="manifest" href="./assets/manifest.webmanifest">
-  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
   <link rel="preload" href="./assets/toolisto-mark.svg" as="image" type="image/svg+xml" />
   <link rel="stylesheet" href="./styles.css" />
+  <style>
+    html.intro-pending, html.intro-pending body { background: #1C1D21; overflow: hidden; }
+    html.intro-pending #toolisto-app { visibility: hidden; opacity: 0; pointer-events: none; }
+    html.intro-pending .site-header,
+    html.intro-pending main,
+    html.intro-pending .site-footer { visibility: hidden; opacity: 0; pointer-events: none; }
+    #toolisto-intro { position: fixed; inset: 0; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #1C1D21; gap: 16px; opacity: 1; animation: introMaster 3000ms ease both; }
+    #toolisto-intro .intro-mark { width: 80px; height: 80px; animation: introScale 500ms ease-out both; }
+    #toolisto-intro .intro-name { color: #F5F4EF; font-size: 1.8rem; font-weight: 700; letter-spacing: -0.04em; font-family: Inter, ui-sans-serif, system-ui, sans-serif; }
+    #toolisto-intro .intro-accent { width: 48px; height: 3px; background: #2563EB; border-radius: 2px; animation: introScale 400ms 100ms ease-out both; }
+    #toolisto-intro .intro-count { color: rgba(245,244,239,0.6); font-size: 0.95rem; font-weight: 400; font-family: Inter, ui-sans-serif, system-ui, sans-serif; animation: introFadeIn 400ms 300ms ease-out both; opacity: 0; }
+    @keyframes introMaster { 0% { opacity: 0; } 17% { opacity: 1; } 77% { opacity: 1; } 100% { opacity: 0; } }
+    @keyframes introScale { from { opacity: 0; transform: scale(0.85); } to { opacity: 1; transform: scale(1); } }
+    @keyframes introFadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @media (prefers-reduced-motion: reduce) {
+      #toolisto-intro { animation: none; opacity: 1; transition: opacity 120ms ease; }
+      #toolisto-intro .intro-mark, #toolisto-intro .intro-accent, #toolisto-intro .intro-count { animation: none; opacity: 1; }
+    }
+  </style>
+  <noscript>
+    <style>
+      #toolisto-intro { display: none !important; }
+      .site-header, main, .site-footer { visibility: visible !important; opacity: 1 !important; pointer-events: auto !important; }
+      html, body { overflow: auto !important; background: initial; }
+    </style>
+  </noscript>
 </head>
 <body>
-  <div class="intro-splash" id="introSplash" aria-hidden="true">
-    <img class="intro-mark" src="./assets/toolisto-mark.svg" alt="" width="100" height="100" />
+  <div id="toolisto-intro" aria-hidden="true">
+    <img class="intro-mark" src="./assets/toolisto-mark.svg" alt="" width="80" height="80" />
     <span class="intro-name">Toolisto</span>
     <span class="intro-accent"></span>
+    <span class="intro-count" id="introCount" hidden aria-hidden="true">89 herramientas disponibles</span>
   </div>
 
-  <a class="skip-link" href="#contenido">Saltar al contenido principal</a>
+  <script>
+  (function () {
+    var intro = document.getElementById('toolisto-intro');
+    if (!intro) return;
+    var html = document.documentElement;
+    var removed = false;
 
+    function getCount() {
+      return document.querySelectorAll('.tool-card[data-tool]').length || 0;
+    }
+
+    function updateCount() {
+      var count = getCount();
+      if (count === 0) return;
+      var label = count + ' herramientas disponibles';
+      var introCount = document.getElementById('introCount');
+      if (introCount) { introCount.textContent = label; introCount.hidden = false; introCount.removeAttribute('aria-hidden'); }
+      var heroCount = document.getElementById('toolCount');
+      if (heroCount) { heroCount.textContent = label; heroCount.hidden = false; heroCount.removeAttribute('aria-hidden'); }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', updateCount);
+    } else {
+      updateCount();
+    }
+
+    function closeIntro() {
+      if (removed) return;
+      removed = true;
+      function cleanup() {
+        if (intro.parentNode) intro.remove();
+        html.classList.remove('intro-pending');
+        html.classList.remove('intro-active');
+        document.body.style.overflow = '';
+      }
+      intro.addEventListener('animationend', function handler(e) {
+        if (e.animationName !== 'introMaster') return;
+        intro.removeEventListener('animationend', handler);
+        cleanup();
+      });
+      setTimeout(cleanup, 800);
+    }
+
+    html.classList.add('intro-active');
+    document.body.style.overflow = 'hidden';
+    setTimeout(closeIntro, 3000);
+    setTimeout(closeIntro, 3200);
+  })();
+  </script>
+
+  <div id="toolisto-app">
   <header class="site-header">
     <div class="header-inner">
       <a class="brand" href="/" aria-label="Ir al inicio de Toolisto">
@@ -35,6 +111,8 @@
         <a href="#herramientas" data-nav-filter="images">Imágenes</a>
         <a href="#herramientas" data-nav-filter="pdf">PDF</a>
         <a href="#herramientas" data-nav-filter="signatures">Firmas</a>
+        <a href="#herramientas" data-nav-filter="documents">Documentos</a>
+        <a href="#herramientas" data-nav-filter="spreadsheets">Hojas de cálculo</a>
         <a href="#herramientas" data-nav-filter="all">Todas</a>
       </nav>
 
@@ -57,6 +135,8 @@
     <a href="#herramientas" data-nav-filter="images">Imágenes</a>
     <a href="#herramientas" data-nav-filter="pdf">PDF</a>
     <a href="#herramientas" data-nav-filter="signatures">Firmas</a>
+    <a href="#herramientas" data-nav-filter="documents">Documentos</a>
+    <a href="#herramientas" data-nav-filter="spreadsheets">Hojas de cálculo</a>
     <a href="#herramientas" data-nav-filter="all">Todas las herramientas</a>
   </nav>
 
@@ -64,45 +144,69 @@
     <section class="hero" id="inicio">
       <div class="hero-inner">
         <div class="hero-left">
-          <h1>¿Qué quieres hacer con tu archivo?</h1>
-          <p>Sube una imagen o PDF y Toolisto te mostrará las acciones disponibles.</p>
+          <h1>Todas tus herramientas de archivos, en un solo lugar</h1>
+          <p class="hero-desc">Convierte, comprime, organiza y mejora imágenes, PDF, documentos, textos, libros electrónicos y hojas de cálculo directamente desde tu navegador.</p>
+          <p class="hero-trust">89 herramientas disponibles · Sin registro · Procesamiento privado en tu dispositivo</p>
+          <div class="hero-search-wrap">
+            <label class="hero-search" for="toolSearch">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
+              <input id="toolSearch" type="search" placeholder="¿Qué necesitas hacer con tu archivo?" autocomplete="off" aria-label="Buscar herramientas" />
+              <button type="button" class="search-clear" id="searchClear" aria-label="Limpiar búsqueda" hidden>×</button>
+            </label>
+            <div class="hero-suggestions" id="heroSuggestions" role="listbox" hidden></div>
+          </div>
+          <div class="hero-actions">
+            <a class="explore-link" href="#herramientas">Explorar herramientas →</a>
+          </div>
           <p class="privacy-note">🔒 Tus archivos se quedan contigo. Se procesan en tu navegador.</p>
         </div>
-        <div class="hero-right">
-          <input id="intentInput" type="hidden" value="" />
-          <div class="drop-zone" id="dropZone" tabindex="0" role="button" aria-label="Seleccionar o arrastrar archivos">
-            <input id="fileInput" type="file" multiple accept="image/jpeg,image/png,image/webp,application/pdf" hidden />
-            <div class="drop-icon" aria-hidden="true">
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-            </div>
-            <strong>Arrastra una imagen o PDF</strong>
-            <span>O selecciona desde tu dispositivo</span>
-            <button class="primary-button" id="browseButton" type="button">Seleccionar archivo</button>
-          </div>
+      </div>
+    </section>
 
-          <div class="file-strip" id="fileStrip" hidden></div>
-
-          <div class="smart-result" id="smartResult" hidden>
-            <div class="smart-icon" id="smartIcon">↘</div>
-            <div class="smart-copy">
-              <span>Acción recomendada</span>
-              <strong id="smartTitle">Reducir imagen</strong>
-              <p id="smartDescription">Aplicaremos una configuración equilibrada para este archivo.</p>
-            </div>
-            <button class="text-button" id="changeToolButton" type="button">Elegir otra</button>
-          </div>
-
-          <details class="advanced-panel" id="advancedPanel" hidden>
-            <summary>Opciones de la herramienta <span>Ajustes avanzados</span></summary>
-            <div id="advancedControls" class="advanced-controls"></div>
-          </details>
-
-          <div class="flow-actions" id="flowActions" hidden>
-            <button class="primary-button run-button" id="runButton" type="button" disabled>
-              <span>Procesar archivo</span><span aria-hidden="true">→</span>
-            </button>
-            <button class="quiet-button" id="clearFilesButton" type="button" hidden>Quitar archivos</button>
-          </div>
+    <section class="featured-section">
+      <div class="featured-inner">
+        <h2>Herramientas destacadas</h2>
+        <div class="featured-grid">
+          <a class="featured-card" href="./comprimir-imagen.html">
+            <span class="featured-icon">↘</span>
+            <span class="featured-name">Comprimir imagen</span>
+            <span class="featured-desc">Reduce el tamaño de una imagen sin perder calidad visible.</span>
+          </a>
+          <a class="featured-card" href="./convertir-imagen.html">
+            <span class="featured-icon">⇄</span>
+            <span class="featured-name">Convertir imagen</span>
+            <span class="featured-desc">Cambia el formato entre JPEG, PNG y WebP.</span>
+          </a>
+          <a class="featured-card" href="./unir-pdf.html">
+            <span class="featured-icon">⊕</span>
+            <span class="featured-name">Unir PDF</span>
+            <span class="featured-desc">Combina varios documentos PDF en un solo archivo.</span>
+          </a>
+          <a class="featured-card" href="./dividir-pdf.html">
+            <span class="featured-icon">⊟</span>
+            <span class="featured-name">Dividir PDF</span>
+            <span class="featured-desc">Extrae páginas individuales o por rangos de un PDF.</span>
+          </a>
+          <a class="featured-card" href="./word-a-pdf.html">
+            <span class="featured-icon">⇒</span>
+            <span class="featured-name">Word a PDF</span>
+            <span class="featured-desc">Convierte documentos Word a formato PDF.</span>
+          </a>
+          <a class="featured-card" href="./jpg-a-png.html">
+            <span class="featured-icon">⇄</span>
+            <span class="featured-name">JPG a PNG</span>
+            <span class="featured-desc">Convierte imágenes JPG al formato PNG.</span>
+          </a>
+          <a class="featured-card" href="./comprimir-word.html">
+            <span class="featured-icon">⇶</span>
+            <span class="featured-name">Comprimir Word</span>
+            <span class="featured-desc">Reduce el peso de archivos Word optimizando imágenes.</span>
+          </a>
+          <a class="featured-card" href="./csv-a-excel.html">
+            <span class="featured-icon">⇌</span>
+            <span class="featured-name">CSV a Excel</span>
+            <span class="featured-desc">Convierte archivos CSV a formato Excel rápidamente.</span>
+          </a>
         </div>
       </div>
     </section>
@@ -116,53 +220,611 @@
             <button class="filter-chip" type="button" data-filter="images">Imágenes</button>
             <button class="filter-chip" type="button" data-filter="pdf">PDF</button>
             <button class="filter-chip" type="button" data-filter="signatures">Firmas</button>
+            <button class="filter-chip" type="button" data-filter="documents">Documentos</button>
+            <button class="filter-chip" type="button" data-filter="text">Texto</button>
+            <button class="filter-chip" type="button" data-filter="ebooks">EPUB</button>
+            <button class="filter-chip" type="button" data-filter="spreadsheets">Hojas de cálculo</button>
           </div>
-          <label class="tool-search" for="toolSearch">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
-            <input id="toolSearch" type="search" placeholder="Buscar herramientas" autocomplete="off" />
-          </label>
         </div>
       </div>
 
       <div class="tool-grid" id="toolGrid">
-        <button class="tool-card" data-tool="compress" data-category="images" type="button">
-          <span class="tool-icon icon-orange">↘</span>
-          <span class="tool-body"><strong>Comprimir imagen</strong><small>Reduce el peso con una meta en KB.</small></span>
+        <a class="tool-card" data-tool="compress" data-category="images" data-input-formats="JPEG PNG WebP" data-output-formats="JPEG PNG WebP" data-keywords="reducir peso tamaño ligera ligero calidad optimizar" href="./comprimir-imagen.html">
+          <span class="tool-icon">↘</span>
+          <span class="tool-body"><strong>Comprimir imagen</strong><small>Reduce el tamaño de archivo de una imagen sin perder calidad visible.</small></span>
           <span class="tool-arrow" aria-hidden="true">→</span>
-        </button>
+        </a>
 
-        <button class="tool-card" data-tool="crop" data-category="images" type="button">
-          <span class="tool-icon icon-blue">⌗</span>
-          <span class="tool-body"><strong>Cambiar tamaño y recortar</strong><small>Dimensiones exactas o formatos para redes.</small></span>
+        <a class="tool-card" data-tool="crop" data-category="images" data-input-formats="JPEG PNG WebP" data-output-formats="JPEG PNG WebP" data-keywords="recortar dimensiones tamaño cambiar escalar resize" href="./redimensionar-imagen.html">
+          <span class="tool-icon">⌗</span>
+          <span class="tool-body"><strong>Cambiar tamaño y recortar</strong><small>Recorta y cambia el tamaño de una imagen con dimensiones exactas.</small></span>
           <span class="tool-arrow" aria-hidden="true">→</span>
-        </button>
+        </a>
 
-        <button class="tool-card" data-tool="convert" data-category="images" type="button">
-          <span class="tool-icon icon-green">⇄</span>
-          <span class="tool-body"><strong>Convertir imagen</strong><small>Cambia entre JPG, PNG y WebP.</small></span>
+        <a class="tool-card" data-tool="convert" data-category="images" data-input-formats="JPEG PNG WebP" data-output-formats="JPEG PNG WebP" data-keywords="" href="./convertir-imagen.html">
+          <span class="tool-icon">⇄</span>
+          <span class="tool-body"><strong>Convertir imagen</strong><small>Cambia el formato de una o varias imágenes entre JPEG, PNG y WebP.</small></span>
           <span class="tool-arrow" aria-hidden="true">→</span>
-        </button>
+        </a>
 
-        <button class="tool-card" data-tool="signature" data-category="signatures" type="button">
-          <span class="tool-icon icon-purple">✒</span>
-          <span class="tool-body"><strong>Limpiar firma</strong><small>Quita el fondo y descarga un PNG transparente.</small></span>
+        <a class="tool-card" data-tool="batchCompress" data-category="images" data-input-formats="JPEG PNG WebP" data-output-formats="JPEG PNG WebP" data-keywords="comprimir lote varias múltiples reducir peso" href="./comprimir-imagenes.html">
+          <span class="tool-icon">⇊</span>
+          <span class="tool-body"><strong>Comprimir varias imágenes</strong><small>Reduce el peso de varias imágenes a la vez con una meta de tamaño en KB.</small></span>
           <span class="tool-arrow" aria-hidden="true">→</span>
-        </button>
+        </a>
 
-        <button class="tool-card" data-tool="mergePdf" data-category="pdf" type="button">
-          <span class="tool-icon icon-red">⊕</span>
-          <span class="tool-body"><strong>Unir PDF</strong><small>Combina documentos respetando el orden.</small></span>
+        <a class="tool-card" data-tool="stripMetadata" data-category="images" data-input-formats="JPEG PNG WebP" data-output-formats="JPEG PNG WebP" data-keywords="" href="./eliminar-metadatos-de-imagen.html">
+          <span class="tool-icon">◈</span>
+          <span class="tool-body"><strong>Eliminar metadatos</strong><small>Elimina los metadatos visibles de una o varias imágenes.</small></span>
           <span class="tool-arrow" aria-hidden="true">→</span>
-        </button>
+        </a>
 
-        <button class="tool-card" data-tool="imagesPdf" data-category="pdf" type="button">
-          <span class="tool-icon icon-amber">▤</span>
-          <span class="tool-body"><strong>Imágenes a PDF</strong><small>Crea un documento con fotos o escaneos.</small></span>
+        <a class="tool-card" data-tool="socialCrop" data-category="images" data-input-formats="JPEG PNG WebP" data-output-formats="JPEG PNG WebP" data-keywords="" href="./recortar-imagen-para-redes-sociales.html">
+          <span class="tool-icon">▣</span>
+          <span class="tool-body"><strong>Recortar para redes</strong><small>Prepara tu imagen para publicar en redes sociales con el tamaño correcto.</small></span>
           <span class="tool-arrow" aria-hidden="true">→</span>
-        </button>
+        </a>
+
+        <a class="tool-card" data-tool="removeObjects" data-category="images" data-input-formats="JPEG PNG WebP" data-output-formats="JPEG PNG WebP" data-keywords="" href="./borrar-objetos-de-imagen.html">
+          <span class="tool-icon">◐</span>
+          <span class="tool-body"><strong>Borrar objetos y texto</strong><small>Elimina objetos, texto o elementos de una imagen usando un pincel manual.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="signature" data-category="signatures" data-input-formats="JPEG PNG WebP" data-output-formats="PNG" data-keywords="firma marca de agua watermark sello transparente" href="./limpiar-firma.html">
+          <span class="tool-icon">✦</span>
+          <span class="tool-body"><strong>Limpiar firma</strong><small>Extrae una firma y exporta un PNG con fondo transparente.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="mergePdf" data-category="pdf" data-input-formats="PDF" data-output-formats="PDF" data-keywords="unir juntar combinar fusionar mezclar" href="./unir-pdf.html">
+          <span class="tool-icon">⊕</span>
+          <span class="tool-body"><strong>Unir PDF</strong><small>Combina varios documentos PDF en un solo archivo.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="imagesPdf" data-category="pdf" data-input-formats="JPEG PNG WebP" data-output-formats="PDF" data-keywords="unir juntar fotos fotografías imagenes imágenes escanear" href="./imagenes-a-pdf.html">
+          <span class="tool-icon">▤</span>
+          <span class="tool-body"><strong>Imágenes a PDF</strong><small>Convierte una o varias imágenes en un archivo PDF.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="splitPdf" data-category="pdf" data-input-formats="PDF" data-output-formats="PDF" data-keywords="dividir separar extraer páginas cortar partir" href="./dividir-pdf.html">
+          <span class="tool-icon">⊟</span>
+          <span class="tool-body"><strong>Dividir PDF</strong><small>Extrae páginas individuales o por rangos de un documento PDF.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="reorderPdf" data-category="pdf" data-input-formats="PDF" data-output-formats="PDF" data-keywords="" href="./organizar-pdf.html">
+          <span class="tool-icon">⇶</span>
+          <span class="tool-body"><strong>Organizar PDF</strong><small>Reordena las páginas de un PDF arrastrándolas.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="pdfToImages" data-category="pdf" data-input-formats="PDF" data-output-formats="JPEG PNG WebP" data-keywords="extraer páginas fotos fotografías sacar imágenes" href="./pdf-a-imagenes.html">
+          <span class="tool-icon">⬒</span>
+          <span class="tool-body"><strong>PDF a imágenes</strong><small>Convierte las páginas de un PDF en imágenes JPEG, PNG o WebP.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="signPdf" data-category="signatures" data-input-formats="PDF" data-output-formats="PDF" data-keywords="firma firmar certificado firma digital e-sign" href="./firmar-pdf.html">
+          <span class="tool-icon">✎</span>
+          <span class="tool-body"><strong>Firmar PDF</strong><small>Dibuja o escribe tu firma y colócala en un documento PDF.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="docPhoto" data-category="images" data-input-formats="JPEG PNG WebP" data-output-formats="JPEG PNG" data-keywords="" href="./foto-para-documentos.html">
+          <span class="tool-icon">⊡</span>
+          <span class="tool-body"><strong>Foto para documentos</strong><small>Genera fotos con las dimensiones correctas para pasaporte, visa, DNI y más.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="censor" data-category="images" data-input-formats="JPEG PNG WebP" data-output-formats="JPEG PNG WebP" data-keywords="" href="./censurar-imagen.html">
+          <span class="tool-icon">▓</span>
+          <span class="tool-body"><strong>Censurar información</strong><small>Oculta datos sensibles de una imagen con distintos métodos de censura.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="fixFormat" data-category="images" data-input-formats="JPEG PNG WebP GIF BMP PDF" data-output-formats="JPEG PNG WebP" data-keywords="" href="./reparar-formato-de-imagen.html">
+          <span class="tool-icon">⟳</span>
+          <span class="tool-body"><strong>Reparar formato</strong><small>Detecta el formato real de un archivo y corrige la extensión si es necesario.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="rescueDoc" data-category="images" data-input-formats="JPEG PNG WebP" data-output-formats="JPEG PNG WebP" data-keywords="" href="./mejorar-documento-fotografiado.html">
+          <span class="tool-icon">⊞</span>
+          <span class="tool-body"><strong>Rescatar documento</strong><small>Mejora la legibilidad de fotos de documentos con ajustes automáticos y manuales.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="fileCompliance" data-category="images" data-input-formats="JPEG PNG WebP" data-output-formats="JPEG PNG WebP" data-keywords="" href="./cumplir-requisitos-de-archivo.html">
+          <span class="tool-icon">☑</span>
+          <span class="tool-body"><strong>Cumplir requisitos</strong><small>Valida y ajusta un archivo a requisitos de peso, dimensiones y formato.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="workflow" data-category="images" data-input-formats="JPEG PNG WebP" data-output-formats="JPEG PNG WebP" data-keywords="" href="./flujo-de-imagenes.html">
+          <span class="tool-icon">⛓</span>
+          <span class="tool-body"><strong>Flujo reutilizable</strong><small>Crea y guarda flujos de procesamiento para encadenar múltiples operaciones.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="advancedConvert" data-category="images" data-input-formats="JPEG PNG WebP" data-output-formats="JPEG PNG WebP" data-keywords="" href="./conversor-avanzado-de-imagenes.html">
+          <span class="tool-icon">⇄</span>
+          <span class="tool-body"><strong>Conversor avanzado</strong><small>Convierte, redimensiona, rota, voltea y añade marca de agua a una o varias imágenes.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="convert" data-category="images" data-input-formats="JPEG" data-output-formats="PNG" data-keywords="" href="./jpg-a-png.html">
+          <span class="tool-icon">⇄</span>
+          <span class="tool-body"><strong>JPG a PNG</strong><small>Convierte una o varias imágenes JPG al formato PNG.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="convert" data-category="images" data-input-formats="PNG" data-output-formats="JPEG" data-keywords="" href="./png-a-jpg.html">
+          <span class="tool-icon">⇄</span>
+          <span class="tool-body"><strong>PNG a JPG</strong><small>Convierte una o varias imágenes PNG al formato JPG.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="convert" data-category="images" data-input-formats="JPEG" data-output-formats="WebP" data-keywords="" href="./jpg-a-webp.html">
+          <span class="tool-icon">⇄</span>
+          <span class="tool-body"><strong>JPG a WebP</strong><small>Convierte una o varias imágenes JPG al formato WebP.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="convert" data-category="images" data-input-formats="WebP" data-output-formats="JPEG" data-keywords="" href="./webp-a-jpg.html">
+          <span class="tool-icon">⇄</span>
+          <span class="tool-body"><strong>WebP a JPG</strong><small>Convierte una o varias imágenes WebP al formato JPG.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="convert" data-category="images" data-input-formats="PNG" data-output-formats="WebP" data-keywords="" href="./png-a-webp.html">
+          <span class="tool-icon">⇄</span>
+          <span class="tool-body"><strong>PNG a WebP</strong><small>Convierte una o varias imágenes PNG al formato WebP.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="convert" data-category="images" data-input-formats="WebP" data-output-formats="PNG" data-keywords="" href="./webp-a-png.html">
+          <span class="tool-icon">⇄</span>
+          <span class="tool-body"><strong>WebP a PNG</strong><small>Convierte una o varias imágenes WebP al formato PNG.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="imagesPdf" data-category="pdf" data-input-formats="JPEG" data-output-formats="PDF" data-keywords="" href="./jpg-a-pdf.html">
+          <span class="tool-icon">▤</span>
+          <span class="tool-body"><strong>JPG a PDF</strong><small>Convierte una o varias imágenes JPG a un archivo PDF.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="imagesPdf" data-category="pdf" data-input-formats="PNG" data-output-formats="PDF" data-keywords="" href="./png-a-pdf.html">
+          <span class="tool-icon">▤</span>
+          <span class="tool-body"><strong>PNG a PDF</strong><small>Convierte una o varias imágenes PNG a un archivo PDF.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="pdfToImages" data-category="pdf" data-input-formats="PDF" data-output-formats="JPEG" data-keywords="" href="./pdf-a-jpg.html">
+          <span class="tool-icon">⬒</span>
+          <span class="tool-body"><strong>PDF a JPG</strong><small>Convierte las páginas de un PDF en imágenes JPG.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="pdfToImages" data-category="pdf" data-input-formats="PDF" data-output-formats="PNG" data-keywords="" href="./pdf-a-png.html">
+          <span class="tool-icon">⬒</span>
+          <span class="tool-body"><strong>PDF a PNG</strong><small>Convierte las páginas de un PDF en imágenes PNG.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="wordToPdf" data-category="documents" data-input-formats="DOC DOCX" data-output-formats="PDF" data-keywords="convertir word docx documento pdf" href="./word-a-pdf.html">
+          <span class="tool-icon">📝</span>
+          <span class="tool-body"><strong>Word a PDF</strong><small>Convierte documentos Word (DOC, DOCX) a formato PDF.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="wordToJpg" data-category="documents" data-input-formats="DOC DOCX" data-output-formats="JPEG" data-keywords="convertir imagen jpg jpeg captura" href="./word-a-jpg.html">
+          <span class="tool-icon">🖼</span>
+          <span class="tool-body"><strong>Word a JPG</strong><small>Convierte las páginas de documentos Word (DOC, DOCX) a imágenes JPG.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="wordToPng" data-category="documents" data-input-formats="DOC DOCX" data-output-formats="PNG" data-keywords="convertir imagen png captura página" href="./word-a-png.html">
+          <span class="tool-icon">🖼</span>
+          <span class="tool-body"><strong>Word a PNG</strong><small>Convierte las páginas de documentos Word (DOC, DOCX) a imágenes PNG sin pérdida.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="wordToTxt" data-category="documents" data-input-formats="DOC DOCX" data-output-formats="TXT" data-keywords="convertir texto txt plain text extraer" href="./word-a-txt.html">
+          <span class="tool-icon">📝</span>
+          <span class="tool-body"><strong>Word a TXT</strong><small>Extrae el texto plano de documentos Word (DOC, DOCX) sin formato.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="wordToHtml" data-category="documents" data-input-formats="DOC DOCX" data-output-formats="HTML" data-keywords="convertir html web página web" href="./word-a-html.html">
+          <span class="tool-icon">🌐</span>
+          <span class="tool-body"><strong>Word a HTML</strong><small>Convierte documentos Word (DOC, DOCX) a código HTML con formato preservado.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="wordToMarkdown" data-category="documents" data-input-formats="DOC DOCX" data-output-formats="Markdown" data-keywords="convertir markdown md formato" href="./word-a-markdown.html">
+          <span class="tool-icon">📋</span>
+          <span class="tool-body"><strong>Word a Markdown</strong><small>Convierte documentos Word (DOC, DOCX) a formato Markdown.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="wordToEpub" data-category="documents" data-input-formats="DOC DOCX" data-output-formats="EPUB" data-keywords="convertir epub libro ebook leer" href="./word-a-epub.html">
+          <span class="tool-icon">📚</span>
+          <span class="tool-body"><strong>Word a EPUB</strong><small>Convierte documentos Word (DOC, DOCX) a formato EPUB para e-readers.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="wordToOdt" data-category="documents" data-input-formats="DOC DOCX" data-output-formats="ODT" data-keywords="convertir odt libreoffice openoffice" href="./word-a-odt.html">
+          <span class="tool-icon">📝</span>
+          <span class="tool-body"><strong>Word a ODT</strong><small>Convierte documentos Word (DOC, DOCX) al formato ODT de OpenDocument.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="odtToWord" data-category="documents" data-input-formats="ODT" data-output-formats="DOCX" data-keywords="" href="./odt-a-word.html">
+          <span class="tool-icon">📝</span>
+          <span class="tool-body"><strong>ODT a Word</strong><small>Convierte documentos ODT al formato DOCX de Microsoft Word.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="rtfToWord" data-category="documents" data-input-formats="RTF" data-output-formats="DOCX" data-keywords="" href="./rtf-a-word.html">
+          <span class="tool-icon">📝</span>
+          <span class="tool-body"><strong>RTF a Word</strong><small>Convierte archivos RTF al formato DOCX de Microsoft Word.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="mergeWord" data-category="documents" data-input-formats="DOC DOCX" data-output-formats="DOCX" data-keywords="" href="./unir-documentos-word.html">
+          <span class="tool-icon">📝</span>
+          <span class="tool-body"><strong>Unir documentos Word</strong><small>Combina varios archivos Word en un solo documento DOCX.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="splitWord" data-category="documents" data-input-formats="DOC DOCX" data-output-formats="DOCX ZIP" data-keywords="" href="./dividir-documento-word.html">
+          <span class="tool-icon">✂</span>
+          <span class="tool-body"><strong>Dividir documento Word</strong><small>Divide un archivo Word en varios documentos por páginas o rangos.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="repairWord" data-category="documents" data-input-formats="DOC DOCX" data-output-formats="DOCX" data-keywords="reparar corrupto dañado arreglar word docx" href="./reparar-word.html">
+          <span class="tool-icon">🔧</span>
+          <span class="tool-body"><strong>Reparar documento Word</strong><small>Repara documentos Word dañados o corruptos para recuperar su contenido.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="compressWord" data-category="documents" data-input-formats="DOC DOCX" data-output-formats="DOCX" data-keywords="reducir peso tamaño comprimir word docx" href="./comprimir-word.html">
+          <span class="tool-icon">📦</span>
+          <span class="tool-body"><strong>Comprimir Word</strong><small>Reduce el peso de archivos Word optimizando imágenes y eliminando datos redundantes.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="stripMetadataWord" data-category="documents" data-input-formats="DOC DOCX" data-output-formats="DOCX" data-keywords="" href="./eliminar-metadatos-word.html">
+          <span class="tool-icon">🔒</span>
+          <span class="tool-body"><strong>Eliminar metadatos de Word</strong><small>Elimina los metadatos ocultos de documentos Word como autor, fecha e historial.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="formatDocument" data-category="documents" data-input-formats="DOC DOCX" data-output-formats="DOCX" data-keywords="" href="./uniformar-formato-documento.html">
+          <span class="tool-icon">🎨</span>
+          <span class="tool-body"><strong>Uniformar formato</strong><small>Normaliza el formato de un documento Word con fuente, tamaño y espaciado consistentes.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="tocWord" data-category="documents" data-input-formats="DOC DOCX" data-output-formats="DOCX" data-keywords="" href="./crear-tabla-de-contenido.html">
+          <span class="tool-icon">📑</span>
+          <span class="tool-body"><strong>Crear tabla de contenido</strong><small>Genera una tabla de contenido automática basada en los encabezados de un documento Word.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="extractWord" data-category="documents" data-input-formats="DOC DOCX" data-output-formats="TXT CSV JSON ZIP" data-keywords="" href="./extraer-contenido-word.html">
+          <span class="tool-icon">📤</span>
+          <span class="tool-body"><strong>Extraer contenido de Word</strong><small>Extrae diferentes tipos de contenido de documentos Word a varios formatos.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="findReplaceWord" data-category="documents" data-input-formats="DOC DOCX" data-output-formats="DOCX ZIP" data-keywords="" href="./buscar-reemplazar-documentos.html">
+          <span class="tool-icon">🔍</span>
+          <span class="tool-body"><strong>Buscar y reemplazar</strong><small>Realiza búsquedas y reemplazos de texto en documentos Word de forma masiva.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="tablesWordToExcel" data-category="documents" data-input-formats="DOC DOCX" data-output-formats="XLSX" data-keywords="" href="./tablas-word-a-excel.html">
+          <span class="tool-icon">📊</span>
+          <span class="tool-body"><strong>Tablas Word a Excel</strong><small>Extrae tablas de documentos Word y las exporta a formato Excel (XLSX).</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="removeBlankPagesWord" data-category="documents" data-input-formats="DOC DOCX" data-output-formats="DOCX" data-keywords="" href="./eliminar-paginas-en-blanco-word.html">
+          <span class="tool-icon">📄</span>
+          <span class="tool-body"><strong>Eliminar páginas en blanco</strong><small>Elimina automáticamente las páginas en blanco vacías de documentos Word.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="txtToPdf" data-category="text" data-input-formats="TXT" data-output-formats="PDF" data-keywords="convertir pdf documento formato imprimir" href="./txt-a-pdf.html">
+          <span class="tool-icon">📄</span>
+          <span class="tool-body"><strong>TXT a PDF</strong><small>Convierte archivos de texto plano TXT al formato PDF.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="txtToEpub" data-category="text" data-input-formats="TXT" data-output-formats="EPUB" data-keywords="convertir epub libro ebook formato" href="./txt-a-epub.html">
+          <span class="tool-icon">📚</span>
+          <span class="tool-body"><strong>TXT a EPUB</strong><small>Convierte archivos de texto plano TXT al formato EPUB para e-readers.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="mergeTxt" data-category="text" data-input-formats="TXT" data-output-formats="TXT" data-keywords="unir combinar juntar fusionar texto" href="./unir-archivos-txt.html">
+          <span class="tool-icon">📎</span>
+          <span class="tool-body"><strong>Unir archivos TXT</strong><small>Combina varios archivos TXT en un solo archivo de texto.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="splitTxt" data-category="text" data-input-formats="TXT" data-output-formats="TXT ZIP" data-keywords="dividir separar partir archivos texto" href="./dividir-archivo-txt.html">
+          <span class="tool-icon">✂</span>
+          <span class="tool-body"><strong>Dividir archivo TXT</strong><small>Divide un archivo TXT en varios fragmentos por líneas o por tamaño.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="sortLines" data-category="text" data-input-formats="TXT" data-output-formats="TXT" data-keywords="" href="./ordenar-lineas-texto.html">
+          <span class="tool-icon">🔤</span>
+          <span class="tool-body"><strong>Ordenar líneas de texto</strong><small>Ordena las líneas de un archivo TXT de forma alfanumérica o personalizada.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="removeDuplicates" data-category="text" data-input-formats="TXT" data-output-formats="TXT" data-keywords="" href="./eliminar-filas-duplicadas.html">
+          <span class="tool-icon">🗑</span>
+          <span class="tool-body"><strong>Eliminar filas duplicadas</strong><small>Elimina las líneas duplicadas de un archivo TXT manteniendo solo ocurrencias únicas.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="listToTable" data-category="text" data-input-formats="TXT" data-output-formats="HTML CSV Markdown XLSX" data-keywords="" href="./convertir-listas-en-tablas.html">
+          <span class="tool-icon">📊</span>
+          <span class="tool-body"><strong>Convertir listas en tablas</strong><small>Transforma listas de texto en tablas estructuradas con múltiples formatos de salida.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="epubToTxt" data-category="ebooks" data-input-formats="EPUB" data-output-formats="TXT" data-keywords="convertir texto txt plain text extraer" href="./epub-a-txt.html">
+          <span class="tool-icon">📄</span>
+          <span class="tool-body"><strong>EPUB a TXT</strong><small>Extrae el texto plano de archivos EPUB sin formato ni diseño.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="epubToHtml" data-category="ebooks" data-input-formats="EPUB" data-output-formats="HTML ZIP" data-keywords="convertir html web página web leer" href="./epub-a-html.html">
+          <span class="tool-icon">🌐</span>
+          <span class="tool-body"><strong>EPUB a HTML</strong><small>Convierte archivos EPUB a páginas HTML con formato preservado.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="epubToMarkdown" data-category="ebooks" data-input-formats="EPUB" data-output-formats="Markdown ZIP" data-keywords="convertir markdown md formato libro" href="./epub-a-markdown.html">
+          <span class="tool-icon">📋</span>
+          <span class="tool-body"><strong>EPUB a Markdown</strong><small>Convierte archivos EPUB a formato Markdown con estructura de capítulos.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="mergeEpub" data-category="ebooks" data-input-formats="EPUB" data-output-formats="EPUB" data-keywords="" href="./unir-epub.html">
+          <span class="tool-icon">📚</span>
+          <span class="tool-body"><strong>Unir libros EPUB</strong><small>Combina varios archivos EPUB en un solo libro electrónico.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="splitEpub" data-category="ebooks" data-input-formats="EPUB" data-output-formats="EPUB ZIP" data-keywords="dividir separar capítulos partir libro" href="./dividir-epub-por-capitulos.html">
+          <span class="tool-icon">✂</span>
+          <span class="tool-body"><strong>Dividir EPUB por capítulos</strong><small>Divide un archivo EPUB en varios archivos EPUB por capítulo o por rango.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="editMetadataEpub" data-category="ebooks" data-input-formats="EPUB" data-output-formats="EPUB" data-keywords="" href="./editar-metadatos-epub.html">
+          <span class="tool-icon">🏷</span>
+          <span class="tool-body"><strong>Editar metadatos EPUB</strong><small>Modifica los metadatos de un archivo EPUB: título, autor, idioma y más.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="coverEpub" data-category="ebooks" data-input-formats="EPUB" data-output-formats="JPEG PNG WebP" data-keywords="" href="./extraer-portada-epub.html">
+          <span class="tool-icon">🖼</span>
+          <span class="tool-body"><strong>Extraer portada EPUB</strong><small>Extrae la imagen de portada de un archivo EPUB en formato imagen.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="imagesEpub" data-category="ebooks" data-input-formats="EPUB" data-output-formats="JPEG PNG ZIP" data-keywords="" href="./extraer-imagenes-epub.html">
+          <span class="tool-icon">🖼</span>
+          <span class="tool-body"><strong>Extraer imágenes EPUB</strong><small>Extrae todas las imágenes contenidas en un archivo EPUB.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="validateEpub" data-category="ebooks" data-input-formats="EPUB" data-output-formats="TXT" data-keywords="" href="./validar-epub.html">
+          <span class="tool-icon">✅</span>
+          <span class="tool-body"><strong>Validar EPUB</strong><small>Valida la estructura y conformidad de un archivo EPUB con el estándar.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="repairEpub" data-category="ebooks" data-input-formats="EPUB" data-output-formats="EPUB" data-keywords="reparar corrupto dañado arreglar epub" href="./reparar-epub.html">
+          <span class="tool-icon">🔧</span>
+          <span class="tool-body"><strong>Reparar EPUB</strong><small>Repara la estructura y contenido de archivos EPUB dañados o corruptos.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="csvToExcel" data-category="spreadsheets" data-input-formats="CSV" data-output-formats="XLSX" data-keywords="convertir excel xlsx hoja de cálculo datos" href="./csv-a-excel.html">
+          <span class="tool-icon">📊</span>
+          <span class="tool-body"><strong>CSV a Excel</strong><small>Convierte archivos CSV a formato Excel (XLSX) de forma rápida y automática.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="excelToCsv" data-category="spreadsheets" data-input-formats="XLSX XLS" data-output-formats="CSV" data-keywords="" href="./excel-a-csv.html">
+          <span class="tool-icon">📋</span>
+          <span class="tool-body"><strong>Excel a CSV</strong><small>Exporta archivos Excel a formato CSV con configuración de separador y codificación.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="excelToJson" data-category="spreadsheets" data-input-formats="XLSX XLS" data-output-formats="JSON" data-keywords="" href="./excel-a-json.html">
+          <span class="tool-icon">{ }</span>
+          <span class="tool-body"><strong>Excel a JSON</strong><small>Convierte archivos Excel a JSON con detección automática de tipos de datos.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="jsonToExcel" data-category="spreadsheets" data-input-formats="JSON" data-output-formats="XLSX" data-keywords="" href="./json-a-excel.html">
+          <span class="tool-icon">📊</span>
+          <span class="tool-body"><strong>JSON a Excel</strong><small>Convierte archivos JSON en hojas de cálculo Excel (.xlsx) editables.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="csvToJson" data-category="spreadsheets" data-input-formats="CSV" data-output-formats="JSON" data-keywords="convertir json datos estructura formato" href="./csv-a-json.html">
+          <span class="tool-icon">{ }</span>
+          <span class="tool-body"><strong>CSV a JSON</strong><small>Convierte archivos CSV a formato JSON con detección automática de separador.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="jsonToCsv" data-category="spreadsheets" data-input-formats="JSON" data-output-formats="CSV" data-keywords="convertir csv datos tabla formato" href="./json-a-csv.html">
+          <span class="tool-icon">📋</span>
+          <span class="tool-body"><strong>JSON a CSV</strong><small>Convierte archivos JSON a formato CSV con separador configurable.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="xmlToJson" data-category="spreadsheets" data-input-formats="XML" data-output-formats="JSON" data-keywords="convertir json datos estructura formato" href="./xml-a-json.html">
+          <span class="tool-icon">{ }</span>
+          <span class="tool-body"><strong>XML a JSON</strong><small>Convierte archivos XML a formato JSON conservando la jerarquía y atributos.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="jsonToXml" data-category="spreadsheets" data-input-formats="JSON" data-output-formats="XML" data-keywords="convertir xml datos estructura formato" href="./json-a-xml.html">
+          <span class="tool-icon">📄</span>
+          <span class="tool-body"><strong>JSON a XML</strong><small>Convierte archivos JSON a formato XML válido con estructura configurable.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="mergeExcel" data-category="spreadsheets" data-input-formats="XLSX XLS" data-output-formats="XLSX" data-keywords="unir combinar juntar fusionar libros" href="./unir-excel.html">
+          <span class="tool-icon">🔗</span>
+          <span class="tool-body"><strong>Unir archivos Excel</strong><small>Combina múltiples archivos Excel en un solo libro con todas sus hojas.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="splitExcel" data-category="spreadsheets" data-input-formats="XLSX XLS" data-output-formats="XLSX" data-keywords="dividir separar hojas partir rango" href="./dividir-excel.html">
+          <span class="tool-icon">✂</span>
+          <span class="tool-body"><strong>Dividir archivo Excel</strong><small>Divide un archivo Excel en múltiples archivos por hojas, filas o rangos.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="compareExcel" data-category="spreadsheets" data-input-formats="XLSX XLS" data-output-formats="TXT" data-keywords="" href="./comparar-excel.html">
+          <span class="tool-icon">🔍</span>
+          <span class="tool-body"><strong>Comparar archivos Excel</strong><small>Detecta diferencias celda por celda entre dos archivos Excel.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="xlsToXlsx" data-category="spreadsheets" data-input-formats="XLS" data-output-formats="XLSX" data-keywords="convertir excel xls xlsx antiguo moderno" href="./xls-a-xlsx.html">
+          <span class="tool-icon">🔄</span>
+          <span class="tool-body"><strong>XLS a XLSX</strong><small>Convierte archivos Excel antiguos (XLS) al formato moderno (XLSX).</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="xlsxToOds" data-category="spreadsheets" data-input-formats="XLSX" data-output-formats="ODS" data-keywords="convertir ods libreoffice openoffice excel" href="./xlsx-a-ods.html">
+          <span class="tool-icon">📄</span>
+          <span class="tool-body"><strong>XLSX a ODS</strong><small>Convierte archivos Excel al formato OpenDocument Spreadsheet (ODS).</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="odsToXlsx" data-category="spreadsheets" data-input-formats="ODS" data-output-formats="XLSX" data-keywords="convertir xlsx excel ods libreoffice" href="./ods-a-xlsx.html">
+          <span class="tool-icon">📊</span>
+          <span class="tool-body"><strong>ODS a XLSX</strong><small>Convierte archivos ODS de LibreOffice al formato Excel (XLSX).</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="rotatePdf" data-category="pdf" data-input-formats="PDF" data-output-formats="PDF" data-keywords="girar rotar voltear orientacion rotacion vertical horizontal" href="./girar-pdf.html">
+          <span class="tool-icon">↻</span>
+          <span class="tool-body"><strong>Girar páginas PDF</strong><small>Cambia la orientación de las páginas de un documento PDF con un solo clic.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="deletePagesPdf" data-category="pdf" data-input-formats="PDF" data-output-formats="PDF" data-keywords="eliminar borrar quitar paginas suprimir remover" href="./eliminar-paginas-pdf.html">
+          <span class="tool-icon">✕</span>
+          <span class="tool-body"><strong>Eliminar páginas PDF</strong><small>Selecciona y elimina las páginas que no necesitas de un documento PDF.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="reversePagesPdf" data-category="pdf" data-input-formats="PDF" data-output-formats="PDF" data-keywords="invertir revertir orden reves inverso alreves" href="./invertir-orden-pdf.html">
+          <span class="tool-icon">⇅</span>
+          <span class="tool-body"><strong>Invertir orden de páginas PDF</strong><small>Pon las páginas de un PDF en orden inverso con un solo clic.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="duplicatePagesPdf" data-category="pdf" data-input-formats="PDF" data-output-formats="PDF" data-keywords="duplicar copiar repetir paginas clonar" href="./duplicar-paginas-pdf.html">
+          <span class="tool-icon">⧉</span>
+          <span class="tool-body"><strong>Duplicar páginas PDF</strong><small>Repite páginas seleccionadas o todo el documento tantas veces como necesites.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="insertBlankPagesPdf" data-category="pdf" data-input-formats="PDF" data-output-formats="PDF" data-keywords="insertar agregar añadir blanco vacio pagina nueva" href="./insertar-paginas-en-blanco-pdf.html">
+          <span class="tool-icon">＋</span>
+          <span class="tool-body"><strong>Insertar páginas en blanco PDF</strong><small>Añade hojas vacías donde las necesites de un documento PDF.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="editMetadataPdf" data-category="pdf" data-input-formats="PDF" data-output-formats="PDF" data-keywords="metadatos titulo autor propiedades informacion edicion" href="./editar-metadatos-pdf.html">
+          <span class="tool-icon">🏷</span>
+          <span class="tool-body"><strong>Editar metadatos PDF</strong><small>Actualiza la información del documento como título, autor y palabras clave.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
       </div>
 
-      <p class="empty-tools" id="emptyTools" hidden>No encontramos una herramienta con ese nombre.</p>
+      <div class="empty-tools" id="emptyTools" hidden>
+        <p class="empty-tools-title">No encontramos una herramienta para esa búsqueda.</p>
+        <p class="empty-tools-sub">Prueba con otro formato o una acción más general.</p>
+        <div class="empty-tools-suggestions">
+          <a href="./comprimir-imagen.html" class="empty-suggest">Comprimir imagen</a>
+          <a href="./convertir-imagen.html" class="empty-suggest">Convertir imagen</a>
+          <a href="./word-a-pdf.html" class="empty-suggest">Word a PDF</a>
+          <a href="./unir-pdf.html" class="empty-suggest">Unir PDF</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="why-section" id="por-que-toolisto">
+      <div class="why-inner">
+        <h2>¿Por qué Toolisto?</h2>
+        <div class="why-grid">
+          <div class="why-card">
+            <div class="why-icon">🔒</div>
+            <h3>Privacidad</h3>
+            <p>Todos los archivos se procesan directamente en tu navegador. Nada se sube a servidores externos.</p>
+          </div>
+          <div class="why-card">
+            <div class="why-icon">🚫</div>
+            <h3>Sin registro</h3>
+            <p>No necesitas crear una cuenta ni proporcionar datos personales para usar ninguna herramienta.</p>
+          </div>
+          <div class="why-card">
+            <div class="why-icon">🧰</div>
+            <h3>Muchas tareas, un solo lugar</h3>
+            <p>Más de 80 herramientas para comprimir, convertir, organizar y mejorar archivos de todo tipo.</p>
+          </div>
+          <div class="why-card">
+            <div class="why-icon">⚡</div>
+            <h3>Acceso rápido</h3>
+            <p>Abre la herramienta que necesitas en un clic, sin esperas ni publicidad invasiva.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="how-section" id="como-funciona">
+      <div class="how-inner">
+        <h2>¿Cómo funciona?</h2>
+        <div class="how-steps">
+          <div class="how-step">
+            <div class="step-number">1</div>
+            <h3>Encuentra</h3>
+            <p>Busca la herramienta que necesitas entre las disponibles o explora por categoría.</p>
+          </div>
+          <div class="how-step">
+            <div class="step-number">2</div>
+            <h3>Selecciona</h3>
+            <p>Elige la herramienta y ajusta los parámetros según lo que necesites.</p>
+          </div>
+          <div class="how-step">
+            <div class="step-number">3</div>
+            <h3>Procesa</h3>
+            <p>Tu archivo se procesa directamente en tu navegador y se descarga automáticamente.</p>
+          </div>
+        </div>
+      </div>
     </section>
 
     <section class="local-banner" id="privacidad">
@@ -174,27 +836,6 @@
       <a href="#inicio">Probar una herramienta →</a>
     </section>
   </main>
-
-  <dialog class="result-dialog" id="resultDialog">
-    <button class="dialog-close" id="dialogClose" type="button" aria-label="Cerrar">×</button>
-    <div class="result-symbol" id="resultSymbol">✓</div>
-    <span class="section-overline">Proceso completado</span>
-    <h2 id="resultTitle">Tu archivo está listo</h2>
-    <p id="resultMessage">Revisa el resultado y descárgalo.</p>
-    <div class="result-stats" id="resultStats"></div>
-    <div class="preview-area" id="previewArea"></div>
-    <div class="dialog-actions">
-      <button class="primary-button" id="downloadButton" type="button">Descargar resultado</button>
-      <button class="secondary-button" id="resetButton" type="button">Preparar otro archivo</button>
-    </div>
-  </dialog>
-
-  <dialog class="picker-dialog" id="pickerDialog">
-    <button class="dialog-close" id="pickerClose" type="button" aria-label="Cerrar">×</button>
-    <span class="section-overline">Seleccionar herramienta</span>
-    <h2>¿Qué quieres hacer con estos archivos?</h2>
-    <div class="picker-grid" id="pickerGrid"></div>
-  </dialog>
 
   <footer class="site-footer">
     <div class="footer-inner">
@@ -215,8 +856,12 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
-  <script type="module" src="./js/app.js"></script>
+  </div>
+
+  <script src="./vendor/pdflib/pdf-lib.min.js"></script>
+  <script src="./vendor/pdfjs/pdf.min.js"></script>
+  <script src="./vendor/jszip/jszip.min.js"></script>
+  <script src="./tool-processors.js"></script>
+<script src="./app.js"></script>
 </body>
 </html>

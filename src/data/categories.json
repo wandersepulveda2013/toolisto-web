@@ -1,0 +1,79 @@
+[
+  {
+    "id": "pdf",
+    "name": "PDF",
+    "slug": "pdf",
+    "description": "Herramientas para dividir, unir, convertir y gestionar documentos PDF.",
+    "toolIds": ["mergePdf", "splitPdf", "reorderPdf", "pdfToImages", "imagesPdf", "signPdf", "rotatePdf", "deletePagesPdf", "reversePagesPdf", "duplicatePagesPdf", "insertBlankPagesPdf", "editMetadataPdf", "compressPdf", "interleavePdf", "cropPdf", "resizePdfPages", "nUpPdf", "splitDoublePdf", "bookletPdf", "watermarkPdf", "addPageNumbersPdf", "addHeaderFooterPdf"],
+    "slugs": ["unir-pdf", "dividir-pdf", "organizar-pdf", "pdf-a-imagenes", "imagenes-a-pdf", "firmar-pdf", "jpg-a-pdf", "png-a-pdf", "pdf-a-jpg", "pdf-a-png", "girar-pdf", "eliminar-paginas-pdf", "invertir-orden-pdf", "duplicar-paginas-pdf", "insertar-paginas-en-blanco-pdf", "editar-metadatos-pdf", "comprimir-pdf", "intercalar-pdf", "recortar-pdf", "cambiar-tamano-paginas-pdf", "varias-paginas-por-hoja-pdf", "dividir-paginas-dobles-pdf", "crear-cuadernillo-pdf", "agregar-marca-de-agua-pdf", "numerar-paginas-pdf", "encabezado-pie-pdf"],
+    "icon": "📄",
+    "enabled": true,
+    "lastModified": "2026-07-24"
+  },
+  {
+    "id": "images",
+    "name": "Imágenes",
+    "slug": "imagenes",
+    "description": "Herramientas para comprimir, convertir, recortar y editar imágenes.",
+    "toolIds": ["compress", "crop", "convert", "batchCompress", "stripMetadata", "socialCrop", "removeObjects", "docPhoto", "censor", "fixFormat", "rescueDoc", "fileCompliance", "workflow", "advancedConvert"],
+    "slugs": ["comprimir-imagen", "redimensionar-imagen", "convertir-imagen", "comprimir-imagenes", "eliminar-metadatos-de-imagen", "recortar-imagen-para-redes-sociales", "borrar-objetos-de-imagen", "foto-para-documentos", "censurar-imagen", "reparar-formato-de-imagen", "mejorar-documento-fotografiado", "cumplir-requisitos-de-archivo", "flujo-de-imagenes", "conversor-avanzado-de-imagenes", "jpg-a-png", "png-a-jpg", "jpg-a-webp", "webp-a-jpg", "png-a-webp", "webp-a-png"],
+    "icon": "🖼",
+    "enabled": true,
+    "lastModified": "2026-07-24"
+  },
+  {
+    "id": "signatures",
+    "name": "Firmas",
+    "slug": "firmas",
+    "description": "Herramientas para crear, limpiar y colocar firmas en documentos.",
+    "toolIds": ["signature", "signPdf"],
+    "slugs": ["limpiar-firma", "firmar-pdf"],
+    "icon": "✍",
+    "enabled": true,
+    "lastModified": "2026-07-24"
+  },
+  {
+    "id": "documents",
+    "name": "Word, ODT y RTF",
+    "slug": "documentos-word",
+    "description": "Herramientas para convertir, dividir, unir y reparar documentos Word, ODT y RTF.",
+    "toolIds": ["wordToPdf", "wordToJpg", "wordToPng", "wordToTxt", "wordToHtml", "wordToMarkdown", "wordToEpub", "wordToOdt", "odtToWord", "rtfToWord", "mergeWord", "splitWord", "repairWord", "compressWord", "stripMetadataWord", "formatDocument", "tocWord", "extractWord", "findReplaceWord", "tablesWordToExcel", "removeBlankPagesWord"],
+    "slugs": ["word-a-pdf", "word-a-jpg", "word-a-png", "word-a-txt", "word-a-html", "word-a-markdown", "word-a-epub", "word-a-odt", "odt-a-word", "rtf-a-word", "unir-documentos-word", "dividir-documento-word", "reparar-word", "comprimir-word", "eliminar-metadatos-word", "uniformar-formato-documento", "crear-tabla-de-contenido", "extraer-contenido-word", "buscar-reemplazar-documentos", "tablas-word-a-excel", "eliminar-paginas-en-blanco-word"],
+    "icon": "📝",
+    "enabled": true,
+    "lastModified": "2026-07-24"
+  },
+  {
+    "id": "text",
+    "name": "Texto y TXT",
+    "slug": "texto",
+    "description": "Herramientas para procesar, convertir y organizar archivos de texto plano.",
+    "toolIds": ["txtToPdf", "txtToEpub", "mergeTxt", "splitTxt", "sortLines", "removeDuplicates", "listToTable"],
+    "slugs": ["txt-a-pdf", "txt-a-epub", "unir-archivos-txt", "dividir-archivo-txt", "ordenar-lineas-texto", "eliminar-filas-duplicadas", "convertir-listas-en-tablas"],
+    "icon": "📄",
+    "enabled": true,
+    "lastModified": "2026-07-24"
+  },
+  {
+    "id": "ebooks",
+    "name": "EPUB y MOBI",
+    "slug": "epub-mobi",
+    "description": "Herramientas para convertir, editar y gestionar libros electrónicos EPUB y MOBI.",
+    "toolIds": ["epubToTxt", "epubToHtml", "epubToMarkdown", "mergeEpub", "splitEpub", "editMetadataEpub", "coverEpub", "imagesEpub", "validateEpub", "repairEpub"],
+    "slugs": ["epub-a-txt", "epub-a-html", "epub-a-markdown", "unir-epub", "dividir-epub-por-capitulos", "editar-metadatos-epub", "extraer-portada-epub", "extraer-imagenes-epub", "validar-epub", "reparar-epub"],
+    "icon": "📚",
+    "enabled": true,
+    "lastModified": "2026-07-24"
+  },
+  {
+    "id": "spreadsheets",
+    "name": "Hojas de cálculo y datos",
+    "slug": "hojas-de-calculo",
+    "description": "Herramientas para convertir, fusionar y gestionar archivos CSV, Excel, JSON y XML.",
+    "toolIds": ["csvToExcel", "excelToCsv", "excelToJson", "jsonToExcel", "csvToJson", "jsonToCsv", "xmlToJson", "jsonToXml", "mergeExcel", "splitExcel", "compareExcel", "xlsToXlsx", "xlsxToOds", "odsToXlsx"],
+    "slugs": ["csv-a-excel", "excel-a-csv", "excel-a-json", "json-a-excel", "csv-a-json", "json-a-csv", "xml-a-json", "json-a-xml", "unir-excel", "dividir-excel", "comparar-excel", "xls-a-xlsx", "xlsx-a-ods", "ods-a-xlsx"],
+    "icon": "📊",
+    "enabled": true,
+    "lastModified": "2026-07-24"
+  }
+]

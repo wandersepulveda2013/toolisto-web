@@ -3,3 +3,8 @@ app.js
 node_modules/
 .DS_Store
 Thumbs.db
+screenshots/
+test-results/
+*.log
+.env
+.env.*

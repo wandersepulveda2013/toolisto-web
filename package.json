@@ -1,0 +1,28 @@
+{
+  "name": "toolisto-directo-v2",
+  "version": "1.0.0",
+  "description": "Rediseño de Toolisto enfocado en utilidad inmediata. La portada deja de parecer una presentación promocional y funciona como una aplicación web desde el primer vistazo.",
+  "main": "app.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wandersepulveda2013/toolisto-web.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/wandersepulveda2013/toolisto-web/issues"
+  },
+  "homepage": "https://github.com/wandersepulveda2013/toolisto-web#readme",
+  "devDependencies": {
+    "playwright": "^1.61.1"
+  }
+}

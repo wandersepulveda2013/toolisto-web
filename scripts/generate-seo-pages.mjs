@@ -1,0 +1,462 @@
+#!/usr/bin/env node
+import { readFileSync, writeFileSync, mkdirSync, cpSync, existsSync } from 'node:fs';
+import { join, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const ROOT = join(__dirname, '..');
+const SRC = join(ROOT, 'src');
+const DATA = join(SRC, 'data');
+const DIST = join(ROOT, 'dist');
+
+function loadJSON(name) {
+  return JSON.parse(readFileSync(join(DATA, name), 'utf-8'));
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function escAttr(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+const isProduction = process.argv.includes('--production');
+const site = loadJSON('site.config.json');
+if (isProduction && site.productionDomain) {
+  site.siteUrl = site.productionDomain;
+}
+if (site.siteUrl.includes('DOMINIO-REAL-DE-TOOLISTO.com')) {
+  console.error('ERROR: site.config.json siteUrl still contains placeholder "DOMINIO-REAL-DE-TOOLISTO.com". Set a real domain before building.');
+  process.exit(1);
+}
+if (isProduction && site.siteUrl.endsWith('.invalid')) {
+  console.error('ERROR: Production build rejected. siteUrl ends with .invalid:', site.siteUrl);
+  console.error('Replace siteUrl or productionDomain in src/data/site.config.json with your real domain before deploying.');
+  process.exit(1);
+}
+if (site.siteUrl.endsWith('.invalid')) {
+  console.warn('WARNING: siteUrl uses .invalid domain:', site.siteUrl, '\n  This is OK for local development. Use --production to enforce a real domain.');
+}
+
+const tools = loadJSON('tools.json');
+const categories = loadJSON('categories.json');
+const redirects = loadJSON('redirects.json');
+const TODAY = site.buildDate || new Date().toISOString().slice(0, 10);
+
+mkdirSync(DIST, { recursive: true });
+mkdirSync(join(DIST, 'assets'), { recursive: true });
+mkdirSync(join(DIST, 'vendor'), { recursive: true });
+mkdirSync(join(DIST, 'js'), { recursive: true });
+
+const ASSETS_SRC = join(ROOT, 'assets');
+if (existsSync(ASSETS_SRC)) cpSync(ASSETS_SRC, join(DIST, 'assets'), { recursive: true });
+cpSync(join(ROOT, 'vendor'), join(DIST, 'vendor'), { recursive: true });
+cpSync(join(ROOT, 'app.js'), join(DIST, 'js', 'app.js'));
+cpSync(join(ROOT, 'tool-processors.js'), join(DIST, 'js', 'tool-processors.js'));
+
+const splashCSS = `<style>
+html.intro-pending, html.intro-pending body { background: #1C1D21; overflow: hidden; }
+html.intro-pending #toolisto-app { visibility: hidden; opacity: 0; pointer-events: none; }
+html.intro-pending .site-header, html.intro-pending main, html.intro-pending .site-footer { visibility: hidden; opacity: 0; pointer-events: none; }
+#toolisto-intro { position: fixed; inset: 0; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #1C1D21; gap: 16px; opacity: 1; transition: opacity 280ms ease; }
+#toolisto-intro.is-leaving { opacity: 0; pointer-events: none; }
+#toolisto-intro .intro-mark { width: 80px; height: 80px; animation: introScale 180ms ease-out both; }
+#toolisto-intro .intro-name { color: #F5F4EF; font-size: 1.8rem; font-weight: 700; letter-spacing: -0.04em; font-family: Inter, ui-sans-serif, system-ui, sans-serif; }
+#toolisto-intro .intro-accent { width: 48px; height: 3px; background: #2563EB; border-radius: 2px; animation: introScale 180ms 60ms ease-out both; }
+@keyframes introScale { from { opacity: 0; transform: scale(0.85); } to { opacity: 1; transform: scale(1); } }
+@media (prefers-reduced-motion: reduce) { #toolisto-intro .intro-mark, #toolisto-intro .intro-accent { animation: none; } #toolisto-intro { transition: opacity 120ms ease; } }
+</style>
+<noscript><style>#toolisto-intro{display:none!important}.site-header,main,.site-footer{visibility:visible!important;opacity:1!important;pointer-events:auto!important}html,body{overflow:auto!important;background:initial}</style></noscript>`;
+
+const splashHTML = `<div id="toolisto-intro" aria-hidden="true"><img class="intro-mark" src="./assets/toolisto-mark.svg" alt="" width="80" height="80" /><span class="intro-name">Toolisto</span><span class="intro-accent"></span></div>`;
+
+const splashScript = `<script>(function(){var i=document.getElementById('toolisto-intro');if(!i)return;var h=document.documentElement;var r=false;function c(){if(r)return;r=true;i.classList.add('is-leaving');function cl(){if(i.parentNode)i.remove();h.classList.remove('intro-pending');h.classList.remove('intro-active');document.body.style.overflow=''}i.addEventListener('transitionend',function(){i.removeEventListener('transitionend',cl);cl()});setTimeout(cl,350)}h.classList.add('intro-active');document.body.style.overflow='hidden';setTimeout(c,180);setTimeout(c,1300)})()</script>`;
+
+const headerNav = `<header class="site-header"><div class="header-inner"><a class="brand" href="./index.html" aria-label="Ir al inicio de Toolisto"><img class="brand-mark-img" src="./assets/toolisto-mark.svg" alt="" width="36" height="36" /><span class="brand-text">Toolisto</span></a><nav class="desktop-nav" aria-label="Categorías de herramientas"><a href="./index.html#herramientas" data-nav-filter="images">Imágenes</a><a href="./index.html#herramientas" data-nav-filter="pdf">PDF</a><a href="./index.html#herramientas" data-nav-filter="signatures">Firmas</a><a href="./index.html#herramientas" data-nav-filter="documents">Documentos</a><a href="./index.html#herramientas" data-nav-filter="spreadsheets">Hojas de cálculo</a><a href="./index.html#herramientas" data-nav-filter="all">Todas</a></nav><div class="header-actions"><a class="header-action-btn" href="./index.html#herramientas" aria-label="Buscar herramientas"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg></a><button class="header-action-btn" id="themeToggle" type="button" aria-label="Cambiar tema"><svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg><svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button><button class="menu-button" id="menuToggle" type="button" aria-expanded="false" aria-controls="mobileNav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button></div></div></header><nav class="mobile-nav" id="mobileNav" hidden><a href="./index.html#herramientas" data-nav-filter="images">Imágenes</a><a href="./index.html#herramientas" data-nav-filter="pdf">PDF</a><a href="./index.html#herramientas" data-nav-filter="signatures">Firmas</a><a href="./index.html#herramientas" data-nav-filter="all">Todas las herramientas</a></nav>`;
+
+const footerHTML = `<footer class="site-footer"><div class="footer-inner"><div class="footer-brand"><a class="brand" href="./index.html" aria-label="Ir al inicio de Toolisto"><img class="brand-mark-img" src="./assets/toolisto-mark.svg" alt="" width="28" height="28" /><span class="brand-text">Toolisto</span></a></div><nav aria-label="Enlaces del pie de página"><a href="./index.html#herramientas">Herramientas</a><a href="mailto:contacto@toolisto.com">Contacto</a></nav><small>© 2026 Toolisto · Tus archivos se quedan contigo.</small></div></footer>`;
+
+function buildRelatedToolGrid(tool) {
+  const slugs = (tool.relatedSlugs || []).slice(0, 6);
+  if (!slugs.length) return '';
+  const links = slugs.map(slug => {
+    const found = tools.find(t => t.slug === slug);
+    if (!found || !found.enabled) return '';
+    return `<a class="tool-card" data-tool="${escAttr(found.toolId)}" data-category="${escAttr(found.category)}" href="./${slug}.html"><span class="tool-icon">${escHtml(found.icon)}</span><span class="tool-body"><strong>${escHtml(found.name)}</strong></span><span class="tool-arrow" aria-hidden="true">→</span></a>`;
+  }).filter(Boolean).join('\n');
+  if (!links) return '';
+  return `<section class="related-tools"><h2>Herramientas relacionadas</h2><div class="tool-grid">${links}</div><p><a href="./index.html#herramientas">Ver todas las herramientas →</a></p></section>`;
+}
+
+function buildBreadcrumbs(items) {
+  const ol = items.map((item, i) => {
+    if (i === items.length - 1) return `<li aria-current="page">${escHtml(item.label)}</li>`;
+    return `<li><a href="${escAttr(item.href)}">${escHtml(item.label)}</a></li>`;
+  }).join('\n            ');
+  return `<nav aria-label="Ruta de navegación">\n  <ol class="breadcrumbs">\n    ${ol}\n  </ol>\n</nav>`;
+}
+
+function buildBreadcrumbLD(items) {
+  const itemListElement = items.map((item, i) => ({
+    "@type": "ListItem",
+    "position": i + 1,
+    "name": item.label,
+    "item": i < items.length - 1 ? site.siteUrl + new URL(item.href, 'https://x.com').pathname : undefined
+  })).filter(i => i.item !== undefined || i.position === items.length);
+  return JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": itemListElement.map(i => {
+      const clean = { "@type": "ListItem", "position": i.position, "name": i.name };
+      if (i.item) clean.item = i.item;
+      return clean;
+    })
+  }, null, 2);
+}
+
+function buildFAQ(faq) {
+  if (!faq || !faq.length) return '';
+  const items = faq.map(f => `
+    <details class="faq-item">
+      <summary>${escHtml(f.q)}</summary>
+      <p>${escHtml(f.a)}</p>
+    </details>`).join('\n');
+  const faqLD = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": faq.map(f => ({
+      "@type": "Question",
+      "name": f.q,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": f.a
+      }
+    }))
+  }, null, 2);
+  return `<section class="faq-section"><h2>Preguntas frecuentes</h2>${items}</section>\n<script type="application/ld+json">${faqLD}</script>`;
+}
+
+function buildToolPage(tool) {
+  const acceptMap = {
+    image: 'image/jpeg,image/png,image/webp',
+    images: 'image/jpeg,image/png,image/webp',
+    pdfs: 'application/pdf',
+    docs: 'application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    odt: 'application/vnd.oasis.opendocument.text',
+    odts: 'application/vnd.oasis.opendocument.text',
+    rtf: 'text/rtf,application/rtf',
+    rtfs: 'text/rtf,application/rtf',
+    txts: 'text/plain',
+    epubs: 'application/epub+zip',
+    mobis: 'application/x-mobipocket-ebook',
+    csvs: 'text/csv,.csv',
+    excels: 'application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,.xls,.xlsx',
+    xls: 'application/vnd.ms-excel,.xls',
+    xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,.xlsx',
+    ods: 'application/vnd.oasis.opendocument.spreadsheet,.ods',
+    jsons: 'application/json,.json',
+    xmls: 'application/xml,text/xml,.xml'
+  };
+  const multiple = tool.accepts === 'images' || tool.accepts === 'pdfs' || tool.accepts === 'docs' || tool.accepts === 'txts' || tool.accepts === 'epubs' || tool.accepts === 'csvs' || tool.accepts === 'excels' || tool.accepts === 'jsons' || tool.accepts === 'xmls';
+
+  const config = { toolId: tool.toolId };
+  if (tool.inputAccept) config.inputAccept = tool.inputAccept;
+  if (tool.preset) config.preset = tool.preset;
+
+  const faqSection = buildFAQ(tool.faq);
+  const relatedGridHTML = buildRelatedToolGrid(tool);
+
+  const instructionsHTML = tool.instructions ? `<section class="instructions"><h2>Cómo funciona</h2><ol>${tool.instructions.map(i => `<li>${escHtml(i)}</li>`).join('\n')}</ol></section>` : '';
+  const limitationsHTML = tool.limitations ? `<section class="limitations"><h2>Limitaciones</h2><ul>${tool.limitations.map(l => `<li>${escHtml(l)}</li>`).join('\n')}</ul></section>` : '';
+  const formatsHTML = `<section class="formats-info"><p><strong>Formatos de entrada:</strong> ${tool.inputFormats.join(', ')}</p><p><strong>Formatos de salida:</strong> ${tool.outputFormats.join(', ')}</p></section>`;
+
+  const breadcrumbs = [
+    { label: 'Inicio', href: './index.html' },
+    { label: tool.name, href: `./${tool.slug}.html` }
+  ];
+  const catDef = categories.find(c => c.toolIds.includes(tool.toolId));
+  if (catDef) breadcrumbs.splice(1, 0, { label: catDef.name, href: `./${catDef.slug}.html` });
+
+  const toolPageConfig = `<script type="application/json" id="tool-page-config">${JSON.stringify(config)}</script>`;
+
+  return `<!doctype html>
+<html lang="es-419" class="intro-pending">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>${escHtml(tool.title)}</title>
+  <meta name="description" content="${escAttr(tool.description)}">
+  <link rel="canonical" href="${site.siteUrl}/${tool.slug}">
+  <meta name="robots" content="index, follow">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Toolisto">
+  <meta property="og:title" content="${escAttr(tool.title)}">
+  <meta property="og:description" content="${escAttr(tool.description)}">
+  <meta property="og:url" content="${site.siteUrl}/${tool.slug}">
+  <meta property="og:image" content="${site.siteUrl}${tool.ogImage || site.defaultOgImage}">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="${escAttr(tool.title)}">
+  <meta name="twitter:description" content="${escAttr(tool.description)}">
+  <meta name="twitter:image" content="${site.siteUrl}${tool.ogImage || site.defaultOgImage}">
+  <meta name="theme-color" content="${site.themeColor}">
+  <link rel="icon" type="image/svg+xml" href="./assets/toolisto-mark.svg">
+  <link rel="stylesheet" href="./styles.css">
+  ${splashCSS}
+  <script type="application/ld+json">${JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": tool.name,
+    "url": `${site.siteUrl}/${tool.slug}`,
+    "description": tool.description,
+    "applicationCategory": "MultimediaApplication",
+    "operatingSystem": "Web Browser",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+  })}</script>
+</head>
+<body>
+  ${splashHTML}
+  ${toolPageConfig}
+  <div id="toolisto-app">
+    ${headerNav}
+    <main id="contenido">
+      <section class="hero hero-tool" id="inicio">
+        <div class="hero-inner">
+          <div class="hero-left">
+            ${buildBreadcrumbs(breadcrumbs)}
+            <h1>${escHtml(tool.h1)}</h1>
+            <p>${escHtml(tool.summary)}</p>
+            <p class="privacy-note">🔒 Tus archivos se quedan contigo. Se procesan en tu navegador.</p>
+          </div>
+          <div class="hero-right">
+            <input id="intentInput" type="hidden" value="" />
+            <div class="drop-zone" id="dropZone" tabindex="0" role="button" aria-label="Seleccionar o arrastrar archivos">
+              <input id="fileInput" type="file" ${multiple ? 'multiple' : ''} accept="${escAttr(tool.inputAccept || acceptMap[tool.accepts] || '')}" hidden />
+              <div class="drop-icon" aria-hidden="true"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
+              <strong>Arrastra ${multiple ? 'los archivos' : 'un archivo'}</strong>
+              <span>O selecciona desde tu dispositivo</span>
+              <span class="formats-hint">Formatos: ${escHtml(tool.inputFormats.join(', '))}</span>
+              <button class="primary-button" id="browseButton" type="button">Seleccionar archivo</button>
+            </div>
+            <div class="file-strip" id="fileStrip" hidden></div>
+            <div class="smart-result" id="smartResult" hidden>
+              <div class="smart-icon" id="smartIcon">${escHtml(tool.icon)}</div>
+              <div class="smart-copy"><span>Acción recomendada</span><strong id="smartTitle">${escHtml(tool.name)}</strong><p id="smartDescription">${escHtml(tool.summary)}</p></div>
+              <button class="text-button" id="changeToolButton" type="button">Elegir otra</button>
+            </div>
+            <details class="advanced-panel" id="advancedPanel" hidden><summary>Opciones de la herramienta <span>Ajustes avanzados</span></summary><div id="advancedControls" class="advanced-controls"></div></details>
+            <div class="flow-actions" id="flowActions" hidden>
+              <button class="primary-button run-button" id="runButton" type="button" disabled><span>Procesar archivo</span><span aria-hidden="true">→</span></button>
+              <button class="quiet-button" id="clearFilesButton" type="button" hidden>Quitar archivos</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="tool-content" id="content">
+        ${formatsHTML}
+        ${instructionsHTML}
+        ${limitationsHTML}
+        ${faqSection}
+        ${relatedGridHTML}
+      </section>
+    </main>
+
+    <dialog class="result-dialog" id="resultDialog"><div class="dialog-header"><h2 id="resultTitle">Resultado</h2><button class="dialog-close" id="dialogClose" type="button" aria-label="Cerrar">×</button></div><p id="resultMessage"></p><div class="result-stats" id="resultStats"></div><div class="preview-area" id="previewArea" hidden></div><div class="dialog-actions"><button class="primary-button" id="downloadButton" type="button">Descargar</button><button class="quiet-button" id="resetButton" type="button">Cerrar</button></div></dialog>
+    <dialog class="picker-dialog" id="pickerDialog"><div class="dialog-header"><h2>Elegir herramienta</h2><button class="dialog-close" id="pickerClose" type="button" aria-label="Cerrar">×</button></div><div class="picker-grid" id="pickerGrid"></div></dialog>
+    ${footerHTML}
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </div>
+  <script src="./vendor/pdflib/pdf-lib.min.js"></script>
+  <script src="./vendor/pdfjs/pdf.min.js"></script>
+  <script src="./vendor/jszip/jszip.min.js"></script>
+  <script src="./js/tool-processors.js"></script>
+  <script src="./js/app.js"></script>
+  ${splashScript}
+</body>
+</html>`;
+}
+
+function buildCategoryPage(cat) {
+  const catTools = cat.slugs.map(slug => tools.find(t => t.slug === slug)).filter(t => t && t.enabled);
+
+  const toolListHTML = catTools.map(t => {
+    return `<li class="category-tool-item"><a href="./${t.slug}.html"><strong>${escHtml(t.name)}</strong></a><p>${escHtml(t.summary)}</p></li>`;
+  }).join('\n');
+
+  const breadcrumbs = [
+    { label: 'Inicio', href: './index.html' },
+    { label: cat.name, href: `./${cat.slug}.html` }
+  ];
+
+  return `<!doctype html>
+<html lang="es-419" class="intro-pending">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>${escHtml(cat.name)} - Herramientas online | Toolisto</title>
+  <meta name="description" content="${escAttr(cat.description)}">
+  <link rel="canonical" href="${site.siteUrl}/${cat.slug}">
+  <meta name="robots" content="index, follow">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Toolisto">
+  <meta property="og:title" content="${escAttr(cat.name)} - Herramientas online | Toolisto">
+  <meta property="og:description" content="${escAttr(cat.description)}">
+  <meta property="og:url" content="${site.siteUrl}/${cat.slug}">
+  <meta property="og:image" content="${site.siteUrl}${site.defaultOgImage}">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="${escAttr(cat.name)} - Herramientas online | Toolisto">
+  <meta name="twitter:description" content="${escAttr(cat.description)}">
+  <meta name="twitter:image" content="${site.siteUrl}${site.defaultOgImage}">
+  <meta name="theme-color" content="${site.themeColor}">
+  <link rel="icon" type="image/svg+xml" href="./assets/toolisto-mark.svg">
+  <link rel="stylesheet" href="./styles.css">
+  ${splashCSS}
+</head>
+<body>
+  ${splashHTML}
+  <div id="toolisto-app">
+    ${headerNav}
+    <main id="contenido">
+      <section class="hero" id="inicio">
+        <div class="hero-inner"><div class="hero-left">
+          ${buildBreadcrumbs(breadcrumbs)}
+          <h1>${escHtml(cat.icon)} ${escHtml(cat.name)}</h1>
+          <p>${escHtml(cat.description)}</p>
+        </div></div>
+      </section>
+      <section class="category-tools">
+        <h2>Herramientas de ${escHtml(cat.name)}</h2>
+        <ul class="category-tool-list">${toolListHTML}</ul>
+      </section>
+    </main>
+    ${footerHTML}
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </div>
+  <script src="./vendor/pdflib/pdf-lib.min.js"></script>
+  <script src="./vendor/pdfjs/pdf.min.js"></script>
+  <script src="./vendor/jszip/jszip.min.js"></script>
+  <script src="./js/app.js"></script>
+  ${splashScript}
+</body>
+</html>`;
+}
+
+function build404Page() {
+  const popularTools = ['comprimir-imagen', 'unir-pdf', 'convertir-imagen', 'dividir-pdf', 'comprimir-imagenes'];
+  const links = popularTools.map(slug => {
+    const t = tools.find(x => x.slug === slug);
+    return t ? `<li><a href="./${t.slug}.html">${escHtml(t.name)}</a></li>` : '';
+  }).filter(Boolean).join('\n');
+
+  const catLinks = categories.filter(c => c.enabled).map(c =>
+    `<li><a href="./${c.slug}.html">${escHtml(c.name)}</a></li>`
+  ).join('\n');
+
+  return `<!doctype html>
+<html lang="es-419" class="intro-pending">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Página no encontrada | Toolisto</title>
+  <meta name="description" content="La página que buscas no existe. Explora las herramientas de Toolisto.">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/svg+xml" href="./assets/toolisto-mark.svg">
+  <link rel="stylesheet" href="./styles.css">
+  ${splashCSS}
+</head>
+<body>
+  ${splashHTML}
+  <div id="toolisto-app">
+    ${headerNav}
+    <main id="contenido">
+      <section class="hero" id="inicio">
+        <div class="hero-inner"><div class="hero-left">
+          <h1>404 — Página no encontrada</h1>
+          <p>La página que buscas no existe o fue movida. Puedes volver al inicio o explorar nuestras herramientas.</p>
+          <a class="primary-button" href="./index.html" style="display:inline-block;margin-top:1rem;">Volver al inicio</a>
+        </div></div>
+      </section>
+      <section class="error-content">
+        <h2>Herramientas populares</h2>
+        <ul>${links}</ul>
+        <h2>Categorías</h2>
+        <ul>${catLinks}</ul>
+        <div style="margin-top:1.5rem">
+          <h2>Buscar herramienta</h2>
+          <input id="toolSearch" type="search" placeholder="Escribe el nombre de una herramienta…" aria-label="Buscar herramientas" style="width:100%;max-width:400px;padding:.6rem 1rem;border:1px solid var(--c-border);border-radius:8px;background:var(--c-surface);color:var(--c-text);font-size:.95rem;" />
+        </div>
+      </section>
+    </main>
+    ${footerHTML}
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </div>
+  <script src="./vendor/pdflib/pdf-lib.min.js"></script>
+  <script src="./vendor/pdfjs/pdf.min.js"></script>
+  <script src="./vendor/jszip/jszip.min.js"></script>
+  <script src="./js/app.js"></script>
+  ${splashScript}
+</body>
+</html>`;
+}
+
+function buildSitemap() {
+  const urls = [
+    { loc: `${site.siteUrl}/`, changefreq: 'weekly', priority: '1.0' }
+  ];
+  categories.filter(c => c.enabled).forEach(c => {
+    urls.push({ loc: `${site.siteUrl}/${c.slug}`, changefreq: 'weekly', priority: '0.8' });
+  });
+  tools.filter(t => t.enabled && t.indexable && t.enabledInSitemap).forEach(t => {
+    urls.push({ loc: `${site.siteUrl}/${t.slug}`, changefreq: 'monthly', priority: '0.7', lastmod: t.lastModified });
+  });
+  const items = urls.map(u => {
+    let xml = `  <url>\n    <loc>${u.loc}</loc>\n    <changefreq>${u.changefreq}</changefreq>\n    <priority>${u.priority}</priority>`;
+    if (u.lastmod) xml += `\n    <lastmod>${u.lastmod}</lastmod>`;
+    xml += `\n  </url>`;
+    return xml;
+  }).join('\n');
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${items}\n</urlset>`;
+}
+
+function buildRobots() {
+  return `User-agent: *
+Allow: /
+
+Sitemap: ${site.siteUrl}/sitemap.xml`;
+}
+
+function buildRedirects() {
+  return redirects.map(r => `${r.from} ${r.to} ${r.code}`).join('\n') + '\n';
+}
+
+const pages = [];
+
+tools.filter(t => t.enabled && t.indexable).forEach(t => {
+  const html = buildToolPage(t);
+  const file = join(DIST, `${t.slug}.html`);
+  writeFileSync(file, html, 'utf-8');
+  pages.push(t.slug);
+  console.log(`  ✓ ${t.slug}.html`);
+});
+
+categories.filter(c => c.enabled).forEach(c => {
+  const html = buildCategoryPage(c);
+  const file = join(DIST, `${c.slug}.html`);
+  writeFileSync(file, html, 'utf-8');
+  pages.push(c.slug);
+  console.log(`  ✓ ${c.slug}.html (category)`);
+});
+
+writeFileSync(join(DIST, '404.html'), build404Page(), 'utf-8');
+console.log('  ✓ 404.html');
+writeFileSync(join(DIST, 'sitemap.xml'), buildSitemap(), 'utf-8');
+console.log('  ✓ sitemap.xml');
+writeFileSync(join(DIST, 'robots.txt'), buildRobots(), 'utf-8');
+console.log('  ✓ robots.txt');
+writeFileSync(join(DIST, '_redirects'), buildRedirects(), 'utf-8');
+console.log('  ✓ _redirects');
+writeFileSync(join(DIST, 'site.json'), JSON.stringify(site, null, 2), 'utf-8');
+console.log('  ✓ site.json');
+
+console.log(`\nBuild complete. ${pages.length} pages generated in dist/.`);
