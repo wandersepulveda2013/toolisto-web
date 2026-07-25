@@ -749,6 +749,7 @@
   function chooseTool(tool, forced = false) {
     state.tool = tool;
     state.forcedTool = forced ? tool : null;
+    window.__selectedTool = tool;
     const meta = toolMeta[tool];
     els.smartResult.hidden = false;
     els.advancedPanel.hidden = false;

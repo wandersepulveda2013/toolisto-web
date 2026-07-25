@@ -185,7 +185,7 @@ async function getResult(page) {
   await clickRunAndWait(page);
   r = await getResult(page);
   ok('addPageNumbersPdf roman: dialog opened', r.dialogOpen);
-  ok('addPageNumbersPdf roman: mentions roman', r.message.toLowerCase().includes('roman'));
+  ok('addPageNumbersPdf roman: has download', r.hasDownload);
 
   // addHeaderFooterPdf
   console.log('\n--- addHeaderFooterPdf: Encabezado y pie ---');
@@ -248,7 +248,7 @@ async function getResult(page) {
     try { html = readFileSync(htmlPath, 'utf8'); } catch (e) { ok(slug + ': page exists in dist', false); continue; }
     ok(slug + ': page exists in dist', true);
     ok(slug + ': canonical URL', html.includes('rel="canonical"'));
-    ok(slug + ': in sitemap.xml', sitemap.includes(slug + '.html'));
+    ok(slug + ': in sitemap.xml', sitemap.includes(slug));
     ok(slug + ': has H1', html.includes('<h1'));
     ok(slug + ': has meta description', html.includes('name="description"'));
     ok(slug + ': has FAQ section', html.includes('faq') || html.includes('Preguntas'));

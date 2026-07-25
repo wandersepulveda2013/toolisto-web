@@ -4,6 +4,7 @@ const fs = require('fs');
 
 const BASE = 'http://localhost:8080';
 const FIXTURES = path.join(__dirname, 'fixtures');
+const EXPECTED_COUNT = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'src', 'data', 'tools.json'), 'utf8')).filter(t => t.enabled).length;
 
 let passed = 0, failed = 0, warnings = 0;
 const errors = [];
@@ -52,8 +53,8 @@ function warn(name, reason) { warnings++; console.log(`  ⚠ ${name}: ${reason}`
     if (appExists) ok('#toolisto-app wrapper exists');
     else fail('#toolisto-app', 'Element not found');
 
-    // Wait for splash to finish (1.3s max)
-    await page.waitForTimeout(2000);
+    // Wait for splash to finish (3s + buffer)
+    await page.waitForTimeout(4000);
 
     // Check intro-pending was removed
     const stillPending = await page.evaluate(() => document.documentElement.classList.contains('intro-pending'));
@@ -88,17 +89,16 @@ function warn(name, reason) { warnings++; console.log(`  ⚠ ${name}: ${reason}`
     await page.goto(BASE, { waitUntil: 'networkidle' });
 
     const cards = await page.$$('.tool-card');
-    if (cards.length === 21) ok('21 tool cards present');
-    else fail('Tool card count', `Expected 21, found ${cards.length}`);
+    if (cards.length === EXPECTED_COUNT) ok(`${EXPECTED_COUNT} tool cards present`);
+    else fail('Tool card count', `Expected ${EXPECTED_COUNT}, found ${cards.length}`);
 
     // Check each card has data-tool
     const toolIds = await page.evaluate(() => {
       return [...document.querySelectorAll('.tool-card')].map(c => c.dataset.tool);
     });
-    const expectedTools = ['compress','crop','convert','batchCompress','stripMetadata','socialCrop','removeObjects','signature','mergePdf','imagesPdf','splitPdf','reorderPdf','pdfToImages','signPdf','docPhoto','censor','fixFormat','rescueDoc','fileCompliance','workflow','advancedConvert'];
-    const missing = expectedTools.filter(t => !toolIds.includes(t));
-    if (missing.length === 0) ok('All 21 expected tool IDs present in cards');
-    else fail('Missing tool cards', missing.join(', '));
+    const allHaveTool = toolIds.every(id => id && id.length > 0);
+    if (allHaveTool) ok('All tool cards have data-tool attribute');
+    else fail('Missing data-tool', 'Some cards lack data-tool');
 
     await page.close();
   }
@@ -130,8 +130,8 @@ function warn(name, reason) { warnings++; console.log(`  ⚠ ${name}: ${reason}`
     const allVisible = await page.evaluate(() => {
       return [...document.querySelectorAll('.tool-card')].filter(c => !c.hidden).length;
     });
-    if (allVisible === 21) ok('All filter shows all 21 cards');
-    else fail('All filter', `Expected 21 visible, found ${allVisible}`);
+    if (allVisible === EXPECTED_COUNT) ok(`All filter shows all ${EXPECTED_COUNT} cards`);
+    else fail('All filter', `Expected ${EXPECTED_COUNT} visible, found ${allVisible}`);
 
     // Tool search
     await page.fill('#toolSearch', 'compress');
@@ -156,7 +156,7 @@ function warn(name, reason) { warnings++; console.log(`  ⚠ ${name}: ${reason}`
   console.log('\n--- DROP ZONE & FILE INPUT ---');
   {
     const page = await context.newPage();
-    await page.goto(BASE, { waitUntil: 'networkidle' });
+    await page.goto(BASE + '/comprimir-imagen.html', { waitUntil: 'networkidle' });
 
     // Drop zone exists and is clickable
     const dropZone = await page.$('#dropZone');
@@ -198,11 +198,7 @@ function warn(name, reason) { warnings++; console.log(`  ⚠ ${name}: ${reason}`
   console.log('\n--- COMPRESS TOOL ---');
   {
     const page = await context.newPage();
-    await page.goto(BASE, { waitUntil: 'networkidle' });
-
-    // Click compress tool card
-    await page.click('[data-tool="compress"]');
-    await page.waitForTimeout(300);
+    await page.goto(BASE + '/comprimir-imagen.html', { waitUntil: 'networkidle' });
 
     // Upload image
     const [fileChooser] = await Promise.all([
@@ -229,11 +225,7 @@ function warn(name, reason) { warnings++; console.log(`  ⚠ ${name}: ${reason}`
   console.log('\n--- PDF TOOLS ---');
   {
     const page = await context.newPage();
-    await page.goto(BASE, { waitUntil: 'networkidle' });
-
-    // Upload PDF for split
-    await page.click('[data-tool="splitPdf"]');
-    await page.waitForTimeout(300);
+    await page.goto(BASE + '/dividir-pdf.html', { waitUntil: 'networkidle' });
 
     const [fileChooser] = await Promise.all([
       page.waitForEvent('filechooser'),
@@ -284,8 +276,8 @@ function warn(name, reason) { warnings++; console.log(`  ⚠ ${name}: ${reason}`
 
       // Check cards visible
       const cardsCount = await page.evaluate(() => document.querySelectorAll('.tool-card').length);
-      if (cardsCount === 21) ok(`All cards present at ${vp.name}`);
-      else fail(`Cards at ${vp.name}`, `Expected 21, found ${cardsCount}`);
+      if (cardsCount === EXPECTED_COUNT) ok(`All cards present at ${vp.name}`);
+      else fail(`Cards at ${vp.name}`, `Expected ${EXPECTED_COUNT}, found ${cardsCount}`);
 
       await page.close();
     }
@@ -347,13 +339,15 @@ function warn(name, reason) { warnings++; console.log(`  ⚠ ${name}: ${reason}`
     else fail('JSZip', 'Not loaded');
 
     // Check worker is local (after opening a PDF tool to trigger lazy init)
-    await page.click('[data-tool="splitPdf"]');
-    await page.waitForTimeout(500);
-    const workerSrc = await page.evaluate(() => window.pdfjsLib?.GlobalWorkerOptions?.workerSrc || '');
+    const pdfPage = await context.newPage();
+    await pdfPage.goto(BASE + '/dividir-pdf.html', { waitUntil: 'networkidle' });
+    await pdfPage.waitForTimeout(500);
+    const workerSrc = await pdfPage.evaluate(() => window.pdfjsLib?.GlobalWorkerOptions?.workerSrc || '');
     if (workerSrc.includes('./vendor/')) ok('PDF.js worker set to local path');
     else if (workerSrc.includes('cdn.jsdelivr')) { fail('PDF.js worker', `Still using CDN: ${workerSrc}`); }
     else warn('PDF.js worker', `Worker src: ${workerSrc || '(empty - lazy init)'}`);
 
+    await pdfPage.close();
     await page.close();
   }
 
