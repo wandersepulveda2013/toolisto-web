@@ -174,7 +174,7 @@ function fail(label, reason) { total++; failed++; console.log(`  ✗ ${label}: $
       const link = document.querySelector('link[rel="canonical"]');
       return link ? link.href : null;
     });
-    if (canonical && canonical.endsWith('/' + slug)) ok(`${slug}: canonical correct`);
+    if (canonical && (canonical.endsWith('/' + slug) || canonical.endsWith('/' + slug + '.html'))) ok(`${slug}: canonical correct`);
     else fail(`${slug}: canonical`, `Got: ${canonical}`);
 
     const ogTitle = await page.$('meta[property="og:title"]');
@@ -321,6 +321,54 @@ function fail(label, reason) { total++; failed++; console.log(`  ✗ ${label}: $
     else fail(`${slug}: console errors`, errors.join('; '));
     page.removeAllListeners('pageerror');
   }
+
+  // --- LEGAL PAGES ---
+  console.log('\n--- Legal Pages ---');
+  for (const slug of ['privacidad', 'condiciones', 'apoyar']) {
+    await page.goto(`${BASE}/${slug}.html`, { waitUntil: 'domcontentloaded' });
+    const title = await page.evaluate(() => document.title);
+    if (title && title.length > 5) ok(`${slug}.html: title present (${title.substring(0, 40)}…)`);
+    else fail(`${slug}.html: title`, `Missing or too short: "${title}"`);
+
+    const h1 = await page.evaluate(() => {
+      const h1s = document.querySelectorAll('h1');
+      return h1s.length === 1 ? h1s[0].textContent.trim() : null;
+    });
+    if (h1) ok(`${slug}.html: exactly 1 H1: "${h1.substring(0, 40)}…"`);
+    else fail(`${slug}.html: H1`, 'Not exactly 1');
+
+    const canonical = await page.evaluate(() => {
+      const link = document.querySelector('link[rel="canonical"]');
+      return link ? link.href : null;
+    });
+    if (canonical && canonical.includes(slug)) ok(`${slug}.html: canonical correct`);
+    else fail(`${slug}.html: canonical`, `Got: ${canonical}`);
+
+    const footerPriv = await page.$(`.site-footer a[href="./privacidad.html"]`);
+    if (footerPriv) ok(`${slug}.html: footer has privacidad link`);
+    else fail(`${slug}.html: footer`, 'Missing privacidad link');
+
+    const footerCond = await page.$(`.site-footer a[href="./condiciones.html"]`);
+    if (footerCond) ok(`${slug}.html: footer has condiciones link`);
+    else fail(`${slug}.html: footer`, 'Missing condiciones link');
+  }
+
+  // apoyar has PayPal link
+  await page.goto(`${BASE}/apoyar.html`, { waitUntil: 'domcontentloaded' });
+  const paypalLink = await page.$('a[href*="paypal.com"]');
+  if (paypalLink) ok('apoyar.html: has PayPal donate link');
+  else fail('apoyar.html: PayPal link', 'Missing');
+
+  // --- RESULT DIALOG SUPPORT BLOCK ---
+  console.log('\n--- Result Dialog Support Block ---');
+  await page.goto(`${BASE}/comprimir-imagen.html`, { waitUntil: 'domcontentloaded' });
+  const hasSupport = await page.$('#resultSupport');
+  if (hasSupport) ok('comprimir-imagen: resultSupport element present');
+  else fail('comprimir-imagen: resultSupport', 'Missing');
+
+  const hasReport = await page.$('#reportProblemLink');
+  if (hasReport) ok('comprimir-imagen: reportProblemLink present');
+  else fail('comprimir-imagen: reportProblemLink', 'Missing');
 
   await browser.close();
 

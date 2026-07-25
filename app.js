@@ -332,6 +332,7 @@
     resultTitle: $('#resultTitle'),
     resultMessage: $('#resultMessage'),
     resultStats: $('#resultStats'),
+    resultSupport: $('#resultSupport'),
     previewArea: $('#previewArea'),
     downloadButton: $('#downloadButton'),
     resetButton: $('#resetButton'),
@@ -4799,6 +4800,7 @@
     els.resultMessage.textContent = result.message;
     els.resultStats.innerHTML = (result.stats || []).map(([label,value]) => `<div class="stat"><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong></div>`).join('');
     els.previewArea.innerHTML = '';
+    if (els.resultSupport) els.resultSupport.hidden = true;
     if (result.preview) {
       state.previewUrl = URL.createObjectURL(result.preview);
       const img = document.createElement('img');
@@ -4816,21 +4818,29 @@
     if (state.outputFiles && state.outputFiles.length > 1) {
       if (!window.JSZip) {
         state.outputFiles.forEach(f => downloadBlob(f.blob, f.name));
+        showSupportBlock();
         return;
       }
       const zip = new window.JSZip();
       state.outputFiles.forEach(f => zip.file(f.name, f.blob));
       const blob = await zip.generateAsync({ type: 'blob', compression: 'DEFLATE', compressionOptions: { level: 6 } });
       downloadBlob(blob, 'resultados.zip');
+      showSupportBlock();
       return;
     }
     if (state.outputFiles && state.outputFiles.length === 1) {
       downloadBlob(state.outputFiles[0].blob, state.outputFiles[0].name);
+      showSupportBlock();
       return;
     }
     if (state.outputBlob) {
       downloadBlob(state.outputBlob, state.outputName || 'toolisto-resultado');
+      showSupportBlock();
     }
+  }
+
+  function showSupportBlock() {
+    if (els.resultSupport) els.resultSupport.hidden = false;
   }
 
   function downloadBlob(blob, name) {

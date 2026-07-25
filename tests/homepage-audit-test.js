@@ -242,6 +242,64 @@ function ok(label, condition) {
   });
   ok('TOTAL_TOOLS is dynamic (reads from DOM)', hasDynamicCount);
 
+  // ── 14. Legal pages exist ──
+  console.log('\n--- 14. Legal pages ---');
+  await page.goto(BASE + '/privacidad.html', { waitUntil: 'domcontentloaded' });
+  ok('privacidad.html loads', (await page.$('h1')) !== null);
+  const privH1 = await page.$eval('h1', el => el.textContent);
+  ok('privacidad.html has correct title', privH1.includes('Privacidad'));
+  const privCanonical = await page.evaluate(() => {
+    const link = document.querySelector('link[rel="canonical"]');
+    return link ? link.href : null;
+  });
+  ok('privacidad.html has canonical URL', privCanonical && privCanonical.includes('privacidad'));
+
+  await page.goto(BASE + '/condiciones.html', { waitUntil: 'domcontentloaded' });
+  ok('condiciones.html loads', (await page.$('h1')) !== null);
+  const condH1 = await page.$eval('h1', el => el.textContent);
+  ok('condiciones.html has correct title', condH1.includes('Condiciones'));
+
+  await page.goto(BASE + '/apoyar.html', { waitUntil: 'domcontentloaded' });
+  ok('apoyar.html loads', (await page.$('h1')) !== null);
+  const apoyH1 = await page.$eval('h1', el => el.textContent);
+  ok('apoyar.html has correct title', apoyH1.includes('Apoyar'));
+  ok('apoyar.html has PayPal link', (await page.$('a[href*="paypal.com"]')) !== null);
+
+  // ── 15. Footer links on all page types ──
+  console.log('\n--- 15. Footer links ---');
+  await page.goto(BASE + '/index.html', { waitUntil: 'domcontentloaded' });
+  ok('Homepage footer has privacidad link', (await page.$('a[href="./privacidad.html"]')) !== null);
+  ok('Homepage footer has condiciones link', (await page.$('a[href="./condiciones.html"]')) !== null);
+  ok('Homepage footer has apoyar link', (await page.$('a[href="./apoyar.html"]')) !== null);
+
+  await page.goto(BASE + '/comprimir-imagen.html', { waitUntil: 'domcontentloaded' });
+  ok('Tool page footer has privacidad link', (await page.$('a[href="./privacidad.html"]')) !== null);
+  ok('Tool page footer has condiciones link', (await page.$('a[href="./condiciones.html"]')) !== null);
+
+  // ── 16. Brand logo href ──
+  console.log('\n--- 16. Brand logo href ---');
+  await page.goto(BASE + '/index.html', { waitUntil: 'domcontentloaded' });
+  const brandHref = await page.$eval('.header-inner .brand', el => el.getAttribute('href'));
+  ok('Header brand href is ./index.html (not /)', brandHref === './index.html');
+
+  const footerBrandHref = await page.$eval('.site-footer .brand', el => el.getAttribute('href'));
+  ok('Footer brand href is ./index.html (not /)', footerBrandHref === './index.html');
+
+  // ── 17. Google Analytics placeholder ──
+  console.log('\n--- 17. Google Analytics placeholder ---');
+  const headHTML = await page.$eval('head', el => el.innerHTML);
+  ok('GA4 placeholder comment exists in head', headHTML.includes('Google Analytics 4'));
+  ok('GA4 gtag.js script commented out', headHTML.includes('googletagmanager.com/gtag'));
+  ok('GA4 measurement ID placeholder G-XXXXXXXXXX', headHTML.includes('G-XXXXXXXXXX'));
+
+  // ── 18. site.config.json has support block ──
+  console.log('\n--- 18. site.config.json support/analytics ---');
+  const config2 = JSON.parse(readFileSync(join(__dirname, '..', 'src', 'data', 'site.config.json'), 'utf-8'));
+  ok('site.config.json has support block', 'support' in config2);
+  ok('support has paypalUrl', config2.support?.paypalUrl?.includes('paypal.com'));
+  ok('support has message', typeof config2.support?.message === 'string' && config2.support.message.length > 10);
+  ok('site.config.json has analytics block', 'analytics' in config2);
+
   // ── SUMMARY ──
   console.log('\n=== RESULTS ===');
   console.log(`  Passed: ${passed}`);

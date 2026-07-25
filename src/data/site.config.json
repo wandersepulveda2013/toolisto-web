@@ -6,5 +6,12 @@
   "defaultOgImage": "/toolisto-web/assets/icon-512.png",
   "themeColor": "#1C1D21",
   "maxFileSize": 26214400,
-  "buildDate": "2026-07-25"
+  "buildDate": "2026-07-25",
+  "support": {
+    "paypalUrl": "https://www.paypal.com/donate/?hosted_button_id=ZSSG3LJQRW3EQ",
+    "message": "Si Toolisto te ha sido útil, considera apoyarnos con una donación."
+  },
+  "analytics": {
+    "ga4MeasurementId": ""
+  }
 }

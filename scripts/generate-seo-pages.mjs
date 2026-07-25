@@ -77,7 +77,7 @@ const splashScript = `<script>(function(){var i=document.getElementById('toolist
 
 const headerNav = `<header class="site-header"><div class="header-inner"><a class="brand" href="./index.html" aria-label="Ir al inicio de Toolisto"><img class="brand-mark-img" src="./assets/toolisto-mark.svg" alt="" width="36" height="36" /><span class="brand-text">Toolisto</span></a><nav class="desktop-nav" aria-label="Categorías de herramientas"><a href="./index.html#herramientas" data-nav-filter="images">Imágenes</a><a href="./index.html#herramientas" data-nav-filter="pdf">PDF</a><a href="./index.html#herramientas" data-nav-filter="signatures">Firmas</a><a href="./index.html#herramientas" data-nav-filter="documents">Documentos</a><a href="./index.html#herramientas" data-nav-filter="spreadsheets">Hojas de cálculo</a><a href="./index.html#herramientas" data-nav-filter="all">Todas</a></nav><div class="header-actions"><a class="header-action-btn" href="./index.html#herramientas" aria-label="Buscar herramientas"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg></a><button class="header-action-btn" id="themeToggle" type="button" aria-label="Cambiar tema"><svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg><svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button><button class="menu-button" id="menuToggle" type="button" aria-expanded="false" aria-controls="mobileNav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button></div></div></header><nav class="mobile-nav" id="mobileNav" hidden><a href="./index.html#herramientas" data-nav-filter="images">Imágenes</a><a href="./index.html#herramientas" data-nav-filter="pdf">PDF</a><a href="./index.html#herramientas" data-nav-filter="signatures">Firmas</a><a href="./index.html#herramientas" data-nav-filter="all">Todas las herramientas</a></nav>`;
 
-const footerHTML = `<footer class="site-footer"><div class="footer-inner"><div class="footer-brand"><a class="brand" href="./index.html" aria-label="Ir al inicio de Toolisto"><img class="brand-mark-img" src="./assets/toolisto-mark.svg" alt="" width="28" height="28" /><span class="brand-text">Toolisto</span></a></div><nav aria-label="Enlaces del pie de página"><a href="./index.html#herramientas">Herramientas</a><a href="mailto:contacto@toolisto.com">Contacto</a></nav><small>© 2026 Toolisto · Tus archivos se quedan contigo.</small></div></footer>`;
+const footerHTML = `<footer class="site-footer"><div class="footer-inner"><div class="footer-brand"><a class="brand" href="./index.html" aria-label="Ir al inicio de Toolisto"><img class="brand-mark-img" src="./assets/toolisto-mark.svg" alt="" width="28" height="28" /><span class="brand-text">Toolisto</span></a></div><nav aria-label="Enlaces del pie de página"><a href="./index.html#herramientas">Herramientas</a><a href="./privacidad.html">Privacidad</a><a href="./condiciones.html">Condiciones</a><a href="./apoyar.html">Apoyar</a><a href="mailto:contacto@toolisto.com">Contacto</a></nav><small>© 2026 Toolisto · Tus archivos se quedan contigo.</small></div></footer>`;
 
 function buildRelatedToolGrid(tool) {
   const slugs = (tool.relatedSlugs || []).slice(0, 6);
@@ -264,7 +264,7 @@ function buildToolPage(tool) {
       </section>
     </main>
 
-    <dialog class="result-dialog" id="resultDialog"><div class="dialog-header"><h2 id="resultTitle">Resultado</h2><button class="dialog-close" id="dialogClose" type="button" aria-label="Cerrar">×</button></div><p id="resultMessage"></p><div class="result-stats" id="resultStats"></div><div class="preview-area" id="previewArea" hidden></div><div class="dialog-actions"><button class="primary-button" id="downloadButton" type="button">Descargar</button><button class="quiet-button" id="resetButton" type="button">Cerrar</button></div></dialog>
+    <dialog class="result-dialog" id="resultDialog"><div class="dialog-header"><h2 id="resultTitle">Resultado</h2><button class="dialog-close" id="dialogClose" type="button" aria-label="Cerrar">×</button></div><p id="resultMessage"></p><div class="result-stats" id="resultStats"></div><div class="preview-area" id="previewArea" hidden></div><div class="result-support" id="resultSupport" hidden><p>${escHtml(site.support?.message || 'Si Toolisto te ha sido útil, considera apoyarnos con una donación.')}</p><a class="support-donate-btn" href="${escAttr(site.support?.paypalUrl || '#')}" target="_blank" rel="noopener noreferrer">Apoyar con PayPal</a></div><div class="report-problem"><a href="mailto:contacto@toolisto.com?subject=Problema%20con%20herramienta&body=Describir%20el%20problema%20aqu%C3%AD..." id="reportProblemLink">Reportar un problema</a></div><div class="dialog-actions"><button class="primary-button" id="downloadButton" type="button">Descargar</button><button class="quiet-button" id="resetButton" type="button">Cerrar</button></div></dialog>
     <dialog class="picker-dialog" id="pickerDialog"><div class="dialog-header"><h2>Elegir herramienta</h2><button class="dialog-close" id="pickerClose" type="button" aria-label="Cerrar">×</button></div><div class="picker-grid" id="pickerGrid"></div></dialog>
     ${footerHTML}
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -402,9 +402,136 @@ function build404Page() {
 </html>`;
 }
 
+function buildLegalPage(slug, title, sections) {
+  const contentHTML = sections.map(s =>
+    `<section class="legal-section"><h2>${escHtml(s.heading)}</h2>${s.body}</section>`
+  ).join('\n');
+
+  const breadcrumbs = [
+    { label: 'Inicio', href: './index.html' },
+    { label: title, href: `./${slug}.html` }
+  ];
+
+  return `<!doctype html>
+<html lang="es-419" class="intro-pending">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>${escHtml(title)} | Toolisto</title>
+  <meta name="description" content="${escAttr(title)} de Toolisto.">
+  <link rel="canonical" href="${site.siteUrl}/${slug}.html">
+  <meta name="robots" content="index, follow">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Toolisto">
+  <meta property="og:title" content="${escAttr(title)} | Toolisto">
+  <meta property="og:description" content="${escAttr(title)} de Toolisto.">
+  <meta property="og:url" content="${site.siteUrl}/${slug}.html">
+  <meta property="og:image" content="${site.siteUrl}${site.defaultOgImage}">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="${escAttr(title)} | Toolisto">
+  <meta name="twitter:description" content="${escAttr(title)} de Toolisto.">
+  <meta name="twitter:image" content="${site.siteUrl}${site.defaultOgImage}">
+  <meta name="theme-color" content="${site.themeColor}">
+  <link rel="icon" type="image/svg+xml" href="./assets/toolisto-mark.svg">
+  <link rel="stylesheet" href="./styles.css">
+  ${splashCSS}
+</head>
+<body>
+  ${splashHTML}
+  <div id="toolisto-app">
+    ${headerNav}
+    <main id="contenido">
+      <section class="hero" id="inicio">
+        <div class="hero-inner"><div class="hero-left">
+          ${buildBreadcrumbs(breadcrumbs)}
+          <h1>${escHtml(title)}</h1>
+        </div></div>
+      </section>
+      <section class="legal-content">
+        ${contentHTML}
+      </section>
+    </main>
+    ${footerHTML}
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </div>
+  <script src="./js/app.js"></script>
+  ${splashScript}
+</body>
+</html>`;
+}
+
+function buildApoyarPage() {
+  const paypalUrl = site.support?.paypalUrl || 'https://www.paypal.com/donate/?hosted_button_id=ZSSG3LJQRW3EQ';
+  const supportMsg = site.support?.message || 'Si Toolisto te ha sido útil, considera apoyarnos con una donación.';
+
+  const breadcrumbs = [
+    { label: 'Inicio', href: './index.html' },
+    { label: 'Apoyar', href: './apoyar.html' }
+  ];
+
+  return `<!doctype html>
+<html lang="es-419" class="intro-pending">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Apoyar Toolisto | Donaciones</title>
+  <meta name="description" content="Apoya a Toolisto con una donación para seguir mejorando las herramientas.">
+  <link rel="canonical" href="${site.siteUrl}/apoyar.html">
+  <meta name="robots" content="index, follow">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Toolisto">
+  <meta property="og:title" content="Apoyar Toolisto | Donaciones">
+  <meta property="og:description" content="Apoya a Toolisto con una donación para seguir mejorando las herramientas.">
+  <meta property="og:url" content="${site.siteUrl}/apoyar.html">
+  <meta property="og:image" content="${site.siteUrl}${site.defaultOgImage}">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Apoyar Toolisto | Donaciones">
+  <meta name="twitter:description" content="Apoya a Toolisto con una donación para seguir mejorando las herramientas.">
+  <meta name="twitter:image" content="${site.siteUrl}${site.defaultOgImage}">
+  <meta name="theme-color" content="${site.themeColor}">
+  <link rel="icon" type="image/svg+xml" href="./assets/toolisto-mark.svg">
+  <link rel="stylesheet" href="./styles.css">
+  ${splashCSS}
+</head>
+<body>
+  ${splashHTML}
+  <div id="toolisto-app">
+    ${headerNav}
+    <main id="contenido">
+      <section class="hero" id="inicio">
+        <div class="hero-inner"><div class="hero-left">
+          ${buildBreadcrumbs(breadcrumbs)}
+          <h1>Apoyar Toolisto</h1>
+          <p>${escHtml(supportMsg)}</p>
+          <a class="support-donate-btn support-donate-btn--large" href="${escAttr(paypalUrl)}" target="_blank" rel="noopener noreferrer">Apoyar con PayPal</a>
+        </div></div>
+      </section>
+      <section class="legal-content">
+        <section class="legal-section">
+          <h2>¿Por qué donar?</h2>
+          <p>Toolisto es una herramienta gratuita que funciona directamente en tu navegador. No mostramos publicidad ni vendemos tus datos. Cada donación nos ayuda a seguir mejorando y manteniendo las herramientas.</p>
+        </section>
+        <section class="legal-section">
+          <h2>¿Cómo funciona?</h2>
+          <p>Haz clic en el botón de PayPal y completa la donación con la cantidad que prefieras. No necesitas crear una cuenta en Toolisto.</p>
+        </section>
+      </section>
+    </main>
+    ${footerHTML}
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </div>
+  <script src="./js/app.js"></script>
+  ${splashScript}
+</body>
+</html>`;
+}
+
 function buildSitemap() {
   const urls = [
-    { loc: `${site.siteUrl}/`, changefreq: 'weekly', priority: '1.0' }
+    { loc: `${site.siteUrl}/`, changefreq: 'weekly', priority: '1.0' },
+    { loc: `${site.siteUrl}/privacidad.html`, changefreq: 'monthly', priority: '0.3' },
+    { loc: `${site.siteUrl}/condiciones.html`, changefreq: 'monthly', priority: '0.3' },
+    { loc: `${site.siteUrl}/apoyar.html`, changefreq: 'monthly', priority: '0.4' }
   ];
   categories.filter(c => c.enabled).forEach(c => {
     urls.push({ loc: `${site.siteUrl}/${c.slug}.html`, changefreq: 'weekly', priority: '0.8' });
@@ -452,6 +579,30 @@ categories.filter(c => c.enabled).forEach(c => {
 
 writeFileSync(join(DIST, '404.html'), build404Page(), 'utf-8');
 console.log('  ✓ 404.html');
+
+const privacySections = [
+  { heading: 'Privacidad', body: '<p>Toolisto procesa todos los archivos directamente en tu navegador. Ningún archivo se sube a nuestros servidores ni se almacena en ningún lugar externo.</p><p>No recopilamos información personal identificable a menos que tú nos contactes directamente por correo electrónico.</p>' },
+  { heading: 'Cookies y tecnologías de seguimiento', body: '<p>Toolisto no utiliza cookies propias. Si se habilita Google Analytics en el futuro, se utilizarán cookies de terceros para fines estadísticos. Puedes desactivar el seguimiento desde las configuraciones de tu navegador.</p>' },
+  { heading: 'Servicios de terceros', body: '<p>Toolisto puede utilizar servicios de terceros como Google Fonts para el diseño visual. Estos servicios pueden recopilar información de forma independiente según sus propias políticas de privacidad.</p>' },
+  { heading: 'Contacto', body: '<p>Si tienes preguntas sobre esta política de privacidad, puedes escribirnos a <a href="mailto:contacto@toolisto.com">contacto@toolisto.com</a>.</p>' },
+  { heading: 'Última actualización', body: `<p>Esta política fue última vez actualizada el ${TODAY}.</p>` }
+];
+writeFileSync(join(DIST, 'privacidad.html'), buildLegalPage('privacidad', 'Política de Privacidad', privacySections), 'utf-8');
+console.log('  ✓ privacidad.html');
+
+const conditionsSections = [
+  { heading: 'Condiciones de uso', body: '<p>El uso de Toolisto implica la aceptación de las siguientes condiciones. Toolisto proporciona herramientas gratuitas de procesamiento de archivos que funcionan directamente en el navegador del usuario.</p>' },
+  { heading: 'Uso del servicio', body: '<p>Toolisto es gratuito y no requiere registro. El usuario es responsable del contenido que procesa. Toolisto no se hace responsable del uso que se haga de las herramientas proporcionadas.</p>' },
+  { heading: 'Propiedad intelectual', body: '<p>El código fuente de Toolisto es de código abierto. Las herramientas se proporcionan "tal cual" sin garantías de ningún tipo.</p>' },
+  { heading: 'Limitación de responsabilidad', body: '<p>En ningún caso Toolisto será responsable por daños directos, indirectos, incidentales o consecuentes derivados del uso o la imposibilidad de uso de las herramientas.</p>' },
+  { heading: 'Cambios en las condiciones', body: '<p>Toolisto se reserva el derecho de modificar estas condiciones en cualquier momento. Los cambios serán efectivos desde su publicación en esta página.</p>' },
+  { heading: 'Última actualización', body: `<p>Estas condiciones fueron última vez actualizadas el ${TODAY}.</p>` }
+];
+writeFileSync(join(DIST, 'condiciones.html'), buildLegalPage('condiciones', 'Condiciones de Uso', conditionsSections), 'utf-8');
+console.log('  ✓ condiciones.html');
+
+writeFileSync(join(DIST, 'apoyar.html'), buildApoyarPage(), 'utf-8');
+console.log('  ✓ apoyar.html');
 writeFileSync(join(DIST, 'sitemap.xml'), buildSitemap(), 'utf-8');
 console.log('  ✓ sitemap.xml');
 writeFileSync(join(DIST, 'robots.txt'), buildRobots(), 'utf-8');

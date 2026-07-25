@@ -198,6 +198,14 @@ function ok(label, condition) {
   const config = JSON.parse(await page.$eval('#tool-page-config', el => el.textContent));
   ok('Config has toolId', config.toolId === 'compress');
 
+  // Result dialog: support block + report-problem
+  console.log('\n--- Result dialog support & report ---');
+  ok('Has resultSupport element', (await page.$('#resultSupport')) !== null);
+  ok('resultSupport is hidden by default', await page.$eval('#resultSupport', el => el.hidden));
+  ok('Has report problem link', (await page.$('#reportProblemLink')) !== null);
+  const reportHref = await page.$eval('#reportProblemLink', el => el.getAttribute('href'));
+  ok('Report link goes to mailto:contacto@toolisto.com', reportHref.includes('mailto:contacto@toolisto.com'));
+
   // ═══════════════════════════════════════════
   // TOOL PAGE: unir-pdf
   // ═══════════════════════════════════════════
@@ -257,6 +265,51 @@ function ok(label, condition) {
     ok(`${vp.name} tool page: dropZone visible`, dzVisible);
     await pg.close();
   }
+
+  // ═══════════════════════════════════════════
+  // LEGAL PAGES
+  // ═══════════════════════════════════════════
+  console.log('\n=== LEGAL PAGES ===\n');
+
+  const legalPage = await context.newPage();
+  await legalPage.goto(BASE + '/privacidad.html', { waitUntil: 'domcontentloaded' });
+  ok('privacidad.html has H1', (await legalPage.$('h1')) !== null);
+  const privTitle = await legalPage.$eval('h1', el => el.textContent);
+  ok('privacidad H1 mentions Privacidad', privTitle.includes('Privacidad'));
+
+  await legalPage.goto(BASE + '/condiciones.html', { waitUntil: 'domcontentloaded' });
+  ok('condiciones.html has H1', (await legalPage.$('h1')) !== null);
+  const condTitle = await legalPage.$eval('h1', el => el.textContent);
+  ok('condiciones H1 mentions Condiciones', condTitle.includes('Condiciones'));
+
+  await legalPage.goto(BASE + '/apoyar.html', { waitUntil: 'domcontentloaded' });
+  ok('apoyar.html has H1', (await legalPage.$('h1')) !== null);
+  const apoyTitle = await legalPage.$eval('h1', el => el.textContent);
+  ok('apoyar H1 mentions Apoyar', apoyTitle.includes('Apoyar'));
+  ok('apoyar has PayPal link', (await legalPage.$('a[href*="paypal.com"]')) !== null);
+
+  // Footer links on tool page
+  console.log('\n--- Footer links on tool page ---');
+  await legalPage.goto(BASE + '/comprimir-imagen.html', { waitUntil: 'domcontentloaded' });
+  ok('Tool page has privacidad footer link', (await legalPage.$('.site-footer a[href="./privacidad.html"]')) !== null);
+  ok('Tool page has condiciones footer link', (await legalPage.$('.site-footer a[href="./condiciones.html"]')) !== null);
+  ok('Tool page has apoyar footer link', (await legalPage.$('.site-footer a[href="./apoyar.html"]')) !== null);
+
+  // Footer links on homepage
+  console.log('\n--- Footer links on homepage ---');
+  await legalPage.goto(BASE + '/index.html', { waitUntil: 'domcontentloaded' });
+  ok('Homepage has privacidad footer link', (await legalPage.$('.site-footer a[href="./privacidad.html"]')) !== null);
+  ok('Homepage has condiciones footer link', (await legalPage.$('.site-footer a[href="./condiciones.html"]')) !== null);
+  ok('Homepage has apoyar footer link', (await legalPage.$('.site-footer a[href="./apoyar.html"]')) !== null);
+
+  // Brand logo hrefs
+  console.log('\n--- Brand logo hrefs ---');
+  const headerBrandHref = await legalPage.$eval('.header-inner .brand', el => el.getAttribute('href'));
+  ok('Header brand href is ./index.html', headerBrandHref === './index.html');
+  const footerBrandHref = await legalPage.$eval('.site-footer .brand', el => el.getAttribute('href'));
+  ok('Footer brand href is ./index.html', footerBrandHref === './index.html');
+
+  await legalPage.close();
 
   // ═══════════════════════════════════════════
   // RESULTS

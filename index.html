@@ -51,6 +51,16 @@
       html, body { overflow: auto !important; background: initial; }
     </style>
   </noscript>
+  <!-- Google Analytics 4 — Descomentar y reemplazar G-XXXXXXXXXX con tu Measurement ID -->
+  <!--
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-XXXXXXXXXX');
+  </script>
+  -->
 </head>
 <body>
   <div id="toolisto-intro" aria-hidden="true">
@@ -116,7 +126,7 @@
   <div id="toolisto-app">
   <header class="site-header">
     <div class="header-inner">
-      <a class="brand" href="/" aria-label="Ir al inicio de Toolisto">
+      <a class="brand" href="./index.html" aria-label="Ir al inicio de Toolisto">
         <img class="brand-mark-img" src="./assets/toolisto-mark.svg" alt="" width="36" height="36" />
         <span class="brand-text">Toolisto</span>
       </a>
@@ -914,14 +924,16 @@
   <footer class="site-footer">
     <div class="footer-inner">
       <div class="footer-brand">
-        <a class="brand" href="/" aria-label="Ir al inicio de Toolisto">
+        <a class="brand" href="./index.html" aria-label="Ir al inicio de Toolisto">
           <img class="brand-mark-img" src="./assets/toolisto-mark.svg" alt="" width="28" height="28" />
           <span class="brand-text">Toolisto</span>
         </a>
       </div>
       <nav aria-label="Enlaces del pie de página">
         <a href="#herramientas">Herramientas</a>
-        <a href="#privacidad">Privacidad</a>
+        <a href="./privacidad.html">Privacidad</a>
+        <a href="./condiciones.html">Condiciones</a>
+        <a href="./apoyar.html">Apoyar</a>
         <a href="mailto:contacto@toolisto.com">Contacto</a>
       </nav>
       <small>© 2026 Toolisto · Tus archivos se quedan contigo.</small>
