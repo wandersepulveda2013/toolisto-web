@@ -45,7 +45,7 @@
     <img class="intro-mark" src="./assets/toolisto-mark.svg" alt="" width="80" height="80" />
     <span class="intro-name">Toolisto</span>
     <span class="intro-accent"></span>
-    <span class="intro-count" id="introCount" hidden aria-hidden="true">89 herramientas disponibles</span>
+    <span class="intro-count" id="introCount" hidden aria-hidden="true">99 herramientas disponibles</span>
   </div>
 
   <script>
@@ -67,6 +67,8 @@
       if (introCount) { introCount.textContent = label; introCount.hidden = false; introCount.removeAttribute('aria-hidden'); }
       var heroCount = document.getElementById('toolCount');
       if (heroCount) { heroCount.textContent = label; heroCount.hidden = false; heroCount.removeAttribute('aria-hidden'); }
+      var heroTrustEl = document.getElementById('heroTrustCount');
+      if (heroTrustEl) { heroTrustEl.textContent = count; }
     }
 
     if (document.readyState === 'loading') {
@@ -146,7 +148,7 @@
         <div class="hero-left">
           <h1>Todas tus herramientas de archivos, en un solo lugar</h1>
           <p class="hero-desc">Convierte, comprime, organiza y mejora imágenes, PDF, documentos, textos, libros electrónicos y hojas de cálculo directamente desde tu navegador.</p>
-          <p class="hero-trust">89 herramientas disponibles · Sin registro · Procesamiento privado en tu dispositivo</p>
+          <p class="hero-trust"><span id="heroTrustCount">99</span> herramientas disponibles · Sin registro · Procesamiento privado en tu dispositivo</p>
           <div class="hero-search-wrap">
             <label class="hero-search" for="toolSearch">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
@@ -760,6 +762,66 @@
         <a class="tool-card" data-tool="editMetadataPdf" data-category="pdf" data-input-formats="PDF" data-output-formats="PDF" data-keywords="metadatos titulo autor propiedades informacion edicion" href="./editar-metadatos-pdf.html">
           <span class="tool-icon">🏷</span>
           <span class="tool-body"><strong>Editar metadatos PDF</strong><small>Actualiza la información del documento como título, autor y palabras clave.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="compressPdf" data-category="pdf" data-input-formats="PDF" data-output-formats="PDF" data-keywords="comprimir pdf reducir peso tamaño optimizar metadatos" href="./comprimir-pdf.html">
+          <span class="tool-icon">📦</span>
+          <span class="tool-body"><strong>Comprimir PDF</strong><small>Reduce el peso del PDF eliminando metadatos y optimizando el contenido.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="interleavePdf" data-category="pdf" data-input-formats="PDF" data-output-formats="PDF" data-keywords="intercalar pdf alternar paginas dos documentos mezclar juntar" href="./intercalar-pdf.html">
+          <span class="tool-icon">🔗</span>
+          <span class="tool-body"><strong>Intercalar páginas PDF</strong><small>Alterna las páginas de dos PDF en un solo documento.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="cropPdf" data-category="pdf" data-input-formats="PDF" data-output-formats="PDF" data-keywords="recortar pdf margenes recorte sangria espacios" href="./recortar-pdf.html">
+          <span class="tool-icon">✂</span>
+          <span class="tool-body"><strong>Recortar márgenes PDF</strong><small>Elimina márgenes blancos de las páginas del PDF.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="resizePdfPages" data-category="pdf" data-input-formats="PDF" data-output-formats="PDF" data-keywords="redimensionar pdf tamaño a4 letter legal cambiar paginas" href="./cambiar-tamano-paginas-pdf.html">
+          <span class="tool-icon">↔</span>
+          <span class="tool-body"><strong>Redimensionar páginas PDF</strong><small>Cambia el tamaño de las páginas a A4, Carta u otro formato.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="nUpPdf" data-category="pdf" data-input-formats="PDF" data-output-formats="PDF" data-keywords="varias paginas hoja pdf 2up 4up agrupar imprimir ahorrar" href="./varias-paginas-por-hoja-pdf.html">
+          <span class="tool-icon">⊞</span>
+          <span class="tool-body"><strong>Varias páginas por hoja</strong><small>Combina varias páginas en una sola hoja (2-up o 4-up).</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="splitDoublePdf" data-category="pdf" data-input-formats="PDF" data-output-formats="PDF" data-keywords="dividir dobles escaneado pdf cortar columnas separar" href="./dividir-paginas-dobles-pdf.html">
+          <span class="tool-icon">⫾</span>
+          <span class="tool-body"><strong>Dividir páginas dobles PDF</strong><small>Separa páginas dobles escaneadas en páginas individuales.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="bookletPdf" data-category="pdf" data-input-formats="PDF" data-output-formats="PDF" data-keywords="cuadernillo booklet pdf imprimir doble cara plegar libro" href="./crear-cuadernillo-pdf.html">
+          <span class="tool-icon">📖</span>
+          <span class="tool-body"><strong>Crear cuadernillo PDF</strong><small>Reordena páginas para impresión doble cara y plegado.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="watermarkPdf" data-category="pdf" data-input-formats="PDF" data-output-formats="PDF" data-keywords="marca agua pdf borrador confidencial watermark texto sello" href="./agregar-marca-de-agua-pdf.html">
+          <span class="tool-icon">💧</span>
+          <span class="tool-body"><strong>Agregar marca de agua PDF</strong><small>Añade un texto de marca de agua a todas las páginas.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="addPageNumbersPdf" data-category="pdf" data-input-formats="PDF" data-output-formats="PDF" data-keywords="numerar paginas pdf numeros page numbers romanos paginacion" href="./numerar-paginas-pdf.html">
+          <span class="tool-icon">#</span>
+          <span class="tool-body"><strong>Numerar páginas PDF</strong><small>Agrega números de página en la posición que elijas.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="addHeaderFooterPdf" data-category="pdf" data-input-formats="PDF" data-output-formats="PDF" data-keywords="encabezado pie pdf texto header footer cabecera documento" href="./encabezado-pie-pdf.html">
+          <span class="tool-icon">⊥</span>
+          <span class="tool-body"><strong>Encabezado y pie de página PDF</strong><small>Añade texto de encabezado y pie en todas las páginas.</small></span>
           <span class="tool-arrow" aria-hidden="true">→</span>
         </a>
       </div>
