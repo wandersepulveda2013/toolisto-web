@@ -1,0 +1,24 @@
+{
+  "name": "toolisto",
+  "version": "2.0.0",
+  "description": "Herramientas directas para preparar imágenes y PDF.",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "audit:count": "node scripts/audit-count.mjs",
+    "audit:slugs": "node test-slug-audit.mjs",
+    "test": "node tests/run-all.mjs",
+    "test:batch1": "node tests/batch1-functional-test.js",
+    "test:batch2": "node tests/batch2-functional-test.js",
+    "test:batch3": "node tests/batch3-functional-test.js",
+    "test:aliases": "node tests/alias-restrictions-test.js",
+    "test:comprehensive": "node tests/comprehensive-test.js",
+    "test:homepage": "node tests/homepage-audit-test.js",
+    "test:qa": "node tests/qa-test.js",
+    "test:seo": "node tests/seo-functional-test.js",
+    "test:embedpdf": "node tests/test-embedpdf.js"
+  },
+  "dependencies": {
+    "pdf-lib": "^1.17.1"
+  },
+  "private": true
+}

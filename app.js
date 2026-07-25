@@ -15,38 +15,26 @@
     activeFilter: 'all',
   };
 
-  const toolMeta = {
-    compress: {
-      icon: '↘', title: 'Reducir imagen',
-      description: 'Reduciremos el peso conservando una calidad equilibrada.',
-      accepts: 'image',
-    },
-    signature: {
-      icon: '✦', title: 'Firma transparente',
-      description: 'Quitaremos el fondo claro y exportaremos un PNG transparente.',
-      accepts: 'image',
-    },
-    imagesPdf: {
-      icon: '▤', title: 'Imágenes a PDF',
-      description: 'Crearemos un solo PDF respetando el orden visible.',
-      accepts: 'images',
-    },
-    mergePdf: {
-      icon: '⊕', title: 'Unir PDF',
-      description: 'Combinaremos los PDF en el orden visible.',
-      accepts: 'pdfs',
-    },
-    crop: {
-      icon: '⌗', title: 'Recortar y redimensionar',
-      description: 'Prepararemos la imagen con dimensiones exactas.',
-      accepts: 'image',
-    },
-    convert: {
-      icon: '⇄', title: 'Convertir imagen',
-      description: 'Convertiremos las imágenes al formato elegido.',
-      accepts: 'images',
-    },
-  };
+  function buildToolMeta() {
+    const meta = {};
+    $$('.tool-card').forEach((card) => {
+      const toolId = card.dataset.tool;
+      if (!toolId) return;
+      const icon = card.querySelector('.tool-icon');
+      const strong = card.querySelector('strong');
+      const small = card.querySelector('small');
+      meta[toolId] = {
+        icon: icon ? icon.textContent.trim() : '',
+        title: strong ? strong.textContent.trim() : toolId,
+        description: small ? small.textContent.trim() : '',
+        accepts: card.dataset.category === 'pdf' ? 'pdf' : card.dataset.category === 'images' ? 'image' : 'image',
+        category: card.dataset.category || 'images',
+      };
+    });
+    return meta;
+  }
+
+  let toolMeta = buildToolMeta();
 
   const els = {
     themeToggle: $('#themeToggle'),
@@ -147,8 +135,17 @@
         setTimeout(() => els.fileInput.click(), 450);
       }
     }));
-  }
 
+    const toolPageConfig = $('#tool-page-config');
+    if (toolPageConfig) {
+      const toolId = toolPageConfig.dataset.toolId;
+      if (toolId) {
+        state.forcedTool = toolId;
+        state.tool = toolId;
+        chooseTool(toolId, true);
+      }
+    }
+  }
 
   function setToolFilter(filter) {
     state.activeFilter = filter;
@@ -161,6 +158,7 @@
     let visible = 0;
 
     $$('.tool-card').forEach((card) => {
+      const hidden = card.hidden;
       const categoryMatches = state.activeFilter === 'all' || card.dataset.category === state.activeFilter;
       const text = card.textContent.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
       const searchMatches = !query || text.includes(query);
@@ -276,6 +274,20 @@
     if (/unir|combinar|juntar|fusionar|ordenar pdf/.test(q) && pdfs.length) return 'mergePdf';
     if (/crear pdf|imagenes a pdf|fotos a pdf|escaneo/.test(q) && images.length) return 'imagesPdf';
     if (/reduc|comprim|menos de|kb|mb|peso|liger/.test(q) && images.length) return 'compress';
+    if (/tamano|resize|dimension/.test(q) && images.length) return 'resizeImage';
+    if (/rotar|girar/.test(q) && pdfs.length) return 'rotatePdf';
+    if (/separar|dividir|split/.test(q) && pdfs.length) return 'splitPdf';
+    if (/extraer|extract/.test(q) && pdfs.length) return 'extractPdf';
+    if (/marca de agua|watermark|marca/.test(q) && pdfs.length) return 'watermarkPdf';
+    if (/numerar|numeros|page number/.test(q) && pdfs.length) return 'addPageNumbersPdf';
+    if (/encabezado|pie|header|footer/.test(q) && pdfs.length) return 'addHeaderFooterPdf';
+    if (/cuadernillo|booklet|impresion/.test(q) && pdfs.length) return 'bookletPdf';
+    if (/cortar pagina|dividir doble|split double/.test(q) && pdfs.length) return 'splitDoublePdf';
+    if (/mejorar|enhance|brillo|contraste/.test(q) && images.length) return 'enhanceImage';
+    if (/fondo|background|remove/.test(q) && images.length) return 'removeBackground';
+    if (/lote|varias|batch/.test(q) && images.length) return 'batchConvert';
+    if (/marca.*imagen|watermark.*image/.test(q) && images.length) return 'watermarkImage';
+    if (/pdf.*imagen|pdf a imagen/.test(q) && pdfs.length) return 'pdfToImages';
 
     if (pdfs.length >= 2) return 'mergePdf';
     if (images.length >= 2) return 'imagesPdf';
@@ -287,6 +299,7 @@
     state.tool = tool;
     state.forcedTool = forced ? tool : null;
     const meta = toolMeta[tool];
+    if (!meta) return;
     els.smartResult.hidden = false;
     els.advancedPanel.hidden = false;
     if (els.flowActions) els.flowActions.hidden = false;
@@ -303,10 +316,18 @@
     const images = files.filter((file) => file.type.startsWith('image/'));
     const pdfs = files.filter((file) => file.type === 'application/pdf');
     if (!files.length) return { ok: false, message: 'Selecciona al menos un archivo.' };
-    if (['compress', 'signature', 'crop'].includes(tool) && images.length !== 1) return { ok: false, message: 'Esta herramienta necesita exactamente una imagen.' };
-    if (tool === 'convert' && (images.length !== files.length || images.length < 1)) return { ok: false, message: 'Selecciona una o varias imágenes compatibles.' };
-    if (tool === 'imagesPdf' && (images.length !== files.length || images.length < 1)) return { ok: false, message: 'Selecciona una o varias imágenes compatibles.' };
-    if (tool === 'mergePdf' && (pdfs.length !== files.length || pdfs.length < 1)) return { ok: false, message: 'Selecciona uno o varios archivos PDF.' };
+    if (['compress', 'signature', 'crop', 'resizeImage', 'watermarkImage', 'enhanceImage', 'removeBackground'].includes(tool) && images.length !== 1) {
+      return { ok: false, message: 'Esta herramienta necesita exactamente una imagen.' };
+    }
+    if (['convert', 'imagesPdf', 'batchConvert'].includes(tool) && (images.length !== files.length || images.length < 1)) {
+      return { ok: false, message: 'Selecciona una o varias imágenes compatibles.' };
+    }
+    if (tool === 'mergePdf' && (pdfs.length !== files.length || pdfs.length < 1)) {
+      return { ok: false, message: 'Selecciona uno o varios archivos PDF.' };
+    }
+    if (['rotatePdf', 'splitPdf', 'extractPdf', 'pdfToImages', 'splitDoublePdf', 'bookletPdf', 'watermarkPdf', 'addPageNumbersPdf', 'addHeaderFooterPdf'].includes(tool) && pdfs.length !== 1) {
+      return { ok: false, message: 'Esta herramienta necesita exactamente un archivo PDF.' };
+    }
     return { ok: true, message: '' };
   }
 
@@ -314,9 +335,10 @@
     const images = state.files.filter((file) => file.type.startsWith('image/'));
     const pdfs = state.files.filter((file) => file.type === 'application/pdf');
     const tools = [];
-    if (images.length === 1 && pdfs.length === 0) tools.push('compress', 'signature', 'crop', 'convert', 'imagesPdf');
-    if (images.length > 1 && pdfs.length === 0) tools.push('imagesPdf', 'convert');
-    if (pdfs.length && images.length === 0) tools.push('mergePdf');
+    if (images.length === 1 && pdfs.length === 0) tools.push('compress', 'signature', 'crop', 'convert', 'imagesPdf', 'resizeImage', 'watermarkImage', 'enhanceImage', 'removeBackground');
+    if (images.length > 1 && pdfs.length === 0) tools.push('imagesPdf', 'convert', 'batchConvert');
+    if (pdfs.length === 1 && images.length === 0) tools.push('rotatePdf', 'splitPdf', 'extractPdf', 'pdfToImages', 'splitDoublePdf', 'bookletPdf', 'watermarkPdf', 'addPageNumbersPdf', 'addHeaderFooterPdf');
+    if (pdfs.length >= 2 && images.length === 0) tools.push('mergePdf');
     return tools;
   }
 
@@ -324,6 +346,7 @@
     els.pickerGrid.innerHTML = '';
     availableTools().forEach((tool) => {
       const meta = toolMeta[tool];
+      if (!meta) return;
       const button = document.createElement('button');
       button.type = 'button';
       button.className = 'picker-option';
@@ -377,6 +400,57 @@
         ${controlNumber('convertQuality', 'Calidad (%)', 86, 25, 100)}
         ${controlNumber('convertWidth', 'Ancho máximo (0 = conservar)', 0, 0, 10000)}
       `,
+      resizeImage: `
+        ${controlNumber('resizeWidth', 'Ancho (px)', 800, 1, 10000)}
+        ${controlNumber('resizeHeight', 'Alto (px)', 600, 1, 10000)}
+        ${controlSelect('resizeFormat', 'Formato', [['image/jpeg','JPG'],['image/png','PNG'],['image/webp','WebP']])}
+      `,
+      rotatePdf: `
+        ${controlSelect('rotateDegrees', 'Rotación', [['90','90° derecha'],['180','180°'],['270','90° izquierda']])}
+      `,
+      splitPdf: `
+        <div class="control" style="grid-column:1/-1"><label>Resultado</label><div style="color:var(--muted);font-size:.9rem">Cada página se separará en un archivo individual.</div></div>
+      `,
+      extractPdf: `
+        ${controlNumber('extractPages', 'Páginas (ej: 1-3,5)', 1, 1, 100)}
+      `,
+      watermarkImage: `
+        ${controlNumber('wmText', 'Texto de marca', 'BORRADOR', 1, 100)}
+        ${controlNumber('wmOpacity', 'Opacidad (%)', 30, 5, 100)}
+      `,
+      enhanceImage: `
+        ${controlNumber('enhBrightness', 'Brillo (%)', 10, -100, 100)}
+        ${controlNumber('enhContrast', 'Contraste (%)', 10, -100, 100)}
+      `,
+      removeBackground: `
+        ${controlNumber('rbThreshold', 'Umbral', 200, 50, 255)}
+      `,
+      batchConvert: `
+        ${controlSelect('batchFormat', 'Formato', [['image/webp','WebP'],['image/jpeg','JPG'],['image/png','PNG']])}
+        ${controlNumber('batchQuality', 'Calidad (%)', 86, 25, 100)}
+      `,
+      pdfToImages: `
+        ${controlSelect('ptiFormat', 'Formato', [['image/png','PNG'],['image/jpeg','JPG']])}
+        ${controlNumber('ptiScale', 'Escala (%)', 100, 50, 300)}
+      `,
+      splitDoublePdf: `
+        ${controlSelect('splitDir', 'Dirección', [['vertical','Vertical (por la mitad)'],['horizontal','Horizontal (por la mitad)']])}
+      `,
+      bookletPdf: `
+        <div class="control" style="grid-column:1/-1"><label>Configuración</label><div style="color:var(--muted);font-size:.9rem">Las páginas se reordenarán para impresión en cuadernillo. Se añadirán páginas en blanco si es necesario.</div></div>
+      `,
+      watermarkPdf: `
+        ${controlNumber('wmPdfText', 'Texto de marca', 'BORRADOR', 1, 100)}
+        ${controlNumber('wmPdfOpacity', 'Opacidad (%)', 30, 5, 100)}
+        ${controlNumber('wmPdfSize', 'Tamaño de fuente', 60, 10, 200)}
+      `,
+      addPageNumbersPdf: `
+        ${controlSelect('numStyle', 'Estilo', [['normal','Normal (1, 2, 3...)'],['roman','Romano (I, II, III...)']])}
+      `,
+      addHeaderFooterPdf: `
+        ${controlNumber('hfHeader', 'Encabezado', 'Documento Confidencial', 1, 200)}
+        ${controlNumber('hfFooter', 'Pie de página', 'Toolisto', 1, 200)}
+      `,
     };
 
     els.advancedControls.innerHTML = htmlByTool[tool] || '';
@@ -418,6 +492,8 @@
     try {
       clearPreviousOutput();
       let result;
+      const processors = window.ToolProcessors || {};
+
       switch (state.tool) {
         case 'compress': result = await processCompress(); break;
         case 'signature': result = await processSignature(); break;
@@ -425,9 +501,54 @@
         case 'mergePdf': result = await processMergePdf(); break;
         case 'crop': result = await processCrop(); break;
         case 'convert': result = await processConvert(); break;
+        case 'splitDoublePdf':
+          result = await processPdfWithProcessor(processors.splitDoublePdf, state.files[0], { direction: valueOf('splitDir', 'vertical') });
+          break;
+        case 'bookletPdf':
+          result = await processPdfWithProcessor(processors.bookletPdf, state.files[0], {});
+          break;
+        case 'watermarkPdf':
+          result = await processPdfWithProcessor(processors.watermarkPdf, state.files[0], {
+            text: valueOf('wmPdfText', 'BORRADOR'),
+            opacity: numberValue('wmPdfOpacity', 30) / 100,
+            fontSize: numberValue('wmPdfSize', 60),
+          });
+          break;
+        case 'addPageNumbersPdf':
+          result = await processPdfWithProcessor(processors.addPageNumbersPdf, state.files[0], {
+            style: valueOf('numStyle', 'normal'),
+          });
+          break;
+        case 'addHeaderFooterPdf':
+          result = await processPdfWithProcessor(processors.addHeaderFooterPdf, state.files[0], {
+            header: valueOf('hfHeader', 'Documento Confidencial'),
+            footer: valueOf('hfFooter', 'Toolisto'),
+            showHeader: !!valueOf('hfHeader', ''),
+            showFooter: !!valueOf('hfFooter', ''),
+          });
+          break;
+        case 'rotatePdf':
+          result = await processPdfWithProcessor(processors.rotatePdf, state.files[0], {
+            degrees: numberValue('rotateDegrees', 90),
+          });
+          break;
+        case 'splitPdf':
+          result = await processPdfWithProcessor(processors.splitPdf, state.files[0], {});
+          break;
+        case 'extractPdf':
+          result = await processPdfWithProcessor(processors.extractPdf, state.files[0], {
+            pages: valueOf('extractPages', '1-5'),
+          });
+          break;
+        case 'resizeImage': result = showToast('Resize requiere Canvas (solo navegador)'); break;
+        case 'watermarkImage': result = showToast('Marca de agua en imagen requiere Canvas'); break;
+        case 'enhanceImage': result = showToast('Mejora de imagen requiere Canvas'); break;
+        case 'removeBackground': result = showToast('Eliminación de fondo requiere Canvas'); break;
+        case 'batchConvert': result = showToast('Conversión por lotes requiere Canvas'); break;
+        case 'pdfToImages': result = showToast('PDF a imágenes requiere Canvas'); break;
         default: throw new Error('Selecciona una herramienta.');
       }
-      presentResult(result);
+      if (result) presentResult(result);
     } catch (error) {
       console.error(error);
       showToast(error?.message || 'No pudimos procesar el archivo.');
@@ -436,6 +557,19 @@
       els.runButton.innerHTML = originalText;
       els.runButton.disabled = false;
     }
+  }
+
+  async function processPdfWithProcessor(processorFn, file, options) {
+    if (!processorFn) throw new Error('Procesador no disponible.');
+    const result = await processorFn(file, options);
+    const blob = new Blob([result.data], { type: 'application/pdf' });
+    return {
+      blob,
+      name: result.name,
+      title: result.title,
+      message: result.message,
+      stats: result.stats,
+    };
   }
 
   async function processCompress() {
@@ -614,7 +748,7 @@
     let pageCount = 0;
 
     for (const file of state.files) {
-      const source = await PDFDocument.load(await file.arrayBuffer(), { ignoreEncryption: false });
+      const source = await PDFDocument.load(await file.arrayBuffer());
       const pages = await merged.copyPages(source, source.getPageIndices());
       pages.forEach((page) => merged.addPage(page));
       pageCount += pages.length;
@@ -769,8 +903,7 @@
     els.resultDialog.close();
     clearPreviousOutput();
     state.files = [];
-    state.tool = null;
-    state.forcedTool = null;
+    state.tool = state.forcedTool || null;
     els.fileInput.value = '';
     els.intentInput.value = '';
     els.advancedPanel.open = false;
