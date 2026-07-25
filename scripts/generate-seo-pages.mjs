@@ -54,6 +54,8 @@ if (existsSync(ASSETS_SRC)) cpSync(ASSETS_SRC, join(DIST, 'assets'), { recursive
 cpSync(join(ROOT, 'vendor'), join(DIST, 'vendor'), { recursive: true });
 cpSync(join(ROOT, 'app.js'), join(DIST, 'js', 'app.js'));
 cpSync(join(ROOT, 'tool-processors.js'), join(DIST, 'js', 'tool-processors.js'));
+cpSync(join(ROOT, 'styles.css'), join(DIST, 'styles.css'));
+cpSync(join(ROOT, 'index.html'), join(DIST, 'index.html'));
 
 const splashCSS = `<style>
 html.intro-pending, html.intro-pending body { background: #1C1D21; overflow: hidden; }
@@ -464,3 +466,30 @@ const headersSrc = join(ROOT, '_headers');
 if (existsSync(headersSrc)) { cpSync(headersSrc, join(DIST, '_headers')); console.log('  ✓ _headers'); }
 
 console.log(`\nBuild complete. ${pages.length} pages generated in dist/.`);
+
+const requiredFiles = [
+  join(DIST, 'index.html'),
+  join(DIST, 'styles.css'),
+  join(DIST, 'js', 'app.js'),
+];
+const requiredDirs = [
+  join(DIST, 'assets'),
+];
+let buildFailed = false;
+for (const f of requiredFiles) {
+  if (!existsSync(f)) {
+    console.error(`FAIL: required file missing: ${f}`);
+    buildFailed = true;
+  }
+}
+for (const d of requiredDirs) {
+  if (!existsSync(d)) {
+    console.error(`FAIL: required directory missing: ${d}`);
+    buildFailed = true;
+  }
+}
+if (buildFailed) {
+  console.error('\nBuild validation FAILED. Missing critical files.');
+  process.exit(1);
+}
+console.log('Build validation OK: all required files present.');
