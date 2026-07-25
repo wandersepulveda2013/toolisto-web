@@ -187,13 +187,13 @@ function buildToolPage(tool) {
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>${escHtml(tool.title)}</title>
   <meta name="description" content="${escAttr(tool.description)}">
-  <link rel="canonical" href="${site.siteUrl}/${tool.slug}">
+  <link rel="canonical" href="${site.siteUrl}/${tool.slug}.html">
   <meta name="robots" content="index, follow">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Toolisto">
   <meta property="og:title" content="${escAttr(tool.title)}">
   <meta property="og:description" content="${escAttr(tool.description)}">
-  <meta property="og:url" content="${site.siteUrl}/${tool.slug}">
+  <meta property="og:url" content="${site.siteUrl}/${tool.slug}.html">
   <meta property="og:image" content="${site.siteUrl}${tool.ogImage || site.defaultOgImage}">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="${escAttr(tool.title)}">
@@ -207,7 +207,7 @@ function buildToolPage(tool) {
     "@context": "https://schema.org",
     "@type": "WebApplication",
     "name": tool.name,
-    "url": `${site.siteUrl}/${tool.slug}`,
+    "url": `${site.siteUrl}/${tool.slug}.html`,
     "description": tool.description,
     "applicationCategory": "MultimediaApplication",
     "operatingSystem": "Web Browser",
@@ -296,13 +296,13 @@ function buildCategoryPage(cat) {
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>${escHtml(cat.name)} - Herramientas online | Toolisto</title>
   <meta name="description" content="${escAttr(cat.description)}">
-  <link rel="canonical" href="${site.siteUrl}/${cat.slug}">
+  <link rel="canonical" href="${site.siteUrl}/${cat.slug}.html">
   <meta name="robots" content="index, follow">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Toolisto">
   <meta property="og:title" content="${escAttr(cat.name)} - Herramientas online | Toolisto">
   <meta property="og:description" content="${escAttr(cat.description)}">
-  <meta property="og:url" content="${site.siteUrl}/${cat.slug}">
+  <meta property="og:url" content="${site.siteUrl}/${cat.slug}.html">
   <meta property="og:image" content="${site.siteUrl}${site.defaultOgImage}">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="${escAttr(cat.name)} - Herramientas online | Toolisto">
@@ -405,10 +405,10 @@ function buildSitemap() {
     { loc: `${site.siteUrl}/`, changefreq: 'weekly', priority: '1.0' }
   ];
   categories.filter(c => c.enabled).forEach(c => {
-    urls.push({ loc: `${site.siteUrl}/${c.slug}`, changefreq: 'weekly', priority: '0.8' });
+    urls.push({ loc: `${site.siteUrl}/${c.slug}.html`, changefreq: 'weekly', priority: '0.8' });
   });
   tools.filter(t => t.enabled && t.indexable && t.enabledInSitemap).forEach(t => {
-    urls.push({ loc: `${site.siteUrl}/${t.slug}`, changefreq: 'monthly', priority: '0.7', lastmod: t.lastModified });
+    urls.push({ loc: `${site.siteUrl}/${t.slug}.html`, changefreq: 'monthly', priority: '0.7', lastmod: t.lastModified });
   });
   const items = urls.map(u => {
     let xml = `  <url>\n    <loc>${u.loc}</loc>\n    <changefreq>${u.changefreq}</changefreq>\n    <priority>${u.priority}</priority>`;
@@ -458,5 +458,9 @@ writeFileSync(join(DIST, '_redirects'), buildRedirects(), 'utf-8');
 console.log('  ✓ _redirects');
 writeFileSync(join(DIST, 'site.json'), JSON.stringify(site, null, 2), 'utf-8');
 console.log('  ✓ site.json');
+writeFileSync(join(DIST, '.nojekyll'), '', 'utf-8');
+console.log('  ✓ .nojekyll');
+const headersSrc = join(ROOT, '_headers');
+if (existsSync(headersSrc)) { cpSync(headersSrc, join(DIST, '_headers')); console.log('  ✓ _headers'); }
 
 console.log(`\nBuild complete. ${pages.length} pages generated in dist/.`);

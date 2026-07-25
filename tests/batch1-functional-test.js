@@ -486,7 +486,7 @@ async function pageStatsFromDialog(page) {
   for (const slug of seoTools) {
     const htmlPath = join(__dirname, '..', 'dist', `${slug}.html`);
     const html = readFileSync(htmlPath, 'utf8');
-    const hasCanonical = html.includes(`rel="canonical" href="https://toolisto.invalid/${slug}"`);
+    const hasCanonical = html.includes(`rel="canonical" href="https://wandersepulveda2013.github.io/toolisto-web/${slug}.html"`);
     const hasSitemap = sitemap.includes(`/${slug}`);
     const hasH1 = html.includes('<h1');
     const hasMetaDesc = html.includes('meta name="description"');

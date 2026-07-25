@@ -1,10 +1,10 @@
 {
   "siteName": "Toolisto",
-  "siteUrl": "https://toolisto.invalid",
-  "productionDomain": "https://toolisto.com",
+  "siteUrl": "https://wandersepulveda2013.github.io/toolisto-web",
+  "productionDomain": "https://wandersepulveda2013.github.io/toolisto-web",
   "defaultLocale": "es-419",
-  "defaultOgImage": "/assets/toolisto-og.png",
+  "defaultOgImage": "/toolisto-web/assets/icon-512.png",
   "themeColor": "#1C1D21",
   "maxFileSize": 26214400,
-  "buildDate": "2026-07-24"
+  "buildDate": "2026-07-25"
 }

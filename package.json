@@ -11,6 +11,7 @@
     "test:batch1": "node tests/batch1-functional-test.js",
     "test:batch2": "node tests/batch2-functional-test.js",
     "test:batch3": "node tests/batch3-functional-test.js",
+    "build": "node scripts/generate-seo-pages.mjs --production",
     "start": "node server.js"
   },
   "repository": {

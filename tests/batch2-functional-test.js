@@ -338,7 +338,7 @@ async function getResult(page) {
     ok(`${slug}: page exists in dist`, htmlExists);
 
     const html = readFileSync(htmlPath, 'utf8');
-    ok(`${slug}: canonical URL`, html.includes(`rel="canonical" href="https://toolisto.invalid/${slug}"`));
+    ok(`${slug}: canonical URL`, html.includes(`rel="canonical" href="https://wandersepulveda2013.github.io/toolisto-web/${slug}.html"`));
     ok(`${slug}: in sitemap.xml`, sitemap.includes(`/${slug}`));
     ok(`${slug}: has H1`, html.includes('<h1'));
     ok(`${slug}: has meta description`, html.includes('meta name="description"'));
