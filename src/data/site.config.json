@@ -1,0 +1,27 @@
+{
+  "siteName": "Toolisto",
+  "siteUrl": "https://wandersepulveda2013.github.io/toolisto-web",
+  "productionDomain": "https://wandersepulveda2013.github.io/toolisto-web",
+  "defaultLocale": "es-419",
+  "defaultOgImage": "/toolisto-web/assets/icon-512.png",
+  "themeColor": "#1C1D21",
+  "maxFileSize": 26214400,
+  "buildDate": "2026-07-25",
+  "support": {
+    "enabled": true,
+    "provider": "paypal",
+    "url": "https://www.paypal.com/donate/?hosted_button_id=ZSSG3LJQRW3EQ",
+    "buttonText": "Apoyar con PayPal",
+    "message": "Si Toolisto te ha sido útil, considera apoyarnos con una donación.",
+    "logo": ""
+  },
+  "analytics": {
+    "enabled": false,
+    "provider": "google-analytics",
+    "measurementId": ""
+  },
+  "feedback": {
+    "enabled": false,
+    "url": ""
+  }
+}

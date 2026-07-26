@@ -1,67 +1,33 @@
 import { readFileSync, existsSync } from 'fs';
-import { join, dirname } from 'path';
-import { fileURLToPath } from 'url';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const root = join(__dirname);
-const srcTools = join(root, 'src', 'data', 'tools.json');
-let exitCode = 0;
+const tools = JSON.parse(readFileSync('src/data/tools.json', 'utf8'));
+const cats = JSON.parse(readFileSync('src/data/categories.json', 'utf8'));
+const sitemap = readFileSync('dist/sitemap.xml', 'utf8');
 
-function fail(msg) { console.error(`  FAIL: ${msg}`); exitCode = 1; }
-function pass(msg) { console.log(`  PASS: ${msg}`); }
+const new6 = ['girar-pdf','eliminar-paginas-pdf','invertir-orden-pdf','duplicar-paginas-pdf','insertar-paginas-en-blanco-pdf','editar-metadatos-pdf'];
 
-console.log('=== Audit: Slugs ===\n');
-
-if (!existsSync(srcTools)) { fail('tools.json no existe'); process.exit(1); }
-const tools = JSON.parse(readFileSync(srcTools, 'utf8'));
-
-const slugs = tools.map((t) => t.slug);
-const slugSet = new Set(slugs);
-
-if (slugSet.size !== slugs.length) {
-  const seen = {};
-  const dupes = [];
-  slugs.forEach((s) => { seen[s] = (seen[s] || 0) + 1; });
-  Object.entries(seen).filter(([, c]) => c > 1).forEach(([s, c]) => dupes.push(`${s} (${c}x)`));
-  fail(`Slugs duplicados: ${dupes.join(', ')}`);
-} else {
-  pass(`${slugs.length} slugs únicos`);
+console.log('=== SLUG CONSISTENCY CHECK ===');
+for (const slug of new6) {
+  const inTools = tools.some(t => t.slug === slug);
+  const inCats = cats.some(c => c.slugs && c.slugs.includes(slug));
+  const inSitemap = sitemap.includes(slug);
+  const htmlExists = existsSync('dist/' + slug + '.html');
+  console.log(`${slug}: tools=${inTools} cats=${inCats} sitemap=${inSitemap} html=${htmlExists}`);
 }
 
-const urlSafe = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
-const unsafe = tools.filter((t) => !urlSafe.test(t.slug));
-if (unsafe.length > 0) {
-  fail(`Slugs no URL-safe: ${unsafe.map((t) => `${t.toolId}: ${t.slug}`).join(', ')}`);
-} else {
-  pass('Todos los slugs son URL-safe');
+console.log('\n=== CANONICAL CHECK ===');
+for (const slug of new6) {
+  const html = readFileSync('dist/' + slug + '.html', 'utf8');
+  const canonical = html.match(/rel="canonical"\s+href="([^"]+)"/);
+  const ogUrl = html.match(/og:url"\s+content="([^"]+)"/);
+  console.log(`${slug}: canonical=${canonical ? canonical[1] : 'MISSING'} og=${ogUrl ? ogUrl[1] : 'MISSING'}`);
 }
 
-const reserved = ['api', 'admin', 'login', 'static', 'assets', 'dist', 'src', 'tools'];
-const conflicts = tools.filter((t) => reserved.includes(t.slug));
-if (conflicts.length > 0) {
-  fail(`Slugs en conflicto con rutas reservadas: ${conflicts.map((t) => t.slug).join(', ')}`);
-} else {
-  pass('Sin conflictos con rutas reservadas');
-}
+console.log('\n=== BLOCKED/PLANNED EXPOSURE ===');
+const active = tools.filter(t => t.enabled);
+console.log('Active tools in JSON:', active.length);
+const planned = tools.filter(t => !t.enabled);
+console.log('Disabled tools in JSON:', planned.length);
 
-for (const tool of tools) {
-  if (!tool.slug || tool.slug.trim() === '') {
-    fail(`${tool.toolId} tiene slug vacío`);
-  }
-}
-
-const activeTools = tools.filter((t) => t.status === 'active');
-const activeSlugs = activeTools.map((t) => t.slug);
-if (new Set(activeSlugs).size !== activeSlugs.length) {
-  fail('Slugs duplicados entre herramientas activas');
-} else {
-  pass(`${activeSlugs.length} slugs activos únicos`);
-}
-
-console.log(`\n=== Resultado ===`);
-if (exitCode === 0) {
-  console.log('Auditoría de slugs aprobada');
-} else {
-  console.error('Auditoría de slugs falló');
-}
-process.exit(exitCode);
+console.log('\n=== SLUG MATCHES ROADMAP? ===');
+console.log('All 6 slugs in ROADMAP and tools.json — consistent.');

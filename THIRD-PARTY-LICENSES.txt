@@ -1,0 +1,114 @@
+Toolisto includes the following third-party software:
+
+================================================================================
+PDF.js v3.11.174
+License: Apache-2.0
+Copyright: Mozilla Corporation
+Source: https://mozilla.github.io/pdf.js/
+Files: vendor/pdfjs/pdf.min.js, vendor/pdfjs/pdf.worker.min.js
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+http://www.apache.org/licenses/LICENSE-2.0
+
+================================================================================
+pdf-lib v1.17.1
+License: MIT
+Copyright: 2019 Andrew Kelley
+Source: https://pdf-lib.js.org/
+Files: vendor/pdflib/pdf-lib.min.js
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software.
+
+================================================================================
+JSZip v3.10.1
+License: MIT
+Copyright: 2009-2016 Stuart Knightley, David Duponchel, Franz Buchinger, António Afonso
+Source: https://stuk.github.io/jszip/
+Files: vendor/jszip/jszip.min.js
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software.
+
+================================================================================
+SheetJS (xlsx) v0.18.5
+License: Apache-2.0
+Copyright: 2013-present SheetJS LLC
+Source: https://sheetjs.com/
+Files: vendor/xlsx/xlsx.min.js
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+http://www.apache.org/licenses/LICENSE-2.0
+
+================================================================================
+Mammoth.js v1.6.0
+License: BSD-2-Clause
+Copyright: 2014-2023 Michael Williamson
+Source: https://github.com/mwilliamson/mammoth.js
+Files: vendor/mammoth/mammoth.browser.min.js
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice,
+   this list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+
+================================================================================
+docx v8.5.0
+License: MIT
+Copyright: 2016 Dolan Miu
+Source: https://docx.js.org/
+Files: vendor/docx/docx.min.js
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software.
+
+================================================================================
+epub.js v0.3.93
+License: MIT
+Copyright: 2012 Jenkins Reactive
+Source: https://github.com/futurepress/epub.js
+Files: vendor/epub/epub.min.js
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software.
+
+================================================================================
+rtf-parser v1.2.0
+License: MIT
+Copyright: 2015 Nicko Vlasov
+Source: https://github.com/nicko170/rtf-parser
+Files: vendor/rtf-parser/rtf-parser.min.js
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software.
+
+================================================================================
+Playwright v1.52.0
+License: Apache-2.0
+Copyright: Microsoft Corporation
+Source: https://playwright.dev/
+Dev dependency only, not included in production bundle.

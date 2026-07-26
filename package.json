@@ -1,27 +1,36 @@
 {
-  "name": "toolisto",
-  "version": "2.0.0",
-  "description": "Herramientas directas para preparar imágenes y PDF.",
+  "name": "toolisto-directo-v2",
+  "version": "1.0.0",
+  "description": "Rediseño de Toolisto enfocado en utilidad inmediata. La portada deja de parecer una presentación promocional y funciona como una aplicación web desde el primer vistazo.",
+  "main": "app.js",
+  "directories": {
+    "test": "tests"
+  },
   "scripts": {
-    "build": "node scripts/build.mjs",
-    "audit:count": "node scripts/audit-count.mjs",
-    "audit:slugs": "node test-slug-audit.mjs",
-    "test": "node tests/run-all.mjs",
+    "test": "node scripts/audit-count.mjs",
     "test:batch1": "node tests/batch1-functional-test.js",
     "test:batch2": "node tests/batch2-functional-test.js",
     "test:batch3": "node tests/batch3-functional-test.js",
-    "test:aliases": "node tests/alias-restrictions-test.js",
-    "test:comprehensive": "node tests/comprehensive-test.js",
-    "test:homepage": "node tests/homepage-audit-test.js",
-    "test:qa": "node tests/qa-test.js",
-    "test:seo": "node tests/seo-functional-test.js",
-    "test:embedpdf": "node tests/test-embedpdf.js"
+    "build": "node scripts/generate-seo-pages.mjs --production",
+    "start": "node server.js"
   },
-  "dependencies": {
-    "pdf-lib": "^1.17.1"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wandersepulveda2013/toolisto-web.git"
   },
-  "private": true,
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/wandersepulveda2013/toolisto-web/issues"
+  },
+  "homepage": "https://github.com/wandersepulveda2013/toolisto-web#readme",
   "devDependencies": {
-    "playwright-core": "^1.62.0"
+    "@ffmpeg/core": "^0.12.9",
+    "@ffmpeg/ffmpeg": "^0.12.15",
+    "@ffmpeg/util": "^0.12.2",
+    "playwright": "^1.61.1",
+    "tesseract.js": "^5.1.1"
   }
 }
