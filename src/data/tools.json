@@ -298,5 +298,20 @@
     "accepts": "pdf",
     "color": "red",
     "batch": 3
+  },
+  {
+    "id": "tool-inspectMetadata",
+    "toolId": "inspectMetadata",
+    "processor": "inspectMetadata",
+    "slug": "inspeccionar-metadatos-archivo",
+    "status": "active",
+    "icon": "🔍",
+    "title": "Inspeccionar metadatos",
+    "shortTitle": "Inspeccionar metadatos",
+    "description": "Lee metadatos de archivos sin modificarlos.",
+    "category": "images",
+    "accepts": "all",
+    "color": "blue",
+    "batch": 1
   }
 ]

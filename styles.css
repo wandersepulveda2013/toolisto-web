@@ -357,3 +357,13 @@ footer > small { grid-column: 1 / -1; color: var(--muted); }
   .result-stats, .picker-grid { grid-template-columns: 1fr; }
   .dialog-actions { flex-direction: column; }
 }
+
+.metadata-table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+.metadata-table th { text-align: left; padding: .4rem .6rem; border-bottom: 2px solid var(--line); color: var(--muted); font-size: .75rem; text-transform: uppercase; letter-spacing: .03em; }
+.metadata-table td { padding: .35rem .6rem; border-bottom: 1px solid var(--line); vertical-align: top; word-break: break-word; }
+.metadata-table .meta-label { color: var(--muted); white-space: nowrap; min-width: 120px; font-weight: 500; }
+.metadata-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.metadata-section { margin-bottom: .5rem; }
+.metadata-badge { display: inline-block; padding: .1rem .45rem; border-radius: 4px; font-size: .7rem; background: var(--line); color: var(--muted); }
+.metadata-warn { background: rgba(231,76,60,.05); border: 1px solid rgba(231,76,60,.15); border-radius: 8px; padding: .5rem; }
+.metadata-actions { border-top: 1px solid var(--line); padding-top: .75rem; }

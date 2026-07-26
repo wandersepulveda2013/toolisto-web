@@ -204,7 +204,16 @@
 
   function addFiles(incoming) {
     const allowed = incoming.filter((file) => {
-      const validType = file.type.startsWith('image/') || file.type === 'application/pdf';
+      const ext = (file.name.split('.').pop() || '').toLowerCase();
+      const validType = file.type.startsWith('image/') || file.type === 'application/pdf'
+        || file.type.startsWith('audio/') || file.type.startsWith('video/')
+        || file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        || file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        || file.type === 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
+        || file.type === 'application/msword' || file.type === 'application/vnd.ms-excel'
+        || file.type === 'application/vnd.ms-powerpoint'
+        || file.type === 'application/zip'
+        || ['mp3','ogg','wav','flac','aac','m4a','wma','opus','mp4','webm','avi','mkv','mov','wmv','docx','xlsx','pptx','doc','xls','ppt'].includes(ext);
       const validSize = file.size <= 25 * 1024 * 1024;
       if (!validType) showToast(`${file.name}: formato no compatible`);
       if (validType && !validSize) showToast(`${file.name}: supera 25 MB`);
@@ -288,6 +297,7 @@
     if (/lote|varias|batch/.test(q) && images.length) return 'batchConvert';
     if (/marca.*imagen|watermark.*image/.test(q) && images.length) return 'watermarkImage';
     if (/pdf.*imagen|pdf a imagen/.test(q) && pdfs.length) return 'pdfToImages';
+    if (/metadatos|metadata|inspeccionar|exif|info.*archivo/.test(q)) return 'inspectMetadata';
 
     if (pdfs.length >= 2) return 'mergePdf';
     if (images.length >= 2) return 'imagesPdf';
@@ -325,6 +335,10 @@
     if (tool === 'mergePdf' && (pdfs.length !== files.length || pdfs.length < 1)) {
       return { ok: false, message: 'Selecciona uno o varios archivos PDF.' };
     }
+    if (tool === 'inspectMetadata') {
+      if (files.length < 1) return { ok: false, message: 'Selecciona al menos un archivo para inspeccionar.' };
+      return { ok: true, message: '' };
+    }
     if (['rotatePdf', 'splitPdf', 'extractPdf', 'pdfToImages', 'splitDoublePdf', 'bookletPdf', 'watermarkPdf', 'addPageNumbersPdf', 'addHeaderFooterPdf'].includes(tool) && pdfs.length !== 1) {
       return { ok: false, message: 'Esta herramienta necesita exactamente un archivo PDF.' };
     }
@@ -339,6 +353,7 @@
     if (images.length > 1 && pdfs.length === 0) tools.push('imagesPdf', 'convert', 'batchConvert');
     if (pdfs.length === 1 && images.length === 0) tools.push('rotatePdf', 'splitPdf', 'extractPdf', 'pdfToImages', 'splitDoublePdf', 'bookletPdf', 'watermarkPdf', 'addPageNumbersPdf', 'addHeaderFooterPdf');
     if (pdfs.length >= 2 && images.length === 0) tools.push('mergePdf');
+    if (files.length >= 1) tools.push('inspectMetadata');
     return tools;
   }
 
@@ -463,6 +478,9 @@
         ${controlNumber('hfHeader', 'Encabezado', 'Documento Confidencial', 1, 200)}
         ${controlNumber('hfFooter', 'Pie de página', 'Toolisto', 1, 200)}
       `,
+      inspectMetadata: `
+        <div class="control" style="grid-column:1/-1"><label><div style="color:var(--muted);font-size:.85rem">Análisis local: los archivos nunca salen de tu navegador. Se detectan metadatos EXIF, IPTC, XMP, PDF y Office.</div></label></div>
+      `,
     };
 
     els.advancedControls.innerHTML = htmlByTool[tool] || '';
@@ -558,9 +576,16 @@
         case 'removeBackground': result = await processRemoveBackground(); break;
         case 'batchConvert': result = await processBatchConvert(); break;
         case 'pdfToImages': result = await processPdfToImages(); break;
+        case 'inspectMetadata': result = await processInspectMetadata(); break;
         default: throw new Error('Selecciona una herramienta.');
       }
-      if (result) presentResult(result);
+      if (result) {
+        if (state.tool === 'inspectMetadata' && result.metadata) {
+          presentMetadataResult(result);
+        } else {
+          presentResult(result);
+        }
+      }
     } catch (error) {
       console.error(error);
       showToast(error?.message || 'No pudimos procesar el archivo.');
@@ -1286,6 +1311,641 @@
         ['Formato', ext.toUpperCase()],
         ['Escala', `${Math.round(scalePct * 100)}%`],
       ],
+    };
+  }
+
+  function presentMetadataResult(result) {
+    state.metadataResult = result;
+    els.resultTitle.textContent = result.title;
+    els.resultMessage.textContent = result.message;
+    els.resultStats.innerHTML = '';
+    els.previewArea.innerHTML = '';
+    els.previewArea.hidden = false;
+
+    const r = result.metadata;
+    const sections = [];
+
+    sections.push(`<div class="metadata-section"><h3 style="margin:0 0 .5rem;color:var(--accent)">A. Información general</h3>`);
+    sections.push(`<table class="metadata-table"><tbody>`);
+    r.general.forEach(([k, v]) => {
+      sections.push(`<tr><td class="meta-label">${escapeHtml(k)}</td><td>${escapeHtml(String(v ?? 'No encontrado'))}</td></tr>`);
+    });
+    sections.push(`</tbody></table></div>`);
+
+    if (r.metadataEntries.length) {
+      sections.push(`<div class="metadata-section"><h3 style="margin:1rem 0 .5rem;color:var(--accent)">B. Metadatos encontrados</h3>`);
+      sections.push(`<table class="metadata-table"><thead><tr><th>Campo</th><th>Valor</th><th>Categoría</th></tr></thead><tbody>`);
+      r.metadataEntries.forEach(([field, value, category]) => {
+        sections.push(`<tr><td class="meta-label">${escapeHtml(field)}</td><td>${escapeHtml(String(value ?? 'No encontrado'))}</td><td><span class="meta-badge">${escapeHtml(category)}</span></td></tr>`);
+      });
+      sections.push(`</tbody></table></div>`);
+    }
+
+    if (r.sensitive.length) {
+      sections.push(`<div class="metadata-section metadata-warn"><h3 style="margin:1rem 0 .5rem;color:#e74c3c">C. Información sensible</h3>`);
+      r.sensitive.forEach(([field, value, risk]) => {
+        const color = risk === 'alto' ? '#e74c3c' : risk === 'medio' ? '#f39c12' : '#3498db';
+        sections.push(`<div class="sensitive-item" style="border-left:3px solid ${color};padding:.4rem .8rem;margin:.3rem 0;background:var(--card);border-radius:4px"><strong>${escapeHtml(field)}</strong>: ${escapeHtml(String(value))} <span class="meta-badge" style="background:${color};color:#fff">${escapeHtml(risk)}</span></div>`);
+      });
+      sections.push(`</div>`);
+    } else {
+      sections.push(`<div class="metadata-section"><h3 style="margin:1rem 0 .5rem;color:var(--accent)">C. Información sensible</h3><p style="color:var(--muted)">No se detectaron metadatos sensibles conocidos.</p></div>`);
+    }
+
+    if (r.technical.length) {
+      sections.push(`<div class="metadata-section"><h3 style="margin:1rem 0 .5rem;color:var(--accent)">D. Vista técnica</h3>`);
+      sections.push(`<div class="metadata-table-wrap"><table class="metadata-table"><thead><tr><th>Campo</th><th>Valor</th><th>Categoría</th><th>Riesgo</th></tr></thead><tbody>`);
+      r.technical.forEach(([field, value, category, risk]) => {
+        const rColor = risk === 'alto' ? '#e74c3c' : risk === 'medio' ? '#f39c12' : '#27ae60';
+        sections.push(`<tr><td class="meta-label">${escapeHtml(field)}</td><td>${escapeHtml(String(value ?? ''))}</td><td><span class="meta-badge">${escapeHtml(category)}</span></td><td><span class="meta-badge" style="background:${rColor};color:#fff">${escapeHtml(risk)}</span></td></tr>`);
+      });
+      sections.push(`</tbody></table></div></div>`);
+    }
+
+    sections.push(`<div class="metadata-actions" style="margin-top:1rem;display:flex;flex-wrap:wrap;gap:.5rem">`);
+    sections.push(`<button type="button" class="btn-secondary" onclick="window._metaCopy()">Copiar resultados</button>`);
+    sections.push(`<button type="button" class="btn-secondary" onclick="window._metaDownloadJSON()">Descargar JSON</button>`);
+    sections.push(`<button type="button" class="btn-secondary" onclick="window._metaDownloadTXT()">Descargar TXT</button>`);
+    if (r.canClean) sections.push(`<button type="button" class="btn-secondary" onclick="window._metaClean()" style="border-color:#e74c3c;color:#e74c3c">Limpiar metadatos</button>`);
+    sections.push(`<button type="button" class="btn-secondary" onclick="window._metaReset()">Analizar otro archivo</button>`);
+    sections.push(`</div>`);
+
+    els.previewArea.innerHTML = `<div class="metadata-result" style="width:100%;max-height:60vh;overflow-y:auto;padding:.5rem">${sections.join('')}</div>`;
+    els.resultDialog.showModal();
+  }
+
+  window._metaCopy = function() {
+    const r = state.metadataResult;
+    if (!r) return;
+    const lines = [r.title, r.message, ''];
+    r.metadata.general.forEach(([k, v]) => lines.push(`${k}: ${v ?? 'No encontrado'}`));
+    lines.push('', '--- Metadatos ---');
+    r.metadata.metadataEntries.forEach(([f, v, c]) => lines.push(`[${c}] ${f}: ${v ?? ''}`));
+    if (r.metadata.sensitive.length) { lines.push('', '--- Sensible ---'); r.metadata.sensitive.forEach(([f, v, risk]) => lines.push(`[${risk.toUpperCase()}] ${f}: ${v}`)); }
+    navigator.clipboard.writeText(lines.join('\n')).then(() => showToast('Copiado al portapapeles'));
+  };
+
+  window._metaDownloadJSON = function() {
+    const r = state.metadataResult;
+    if (!r) return;
+    const obj = { title: r.title, general: Object.fromEntries(r.metadata.general), metadata: Object.fromEntries(r.metadata.metadataEntries.map(([f,v,c]) => [f, { value: v, category: c }])), sensitive: r.metadata.sensitive.map(([f,v,r]) => ({ field: f, value: v, risk: r })), technical: Object.fromEntries(r.metadata.technical.map(([f,v,c,r]) => [f, { value: v, category: c, risk: r }])) };
+    const blob = new Blob([JSON.stringify(obj, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = `${r.metadata.fileName || 'metadatos'}.json`; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+  };
+
+  window._metaDownloadTXT = function() {
+    const r = state.metadataResult;
+    if (!r) return;
+    const lines = [r.title, '='.repeat(r.title.length), '', r.message, '', 'INFORMACIÓN GENERAL', '-'.repeat(20)];
+    r.metadata.general.forEach(([k, v]) => lines.push(`  ${k}: ${v ?? 'No encontrado'}`));
+    lines.push('', 'METADATOS ENCONTRADOS', '-'.repeat(20));
+    r.metadata.metadataEntries.forEach(([f, v, c]) => lines.push(`  [${c}] ${f}: ${v ?? ''}`));
+    if (r.metadata.sensitive.length) { lines.push('', 'INFORMACIÓN SENSIBLE', '-'.repeat(20)); r.metadata.sensitive.forEach(([f, v, risk]) => lines.push(`  [${risk.toUpperCase()}] ${f}: ${v}`)); }
+    lines.push('', 'VISTA TÉCNICA', '-'.repeat(20));
+    r.metadata.technical.forEach(([f, v, c, risk]) => lines.push(`  [${c}] ${f}: ${v ?? ''} (${risk})`));
+    const blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = `${r.metadata.fileName || 'metadatos'}.txt`; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+  };
+
+  window._metaClean = async function() {
+    const r = state.metadataResult;
+    if (!r || !state.files.length) return;
+    const file = state.files[0];
+    try {
+      if (file.type === 'image/jpeg') {
+        const buf = new Uint8Array(await file.arrayBuffer());
+        const cleaned = stripJpegExif(buf);
+        const blob = new Blob([cleaned], { type: 'image/jpeg' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a'); a.href = url; a.download = file.name.replace(/\.[^.]+$/, '') + '-sin-metadatos.jpg'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+        showToast('Metadatos eliminados. Descargando copia limpia.');
+      } else {
+        showToast('Limpieza disponible solo para JPEG por ahora.');
+      }
+    } catch (e) { showToast('Error al limpiar: ' + e.message); }
+  };
+
+  window._metaReset = function() {
+    els.resultDialog.close();
+    clearPreviousOutput();
+    state.files = [];
+    state.metadataResult = null;
+    els.fileInput.value = '';
+    els.intentInput.value = '';
+    els.advancedPanel.open = false;
+    renderFiles();
+    updateRecommendation();
+    document.querySelector('#inicio').scrollIntoView({ behavior: 'smooth' });
+  };
+
+  function stripJpegExif(buf) {
+    if (buf[0] !== 0xFF || buf[1] !== 0xD8) return buf;
+    const out = [0xFF, 0xD8];
+    let i = 2;
+    while (i < buf.length - 1) {
+      if (buf[i] !== 0xFF) break;
+      const marker = buf[i + 1];
+      if (marker === 0xDA) { out.push(...buf.slice(i)); break; }
+      if (marker === 0xE1 || marker === 0xED || marker === 0xFE) { i += 2 + (buf[i+2] << 8 | buf[i+3]); continue; }
+      out.push(buf[i], buf[i + 1]);
+      i += 2;
+      if (marker >= 0xC0 && marker <= 0xCF && marker !== 0xC4 && marker !== 0xC8 && marker !== 0xCC) {
+        const len = buf[i] << 8 | buf[i + 1];
+        out.push(...buf.slice(i, i + len));
+        i += len;
+      } else if (marker === 0xC4 || marker === 0xC8 || marker === 0xCC) {
+        const len = buf[i] << 8 | buf[i + 1];
+        i += len;
+      } else if (marker === 0xD9 || marker === 0xD0 || marker === 0xD1 || marker === 0xD2 || marker === 0xD3 || marker === 0xD4 || marker === 0xD5 || marker === 0xD6 || marker === 0xD7 || marker === 0xD8) {
+        /* no payload */
+      } else {
+        const len = buf[i] << 8 | buf[i + 1];
+        i += len;
+      }
+    }
+    return new Uint8Array(out);
+  }
+
+  function parseExifFromBuffer(buf) {
+    const view = new DataView(buf);
+    if (view.getUint16(0) !== 0xFFD8) return null;
+    let offset = 2;
+    while (offset < buf.byteLength - 1) {
+      if (view.getUint8(offset) !== 0xFF) break;
+      const marker = view.getUint8(offset + 1);
+      if (marker === 0xE1) {
+        const len = view.getUint16(offset + 2);
+        const header = String.fromCharCode(...new Uint8Array(buf, offset + 4, 4));
+        if (header.startsWith('Exif')) return parseExifData(buf, offset + 4 + 6, len - 8);
+        offset += 2 + len;
+      } else if (marker === 0xD9 || marker === 0xDA) {
+        break;
+      } else {
+        offset += 2 + (view.getUint16(offset + 2) || 2);
+      }
+    }
+    return null;
+  }
+
+  function parseExifData(buf, start, length) {
+    try {
+      const view = new DataView(buf);
+      const bo = view.getUint16(start);
+      const le = bo === 0x4949;
+      const read16 = (off) => le ? view.getUint16(off, true) : view.getUint16(off);
+      const read32 = (off) => le ? view.getUint32(off, true) : view.getUint32(off);
+      const readAscii = (off, len) => {
+        let s = '';
+        for (let i = 0; i < len; i++) s += String.fromCharCode(view.getUint8(off + i));
+        return s.replace(/\0+$/, '');
+      };
+      const tags = {};
+      const dirStart = start + 2 + 2;
+      const count = read16(dirStart - 2);
+      for (let i = 0; i < count; i++) {
+        const entry = dirStart + i * 12;
+        if (entry + 12 > start + length) break;
+        const tag = read16(entry);
+        const type = read16(entry + 2);
+        const num = read32(entry + 4);
+        let val;
+        const voff = entry + 8;
+        if (type === 2) {
+          const strLen = num > 4 ? read32(voff) : num;
+          const strOff = num > 4 ? (read32(voff) & 0x0FFFFFFF) + start : voff;
+          val = readAscii(strOff, strLen);
+        } else if (type === 3) { val = read16(voff); }
+        else if (type === 4) { val = read32(voff); }
+        else if (type === 5 || type === 10) {
+          const numOff = num > 4 ? (read32(voff) & 0x0FFFFFFF) + start : voff;
+          const n = read32(numOff); const d = read32(numOff + 4);
+          val = d ? n / d : n;
+        }
+        else { val = num; }
+        tags[tag] = val;
+      }
+      return tags;
+    } catch (e) { return null; }
+  }
+
+  const EXIF_TAGS = {
+    0x010F: 'Fabricante', 0x0110: 'Modelo', 0x0112: 'Orientación', 0x011A: 'Resolución X',
+    0x011B: 'Resolución Y', 0x0131: 'Software', 0x0132: 'Fecha modificación', 0x013B: 'Autor',
+    0x8298: 'Copyright', 0x8769: 'IFD Exif', 0x8825: 'GPS IFD',
+    0xA005: 'Exif IFD', 0x010E: 'Descripción', 0x0213: 'Posición YCC',
+    0xA430: 'Cámara owner', 0xA431: 'Serial number', 0xA432: 'Lens info',
+    0xA433: 'Lens make', 0xA434: 'Lens model',
+  };
+
+  const GPS_TAGS = {
+    1: 'GPS Lat Ref', 2: 'GPS Lat', 3: 'GPS Lon Ref', 4: 'GPS Lon',
+    5: 'GPS Alt Ref', 6: 'GPS Altitud',
+  };
+
+  function formatExifValue(tag, val) {
+    if (tag === 0x0112) { const o = {1:'Normal',2:'Volteado horizontal',3:'Rotado 180°',4:'Volteado vertical',5:'Rotado 90° CW',6:'Rotado 90° CCW',7:'No estándar',8:'Rotado 270°'}; return o[val] || String(val); }
+    if (tag === 0xA001 || tag === 0x0106) { const s = {1:'sRGB',2:'Adobe RGB',65535:'No definido'}; return s[val] || String(val); }
+    if (Array.isArray(val)) return val.join('/');
+    return String(val);
+  }
+
+  function getImageDimensions(file) {
+    return new Promise((resolve) => {
+      const url = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload = () => { URL.revokeObjectURL(url); resolve({ width: img.naturalWidth, height: img.naturalHeight }); };
+      img.onerror = () => { URL.revokeObjectURL(url); resolve(null); };
+      img.src = url;
+    });
+  }
+
+  async function analyzeImageMetadata(file) {
+    const general = [['Nombre', file.name], ['Tipo', file.type], ['Tamaño', formatBytes(file.size)], ['Última modificación', new Date(file.lastModified).toLocaleString('es')]];
+    const dims = await getImageDimensions(file);
+    if (dims) general.push(['Dimensiones', `${dims.width} × ${dims.height} px`]);
+    general.push(['Análisis', 'Local en navegador']);
+
+    const metadataEntries = [];
+    const sensitive = [];
+    const technical = [];
+
+    const buf = await file.arrayBuffer();
+    const exifTags = parseExifFromBuffer(buf);
+
+    if (exifTags) {
+      const tagMap = { 0x010F: 'Fabricante', 0x0110: 'Modelo', 0x0112: 'Orientación', 0x0131: 'Software', 0x013B: 'Autor', 0x8298: 'Copyright', 0x010E: 'Descripción', 0xA430: 'Propietario', 0xA431: 'Número de serie', 0xA432: 'Info lente', 0xA433: 'Fabricante lente', 0xA434: 'Modelo lente' };
+      for (const [tag, name] of Object.entries(tagMap)) {
+        const t = parseInt(tag);
+        if (exifTags[t] !== undefined) {
+          const v = formatExifValue(t, exifTags[t]);
+          metadataEntries.push([name, v, 'EXIF']);
+          technical.push([name, v, 'EXIF', 'medio']);
+        }
+      }
+      if (exifTags[0x9003]) metadataEntries.push(['Fecha de captura', exifTags[0x9003], 'EXIF']);
+      if (exifTags[0x9004]) metadataEntries.push(['Fecha original', exifTags[0x9004], 'EXIF']);
+      if (exifTags[0xA001]) metadataEntries.push(['Perfil de color', formatExifValue(0xA001, exifTags[0xA001]), 'EXIF']);
+      if (exifTags[0xA420]) metadataEntries.push(['Versión unique image', String(exifTags[0xA420]), 'EXIF']);
+
+      if (exifTags[0x8825]) {
+        metadataEntries.push(['Datos GPS presentes', 'Sí', 'GPS']);
+        sensitive.push(['Ubicación GPS', 'GPS disponible en archivo', 'alto']);
+        technical.push(['GPS', 'Coordenadas incrustadas', 'GPS', 'alto']);
+      }
+
+      if (exifTags[0x010F]) sensitive.push(['Fabricante de cámara', formatExifValue(0x010F, exifTags[0x010F]), 'medio']);
+      if (exifTags[0x0110]) sensitive.push(['Modelo de cámara', formatExifValue(0x0110, exifTags[0x0110]), 'medio']);
+      if (exifTags[0x0131]) sensitive.push(['Software utilizado', formatExifValue(0x0131, exifTags[0x0131]), 'medio']);
+      if (exifTags[0x013B]) sensitive.push(['Autor', formatExifValue(0x013B, exifTags[0x013B]), 'medio']);
+      if (exifTags[0x8298]) sensitive.push(['Copyright', formatExifValue(0x8298, exifTags[0x8298]), 'bajo']);
+      if (exifTags[0xA430]) sensitive.push(['Propietario de cámara', formatExifValue(0xA430, exifTags[0xA430]), 'medio']);
+      if (exifTags[0xA431]) sensitive.push(['Número de serie', formatExifValue(0xA431, exifTags[0xA431]), 'alto']);
+      if (exifTags[0x9003] || exifTags[0x9004]) sensitive.push(['Fecha de captura', exifTags[0x9003] || exifTags[0x9004], 'medio']);
+    }
+
+    if (dims) { technical.push(['Dimensiones', `${dims.width} × ${dims.height}`, 'Imagen', 'bajo']); technical.push(['Píxeles totales', formatBytes(dims.width * dims.height * 4).replace(' bytes','').trim(), 'Imagen', 'bajo']); }
+    technical.push(['Tamaño archivo', formatBytes(file.size), 'General', 'bajo']);
+    technical.push(['Tipo MIME', file.type || 'No detectado', 'General', 'bajo']);
+
+    return { general, metadataEntries, sensitive, technical, canClean: file.type === 'image/jpeg', fileName: file.name };
+  }
+
+  async function analyzePdfMetadata(file) {
+    const general = [['Nombre', file.name], ['Tipo', file.type], ['Tamaño', formatBytes(file.size)], ['Última modificación', new Date(file.lastModified).toLocaleString('es')], ['Análisis', 'Local en navegador']];
+
+    const metadataEntries = [];
+    const sensitive = [];
+    const technical = [];
+
+    try {
+      if (window.PDFLib) {
+        const pdfDoc = await PDFLib.PDFDocument.load(await file.arrayBuffer(), { ignoreEncryption: true });
+        const title = pdfDoc.getTitle();
+        const author = pdfDoc.getAuthor();
+        const subject = pdfDoc.getSubject();
+        const keywords = pdfDoc.getKeywords();
+        const creator = pdfDoc.getCreator();
+        const producer = pdfDoc.getProducer();
+        const creationDate = pdfDoc.getCreationDate();
+        const modDate = pdfDoc.getModificationDate();
+        const pages = pdfDoc.getPageCount();
+        const isEnc = pdfDoc.isEncrypted;
+
+        const pdfFields = [
+          ['Título', title], ['Autor', author], ['Asunto', subject], ['Palabras clave', keywords],
+          ['Creador', creator], ['Productor', producer], ['Fecha creación', creationDate?.toLocaleString?.('es') || null],
+          ['Fecha modificación', modDate?.toLocaleString?.('es') || null], ['Páginas', pages], ['Cifrado', isEnc ? 'Sí' : 'No'],
+        ];
+        pdfFields.forEach(([k, v]) => {
+          if (v !== null && v !== '' && v !== undefined) metadataEntries.push([k, String(v), 'PDF']);
+        });
+
+        if (author) sensitive.push(['Autor', author, 'medio']);
+        if (creator) sensitive.push(['Software creador', creator, 'medio']);
+        if (producer) sensitive.push(['Software productor', producer, 'medio']);
+        if (creationDate) sensitive.push(['Fecha creación', creationDate.toLocaleString('es'), 'medio']);
+
+        technical.push(['Páginas', pages, 'PDF', 'bajo']);
+        if (isEnc) technical.push(['Cifrado', 'Sí', 'PDF', 'medio']);
+        if (creator) technical.push(['Creador', creator, 'PDF', 'medio']);
+        if (producer) technical.push(['Productor', producer, 'PDF', 'medio']);
+        technical.push(['Tamaño', formatBytes(file.size), 'General', 'bajo']);
+      }
+    } catch (e) {
+      metadataEntries.push(['Error', e.message, 'Error']);
+    }
+
+    return { general, metadataEntries, sensitive, technical, canClean: false, fileName: file.name };
+  }
+
+  async function analyzeOfficeMetadata(file) {
+    const general = [['Nombre', file.name], ['Tipo', file.type], ['Tamaño', formatBytes(file.size)], ['Última modificación', new Date(file.lastModified).toLocaleString('es')], ['Análisis', 'Local en navegador']];
+
+    const metadataEntries = [];
+    const sensitive = [];
+    const technical = [];
+
+    try {
+      if (!window.JSZip) throw new Error('JSZip no disponible');
+      const zip = await JSZip.loadAsync(await file.arrayBuffer());
+
+      const propFiles = ['docProps/core.xml', 'docProps/app.xml', 'docProps/custom.xml'];
+      const propTags = {
+        'dc:creator': 'Autor', 'cp:lastModifiedBy': 'Último autor', 'cp:company': 'Empresa',
+        'cp:manager': 'Administrador', 'dc:title': 'Título', 'dc:subject': 'Asunto',
+        'dc:description': 'Comentarios', 'cp:keywords': 'Palabras clave',
+        'dcterms:created': 'Fecha creación', 'dcterms:modified': 'Fecha modificación',
+        'cp:revision': 'Revisiones', 'Application': 'Aplicación', 'TotalTime': 'Tiempo edición',
+        'Pages': 'Páginas', 'Words': 'Palabras', 'Characters': 'Caracteres',
+      };
+
+      for (const pf of propFiles) {
+        const f = zip.file(pf);
+        if (!f) continue;
+        const xml = await f.async('text');
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(xml, 'text/xml');
+        doc.querySelectorAll('*').forEach((el) => {
+          const tag = el.tagName.split(':').pop();
+          const val = el.textContent?.trim();
+          if (val && propTags[tag]) {
+            const name = propTags[tag];
+            metadataEntries.push([name, val, 'Office']);
+            if (['Autor', 'Último autor', 'Empresa', 'Administrador'].includes(name)) sensitive.push([name, val, 'medio']);
+            if (['Fecha creación', 'Fecha modificación'].includes(name)) sensitive.push([name, val, 'medio']);
+            if (['Aplicación', 'Revisiones', 'Tiempo edición'].includes(name)) technical.push([name, val, 'Office', 'bajo']);
+          }
+        });
+      }
+
+      technical.push(['Tamaño', formatBytes(file.size), 'General', 'bajo']);
+    } catch (e) {
+      metadataEntries.push(['Error', e.message, 'Error']);
+    }
+
+    return { general, metadataEntries, sensitive, technical, canClean: false, fileName: file.name };
+  }
+
+  async function analyzeAudioMetadata(file) {
+    const general = [['Nombre', file.name], ['Tipo', file.type], ['Tamaño', formatBytes(file.size)], ['Última modificación', new Date(file.lastModified).toLocaleString('es')], ['Análisis', 'Local en navegador']];
+
+    const metadataEntries = [];
+    const sensitive = [];
+    const technical = [];
+
+    try {
+      const buf = new Uint8Array(await file.arrayBuffer());
+
+      if (buf[0] === 0x49 && buf[1] === 0x44 && buf[2] === 0x33) {
+        const version = buf[3];
+        const size = ((buf[6] & 0x7F) << 21) | ((buf[7] & 0x7F) << 14) | ((buf[8] & 0x7F) << 7) | (buf[9] & 0x7F);
+        general.push(['Formato', `ID3v2.${version}`]);
+
+        const maxLen = Math.min(size + 10, buf.length);
+        let offset = 10;
+        let safety = 0;
+        while (offset < maxLen - 10 && safety < 100) {
+          safety++;
+          const frameId = String.fromCharCode(buf[offset], buf[offset+1], buf[offset+2], buf[offset+3]);
+          if (buf[offset] === 0) break;
+          let frameSize;
+          if (version === 4) {
+            frameSize = ((buf[offset+4] & 0x7F) << 21) | ((buf[offset+5] & 0x7F) << 14) | ((buf[offset+6] & 0x7F) << 7) | (buf[offset+7] & 0x7F);
+          } else {
+            frameSize = (buf[offset+4] << 24) | (buf[offset+5] << 16) | (buf[offset+6] << 8) | buf[offset+7];
+          }
+          if (frameSize <= 0 || frameSize > buf.length) break;
+
+          const encoding = buf[offset + 10];
+          const textBytes = buf.slice(offset + 11, offset + 10 + frameSize);
+          let text;
+          if (encoding === 0 || encoding === 3) text = new TextDecoder('utf-8').decode(textBytes);
+          else text = new TextDecoder('iso-8859-1').decode(textBytes);
+          text = text.replace(/\0+$/, '');
+
+          const id3Map = { TIT2: 'Título', TPE1: 'Artista', TALB: 'Álbum', TCON: 'Género', TDRC: 'Año', TYER: 'Año', COMM: 'Comentarios', TENC: 'Software', TSSE: 'Software' };
+          if (id3Map[frameId] && text) {
+            metadataEntries.push([id3Map[frameId], text, 'ID3']);
+            if (['Software'].includes(id3Map[frameId])) sensitive.push([id3Map[frameId], text, 'medio']);
+          }
+
+          offset += 10 + frameSize;
+        }
+
+        if (buf[128] === 0x54 && buf[129] === 0x41 && buf[130] === 0x47) {
+          const title = new TextDecoder('iso-8859-1').decode(buf.slice(133, 163)).replace(/\0+$/, '');
+          const artist = new TextDecoder('iso-8859-1').decode(buf.slice(163, 193)).replace(/\0+$/, '');
+          const album = new TextDecoder('iso-8859-1').decode(buf.slice(193, 223)).replace(/\0+$/, '');
+          if (title && !metadataEntries.find(([k]) => k === 'Título')) metadataEntries.push(['Título (ID3v1)', title, 'ID3']);
+          if (artist && !metadataEntries.find(([k]) => k === 'Artista')) metadataEntries.push(['Artista (ID3v1)', artist, 'ID3']);
+          if (album && !metadataEntries.find(([k]) => k === 'Álbum')) metadataEntries.push(['Álbum (ID3v1)', album, 'ID3']);
+        }
+      } else if (buf[0] === 0x66 && buf[1] === 0x4C && buf[2] === 0x61 && buf[3] === 0x43) {
+        general.push(['Formato', 'FLAC']);
+        let pos = 4;
+        while (pos < Math.min(buf.length, 10000)) {
+          const isLast = (buf[pos] & 0x80) !== 0;
+          const blockType = buf[pos] & 0x7F;
+          const blockSize = (buf[pos+1] << 16) | (buf[pos+2] << 8) | buf[pos+3];
+          if (blockType === 4 && blockSize > 0) {
+            const tagData = new TextDecoder('utf-8').decode(buf.slice(pos + 4, pos + 4 + blockSize));
+            const pairs = tagData.split('\n').filter(Boolean);
+            pairs.forEach((p) => {
+              const [k, ...vParts] = p.split('=');
+              const v = vParts.join('=');
+              const map = { TITLE: 'Título', ARTIST: 'Artista', ALBUM: 'Álbum', GENRE: 'Género', DATE: 'Año', COMMENT: 'Comentarios', SOFTWARE: 'Software' };
+              if (map[k] && v) metadataEntries.push([map[k], v, 'Vorbis']);
+            });
+          }
+          pos += 4 + blockSize;
+          if (isLast) break;
+        }
+      } else {
+        general.push(['Formato', file.type || 'Desconocido']);
+        metadataEntries.push(['Etiquetas', 'Formato no reconocido para análisis ID3/Vorbis', 'Info']);
+      }
+
+      technical.push(['Tamaño', formatBytes(file.size), 'General', 'bajo']);
+      technical.push(['Tipo MIME', file.type || 'No detectado', 'General', 'bajo']);
+    } catch (e) {
+      metadataEntries.push(['Error al analizar audio', e.message, 'Error']);
+    }
+
+    return { general, metadataEntries, sensitive, technical, canClean: false, fileName: file.name };
+  }
+
+  async function analyzeVideoMetadata(file) {
+    const general = [['Nombre', file.name], ['Tipo', file.type], ['Tamaño', formatBytes(file.size)], ['Última modificación', new Date(file.lastModified).toLocaleString('es')], ['Análisis', 'Local en navegador']];
+
+    const metadataEntries = [];
+    const sensitive = [];
+    const technical = [];
+
+    try {
+      const buf = new Uint8Array(await file.arrayBuffer());
+
+      if (buf[4] === 0x66 && buf[5] === 0x74 && buf[6] === 0x79 && buf[7] === 0x70) {
+        const brand = new TextDecoder('ascii').decode(buf.slice(8, 12)).replace(/\0+$/g, '');
+        general.push(['Formato', `MP4 (${brand})`]);
+
+        const findBox = (data, type, start = 0, end = data.length) => {
+          let pos = start;
+          while (pos < end - 8) {
+            const sz = (data[pos] << 24) | (data[pos+1] << 16) | (data[pos+2] << 8) | data[pos+3];
+            if (sz <= 0 || sz > end - pos) return null;
+            const boxType = String.fromCharCode(data[pos+4], data[pos+5], data[pos+6], data[pos+7]);
+            if (boxType === type) return { offset: pos, size: sz };
+            pos += sz;
+          }
+          return null;
+        };
+
+        const readBox = (data, type) => {
+          const box = findBox(data, type);
+          if (!box) return null;
+          return data.slice(box.offset + 8, box.offset + box.size);
+        };
+
+        const parseString = (data, encoding) => {
+          const decoder = new TextDecoder(encoding || 'utf-8');
+          return decoder.decode(data).replace(/\0+$/g, '');
+        };
+
+        const mvhd = readBox(buf, 'mvhd');
+        if (mvhd) {
+          const version = mvhd[0];
+          let ts;
+          if (version === 0) ts = (mvhd[12] << 24) | (mvhd[13] << 16) | (mvhd[14] << 8) | mvhd[15];
+          else ts = ((mvhd[16] & 0xFF) << 56) | ((mvhd[17] & 0xFF) << 48) | ((mvhd[18] & 0xFF) << 40) | ((mvhd[19] & 0xFF) << 32) | (mvhd[20] << 24) | (mvhd[21] << 16) | (mvhd[22] << 8) | mvhd[23];
+          const timescale = version === 0 ? (mvhd[16] << 24 | mvhd[17] << 16 | mvhd[18] << 8 | mvhd[19]) : 1;
+          if (timescale > 0 && ts > 0) {
+            const dur = ts / timescale;
+            general.push(['Duración', `${Math.floor(dur / 60)}m ${Math.floor(dur % 60)}s`]);
+            technical.push(['Duración', `${dur.toFixed(1)}s`, 'Video', 'bajo']);
+          }
+        }
+
+        const meta = readBox(buf, 'meta');
+        if (meta) {
+          const udta = (() => {
+            let pos = 0;
+            while (pos < meta.length - 8) {
+              const sz = (meta[pos] << 24) | (meta[pos+1] << 16) | (meta[pos+2] << 8) | meta[pos+3];
+              const t = String.fromCharCode(meta[pos+4], meta[pos+5], meta[pos+6], meta[pos+7]);
+              if (t === 'udta') return meta.slice(pos + 8, pos + sz);
+              if (sz <= 0) break;
+              pos += sz;
+            }
+            return null;
+          })();
+          if (udta) {
+            let pos = 0;
+            while (pos < udta.length - 8) {
+              const sz = (udta[pos] << 24) | (udta[pos+1] << 16) | (udta[pos+2] << 8) | udta[pos+3];
+              const t = String.fromCharCode(udta[pos+4], udta[pos+5], udta[pos+6], udta[pos+7]);
+              if (sz <= 0 || sz > udta.length - pos) break;
+              const tagMap = { '\xA9nam': 'Título', '\xA9ART': 'Artista', '\xA9alb': 'Álbum', '\xA9gen': 'Género', '\xA9day': 'Año', '\xA9cmt': 'Comentarios', '\xA9too': 'Software', '©nam': 'Título', '©ART': 'Artista', '©alb': 'Álbum', '©gen': 'Género', '©day': 'Año', '©cmt': 'Comentarios', '©too': 'Software' };
+              if (tagMap[t]) {
+                const val = parseString(udta.slice(pos + 8, pos + sz));
+                if (val) { metadataEntries.push([tagMap[t], val, 'MP4']); if (tagMap[t] === 'Software') sensitive.push(['Software', val, 'medio']); }
+              }
+              pos += sz;
+            }
+          }
+        }
+
+        const trak = findBox(buf, 'trak');
+        if (trak) {
+          const tkhd = readBox(buf, 'tkhd');
+          if (tkhd && tkhd.length > 24) {
+            const w = (tkhd[20] << 8) | tkhd[21];
+            const h = (tkhd[22] << 8) | tkhd[23];
+            if (w && h) general.push(['Resolución', `${w} × ${h} px`]);
+          }
+        }
+      } else {
+        general.push(['Formato', file.type || 'Desconocido']);
+        metadataEntries.push(['Etiquetas', 'Formato MP4/ISOBMFF requerido para análisis detallado', 'Info']);
+      }
+
+      technical.push(['Tamaño', formatBytes(file.size), 'General', 'bajo']);
+      technical.push(['Tipo MIME', file.type || 'No detectado', 'General', 'bajo']);
+    } catch (e) {
+      metadataEntries.push(['Error al analizar video', e.message, 'Error']);
+    }
+
+    return { general, metadataEntries, sensitive, technical, canClean: false, fileName: file.name };
+  }
+
+  async function processInspectMetadata() {
+    const files = state.files;
+    if (!files.length) throw new Error('Selecciona al menos un archivo.');
+    const allResults = [];
+
+    for (const file of files) {
+      let metadata;
+      const mime = file.type || '';
+      if (mime.startsWith('image/')) metadata = await analyzeImageMetadata(file);
+      else if (mime === 'application/pdf') metadata = await analyzePdfMetadata(file);
+      else if (mime.includes('word') || mime.includes('document') || file.name.match(/\.docx?$/i)) metadata = await analyzeOfficeMetadata(file);
+      else if (mime.startsWith('audio/')) metadata = await analyzeAudioMetadata(file);
+      else if (mime.startsWith('video/')) metadata = await analyzeVideoMetadata(file);
+      else metadata = {
+        general: [['Nombre', file.name], ['Tipo', file.type || 'Desconocido'], ['Tamaño', formatBytes(file.size)], ['Última modificación', new Date(file.lastModified).toLocaleString('es')]],
+        metadataEntries: [['Formato', 'Tipo de archivo no reconocido para análisis detallado', 'Info']],
+        sensitive: [], technical: [['Tamaño', formatBytes(file.size), 'General', 'bajo']], canClean: false, fileName: file.name,
+      };
+      allResults.push(metadata);
+    }
+
+    if (allResults.length === 1) {
+      const m = allResults[0];
+      return {
+        metadata: m,
+        blob: null, name: '',
+        title: 'Metadatos inspeccionados',
+        message: `${m.metadataEntries.length} campo(s) detectado(s) en "${m.fileName}".`,
+        preview: null, stats: [],
+      };
+    }
+
+    const merged = { general: [], metadataEntries: [], sensitive: [], technical: [], canClean: false, fileName: `${allResults.length} archivos` };
+    for (const m of allResults) {
+      merged.metadataEntries.push([`--- ${m.fileName} ---`, '', '']);
+      merged.metadataEntries.push(...m.metadataEntries);
+      merged.sensitive.push(...m.sensitive);
+      merged.technical.push(...m.technical);
+    }
+    merged.canClean = allResults.some(m => m.canClean);
+
+    return {
+      metadata: merged,
+      blob: null, name: '',
+      title: 'Metadatos inspeccionados',
+      message: `${allResults.length} archivo(s) analizado(s).`,
+      preview: null, stats: [],
     };
   }
 

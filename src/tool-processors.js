@@ -434,6 +434,7 @@
   processors.crop = async function () { throw new Error('Recorte requiere Canvas (solo navegador).'); };
   processors.convert = async function () { throw new Error('Conversión requiere Canvas (solo navegador).'); };
   processors.signature = async function () { throw new Error('Firma requiere Canvas (solo navegador).'); };
+  processors.inspectMetadata = async function () { throw new Error('Inspección de metadatos requiere APIs del navegador.'); };
 
   if (typeof module !== 'undefined' && module.exports) {
     module.exports = processors;

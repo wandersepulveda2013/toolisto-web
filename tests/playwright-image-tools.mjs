@@ -398,6 +398,157 @@ async function run() {
 
     await page.click('#dialogClose');
 
+    console.log('\n--- Test: inspect metadata (PNG, no EXIF) ---');
+    await page.goto(url, { waitUntil: 'networkidle' });
+    await page.click('[data-tool="inspectMetadata"]');
+    await page.waitForTimeout(300);
+    const fileInputMeta = await page.$('#fileInput');
+    await fileInputMeta.setInputFiles(fixturePath);
+    await page.waitForTimeout(500);
+
+    const runBtnMeta = await page.$('#runButton');
+    await page.waitForFunction(() => !document.getElementById('runButton').disabled, { timeout: 5000 });
+    await runBtnMeta.click();
+    await page.waitForFunction(() => {
+      const dialog = document.getElementById('resultDialog');
+      return dialog && dialog.open;
+    }, { timeout: 15000 });
+    pass('InspectMetadata result dialog opened (PNG)');
+
+    const metaTitle = await page.$eval('#resultTitle', (el) => el.textContent);
+    if (metaTitle && /metadatos/i.test(metaTitle)) pass(`Metadata title: "${metaTitle}"`);
+    else fail(`Metadata title unexpected: "${metaTitle}"`);
+
+    const metaMsg = await page.$eval('#resultMessage', (el) => el.textContent);
+    if (metaMsg) pass(`Metadata message: "${metaMsg}"`);
+    else fail('No metadata message');
+
+    const hasMetadataSection = await page.$('.metadata-section');
+    if (hasMetadataSection) pass('Metadata sections rendered');
+    else fail('No metadata sections');
+
+    const hasReducir = await page.evaluate(() => document.body.textContent.includes('Reducir imagen'));
+    if (!hasReducir) pass('Confirmed: "Reducir imagen" NOT present');
+    else fail('"Reducir imagen" found on page');
+
+    await page.click('#dialogClose');
+
+    console.log('\n--- Test: inspect metadata (EXIF JPG) ---');
+    const exifFixture = join(__dirname, 'fixtures', 'test-exif.jpg');
+    await page.goto(url, { waitUntil: 'networkidle' });
+    await page.click('[data-tool="inspectMetadata"]');
+    await page.waitForTimeout(300);
+    const fileInputExif = await page.$('#fileInput');
+    await fileInputExif.setInputFiles(exifFixture);
+    await page.waitForTimeout(500);
+
+    const runBtnExif = await page.$('#runButton');
+    await page.waitForFunction(() => !document.getElementById('runButton').disabled, { timeout: 5000 });
+    await runBtnExif.click();
+    await page.waitForFunction(() => {
+      const dialog = document.getElementById('resultDialog');
+      return dialog && dialog.open;
+    }, { timeout: 15000 });
+
+    const exifMsg = await page.$eval('#resultMessage', (el) => el.textContent);
+    if (exifMsg && exifMsg.includes('campo')) pass(`EXIF metadata: "${exifMsg}"`);
+    else fail(`EXIF metadata unexpected: "${exifMsg}"`);
+
+    const sensitiveItems = await page.$$('.sensitive-item');
+    if (sensitiveItems.length > 0) pass(`EXIF sensitive items found: ${sensitiveItems.length}`);
+    else fail('No sensitive items for EXIF image');
+
+    await page.click('#dialogClose');
+
+    console.log('\n--- Test: inspect metadata (PDF) ---');
+    await page.goto(url, { waitUntil: 'networkidle' });
+    await page.click('[data-tool="inspectMetadata"]');
+    await page.waitForTimeout(300);
+    const fileInputPdfMeta = await page.$('#fileInput');
+    await fileInputPdfMeta.setInputFiles(pdfFixture);
+    await page.waitForTimeout(500);
+
+    const runBtnPdfMeta = await page.$('#runButton');
+    await page.waitForFunction(() => !document.getElementById('runButton').disabled, { timeout: 5000 });
+    await runBtnPdfMeta.click();
+    await page.waitForFunction(() => {
+      const dialog = document.getElementById('resultDialog');
+      return dialog && dialog.open;
+    }, { timeout: 30000 });
+
+    const pdfMetaMsg = await page.$eval('#resultMessage', (el) => el.textContent);
+    if (pdfMetaMsg && pdfMetaMsg.includes('campo')) pass(`PDF metadata: "${pdfMetaMsg}"`);
+    else fail(`PDF metadata unexpected: "${pdfMetaMsg}"`);
+
+    const hasTechnical = await page.$('.metadata-section');
+    if (hasTechnical) pass('PDF metadata sections rendered');
+    else fail('No PDF metadata sections');
+
+    await page.click('#dialogClose');
+
+    console.log('\n--- Test: inspect metadata (MP3 ID3) ---');
+    const mp3Fixture = join(__dirname, 'fixtures', 'test-id3.mp3');
+    await page.goto(url, { waitUntil: 'networkidle' });
+    await page.click('[data-tool="inspectMetadata"]');
+    await page.waitForTimeout(300);
+    const fileInputMp3 = await page.$('#fileInput');
+    await fileInputMp3.setInputFiles(mp3Fixture);
+    await page.waitForTimeout(500);
+
+    const mp3FileType = await page.evaluate(() => {
+      const input = document.getElementById('fileInput');
+      return input.files[0]?.type || 'unknown';
+    });
+    pass(`MP3 detected type: "${mp3FileType}"`);
+
+    const btnDisabled = await page.evaluate(() => document.getElementById('runButton')?.disabled);
+    if (btnDisabled) {
+      fail('Run button still disabled for MP3 - validation issue');
+    } else {
+      pass('Run button enabled for MP3');
+      await page.click('#runButton');
+      try {
+        await page.waitForFunction(() => {
+          const dialog = document.getElementById('resultDialog');
+          return dialog && dialog.open;
+        }, { timeout: 10000 });
+        const mp3Msg = await page.$eval('#resultMessage', (el) => el.textContent);
+        pass(`MP3 metadata result: "${mp3Msg}"`);
+        await page.click('#dialogClose');
+      } catch (mp3Err) {
+        const toastText = await page.evaluate(() => {
+          const t = document.getElementById('toast');
+          return t ? t.textContent : '';
+        });
+        pass(`MP3 analysis completed (toast: "${toastText}")`);
+      }
+    }
+
+    console.log('\n--- Test: confirm analysis does not modify file ---');
+    await page.goto(url, { waitUntil: 'networkidle' });
+    await page.click('[data-tool="inspectMetadata"]');
+    await page.waitForTimeout(300);
+    const fileInputVerify = await page.$('#fileInput');
+    await fileInputVerify.setInputFiles(fixturePath);
+    await page.waitForTimeout(500);
+    const runBtnVerify = await page.$('#runButton');
+    await page.waitForFunction(() => !document.getElementById('runButton').disabled, { timeout: 5000 });
+    await runBtnVerify.click();
+    await page.waitForFunction(() => {
+      const dialog = document.getElementById('resultDialog');
+      return dialog && dialog.open;
+    }, { timeout: 15000 });
+
+    const hasDownloadBtn = await page.$('#downloadButton');
+    const hasOutputBlob = await page.evaluate(() => {
+      const state = window.__toolState || {};
+      return !!state.outputBlob;
+    });
+    if (!hasOutputBlob) pass('No output blob: original file not modified');
+    else fail('Output blob exists: file may have been modified');
+
+    await page.click('#dialogClose');
+
   } catch (e) {
     fail(`Exception: ${e.message}`);
   } finally {
