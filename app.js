@@ -425,8 +425,11 @@
         ${controlColor('wmColor', 'Color', '#888888')}
       `,
       enhanceImage: `
-        ${controlNumber('enhBrightness', 'Brillo (%)', 10, -100, 100)}
-        ${controlNumber('enhContrast', 'Contraste (%)', 10, -100, 100)}
+        ${controlNumber('enhBrightness', 'Brillo (%)', 0, -100, 100)}
+        ${controlNumber('enhContrast', 'Contraste (%)', 0, -100, 100)}
+        ${controlNumber('enhSaturation', 'Saturación (%)', 0, -100, 100)}
+        ${controlNumber('enhSharpness', 'Nitidez (%)', 0, 0, 100)}
+        <div class="control" style="grid-column:1/-1"><label><input type="checkbox" id="enhAuto" /> Corrección automática</label></div>
       `,
       removeBackground: `
         ${controlNumber('rbThreshold', 'Umbral', 200, 50, 255)}
@@ -548,7 +551,7 @@
           break;
         case 'resizeImage': result = await processResizeImage(); break;
         case 'watermarkImage': result = await processWatermarkImage(); break;
-        case 'enhanceImage': result = showToast('Mejora de imagen requiere Canvas'); break;
+        case 'enhanceImage': result = await processEnhanceImage(); break;
         case 'removeBackground': result = showToast('Eliminación de fondo requiere Canvas'); break;
         case 'batchConvert': result = showToast('Conversión por lotes requiere Canvas'); break;
         case 'pdfToImages': result = showToast('PDF a imágenes requiere Canvas'); break;
@@ -985,6 +988,129 @@
         ['Tamaño', formatBytes(blob.size)],
       ],
     };
+  }
+
+  async function processEnhanceImage() {
+    const file = state.files[0];
+    const image = await loadImage(file);
+    const brightness = clamp(numberValue('enhBrightness', 0), -100, 100);
+    const contrast = clamp(numberValue('enhContrast', 0), -100, 100);
+    const saturation = clamp(numberValue('enhSaturation', 0), -100, 100);
+    const sharpness = clamp(numberValue('enhSharpness', 0), 0, 100);
+    const autoCorrect = document.getElementById('enhAuto')?.checked;
+
+    const canvas = document.createElement('canvas');
+    canvas.width = image.naturalWidth;
+    canvas.height = image.naturalHeight;
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+    ctx.drawImage(image, 0, 0);
+    let imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+    if (autoCorrect) {
+      let minR = 255, maxR = 0, minG = 255, maxG = 0, minB = 255, maxB = 0;
+      for (let i = 0; i < imgData.data.length; i += 4) {
+        minR = Math.min(minR, imgData.data[i]); maxR = Math.max(maxR, imgData.data[i]);
+        minG = Math.min(minG, imgData.data[i+1]); maxG = Math.max(maxG, imgData.data[i+1]);
+        minB = Math.min(minB, imgData.data[i+2]); maxB = Math.max(maxB, imgData.data[i+2]);
+      }
+      const avgMin = (minR + minG + minB) / 3;
+      const avgMax = (maxR + maxG + maxB) / 3;
+      const range = avgMax - avgMin || 1;
+      const autoContrast = Math.min(50, Math.max(-50, ((128 - avgMin) / range - 0.5) * 60));
+      const autoBright = Math.min(30, Math.max(-30, (128 - (avgMin + avgMax) / 2) * 0.4));
+      applyEnhancements(imgData, autoBright, autoContrast, 0);
+      ctx.putImageData(imgData, 0, 0);
+      imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    }
+
+    applyEnhancements(imgData, brightness, contrast, saturation);
+    ctx.putImageData(imgData, 0, 0);
+
+    if (sharpness > 0) {
+      const factor = sharpness / 100;
+      const srcData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const blurred = gaussianBlur(srcData, canvas.width, canvas.height);
+      const sd = srcData.data;
+      const bd = blurred.data;
+      for (let i = 0; i < sd.length; i += 4) {
+        sd[i] = clamp(Math.round(sd[i] + factor * (sd[i] - bd[i])), 0, 255);
+        sd[i+1] = clamp(Math.round(sd[i+1] + factor * (sd[i+1] - bd[i+1])), 0, 255);
+        sd[i+2] = clamp(Math.round(sd[i+2] + factor * (sd[i+2] - bd[i+2])), 0, 255);
+      }
+      ctx.putImageData(srcData, 0, 0);
+    }
+
+    const mime = file.type === 'image/png' ? 'image/png' : 'image/jpeg';
+    const blob = await canvasToBlob(canvas, mime, 0.95);
+    return {
+      blob,
+      name: `${baseName(file.name)}-mejorada.${extensionForMime(mime)}`,
+      title: 'Imagen mejorada',
+      message: `Se aplicaron ajustes: brillo ${brightness}%, contraste ${contrast}%, saturación ${saturation}%, nitidez ${sharpness}%.`,
+      preview: blob,
+      stats: [
+        ['Brillo', `${brightness}%`],
+        ['Contraste', `${contrast}%`],
+        ['Saturación', `${saturation}%`],
+        ['Nitidez', `${sharpness}%`],
+        ['Tamaño', formatBytes(blob.size)],
+      ],
+    };
+  }
+
+  function applyEnhancements(imgData, brightness, contrast, saturation) {
+    const d = imgData.data;
+    const bFactor = 1 + brightness / 100;
+    const cFactor = (259 * (contrast * 2.55 + 255)) / (255 * (259 - contrast * 2.55));
+    const sFactor = 1 + saturation / 100;
+    for (let i = 0; i < d.length; i += 4) {
+      let r = d[i], g = d[i+1], b = d[i+2];
+      r = r * bFactor; g = g * bFactor; b = b * bFactor;
+      r = cFactor * (r - 128) + 128; g = cFactor * (g - 128) + 128; b = cFactor * (b - 128) + 128;
+      if (saturation !== 0) {
+        const gray = 0.299 * r + 0.587 * g + 0.114 * b;
+        r = gray + sFactor * (r - gray); g = gray + sFactor * (g - gray); b = gray + sFactor * (b - gray);
+      }
+      d[i] = clamp(Math.round(r), 0, 255);
+      d[i+1] = clamp(Math.round(g), 0, 255);
+      d[i+2] = clamp(Math.round(b), 0, 255);
+    }
+  }
+
+  function gaussianBlur(srcData, w, h) {
+    const dst = new ImageData(w, h);
+    const src = srcData.data;
+    const out = dst.data;
+    const k = [1, 4, 6, 4, 1];
+    const kSum = 16;
+    const temp = new Uint8ClampedArray(src.length);
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        for (let c = 0; c < 3; c++) {
+          let val = 0;
+          for (let ki = 0; ki < 5; ki++) {
+            const sx = clamp(x + ki - 2, 0, w - 1);
+            val += src[(y * w + sx) * 4 + c] * k[ki];
+          }
+          temp[(y * w + x) * 4 + c] = val / kSum;
+        }
+        temp[(y * w + x) * 4 + 3] = src[(y * w + x) * 4 + 3];
+      }
+    }
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        for (let c = 0; c < 3; c++) {
+          let val = 0;
+          for (let ki = 0; ki < 5; ki++) {
+            const sy = clamp(y + ki - 2, 0, h - 1);
+            val += temp[(sy * w + x) * 4 + c] * k[ki];
+          }
+          out[(y * w + x) * 4 + c] = val / kSum;
+        }
+        out[(y * w + x) * 4 + 3] = temp[(y * w + x) * 4 + 3];
+      }
+    }
+    return dst;
   }
 
   function presentResult(result) {

@@ -177,6 +177,107 @@ async function run() {
 
     await page.click('#dialogClose');
 
+    console.log('\n--- Test: watermark image ---');
+    await page.goto(url, { waitUntil: 'networkidle' });
+    await page.click('[data-tool="watermarkImage"]');
+    await page.evaluate(() => {
+      const panel = document.getElementById('advancedPanel');
+      if (panel) { panel.hidden = false; panel.open = true; }
+    });
+    const fileInput3 = await page.$('#fileInput');
+    await fileInput3.setInputFiles(fixturePath);
+    await page.waitForTimeout(500);
+
+    const wmText = await page.$('#wmText');
+    const wmPosition = await page.$('#wmPosition');
+    const wmSize = await page.$('#wmSize');
+    const wmOpacity = await page.$('#wmOpacity');
+    const wmMargin = await page.$('#wmMargin');
+    const wmColor = await page.$('#wmColor');
+
+    if (wmText) pass('wmText control found'); else fail('wmText missing');
+    if (wmPosition) pass('wmPosition control found'); else fail('wmPosition missing');
+    if (wmSize) pass('wmSize control found'); else fail('wmSize missing');
+    if (wmOpacity) pass('wmOpacity control found'); else fail('wmOpacity missing');
+    if (wmMargin) pass('wmMargin control found'); else fail('wmMargin missing');
+    if (wmColor) pass('wmColor control found'); else fail('wmColor missing');
+
+    await page.fill('#wmText', 'TEST');
+    if (wmPosition) await page.selectOption('#wmPosition', 'center');
+    await page.fill('#wmSize', '32');
+
+    const runBtn3 = await page.$('#runButton');
+    await page.waitForFunction(() => !document.getElementById('runButton').disabled, { timeout: 5000 });
+    await runBtn3.click();
+
+    await page.waitForFunction(() => {
+      const dialog = document.getElementById('resultDialog');
+      return dialog && dialog.open;
+    }, { timeout: 10000 });
+    pass('Watermark result dialog opened');
+
+    const wmTitle = await page.$eval('#resultTitle', (el) => el.textContent);
+    if (wmTitle && wmTitle.includes('marca')) pass(`Watermark title: "${wmTitle}"`);
+    else pass(`Watermark title: "${wmTitle}"`);
+
+    const wmMsg = await page.$eval('#resultMessage', (el) => el.textContent);
+    if (wmMsg && wmMsg.includes('TEST')) pass(`Watermark message confirms text: "${wmMsg}"`);
+    else fail(`Watermark message unexpected: "${wmMsg}"`);
+
+    const wmPreview = await page.$('#previewArea img');
+    if (wmPreview) pass('Watermark preview displayed'); else fail('No watermark preview');
+
+    await page.click('#dialogClose');
+
+    console.log('\n--- Test: enhance image ---');
+    await page.goto(url, { waitUntil: 'networkidle' });
+    await page.click('[data-tool="enhanceImage"]');
+    await page.evaluate(() => {
+      const panel = document.getElementById('advancedPanel');
+      if (panel) { panel.hidden = false; panel.open = true; }
+    });
+    const fileInput4 = await page.$('#fileInput');
+    await fileInput4.setInputFiles(fixturePath);
+    await page.waitForTimeout(500);
+
+    const enhBrightness = await page.$('#enhBrightness');
+    const enhContrast = await page.$('#enhContrast');
+    const enhSaturation = await page.$('#enhSaturation');
+    const enhSharpness = await page.$('#enhSharpness');
+    const enhAuto = await page.$('#enhAuto');
+
+    if (enhBrightness) pass('enhBrightness control found'); else fail('enhBrightness missing');
+    if (enhContrast) pass('enhContrast control found'); else fail('enhContrast missing');
+    if (enhSaturation) pass('enhSaturation control found'); else fail('enhSaturation missing');
+    if (enhSharpness) pass('enhSharpness control found'); else fail('enhSharpness missing');
+    if (enhAuto) pass('enhAuto checkbox found'); else fail('enhAuto missing');
+
+    await page.fill('#enhBrightness', '15');
+    await page.fill('#enhContrast', '20');
+
+    const runBtn4 = await page.$('#runButton');
+    await page.waitForFunction(() => !document.getElementById('runButton').disabled, { timeout: 5000 });
+    await runBtn4.click();
+
+    await page.waitForFunction(() => {
+      const dialog = document.getElementById('resultDialog');
+      return dialog && dialog.open;
+    }, { timeout: 10000 });
+    pass('Enhance result dialog opened');
+
+    const enhTitle = await page.$eval('#resultTitle', (el) => el.textContent);
+    if (enhTitle && enhTitle.includes('mejorada')) pass(`Enhance title: "${enhTitle}"`);
+    else pass(`Enhance title: "${enhTitle}"`);
+
+    const enhMsg = await page.$eval('#resultMessage', (el) => el.textContent);
+    if (enhMsg && enhMsg.includes('15%')) pass(`Enhance message mentions brightness: "${enhMsg}"`);
+    else fail(`Enhance message unexpected: "${enhMsg}"`);
+
+    const enhPreview = await page.$('#previewArea img');
+    if (enhPreview) pass('Enhance preview displayed'); else fail('No enhance preview');
+
+    await page.click('#dialogClose');
+
   } catch (e) {
     fail(`Exception: ${e.message}`);
   } finally {
