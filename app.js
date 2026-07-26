@@ -403,7 +403,9 @@
       resizeImage: `
         ${controlNumber('resizeWidth', 'Ancho (px)', 800, 1, 10000)}
         ${controlNumber('resizeHeight', 'Alto (px)', 600, 1, 10000)}
+        <div class="control" style="grid-column:1/-1"><label><input type="checkbox" id="resizeKeepRatio" checked /> Mantener proporción</label></div>
         ${controlSelect('resizeFormat', 'Formato', [['image/jpeg','JPG'],['image/png','PNG'],['image/webp','WebP']])}
+        ${controlNumber('resizeQuality', 'Calidad (%)', 92, 10, 100)}
       `,
       rotatePdf: `
         ${controlSelect('rotateDegrees', 'Rotación', [['90','90° derecha'],['180','180°'],['270','90° izquierda']])}
@@ -540,7 +542,7 @@
             pages: valueOf('extractPages', '1-5'),
           });
           break;
-        case 'resizeImage': result = showToast('Resize requiere Canvas (solo navegador)'); break;
+        case 'resizeImage': result = await processResizeImage(); break;
         case 'watermarkImage': result = showToast('Marca de agua en imagen requiere Canvas'); break;
         case 'enhanceImage': result = showToast('Mejora de imagen requiere Canvas'); break;
         case 'removeBackground': result = showToast('Eliminación de fondo requiere Canvas'); break;
@@ -864,6 +866,51 @@
       title:'Lote convertido',
       message:`Se convirtieron ${converted.length} imágenes y se reunieron en un ZIP.`,
       stats:[['Archivos',String(converted.length)],['Formato',extensionForMime(mime).toUpperCase()],['ZIP',formatBytes(blob.size)]],
+    };
+  }
+
+  async function processResizeImage() {
+    const file = state.files[0];
+    const image = await loadImage(file);
+    let width = clamp(numberValue('resizeWidth', 800), 1, 10000);
+    let height = clamp(numberValue('resizeHeight', 600), 1, 10000);
+    const keepRatio = document.getElementById('resizeKeepRatio')?.checked;
+    const mime = valueOf('resizeFormat', 'image/jpeg');
+    const quality = clamp(numberValue('resizeQuality', 92) / 100, 0.1, 1);
+
+    if (keepRatio) {
+      const ratio = image.naturalWidth / image.naturalHeight;
+      if (width / height > ratio) {
+        width = Math.round(height * ratio);
+      } else {
+        height = Math.round(width / ratio);
+      }
+    }
+
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d', { alpha: mime !== 'image/jpeg' });
+    if (mime === 'image/jpeg') {
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, width, height);
+    }
+    ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(image, 0, 0, width, height);
+    const blob = await canvasToBlob(canvas, mime, quality);
+
+    return {
+      blob,
+      name: `${baseName(file.name)}-${width}x${height}.${extensionForMime(mime)}`,
+      title: 'Imagen redimensionada',
+      message: `La imagen se redimensionó a ${width} × ${height} píxeles.`,
+      preview: blob,
+      stats: [
+        ['Original', `${image.naturalWidth} × ${image.naturalHeight}`],
+        ['Resultado', `${width} × ${height}`],
+        ['Formato', extensionForMime(mime).toUpperCase()],
+        ['Tamaño', formatBytes(blob.size)],
+      ],
     };
   }
 
