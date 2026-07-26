@@ -8,10 +8,20 @@
   "maxFileSize": 26214400,
   "buildDate": "2026-07-25",
   "support": {
-    "paypalUrl": "https://www.paypal.com/donate/?hosted_button_id=ZSSG3LJQRW3EQ",
-    "message": "Si Toolisto te ha sido útil, considera apoyarnos con una donación."
+    "enabled": true,
+    "provider": "paypal",
+    "url": "https://www.paypal.com/donate/?hosted_button_id=ZSSG3LJQRW3EQ",
+    "buttonText": "Apoyar con PayPal",
+    "message": "Si Toolisto te ha sido útil, considera apoyarnos con una donación.",
+    "logo": ""
   },
   "analytics": {
-    "ga4MeasurementId": ""
+    "enabled": false,
+    "provider": "google-analytics",
+    "measurementId": ""
+  },
+  "feedback": {
+    "enabled": false,
+    "url": ""
   }
 }

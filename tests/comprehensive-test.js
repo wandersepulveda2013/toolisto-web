@@ -202,9 +202,15 @@ function ok(label, condition) {
   console.log('\n--- Result dialog support & report ---');
   ok('Has resultSupport element', (await page.$('#resultSupport')) !== null);
   ok('resultSupport is hidden by default', await page.$eval('#resultSupport', el => el.hidden));
-  ok('Has report problem link', (await page.$('#reportProblemLink')) !== null);
-  const reportHref = await page.$eval('#reportProblemLink', el => el.getAttribute('href'));
-  ok('Report link goes to mailto:contacto@toolisto.com', reportHref.includes('mailto:contacto@toolisto.com'));
+  const hasReportLink = await page.$('#reportProblemLink');
+  if (hasReportLink) {
+    const reportHref = await page.$eval('#reportProblemLink', el => el.getAttribute('href'));
+    ok('Report link is not mailto:', !reportHref.startsWith('mailto:'));
+    ok('Report link is not href="#"', reportHref !== '#');
+  } else {
+    ok('feedback.enabled=false: no report link (correct)', true);
+  }
+  ok('Has copy-tech-btn', (await page.$('.copy-tech-btn')) !== null);
 
   // ═══════════════════════════════════════════
   // TOOL PAGE: unir-pdf

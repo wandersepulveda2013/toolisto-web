@@ -15,7 +15,17 @@
     activeFilter: 'all',
     outputFiles: [],
     inputAccept: null,
+    processError: null,
+    processPhase: '',
   };
+
+  function trackEvent(name, params) {
+    try {
+      if (typeof window.gtag === 'function') {
+        window.gtag('event', name, params || {});
+      }
+    } catch (_) { /* analytics may not be loaded */ }
+  }
 
   const DOC_MIMES = [
     'application/msword',
@@ -1423,6 +1433,8 @@
     if (!validation.ok) return showToast(validation.message);
 
     state.processing = true;
+    state.processError = null;
+    state.processPhase = '';
     const originalText = els.runButton.innerHTML;
     els.runButton.innerHTML = '<span>Procesando…</span><span>•••</span>';
     els.runButton.disabled = true;
@@ -1443,11 +1455,13 @@
       }
 
       if (!result || !result.files || !result.files.length) {
+        state.processPhase = 'validation';
         showToast(result?.message || 'No se pudo procesar el archivo.');
         return;
       }
 
       state.outputFiles = result.files;
+      state.processPhase = 'completed';
       showResult({
         title: result.title || result.message || 'Procesamiento completado',
         message: result.message || `${result.files.length} archivo(s) listo(s) para descargar.`,
@@ -1457,6 +1471,8 @@
       });
     } catch (error) {
       console.error(error);
+      state.processError = error;
+      state.processPhase = 'failed';
       showToast(error?.message || 'No pudimos procesar el archivo.');
     } finally {
       state.processing = false;
@@ -4811,7 +4827,36 @@
     } else {
       els.previewArea.hidden = true;
     }
+    trackEvent('result_shown', { tool: state.tool || '', files: (state.outputFiles || []).length });
     els.resultDialog.showModal();
+  }
+
+  function copyTechnicalDetails() {
+    var toolId = state.tool || 'unknown';
+    var slug = window.location.pathname.replace(/.*\//, '').replace(/\.html$/, '') || 'index';
+    var phase = state.processPhase || 'unknown';
+    var browser = (navigator.userAgent || '').substring(0, 80);
+    var datetime = new Date().toISOString();
+    var error = state.processError ? String(state.processError.message || state.processError).substring(0, 120) : '';
+    var lines = [
+      'Herramienta: ' + toolId,
+      'Slug: ' + slug,
+      'Fase: ' + phase,
+      'Error: ' + (error || 'ninguno'),
+      'Navegador: ' + browser,
+      'Fecha: ' + datetime
+    ];
+    var text = lines.join('\n');
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function() {
+        showToast('Detalles copiados al portapapeles');
+      }, function() {
+        showToast('No se pudo copiar');
+      });
+    } else {
+      showToast('Copiar no disponible');
+    }
+    trackEvent('copy_tech_details', { tool: toolId });
   }
 
   async function downloadResult() {
@@ -4840,7 +4885,23 @@
   }
 
   function showSupportBlock() {
-    if (els.resultSupport) els.resultSupport.hidden = false;
+    if (!els.resultSupport) return;
+    var hasValidOutput = false;
+    try {
+      if (state.outputFiles && state.outputFiles.length > 0) {
+        hasValidOutput = state.outputFiles.some(function(f) { return f.blob && f.blob.size > 0; });
+      } else if (state.outputBlob) {
+        hasValidOutput = state.outputBlob.size > 0;
+      }
+    } catch (_) { /* blob access may fail */ }
+    if (state.processError) {
+      els.resultSupport.hidden = true;
+      return;
+    }
+    els.resultSupport.hidden = !hasValidOutput;
+    if (hasValidOutput) {
+      trackEvent('support_shown', { tool: state.tool || '' });
+    }
   }
 
   function downloadBlob(blob, name) {

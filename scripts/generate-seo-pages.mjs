@@ -44,6 +44,31 @@ const categories = loadJSON('categories.json');
 const redirects = loadJSON('redirects.json');
 const TODAY = site.buildDate || new Date().toISOString().slice(0, 10);
 
+const supportCfg = site.support || {};
+const analyticsCfg = site.analytics || {};
+const feedbackCfg = site.feedback || {};
+
+function buildGoogleAnalyticsTag() {
+  if (!analyticsCfg.enabled || analyticsCfg.provider !== 'google-analytics' || !analyticsCfg.measurementId) return '';
+  const id = analyticsCfg.measurementId;
+  return `<script async src="https://www.googletagmanager.com/gtag/js?id=${escAttr(id)}"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${escAttr(id)}');</script>`;
+}
+
+function getSupportButtonHtml() {
+  if (!supportCfg.enabled || !supportCfg.url) return '';
+  const logoPath = supportCfg.logo ? join(ROOT, supportCfg.logo) : null;
+  const logoExists = logoPath && existsSync(logoPath);
+  const logoImg = logoExists ? `<img src="${escAttr(supportCfg.logo)}" alt="" width="24" height="24" style="vertical-align:middle;margin-right:6px">` : '';
+  return `<a class="support-donate-btn" href="${escAttr(supportCfg.url)}" target="_blank" rel="noopener noreferrer">${logoImg}${escHtml(supportCfg.buttonText || 'Apoyar con PayPal')}</a>`;
+}
+
+function getFeedbackHtml() {
+  const reportLink = (feedbackCfg.enabled && feedbackCfg.url)
+    ? `<a href="${escAttr(feedbackCfg.url)}" target="_blank" rel="noopener noreferrer" id="reportProblemLink">Reportar un problema</a> · `
+    : '';
+  return `<div class="report-problem">${reportLink}<button type="button" class="copy-tech-btn" onclick="typeof copyTechnicalDetails==='function'&&copyTechnicalDetails()">Copiar detalles técnicos</button></div>`;
+}
+
 mkdirSync(DIST, { recursive: true });
 mkdirSync(join(DIST, 'assets'), { recursive: true });
 mkdirSync(join(DIST, 'vendor'), { recursive: true });
@@ -77,7 +102,7 @@ const splashScript = `<script>(function(){var i=document.getElementById('toolist
 
 const headerNav = `<header class="site-header"><div class="header-inner"><a class="brand" href="./index.html" aria-label="Ir al inicio de Toolisto"><img class="brand-mark-img" src="./assets/toolisto-mark.svg" alt="" width="36" height="36" /><span class="brand-text">Toolisto</span></a><nav class="desktop-nav" aria-label="Categorías de herramientas"><a href="./index.html#herramientas" data-nav-filter="images">Imágenes</a><a href="./index.html#herramientas" data-nav-filter="pdf">PDF</a><a href="./index.html#herramientas" data-nav-filter="signatures">Firmas</a><a href="./index.html#herramientas" data-nav-filter="documents">Documentos</a><a href="./index.html#herramientas" data-nav-filter="spreadsheets">Hojas de cálculo</a><a href="./index.html#herramientas" data-nav-filter="all">Todas</a></nav><div class="header-actions"><a class="header-action-btn" href="./index.html#herramientas" aria-label="Buscar herramientas"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg></a><button class="header-action-btn" id="themeToggle" type="button" aria-label="Cambiar tema"><svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg><svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button><button class="menu-button" id="menuToggle" type="button" aria-expanded="false" aria-controls="mobileNav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button></div></div></header><nav class="mobile-nav" id="mobileNav" hidden><a href="./index.html#herramientas" data-nav-filter="images">Imágenes</a><a href="./index.html#herramientas" data-nav-filter="pdf">PDF</a><a href="./index.html#herramientas" data-nav-filter="signatures">Firmas</a><a href="./index.html#herramientas" data-nav-filter="all">Todas las herramientas</a></nav>`;
 
-const footerHTML = `<footer class="site-footer"><div class="footer-inner"><div class="footer-brand"><a class="brand" href="./index.html" aria-label="Ir al inicio de Toolisto"><img class="brand-mark-img" src="./assets/toolisto-mark.svg" alt="" width="28" height="28" /><span class="brand-text">Toolisto</span></a></div><nav aria-label="Enlaces del pie de página"><a href="./index.html#herramientas">Herramientas</a><a href="./privacidad.html">Privacidad</a><a href="./condiciones.html">Condiciones</a><a href="./apoyar.html">Apoyar</a><a href="mailto:contacto@toolisto.com">Contacto</a></nav><small>© 2026 Toolisto · Tus archivos se quedan contigo.</small></div></footer>`;
+const footerHTML = `<footer class="site-footer"><div class="footer-inner"><div class="footer-brand"><a class="brand" href="./index.html" aria-label="Ir al inicio de Toolisto"><img class="brand-mark-img" src="./assets/toolisto-mark.svg" alt="" width="28" height="28" /><span class="brand-text">Toolisto</span></a></div><nav aria-label="Enlaces del pie de página"><a href="./index.html#herramientas">Herramientas</a><a href="./privacidad.html">Privacidad</a><a href="./condiciones.html">Condiciones</a><a href="./apoyar.html">Apoyar</a></nav><small>© 2026 Toolisto · Tus archivos se quedan contigo.</small></div></footer>`;
 
 function buildRelatedToolGrid(tool) {
   const slugs = (tool.relatedSlugs || []).slice(0, 6);
@@ -215,6 +240,7 @@ function buildToolPage(tool) {
     "operatingSystem": "Web Browser",
     "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
   })}</script>
+  ${buildGoogleAnalyticsTag()}
 </head>
 <body>
   ${splashHTML}
@@ -264,7 +290,7 @@ function buildToolPage(tool) {
       </section>
     </main>
 
-    <dialog class="result-dialog" id="resultDialog"><div class="dialog-header"><h2 id="resultTitle">Resultado</h2><button class="dialog-close" id="dialogClose" type="button" aria-label="Cerrar">×</button></div><p id="resultMessage"></p><div class="result-stats" id="resultStats"></div><div class="preview-area" id="previewArea" hidden></div><div class="result-support" id="resultSupport" hidden><p>${escHtml(site.support?.message || 'Si Toolisto te ha sido útil, considera apoyarnos con una donación.')}</p><a class="support-donate-btn" href="${escAttr(site.support?.paypalUrl || '#')}" target="_blank" rel="noopener noreferrer">Apoyar con PayPal</a></div><div class="report-problem"><a href="mailto:contacto@toolisto.com?subject=Problema%20con%20herramienta&body=Describir%20el%20problema%20aqu%C3%AD..." id="reportProblemLink">Reportar un problema</a></div><div class="dialog-actions"><button class="primary-button" id="downloadButton" type="button">Descargar</button><button class="quiet-button" id="resetButton" type="button">Cerrar</button></div></dialog>
+    <dialog class="result-dialog" id="resultDialog"><div class="dialog-header"><h2 id="resultTitle">Resultado</h2><button class="dialog-close" id="dialogClose" type="button" aria-label="Cerrar">×</button></div><p id="resultMessage"></p><div class="result-stats" id="resultStats"></div><div class="preview-area" id="previewArea" hidden></div><div class="result-support" id="resultSupport" hidden><p>${escHtml(supportCfg.message || 'Si Toolisto te ha sido útil, considera apoyarnos con una donación.')}</p>${getSupportButtonHtml()}</div>${getFeedbackHtml()}<div class="dialog-actions"><button class="primary-button" id="downloadButton" type="button">Descargar</button><button class="quiet-button" id="resetButton" type="button">Cerrar</button></div></dialog>
     <dialog class="picker-dialog" id="pickerDialog"><div class="dialog-header"><h2>Elegir herramienta</h2><button class="dialog-close" id="pickerClose" type="button" aria-label="Cerrar">×</button></div><div class="picker-grid" id="pickerGrid"></div></dialog>
     ${footerHTML}
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -314,6 +340,7 @@ function buildCategoryPage(cat) {
   <link rel="icon" type="image/svg+xml" href="./assets/toolisto-mark.svg">
   <link rel="stylesheet" href="./styles.css">
   ${splashCSS}
+  ${buildGoogleAnalyticsTag()}
 </head>
 <body>
   ${splashHTML}
@@ -366,6 +393,7 @@ function build404Page() {
   <link rel="icon" type="image/svg+xml" href="./assets/toolisto-mark.svg">
   <link rel="stylesheet" href="./styles.css">
   ${splashCSS}
+  ${buildGoogleAnalyticsTag()}
 </head>
 <body>
   ${splashHTML}
@@ -435,6 +463,7 @@ function buildLegalPage(slug, title, sections) {
   <link rel="icon" type="image/svg+xml" href="./assets/toolisto-mark.svg">
   <link rel="stylesheet" href="./styles.css">
   ${splashCSS}
+  ${buildGoogleAnalyticsTag()}
 </head>
 <body>
   ${splashHTML}
@@ -461,8 +490,8 @@ function buildLegalPage(slug, title, sections) {
 }
 
 function buildApoyarPage() {
-  const paypalUrl = site.support?.paypalUrl || 'https://www.paypal.com/donate/?hosted_button_id=ZSSG3LJQRW3EQ';
-  const supportMsg = site.support?.message || 'Si Toolisto te ha sido útil, considera apoyarnos con una donación.';
+  const paypalUrl = supportCfg.url || 'https://www.paypal.com/donate/?hosted_button_id=ZSSG3LJQRW3EQ';
+  const supportMsg = supportCfg.message || 'Si Toolisto te ha sido útil, considera apoyarnos con una donación.';
 
   const breadcrumbs = [
     { label: 'Inicio', href: './index.html' },
@@ -492,6 +521,7 @@ function buildApoyarPage() {
   <link rel="icon" type="image/svg+xml" href="./assets/toolisto-mark.svg">
   <link rel="stylesheet" href="./styles.css">
   ${splashCSS}
+  ${buildGoogleAnalyticsTag()}
 </head>
 <body>
   ${splashHTML}

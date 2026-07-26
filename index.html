@@ -35,13 +35,13 @@
     #toolisto-intro .intro-mark { width: 80px; height: 80px; animation: introScale 500ms ease-out both; }
     #toolisto-intro .intro-name { color: #F5F4EF; font-size: 1.8rem; font-weight: 700; letter-spacing: -0.04em; font-family: Inter, ui-sans-serif, system-ui, sans-serif; }
     #toolisto-intro .intro-accent { width: 48px; height: 3px; background: #2563EB; border-radius: 2px; animation: introScale 400ms 100ms ease-out both; }
-    #toolisto-intro .intro-count { color: rgba(245,244,239,0.6); font-size: 0.95rem; font-weight: 400; font-family: Inter, ui-sans-serif, system-ui, sans-serif; animation: introFadeIn 400ms 300ms ease-out both; opacity: 0; }
+    #toolisto-intro .intro-tagline { color: rgba(245,244,239,0.6); font-size: 0.95rem; font-weight: 400; font-family: Inter, ui-sans-serif, system-ui, sans-serif; animation: introFadeIn 400ms 300ms ease-out both; opacity: 0; }
     @keyframes introMaster { 0% { opacity: 0; } 17% { opacity: 1; } 77% { opacity: 1; } 100% { opacity: 0; } }
     @keyframes introScale { from { opacity: 0; transform: scale(0.85); } to { opacity: 1; transform: scale(1); } }
     @keyframes introFadeIn { from { opacity: 0; } to { opacity: 1; } }
     @media (prefers-reduced-motion: reduce) {
       #toolisto-intro { animation: none; opacity: 1; transition: opacity 120ms ease; }
-      #toolisto-intro .intro-mark, #toolisto-intro .intro-accent, #toolisto-intro .intro-count { animation: none; opacity: 1; }
+      #toolisto-intro .intro-mark, #toolisto-intro .intro-accent, #toolisto-intro .intro-tagline { animation: none; opacity: 1; }
     }
   </style>
   <noscript>
@@ -51,8 +51,6 @@
       html, body { overflow: auto !important; background: initial; }
     </style>
   </noscript>
- 
-  
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-85Z3FX6DEQ"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
@@ -60,14 +58,13 @@
     gtag('js', new Date());
     gtag('config', 'G-85Z3FX6DEQ');
   </script>
-  
 </head>
 <body>
   <div id="toolisto-intro" aria-hidden="true">
     <img class="intro-mark" src="./assets/toolisto-mark.svg" alt="" width="80" height="80" />
     <span class="intro-name">Toolisto</span>
     <span class="intro-accent"></span>
-    <span class="intro-count" id="introCount" hidden aria-hidden="true">99 herramientas disponibles</span>
+    <span class="intro-tagline">Simplifica lo que haces.</span>
   </div>
 
   <script>
@@ -77,26 +74,20 @@
     var html = document.documentElement;
     var removed = false;
 
-    function getCount() {
-      return document.querySelectorAll('.tool-card[data-tool]').length || 0;
-    }
-
-    function updateCount() {
-      var count = getCount();
-      if (count === 0) return;
-      var label = count + ' herramientas disponibles';
-      var introCount = document.getElementById('introCount');
-      if (introCount) { introCount.textContent = label; introCount.hidden = false; introCount.removeAttribute('aria-hidden'); }
+    function updateHeroCount() {
+      var cards = document.querySelectorAll('.tool-card[data-tool]').length || 0;
+      if (cards === 0) return;
+      var label = cards + ' herramientas disponibles';
       var heroCount = document.getElementById('toolCount');
       if (heroCount) { heroCount.textContent = label; heroCount.hidden = false; heroCount.removeAttribute('aria-hidden'); }
       var heroTrustEl = document.getElementById('heroTrustCount');
-      if (heroTrustEl) { heroTrustEl.textContent = count; }
+      if (heroTrustEl) { heroTrustEl.textContent = cards; }
     }
 
     if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', updateCount);
+      document.addEventListener('DOMContentLoaded', updateHeroCount);
     } else {
-      updateCount();
+      updateHeroCount();
     }
 
     function closeIntro() {
@@ -934,7 +925,6 @@
         <a href="./privacidad.html">Privacidad</a>
         <a href="./condiciones.html">Condiciones</a>
         <a href="./apoyar.html">Apoyar</a>
-        <a href="mailto:contacto@toolisto.com">Contacto</a>
       </nav>
       <small>© 2026 Toolisto · Tus archivos se quedan contigo.</small>
     </div>

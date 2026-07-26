@@ -366,9 +366,19 @@ function fail(label, reason) { total++; failed++; console.log(`  ✗ ${label}: $
   if (hasSupport) ok('comprimir-imagen: resultSupport element present');
   else fail('comprimir-imagen: resultSupport', 'Missing');
 
+  const supportHidden = await page.$eval('#resultSupport', el => el.hidden);
+  ok('comprimir-imagen: resultSupport hidden by default', supportHidden);
+
   const hasReport = await page.$('#reportProblemLink');
-  if (hasReport) ok('comprimir-imagen: reportProblemLink present');
-  else fail('comprimir-imagen: reportProblemLink', 'Missing');
+  if (hasReport) {
+    const reportHref = await page.$eval('#reportProblemLink', el => el.getAttribute('href'));
+    ok('comprimir-imagen: report link is not mailto', !reportHref.startsWith('mailto:'));
+  } else {
+    ok('comprimir-imagen: feedback disabled, no report link (correct)', true);
+  }
+
+  const hasCopyBtn = await page.$('.copy-tech-btn');
+  ok('comprimir-imagen: copy-tech-btn present', hasCopyBtn !== null);
 
   await browser.close();
 

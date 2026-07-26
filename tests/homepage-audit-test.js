@@ -74,10 +74,13 @@ function ok(label, condition) {
   const toolCardCount = await page.$$eval('.tool-card[data-tool]', cards => cards.length);
   ok(`${EXPECTED_COUNT} tool cards on homepage`, toolCardCount === EXPECTED_COUNT);
 
-  // Verify the splash screen counter reads from DOM (dynamic, not hardcoded)
-  const introScript = await page.$eval('script', s => s.textContent);
+  // Verify the splash screen has tagline, not counter
+  const introScript = await page.$$eval('script', scripts => {
+    const s = scripts.find(s => s.textContent.includes('closeIntro'));
+    return s ? s.textContent : '';
+  });
+  ok('No introCount reference in intro script', !introScript.includes('introCount'));
   ok('Counter script reads from DOM dynamically', introScript.includes("querySelectorAll('.tool-card[data-tool]')"));
-  ok('Counter updates introCount element', introScript.includes('introCount'));
 
   // ── 4. Animation timing ──
   console.log('\n--- 4. Animation timing ---');
@@ -225,11 +228,16 @@ function ok(label, condition) {
 
   // ── COUNTER SOURCE INTEGRITY ──
   console.log('\n--- 13. Counter source integrity ---');
-  // Navigate fresh — introCount text is set dynamically by splash script
+  // Navigate fresh — intro tagline is static, hero count is dynamic
   await page.goto(BASE + '/index.html', { waitUntil: 'networkidle' });
-  const splashText = await page.$eval('#introCount', el => el.textContent);
-  const splashCount = parseInt(splashText.match(/(\d+)/)?.[1] || '0', 10);
-  ok(`Splash counter matches tools.json (${splashCount} === ${EXPECTED_COUNT})`, splashCount === EXPECTED_COUNT);
+  const taglineEl = await page.$('#toolisto-intro .intro-tagline');
+  if (taglineEl) {
+    const taglineText = await taglineEl.textContent();
+    ok(`Intro tagline says "Simplifica lo que haces."`, taglineText.trim() === 'Simplifica lo que haces.');
+  } else {
+    ok('Intro tagline element exists', false);
+  }
+  ok('No introCount element on page', await page.$('#introCount') === null);
 
   const heroTrustText = await page.$eval('.hero-trust', el => el.textContent);
   const heroTrustCount = parseInt(heroTrustText.match(/(\d+)/)?.[1] || '0', 10);
@@ -237,8 +245,8 @@ function ok(label, condition) {
 
   // Verify TOTAL_TOOLS is dynamic, not a literal number
   const hasDynamicCount = await page.evaluate(() => {
-    const s = document.querySelector('script');
-    return s.textContent.includes("querySelectorAll('.tool-card[data-tool]')");
+    const s = [...document.querySelectorAll('script')].find(s => s.textContent.includes('closeIntro'));
+    return s ? s.textContent.includes("querySelectorAll('.tool-card[data-tool]')") : false;
   });
   ok('TOTAL_TOOLS is dynamic (reads from DOM)', hasDynamicCount);
 
@@ -285,20 +293,53 @@ function ok(label, condition) {
   const footerBrandHref = await page.$eval('.site-footer .brand', el => el.getAttribute('href'));
   ok('Footer brand href is ./index.html (not /)', footerBrandHref === './index.html');
 
-  // ── 17. Google Analytics placeholder ──
-  console.log('\n--- 17. Google Analytics placeholder ---');
+  // ── 17. Google Analytics ──
+  console.log('\n--- 17. Google Analytics ---');
   const headHTML = await page.$eval('head', el => el.innerHTML);
-  ok('GA4 placeholder comment exists in head', headHTML.includes('Google Analytics 4'));
-  ok('GA4 gtag.js script commented out', headHTML.includes('googletagmanager.com/gtag'));
-  ok('GA4 measurement ID placeholder G-XXXXXXXXXX', headHTML.includes('G-XXXXXXXXXX'));
+  ok('No manual GA4 placeholder comment in head', !headHTML.includes('Google Analytics 4'));
+  ok('No commented-out GA4 script', !headHTML.includes('<!--'));
+  ok('No hardcoded G-XXXXXXXXXX', !headHTML.includes('G-XXXXXXXXXX'));
+  const indexSrc = readFileSync(join(__dirname, '..', 'index.html'), 'utf-8');
+  ok('No GA comment block in index.html source', !indexSrc.includes('Google Analytics 4'));
 
-  // ── 18. site.config.json has support block ──
-  console.log('\n--- 18. site.config.json support/analytics ---');
+  // ── 18. site.config.json normalized blocks ──
+  console.log('\n--- 18. site.config.json normalized blocks ---');
   const config2 = JSON.parse(readFileSync(join(__dirname, '..', 'src', 'data', 'site.config.json'), 'utf-8'));
   ok('site.config.json has support block', 'support' in config2);
-  ok('support has paypalUrl', config2.support?.paypalUrl?.includes('paypal.com'));
-  ok('support has message', typeof config2.support?.message === 'string' && config2.support.message.length > 10);
+  ok('support.enabled is boolean', typeof config2.support?.enabled === 'boolean');
+  ok('support.provider is "paypal"', config2.support?.provider === 'paypal');
+  ok('support.url has paypal.com', config2.support?.url?.includes('paypal.com'));
+  ok('support.buttonText exists', typeof config2.support?.buttonText === 'string' && config2.support.buttonText.length > 3);
+  ok('support.message exists', typeof config2.support?.message === 'string' && config2.support.message.length > 10);
+  ok('No support.paypalUrl (renamed to url)', !config2.support?.paypalUrl);
   ok('site.config.json has analytics block', 'analytics' in config2);
+  ok('analytics.enabled is boolean', typeof config2.analytics?.enabled === 'boolean');
+  ok('analytics.provider is "google-analytics"', config2.analytics?.provider === 'google-analytics');
+  ok('analytics.measurementId exists', typeof config2.analytics?.measurementId === 'string');
+  ok('site.config.json has feedback block', 'feedback' in config2);
+  ok('feedback.enabled is boolean', typeof config2.feedback?.enabled === 'boolean');
+  ok('feedback.url is string', typeof config2.feedback?.url === 'string');
+
+  // ── 19. No manual analytics in HTML ──
+  console.log('\n--- 19. No manual analytics in generated HTML ---');
+  await page.goto(BASE + '/comprimir-imagen.html', { waitUntil: 'domcontentloaded' });
+  const toolPageHead = await page.$eval('head', el => el.innerHTML);
+  ok('No manual GA comment in tool page head', !toolPageHead.includes('Google Analytics 4'));
+  ok('No G-XXXXXXXXXX in tool page', !toolPageHead.includes('G-XXXXXXXXXX'));
+
+  // ── 20. Support block respects enabled=false ──
+  console.log('\n--- 20. Support block respects config ---');
+  ok('Support block hidden by default', await page.$eval('#resultSupport', el => el.hidden));
+
+  // ── 21. No href="#"" in support links ──
+  console.log('\n--- 21. No href="#" in support/feedback links ---');
+  await page.goto(BASE + '/comprimir-imagen.html', { waitUntil: 'domcontentloaded' });
+  const allLinks = await page.$$eval('#resultSupport a', links => links.map(a => a.getAttribute('href')));
+  const hasHashLink = allLinks.some(href => href === '#');
+  ok('No href="#" in support links', !hasHashLink);
+  const feedbackLinks = await page.$$eval('#reportProblemLink', links => links.map(a => a.getAttribute('href')));
+  const hasMailtoLink = feedbackLinks.some(href => href && href.startsWith('mailto:'));
+  ok('No mailto: links in feedback', !hasMailtoLink);
 
   // ── SUMMARY ──
   console.log('\n=== RESULTS ===');
