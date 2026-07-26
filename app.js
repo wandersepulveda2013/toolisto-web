@@ -432,7 +432,10 @@
         <div class="control" style="grid-column:1/-1"><label><input type="checkbox" id="enhAuto" /> Corrección automática</label></div>
       `,
       removeBackground: `
-        ${controlNumber('rbThreshold', 'Umbral', 200, 50, 255)}
+        ${controlNumber('rbThreshold', 'Tolerancia de color', 30, 1, 128)}
+        ${controlSelect('rbSample', 'Muestrear fondo de', [['topleft','Esquina superior izquierda'],['topright','Esquina superior derecha'],['bottomleft','Esquina inferior izquierda'],['bottomright','Esquina inferior derecha'],['center','Centro']])}
+        ${controlNumber('rbSoftness', 'Suavizado de borde', 5, 0, 30)}
+        <div class="control" style="grid-column:1/-1"><label><div style="color:var(--muted);font-size:.85rem">Modo por color: elimina píxeles similares al color de fondo. Funciona mejor con fondos uniformes. No es eliminación inteligente con IA.</div></label></div>
       `,
       batchConvert: `
         ${controlSelect('batchFormat', 'Formato', [['image/webp','WebP'],['image/jpeg','JPG'],['image/png','PNG']])}
@@ -552,7 +555,7 @@
         case 'resizeImage': result = await processResizeImage(); break;
         case 'watermarkImage': result = await processWatermarkImage(); break;
         case 'enhanceImage': result = await processEnhanceImage(); break;
-        case 'removeBackground': result = showToast('Eliminación de fondo requiere Canvas'); break;
+        case 'removeBackground': result = await processRemoveBackground(); break;
         case 'batchConvert': result = showToast('Conversión por lotes requiere Canvas'); break;
         case 'pdfToImages': result = showToast('PDF a imágenes requiere Canvas'); break;
         default: throw new Error('Selecciona una herramienta.');
@@ -1111,6 +1114,59 @@
       }
     }
     return dst;
+  }
+
+  async function processRemoveBackground() {
+    const file = state.files[0];
+    const image = await loadImage(file);
+    const threshold = clamp(numberValue('rbThreshold', 30), 1, 128);
+    const samplePos = valueOf('rbSample', 'topleft');
+    const softness = clamp(numberValue('rbSoftness', 5), 0, 30);
+
+    const canvas = document.createElement('canvas');
+    canvas.width = image.naturalWidth;
+    canvas.height = image.naturalHeight;
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+    ctx.drawImage(image, 0, 0);
+    const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const d = imgData.data;
+
+    let sampleX, sampleY;
+    if (samplePos === 'topright') { sampleX = canvas.width - 1; sampleY = 0; }
+    else if (samplePos === 'bottomleft') { sampleX = 0; sampleY = canvas.height - 1; }
+    else if (samplePos === 'bottomright') { sampleX = canvas.width - 1; sampleY = canvas.height - 1; }
+    else if (samplePos === 'center') { sampleX = Math.floor(canvas.width / 2); sampleY = Math.floor(canvas.height / 2); }
+    else { sampleX = 0; sampleY = 0; }
+
+    const si = (sampleY * canvas.width + sampleX) * 4;
+    const bgR = d[si], bgG = d[si + 1], bgB = d[si + 2];
+
+    for (let i = 0; i < d.length; i += 4) {
+      const r = d[i], g = d[i + 1], b = d[i + 2];
+      const dist = Math.sqrt((r - bgR) ** 2 + (g - bgG) ** 2 + (b - bgB) ** 2);
+      if (dist <= threshold) {
+        d[i + 3] = 0;
+      } else if (softness > 0 && dist <= threshold + softness) {
+        const alpha = Math.round(255 * ((dist - threshold) / softness));
+        d[i + 3] = Math.min(d[i + 3], alpha);
+      }
+    }
+    ctx.putImageData(imgData, 0, 0);
+    const blob = await canvasToBlob(canvas, 'image/png', 1);
+    return {
+      blob,
+      name: `${baseName(file.name)}-sin-fondo.png`,
+      title: 'Fondo eliminado',
+      message: `Fondo eliminado por color (tolerancia ${threshold}). Resultado en PNG transparente.`,
+      preview: blob,
+      stats: [
+        ['Modo', 'Color uniforme'],
+        ['Tolerancia', String(threshold)],
+        ['Suavizado', String(softness)],
+        ['Dimensiones', `${canvas.width} × ${canvas.height}`],
+        ['Tamaño', formatBytes(blob.size)],
+      ],
+    };
   }
 
   function presentResult(result) {

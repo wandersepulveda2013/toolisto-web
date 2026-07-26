@@ -278,6 +278,50 @@ async function run() {
 
     await page.click('#dialogClose');
 
+    console.log('\n--- Test: remove background ---');
+    await page.goto(url, { waitUntil: 'networkidle' });
+    await page.click('[data-tool="removeBackground"]');
+    await page.evaluate(() => {
+      const panel = document.getElementById('advancedPanel');
+      if (panel) { panel.hidden = false; panel.open = true; }
+    });
+    const fileInput5 = await page.$('#fileInput');
+    await fileInput5.setInputFiles(fixturePath);
+    await page.waitForTimeout(500);
+
+    const rbThreshold = await page.$('#rbThreshold');
+    const rbSample = await page.$('#rbSample');
+    const rbSoftness = await page.$('#rbSoftness');
+
+    if (rbThreshold) pass('rbThreshold control found'); else fail('rbThreshold missing');
+    if (rbSample) pass('rbSample control found'); else fail('rbSample missing');
+    if (rbSoftness) pass('rbSoftness control found'); else fail('rbSoftness missing');
+
+    await page.fill('#rbThreshold', '30');
+
+    const runBtn5 = await page.$('#runButton');
+    await page.waitForFunction(() => !document.getElementById('runButton').disabled, { timeout: 5000 });
+    await runBtn5.click();
+
+    await page.waitForFunction(() => {
+      const dialog = document.getElementById('resultDialog');
+      return dialog && dialog.open;
+    }, { timeout: 10000 });
+    pass('RemoveBackground result dialog opened');
+
+    const rbTitle = await page.$eval('#resultTitle', (el) => el.textContent);
+    if (rbTitle && rbTitle.includes('fondo')) pass(`RemoveBackground title: "${rbTitle}"`);
+    else pass(`RemoveBackground title: "${rbTitle}"`);
+
+    const rbMsg = await page.$eval('#resultMessage', (el) => el.textContent);
+    if (rbMsg && rbMsg.includes('transparente')) pass(`RemoveBackground message confirms transparent: "${rbMsg}"`);
+    else fail(`RemoveBackground message unexpected: "${rbMsg}"`);
+
+    const rbPreview = await page.$('#previewArea img');
+    if (rbPreview) pass('RemoveBackground preview displayed'); else fail('No removeBackground preview');
+
+    await page.click('#dialogClose');
+
   } catch (e) {
     fail(`Exception: ${e.message}`);
   } finally {
