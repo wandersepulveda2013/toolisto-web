@@ -61,5 +61,92 @@ if (existsSync(distIndex)) {
   }
 }
 
-console.log(`\n=== Resultado Batch 2: ${failures === 0 ? 'APROBADO' : `${failures} FALLO(S)`} ===`);
-process.exit(failures > 0 ? 1 : 0);
+// ─── Pruebas de procesamiento real ─────────────────────────────────────
+console.log('\n--- Pruebas de procesamiento rotatePdf ---\n');
+
+async function runProcessorTests() {
+  let processors;
+  try {
+    processors = require(join(root, 'src', 'tool-processors.js'));
+  } catch (e) {
+    fail('No se pudo cargar tool-processors.js: ' + e.message);
+    return;
+  }
+
+  const { PDFDocument, degrees } = require('pdf-lib');
+  const fixturePath = join(root, 'tests', 'fixtures', 'five-pages.pdf');
+  if (!existsSync(fixturePath)) {
+    fail('Fixture five-pages.pdf no existe — ejecuta: node tests/create-fixture.mjs');
+    return;
+  }
+  const fixtureBytes = readFileSync(fixturePath);
+
+  const angles = [90, 180, 270];
+  for (const angle of angles) {
+    console.log(`  rotatePdf (${angle}°):`);
+    try {
+      const result = await processors.rotatePdf(fixtureBytes, { degrees: angle });
+      if (!result.data || result.data.length === 0) {
+        fail(`rotatePdf ${angle}°: resultado vacío`);
+        continue;
+      }
+      pass(`rotatePdf ${angle}°: ${result.data.length} bytes generados`);
+
+      const outDoc = await PDFDocument.load(result.data);
+      if (outDoc.getPageCount() !== 5) {
+        fail(`rotatePdf ${angle}°: ${outDoc.getPageCount()} páginas (esperado 5)`);
+        continue;
+      }
+      pass(`rotatePdf ${angle}°: conserva 5 páginas`);
+
+      for (let i = 0; i < outDoc.getPageCount(); i++) {
+        const rotation = outDoc.getPage(i).getRotation();
+        const actualAngle = rotation.angle;
+        if (actualAngle !== angle) {
+          fail(`rotatePdf ${angle}°: página ${i + 1} tiene rotación ${actualAngle}° (esperado ${angle}°)`);
+        } else {
+          pass(`rotatePdf ${angle}°: página ${i + 1} rotación real = ${actualAngle}°`);
+        }
+      }
+
+      if (!result.message.includes(String(angle))) {
+        fail(`rotatePdf ${angle}°: mensaje no confirma grados: "${result.message}"`);
+      } else {
+        pass(`rotatePdf ${angle}°: mensaje = "${result.message}"`);
+      }
+    } catch (e) {
+      fail(`rotatePdf ${angle}°: excepción: ${e.message}`);
+    }
+  }
+
+  // Test validación: rotación inválida debe fallar
+  console.log('\n  rotatePdf (rotación inválida):');
+  try {
+    await processors.rotatePdf(fixtureBytes, { degrees: 45 });
+    fail('rotatePdf 45°: debería haber lanzado error');
+  } catch (e) {
+    pass(`rotatePdf 45°: rechazado correctamente — "${e.message}"`);
+  }
+
+  // Test re-apertura del resultado
+  console.log('\n  rotatePdf (re-apertura):');
+  try {
+    const result = await processors.rotatePdf(fixtureBytes, { degrees: 90 });
+    const reopened = await PDFDocument.load(result.data);
+    if (reopened.getPageCount() === 0) {
+      fail('rotatePdf: re-apertura produce 0 páginas');
+    } else {
+      pass(`rotatePdf: re-apertura exitosa (${reopened.getPageCount()} páginas)`);
+    }
+  } catch (e) {
+    fail(`rotatePdf: re-apertura falló: ${e.message}`);
+  }
+}
+
+runProcessorTests().then(() => {
+  console.log(`\n=== Resultado Batch 2: ${failures === 0 ? 'APROBADO' : `${failures} FALLO(S)`} ===`);
+  process.exit(failures > 0 ? 1 : 0);
+}).catch((e) => {
+  console.error(`Error fatal: ${e.message}`);
+  process.exit(1);
+});

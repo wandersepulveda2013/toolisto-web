@@ -90,20 +90,23 @@
   // ─── Batch 2 ────────────────────────────────────────────────────────
 
   processors.rotatePdf = async function (input, options) {
-    const { PDFDocument } = getPDFLib();
+    const { PDFDocument, degrees: pdfDegrees } = getPDFLib();
     const bytes = await getInputBytes(input);
     const src = await PDFDocument.load(bytes);
-    const degrees = (options && options.degrees) || 90;
+    const rotationDegrees = (options && options.degrees) || 90;
+    if (typeof rotationDegrees !== 'number' || ![90, 180, 270].includes(rotationDegrees % 360)) {
+      throw new Error('Rotación no válida: se aceptan 90, 180 o 270 grados.');
+    }
     const dst = await PDFDocument.create();
     const copied = await dst.copyPages(src, src.getPageIndices());
-    copied.forEach((p) => { p.setRotation(degrees); dst.addPage(p); });
+    copied.forEach((p) => { p.setRotation(pdfDegrees(rotationDegrees)); dst.addPage(p); });
     const out = await dst.save();
     return {
       data: out,
       name: 'toolisto-rotado.pdf',
       title: 'PDF rotado',
-      message: `Se rotaron ${copied.length} páginas ${degrees} grados.`,
-      stats: [['Páginas', String(copied.length)], ['Rotación', degrees + '°'], ['Tamaño', formatBytes(out.length)]],
+      message: `Se rotaron ${copied.length} páginas ${rotationDegrees} grados.`,
+      stats: [['Páginas', String(copied.length)], ['Rotación', rotationDegrees + '°'], ['Tamaño', formatBytes(out.length)]],
       pageCount: copied.length,
     };
   };
