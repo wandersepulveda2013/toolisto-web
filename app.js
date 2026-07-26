@@ -417,8 +417,12 @@
         ${controlNumber('extractPages', 'Páginas (ej: 1-3,5)', 1, 1, 100)}
       `,
       watermarkImage: `
-        ${controlNumber('wmText', 'Texto de marca', 'BORRADOR', 1, 100)}
+        <div class="control"><label for="wmText">Texto de marca</label><input id="wmText" type="text" value="BORRADOR" maxlength="100" /></div>
+        ${controlSelect('wmPosition', 'Posición', [['center','Centro'],['top-left','Superior izquierda'],['top-right','Superior derecha'],['bottom-left','Inferior izquierda'],['bottom-right','Inferior derecha'],['tiled','Mosaico']])}
+        ${controlNumber('wmSize', 'Tamaño de fuente', 48, 8, 200)}
         ${controlNumber('wmOpacity', 'Opacidad (%)', 30, 5, 100)}
+        ${controlNumber('wmMargin', 'Margen (px)', 20, 0, 200)}
+        ${controlColor('wmColor', 'Color', '#888888')}
       `,
       enhanceImage: `
         ${controlNumber('enhBrightness', 'Brillo (%)', 10, -100, 100)}
@@ -543,7 +547,7 @@
           });
           break;
         case 'resizeImage': result = await processResizeImage(); break;
-        case 'watermarkImage': result = showToast('Marca de agua en imagen requiere Canvas'); break;
+        case 'watermarkImage': result = await processWatermarkImage(); break;
         case 'enhanceImage': result = showToast('Mejora de imagen requiere Canvas'); break;
         case 'removeBackground': result = showToast('Eliminación de fondo requiere Canvas'); break;
         case 'batchConvert': result = showToast('Conversión por lotes requiere Canvas'); break;
@@ -909,6 +913,75 @@
         ['Original', `${image.naturalWidth} × ${image.naturalHeight}`],
         ['Resultado', `${width} × ${height}`],
         ['Formato', extensionForMime(mime).toUpperCase()],
+        ['Tamaño', formatBytes(blob.size)],
+      ],
+    };
+  }
+
+  async function processWatermarkImage() {
+    const file = state.files[0];
+    const image = await loadImage(file);
+    const text = valueOf('wmText', 'BORRADOR');
+    const position = valueOf('wmPosition', 'center');
+    const fontSize = clamp(numberValue('wmSize', 48), 8, 200);
+    const opacity = clamp(numberValue('wmOpacity', 30) / 100, 0.05, 1);
+    const margin = clamp(numberValue('wmMargin', 20), 0, 200);
+    const color = valueOf('wmColor', '#888888');
+
+    const canvas = document.createElement('canvas');
+    canvas.width = image.naturalWidth;
+    canvas.height = image.naturalHeight;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(image, 0, 0);
+
+    ctx.save();
+    ctx.globalAlpha = opacity;
+    ctx.fillStyle = color;
+    ctx.font = `bold ${fontSize}px sans-serif`;
+    ctx.textBaseline = 'middle';
+
+    if (position === 'tiled') {
+      ctx.textAlign = 'center';
+      const metrics = ctx.measureText(text);
+      const textW = metrics.width;
+      const textH = fontSize * 1.2;
+      const angle = -Math.PI / 6;
+      for (let y = -canvas.height; y < canvas.height * 2; y += textH * 2.5) {
+        for (let x = -canvas.width; x < canvas.width * 2; x += textW * 2) {
+          ctx.save();
+          ctx.translate(x, y);
+          ctx.rotate(angle);
+          ctx.fillText(text, 0, 0);
+          ctx.restore();
+        }
+      }
+    } else {
+      const metrics = ctx.measureText(text);
+      const textW = metrics.width;
+      const textH = fontSize;
+      let x, y;
+      if (position === 'top-left') { x = margin; y = margin + textH / 2; }
+      else if (position === 'top-right') { x = canvas.width - margin - textW; y = margin + textH / 2; }
+      else if (position === 'bottom-left') { x = margin; y = canvas.height - margin - textH / 2; }
+      else if (position === 'bottom-right') { x = canvas.width - margin - textW; y = canvas.height - margin - textH / 2; }
+      else { x = (canvas.width - textW) / 2; y = canvas.height / 2; }
+      ctx.textAlign = 'left';
+      ctx.fillText(text, x, y);
+    }
+    ctx.restore();
+
+    const mime = file.type === 'image/png' ? 'image/png' : 'image/jpeg';
+    const blob = await canvasToBlob(canvas, mime, 0.92);
+    return {
+      blob,
+      name: `${baseName(file.name)}-marcadeagua.${extensionForMime(mime)}`,
+      title: 'Marca de agua añadida',
+      message: `Marca de agua "${text}" añadida en posición ${position}.`,
+      preview: blob,
+      stats: [
+        ['Posición', position],
+        ['Opacidad', `${Math.round(opacity * 100)}%`],
+        ['Dimensiones', `${canvas.width} × ${canvas.height}`],
         ['Tamaño', formatBytes(blob.size)],
       ],
     };
