@@ -30,7 +30,7 @@
     "@ffmpeg/core": "^0.12.9",
     "@ffmpeg/ffmpeg": "^0.12.15",
     "@ffmpeg/util": "^0.12.2",
-    "playwright": "^1.61.1",
+    "playwright": "^1.62.0",
     "tesseract.js": "^5.1.1"
   }
 }
