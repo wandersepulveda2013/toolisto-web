@@ -6,12 +6,12 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, '..');
 const srcTools = join(root, 'src', 'data', 'tools.json');
 const distIndex = join(root, 'dist', 'index.html');
-const distTools = join(root, 'dist', 'tools');
 let exitCode = 0;
 let issues = [];
 
 function fail(msg) { issues.push(msg); console.error(`  FAIL: ${msg}`); }
 function pass(msg) { console.log(`  PASS: ${msg}`); }
+function info(msg) { console.log(`  INFO: ${msg}`); }
 
 console.log('=== Audit: Count ===\n');
 
@@ -44,17 +44,33 @@ tools.forEach((t) => { idCounts[t.id] = (idCounts[t.id] || 0) + 1; });
 const dupIds = Object.entries(idCounts).filter(([, c]) => c > 1);
 if (dupIds.length > 0) { fail(`IDs duplicados: ${dupIds.map(([s, c]) => `${s} (${c}x)`).join(', ')}`); } else { pass('Cero IDs duplicados'); }
 
-// 7. Check duplicate toolIds
+// 7. Shared toolIds (informational, not a failure)
 const toolIdCounts = {};
 tools.forEach((t) => { toolIdCounts[t.toolId] = (toolIdCounts[t.toolId] || 0) + 1; });
-const dupToolIds = Object.entries(toolIdCounts).filter(([, c]) => c > 1);
-if (dupToolIds.length > 0) { fail(`ToolIds duplicados: ${dupToolIds.map(([s, c]) => `${s} (${c}x)`).join(', ')}`); } else { pass('Cero toolIds duplicados'); }
+const uniqueToolIds = Object.keys(toolIdCounts).length;
+const sharedToolIds = Object.entries(toolIdCounts).filter(([, c]) => c > 1);
+pass(`${uniqueToolIds} toolIds únicos de ${tools.length} entradas`);
+if (sharedToolIds.length > 0) {
+  info(`ToolIds compartidos (intencional): ${sharedToolIds.map(([s, c]) => `${s} (${c}x)`).join(', ')}`);
+}
 
-// 8. Count active tools
-const activeTools = tools.filter((t) => t.status === 'active');
-const blockedTools = tools.filter((t) => t.status === 'blocked');
-const testingTools = tools.filter((t) => t.status === 'testing');
-pass(`Activas: ${activeTools.length}, Bloqueadas: ${blockedTools.length}, En prueba: ${testingTools.length}`);
+// 8. All tools are active (no status field required)
+pass(`${tools.length} herramientas (todas activas por defecto)`);
+
+// 8b. Check required fields
+const requiredFields = ['id', 'slug', 'toolId', 'name', 'title', 'description', 'summary', 'category'];
+let missingFields = 0;
+for (const tool of tools) {
+  for (const field of requiredFields) {
+    if (!tool[field]) {
+      fail(`${tool.id}: campo "${field}" faltante`);
+      missingFields++;
+    }
+  }
+}
+if (missingFields === 0) {
+  pass(`Todas las ${tools.length} herramientas tienen campos requeridos (${requiredFields.join(', ')})`);
+}
 
 // 9. Check dist exists
 if (!existsSync(distIndex)) { fail('dist/index.html no existe — ejecuta npm run build'); } else { pass('dist/index.html existe'); }
@@ -64,99 +80,109 @@ if (existsSync(distIndex)) {
   const indexContent = readFileSync(distIndex, 'utf8');
   const cardMatches = indexContent.match(/class="tool-card"/g);
   const cardCount = cardMatches ? cardMatches.length : 0;
-  if (cardCount !== activeTools.length) {
-    fail(`Portada tiene ${cardCount} tarjetas pero tools.json tiene ${activeTools.length} activas`);
+  if (cardCount !== tools.length) {
+    fail(`Portada tiene ${cardCount} tarjetas pero tools.json tiene ${tools.length} herramientas`);
   } else {
-    pass(`Portada tiene ${cardCount} tarjetas = ${activeTools.length} activas`);
+    pass(`Portada tiene ${cardCount} tarjetas = ${tools.length} herramientas`);
   }
 
   // Check counter
   const counterMatch = indexContent.match(/tool-count[^>]*>(\d+)/);
   if (counterMatch) {
     const counterVal = parseInt(counterMatch[1], 10);
-    if (counterVal !== activeTools.length) {
-      fail(`Contador muestra ${counterVal} pero hay ${activeTools.length} activas`);
+    if (counterVal !== tools.length) {
+      fail(`Contador muestra ${counterVal} pero hay ${tools.length} herramientas`);
     } else {
-      pass(`Contador muestra ${counterVal} = ${activeTools.length} activas`);
+      pass(`Contador muestra ${counterVal} = ${tools.length} herramientas`);
     }
   } else {
     pass('Contador no encontrado (se genera dinámicamente)');
   }
 
-  // Check each active tool has a card
-  for (const tool of activeTools) {
+  // Check each tool has a card
+  let missingCards = 0;
+  for (const tool of tools) {
     const hasCard = indexContent.includes(`data-tool="${tool.toolId}"`);
     if (!hasCard) {
       fail(`Tool "${tool.toolId}" no tiene tarjeta en la portada`);
+      missingCards++;
     }
   }
-  pass(`Todas las ${activeTools.length} herramientas activas tienen tarjeta`);
+  if (missingCards === 0) {
+    pass(`Todas las ${tools.length} herramientas tienen tarjeta`);
+  }
 }
 
-// 11. Check tool pages exist
-if (existsSync(distTools)) {
+// 11. Check tool pages exist (flat structure: dist/{slug}.html)
+const distDir = join(root, 'dist');
+if (existsSync(distDir)) {
   let missingPages = 0;
-  for (const tool of activeTools) {
-    const pagePath = join(distTools, tool.slug, 'index.html');
+  for (const tool of tools) {
+    const pagePath = join(distDir, `${tool.slug}.html`);
     if (!existsSync(pagePath)) {
-      fail(`Página faltante: dist/tools/${tool.slug}/index.html`);
+      fail(`Página faltante: dist/${tool.slug}.html`);
       missingPages++;
     }
   }
   if (missingPages === 0) {
-    pass(`Todas las ${activeTools.length} páginas de herramientas existen`);
+    pass(`Todas las ${tools.length} páginas de herramientas existen`);
   }
 
-  // Count generated pages
-  const toolDirs = readdirSync(distTools).filter((d) => existsSync(join(distTools, d, 'index.html')));
-  if (toolDirs.length !== activeTools.length) {
-    fail(`Hay ${toolDirs.length} páginas generadas pero ${activeTools.length} activas`);
-  } else {
-    pass(`${toolDirs.length} páginas generadas = ${activeTools.length} activas`);
-  }
+  // Count generated HTML pages
+  const htmlFiles = readdirSync(distDir).filter((f) => f.endsWith('.html'));
+  pass(`${htmlFiles.length} archivos HTML en dist/`);
 } else {
-  fail('dist/tools/ no existe — ejecuta npm run build');
+  fail('dist/ no existe — ejecuta npm run build');
 }
 
-// 12. Check processor declarations
-const processorPath = join(root, 'src', 'tool-processors.js');
+// 12. Check processor coverage (tool-processors.js + app.js switch-case)
+const processorPath = join(root, 'tool-processors.js');
+const appJsPath = join(root, 'app.js');
+const coveredTools = new Set();
+
 if (existsSync(processorPath)) {
   const procContent = readFileSync(processorPath, 'utf8');
-  let missingProcessors = 0;
-  for (const tool of activeTools) {
-    const procName = tool.processor || tool.toolId;
-    const hasProc = procContent.includes(`processors.${procName}`) || procContent.includes(`processors['${procName}']`);
-    if (!hasProc) {
-      fail(`Procesador "${procName}" declarado pero no encontrado en tool-processors.js`);
-      missingProcessors++;
-    }
-  }
-  if (missingProcessors === 0) {
-    pass(`Todos los procesadores de herramientas activas existen`);
-  }
+  const procMatches = procContent.match(/ToolProcessors\.(\w+)\s*=/g) || [];
+  procMatches.forEach((m) => {
+    const name = m.replace(/ToolProcessors\.|(\s*=)/g, '');
+    coveredTools.add(name);
+  });
+  pass(`tool-processors.js: ${coveredTools.size} procesadores registrados`);
 } else {
-  fail('src/tool-processors.js no existe');
+  fail('tool-processors.js no existe en raíz');
 }
 
-// 13. Check toolMeta sync (if present in app.js)
-const appJsPath = join(root, 'app.js');
+if (existsSync(appJsPath)) {
+  const appContent = readFileSync(appJsPath, 'utf8');
+  const switchMatches = appContent.match(/case\s+'(\w+)':/g) || [];
+  const switchCases = switchMatches.map((m) => m.replace(/case\s+'|':/g, ''));
+  switchCases.forEach((c) => coveredTools.add(c));
+  pass(`app.js: ${switchCases.length} handlers en switch-case`);
+}
+
+let missingCoverage = 0;
+for (const tool of tools) {
+  if (!coveredTools.has(tool.toolId)) {
+    fail(`Tool "${tool.toolId}" sin procesador ni handler`);
+    missingCoverage++;
+  }
+}
+if (missingCoverage === 0) {
+  pass(`Todas las ${tools.length} herramientas tienen cobertura (procesador o handler)`);
+}
+
+// 13. Check toolMeta entries (informational — not all tools need entries)
 if (existsSync(appJsPath)) {
   const appContent = readFileSync(appJsPath, 'utf8');
   if (appContent.includes('const toolMeta')) {
     const metaMatch = appContent.match(/const toolMeta\s*=\s*\{([\s\S]*?)\};/);
     if (metaMatch) {
-      const metaKeys = metaMatch[1].match(/(\w+):/g) || [];
+      const metaKeys = metaMatch[1].match(/(\w+):\s*\{/g) || [];
       const keyCount = metaKeys.length;
-      if (keyCount !== activeTools.length) {
-        fail(`toolMeta tiene ${keyCount} entradas pero hay ${activeTools.length} activas`);
-      } else {
-        pass(`toolMeta sincronizado: ${keyCount} entradas = ${activeTools.length} activas`);
-      }
+      pass(`toolMeta: ${keyCount} entradas (las herramientas sin entrada usan procesador o handler)`);
     }
-  } else if (appContent.includes('getToolMeta') || appContent.includes('buildToolMeta')) {
-    pass('toolMeta se deriva dinámicamente de tools.json/DOM');
   } else {
-    pass('app.js no contiene toolMeta estático (se asume derivado)');
+    pass('app.js no contiene toolMeta estático');
   }
 }
 

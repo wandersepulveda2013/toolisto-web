@@ -6327,7 +6327,8 @@
       "columnas",
       "separar"
     ],
-    "id": "splitDoublePdf"
+    "id": "splitDoublePdf",
+    "description": "Divide páginas dobles de un PDF escaneado en páginas individuales. Corta vertical o horizontalmente."
   },
   {
     "category": "pdf",
@@ -6399,7 +6400,8 @@
       "plegar",
       "libro"
     ],
-    "id": "bookletPdf"
+    "id": "bookletPdf",
+    "description": "Reordena las páginas de un PDF para imprimirlo como cuadernillo doble cara y plegarlo como un libro."
   },
   {
     "category": "pdf",
@@ -6472,7 +6474,8 @@
       "texto",
       "sello"
     ],
-    "id": "watermarkPdf"
+    "id": "watermarkPdf",
+    "description": "Agrega una marca de agua de texto personalizado a todas las páginas de un PDF. Ideal para BORRADOR o CONFIDENCIAL."
   },
   {
     "category": "pdf",
@@ -6544,7 +6547,8 @@
       "romanos",
       "paginacion"
     ],
-    "id": "addPageNumbersPdf"
+    "id": "addPageNumbersPdf",
+    "description": "Agrega números de página en la posición y formato que elijas a todas las páginas de un PDF."
   },
   {
     "category": "pdf",
@@ -6617,7 +6621,8 @@
       "cabecera",
       "documento"
     ],
-    "id": "addHeaderFooterPdf"
+    "id": "addHeaderFooterPdf",
+    "description": "Añade texto de encabezado y pie de página centrado en todas las páginas de un PDF."
   },
   {
     "id": "unzipFile",

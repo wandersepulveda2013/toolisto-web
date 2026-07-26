@@ -28,12 +28,17 @@ if (!existsSync(indexPath)) { fail('index.html no existe'); } else {
   if (!html.includes('viewport')) fail('Viewport no encontrado');
   else pass('Viewport presente');
 
-  // No broken references
+  // No broken references (check root AND dist, since index.html is a build template)
+  const distDir = join(root, 'dist');
   const scriptRefs = html.match(/src="([^"]+)"/g) || [];
   for (const ref of scriptRefs) {
-    const path = ref.replace(/src="|"/g, '');
-    if (!path.startsWith('http') && !existsSync(join(root, path))) {
-      fail(`Referencia rota: ${path}`);
+    const refPath = ref.replace(/src="|"/g, '');
+    if (!refPath.startsWith('http')) {
+      const existsAtRoot = existsSync(join(root, refPath));
+      const existsAtDist = existsSync(join(distDir, refPath));
+      if (!existsAtRoot && !existsAtDist) {
+        fail(`Referencia rota: ${refPath}`);
+      }
     }
   }
   pass(`${scriptRefs.length} referencias verificadas`);
@@ -99,11 +104,11 @@ if (!existsSync(cssPath)) { fail('styles.css no existe'); } else {
   }
 }
 
-// Check tool-processors.js
-const procPath = join(root, 'src', 'tool-processors.js');
-if (!existsSync(procPath)) { fail('src/tool-processors.js no existe'); } else {
+// Check tool-processors.js (root level, not src/)
+const procPath = join(root, 'tool-processors.js');
+if (!existsSync(procPath)) { fail('tool-processors.js no existe en raíz'); } else {
   const procContent = readFileSync(procPath, 'utf8');
-  pass('src/tool-processors.js existe');
+  pass('tool-processors.js existe');
 
   try {
     const m = {};

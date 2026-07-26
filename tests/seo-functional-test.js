@@ -12,7 +12,6 @@ console.log('=== SEO Functional Test ===\n');
 
 if (!existsSync(toolsPath)) { fail('tools.json no existe'); process.exit(1); }
 const tools = JSON.parse(readFileSync(toolsPath, 'utf8'));
-const activeTools = tools.filter((t) => t.status === 'active');
 
 // Check main page SEO
 const distIndex = join(root, 'dist', 'index.html');
@@ -32,7 +31,7 @@ if (existsSync(distIndex)) {
   else pass('Attribute lang="es" presente');
 
   // Check semantic HTML
-  if (!html.includes('<main>')) fail('Elemento <main> faltante');
+  if (!html.includes('<main')) fail('Elemento <main> faltante');
   else pass('Elemento <main> presente');
 
   if (!html.includes('<header')) fail('Elemento <header> faltante');
@@ -52,14 +51,16 @@ if (existsSync(distIndex)) {
   fail('dist/index.html no existe');
 }
 
-// Check tool pages SEO
-const distTools = join(root, 'dist', 'tools');
-if (existsSync(distTools)) {
+// Check tool pages SEO (flat structure: dist/{slug}.html)
+const distDir = join(root, 'dist');
+if (existsSync(distDir)) {
   let pagesChecked = 0;
-  for (const tool of activeTools) {
-    const pagePath = join(distTools, tool.slug, 'index.html');
+  let pagesFailed = 0;
+  for (const tool of tools) {
+    const pagePath = join(distDir, `${tool.slug}.html`);
     if (!existsSync(pagePath)) {
-      fail(`${tool.toolId}: página faltante`);
+      fail(`${tool.toolId}: página faltante (dist/${tool.slug}.html)`);
+      pagesFailed++;
       continue;
     }
     const pageHtml = readFileSync(pagePath, 'utf8');
@@ -70,15 +71,17 @@ if (existsSync(distTools)) {
     if (!pageHtml.includes('meta name="description"')) fail(`${tool.toolId}: meta description faltante`);
     else pagesChecked++;
 
-    if (!pageHtml.includes(`data-tool-id="${tool.toolId}"`)) {
+    if (!pageHtml.includes(`<script type="application/json" id="tool-page-config">`)) {
       fail(`${tool.toolId}: tool-page-config faltante`);
+    } else if (!pageHtml.includes(`"toolId":"${tool.toolId}"`)) {
+      fail(`${tool.toolId}: toolId no coincide en config`);
     } else {
       pagesChecked++;
     }
   }
-  if (pagesChecked > 0) pass(`${pagesChecked} verificaciones SEO en páginas de herramientas`);
+  if (pagesChecked > 0) pass(`${pagesChecked} verificaciones SEO en páginas de herramientas (${tools.length - pagesFailed} páginas)`);
 } else {
-  pass('dist/tools/ no existe (se omite)');
+  fail('dist/ no existe');
 }
 
 // Check sitemap.xml
@@ -89,18 +92,20 @@ if (existsSync(sitemapPath)) {
   else pass('sitemap.xml es XML válido');
 
   const urlCount = (sitemap.match(/<url>/g) || []).length;
-  if (urlCount < activeTools.length) {
-    fail(`sitemap.xml tiene ${urlCount} URLs vs ${activeTools.length} activas`);
+  if (urlCount < tools.length) {
+    fail(`sitemap.xml tiene ${urlCount} URLs vs ${tools.length} herramientas`);
   } else {
     pass(`sitemap.xml tiene ${urlCount} URLs`);
   }
 
-  for (const tool of activeTools) {
+  let missingSlugs = 0;
+  for (const tool of tools) {
     if (!sitemap.includes(tool.slug)) {
       fail(`${tool.toolId}: slug no en sitemap`);
+      missingSlugs++;
     }
   }
-  pass(`Todos los slugs activos en sitemap`);
+  if (missingSlugs === 0) pass(`Todos los slugs en sitemap`);
 } else {
   fail('dist/sitemap.xml no existe');
 }
