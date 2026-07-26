@@ -75,6 +75,7 @@ async function run() {
     pass('runButton found');
 
     const fixturePath = join(__dirname, 'fixtures', 'test-200x100.png');
+    const fixtureSmall = join(__dirname, 'fixtures', 'test-10x10.png');
     const fileInput = await page.$('#fileInput');
     await fileInput.setInputFiles(fixturePath);
     pass('Test image uploaded');
@@ -319,6 +320,44 @@ async function run() {
 
     const rbPreview = await page.$('#previewArea img');
     if (rbPreview) pass('RemoveBackground preview displayed'); else fail('No removeBackground preview');
+
+    await page.click('#dialogClose');
+
+    console.log('\n--- Test: batch convert ---');
+    await page.goto(url, { waitUntil: 'networkidle' });
+    await page.click('[data-tool="batchConvert"]');
+    await page.evaluate(() => {
+      const panel = document.getElementById('advancedPanel');
+      if (panel) { panel.hidden = false; panel.open = true; }
+    });
+    const fileInput6 = await page.$('#fileInput');
+    await fileInput6.setInputFiles([fixturePath, fixtureSmall]);
+    await page.waitForTimeout(500);
+
+    const batchFormat = await page.$('#batchFormat');
+    const batchQuality = await page.$('#batchQuality');
+    if (batchFormat) pass('batchFormat control found'); else fail('batchFormat missing');
+    if (batchQuality) pass('batchQuality control found'); else fail('batchQuality missing');
+
+    await page.selectOption('#batchFormat', 'image/png');
+
+    const runBtn6 = await page.$('#runButton');
+    await page.waitForFunction(() => !document.getElementById('runButton').disabled, { timeout: 5000 });
+    await runBtn6.click();
+
+    await page.waitForFunction(() => {
+      const dialog = document.getElementById('resultDialog');
+      return dialog && dialog.open;
+    }, { timeout: 10000 });
+    pass('BatchConvert result dialog opened');
+
+    const bcTitle = await page.$eval('#resultTitle', (el) => el.textContent);
+    if (bcTitle && bcTitle.includes('lotes')) pass(`BatchConvert title: "${bcTitle}"`);
+    else fail(`BatchConvert title unexpected: "${bcTitle}"`);
+
+    const bcMsg = await page.$eval('#resultMessage', (el) => el.textContent);
+    if (bcMsg && bcMsg.includes('2')) pass(`BatchConvert message confirms 2 files: "${bcMsg}"`);
+    else fail(`BatchConvert message unexpected: "${bcMsg}"`);
 
     await page.click('#dialogClose');
 

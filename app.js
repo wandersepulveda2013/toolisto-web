@@ -556,7 +556,7 @@
         case 'watermarkImage': result = await processWatermarkImage(); break;
         case 'enhanceImage': result = await processEnhanceImage(); break;
         case 'removeBackground': result = await processRemoveBackground(); break;
-        case 'batchConvert': result = showToast('Conversión por lotes requiere Canvas'); break;
+        case 'batchConvert': result = await processBatchConvert(); break;
         case 'pdfToImages': result = showToast('PDF a imágenes requiere Canvas'); break;
         default: throw new Error('Selecciona una herramienta.');
       }
@@ -1165,6 +1165,64 @@
         ['Suavizado', String(softness)],
         ['Dimensiones', `${canvas.width} × ${canvas.height}`],
         ['Tamaño', formatBytes(blob.size)],
+      ],
+    };
+  }
+
+  async function processBatchConvert() {
+    const files = state.files;
+    if (!files.length) throw new Error('Agrega al menos una imagen para convertir.');
+    const mime = valueOf('batchFormat', 'image/webp');
+    const quality = clamp(numberValue('batchQuality', 86), 25, 100) / 100;
+    const ext = mime === 'image/webp' ? 'webp' : mime === 'image/jpeg' ? 'jpg' : 'png';
+    const hasJSZip = !!window.JSZip;
+    const zip = hasJSZip ? new JSZip() : null;
+    let ok = 0, fail = 0, totalSize = 0;
+
+    for (const file of files) {
+      try {
+        const image = await loadImage(file);
+        const canvas = document.createElement('canvas');
+        canvas.width = image.naturalWidth;
+        canvas.height = image.naturalHeight;
+        canvas.getContext('2d').drawImage(image, 0, 0);
+        const blob = await canvasToBlob(canvas, mime, quality);
+        totalSize += blob.size;
+        const outName = `${baseName(file.name)}.${ext}`;
+        if (zip) zip.file(outName, blob);
+        else { const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = outName; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 1500); }
+        ok++;
+      } catch (e) { fail++; }
+    }
+
+    if (zip) {
+      const zipBlob = await zip.generateAsync({ type: 'blob' });
+      return {
+        blob: zipBlob,
+        name: `toolisto-lote-${ok}archivos.zip`,
+        title: `Conversión por lotes completada`,
+        message: `${ok} archivo(s) convertidos a ${ext.toUpperCase()}${fail ? `, ${fail} fallidos` : ''}.`,
+        preview: null,
+        stats: [
+          ['Convertidos', String(ok)],
+          ['Fallidos', String(fail)],
+          ['Formato', ext.toUpperCase()],
+          ['Calidad', `${Math.round(quality * 100)}%`],
+          ['Tamaño total', formatBytes(totalSize)],
+        ],
+      };
+    }
+    return {
+      blob: null,
+      name: '',
+      title: `Conversión por lotes completada`,
+      message: `${ok} archivo(s) convertidos a ${ext.toUpperCase()}${fail ? `, ${fail} fallidos` : ''}. Descargas individuales realizadas.`,
+      preview: null,
+      stats: [
+        ['Convertidos', String(ok)],
+        ['Fallidos', String(fail)],
+        ['Formato', ext.toUpperCase()],
+        ['Calidad', `${Math.round(quality * 100)}%`],
       ],
     };
   }
