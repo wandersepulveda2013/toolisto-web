@@ -26,7 +26,9 @@ function generateToolPage(template, tool) {
     `<meta name="description" content="${tool.description} Toolisto."`
   );
   html = html.replace('</main>', `${toolConfig}\n  </main>`);
-  const counter = html.match(/<span class="tool-count">[\s\S]*?<\/span>/);
+  html = html.replace(/href="styles\.css"/g, 'href="../../styles.css"');
+  html = html.replace(/src="src\/tool-processors\.js"/g, 'src="../../src/tool-processors.js"');
+  html = html.replace(/src="app\.js"/g, 'src="../../app.js"');
   return html;
 }
 

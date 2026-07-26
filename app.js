@@ -234,7 +234,7 @@
       const pill = document.createElement('div');
       pill.className = 'file-pill';
       pill.innerHTML = `
-        <span>${file.type === 'application/pdf' ? 'PDF' : 'IMG'}</span>
+        <span>${file.type === 'application/pdf' ? 'PDF' : file.type.startsWith('audio/') ? 'AUD' : file.type.startsWith('video/') ? 'VID' : file.type.includes('spreadsheet') || file.name.match(/\.xlsx?$/i) ? 'XLS' : file.type.includes('presentation') || file.name.match(/\.pptx?$/i) ? 'PPT' : file.type.includes('word') || file.name.match(/\.docx?$/i) ? 'DOC' : 'IMG'}</span>
         <strong title="${escapeHtml(file.name)}">${escapeHtml(shorten(file.name, 24))}</strong>
         <small>${formatBytes(file.size)}</small>
         ${index > 0 ? `<button type="button" data-action="up" aria-label="Mover ${escapeHtml(file.name)} hacia atrás">←</button>` : ''}
@@ -298,6 +298,9 @@
     if (/marca.*imagen|watermark.*image/.test(q) && images.length) return 'watermarkImage';
     if (/pdf.*imagen|pdf a imagen/.test(q) && pdfs.length) return 'pdfToImages';
     if (/metadatos|metadata|inspeccionar|exif|info.*archivo/.test(q)) return 'inspectMetadata';
+
+    const hasNonImagePdf = files.some((f) => !f.type.startsWith('image/') && f.type !== 'application/pdf');
+    if (hasNonImagePdf) return 'inspectMetadata';
 
     if (pdfs.length >= 2) return 'mergePdf';
     if (images.length >= 2) return 'imagesPdf';
@@ -1909,7 +1912,7 @@
       const mime = file.type || '';
       if (mime.startsWith('image/')) metadata = await analyzeImageMetadata(file);
       else if (mime === 'application/pdf') metadata = await analyzePdfMetadata(file);
-      else if (mime.includes('word') || mime.includes('document') || file.name.match(/\.docx?$/i)) metadata = await analyzeOfficeMetadata(file);
+      else if (mime.includes('word') || mime.includes('document') || mime.includes('spreadsheet') || mime.includes('presentation') || mime.includes('msword') || mime.includes('excel') || mime.includes('powerpoint') || file.name.match(/\.(docx?|xlsx?|pptx?)$/i)) metadata = await analyzeOfficeMetadata(file);
       else if (mime.startsWith('audio/')) metadata = await analyzeAudioMetadata(file);
       else if (mime.startsWith('video/')) metadata = await analyzeVideoMetadata(file);
       else metadata = {
@@ -1986,6 +1989,7 @@
     clearPreviousOutput();
     state.files = [];
     state.tool = state.forcedTool || null;
+    state.metadataResult = null;
     els.fileInput.value = '';
     els.intentInput.value = '';
     els.advancedPanel.open = false;

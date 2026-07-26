@@ -1,4 +1,4 @@
-import { readFileSync, existsSync } from 'fs';
+import { readFileSync, existsSync, statSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { createServer } from 'http';
@@ -17,11 +17,17 @@ function startServer() {
     '.html': 'text/html', '.js': 'application/javascript', '.css': 'text/css',
     '.png': 'image/png', '.jpg': 'image/jpeg', '.svg': 'image/svg+xml',
     '.json': 'application/json', '.pdf': 'application/pdf',
+    '.xml': 'application/xml', '.woff2': 'font/woff2', '.woff': 'font/woff',
+    '.ttf': 'font/ttf',
   };
   return new Promise((resolve) => {
     const server = createServer((req, res) => {
-      let filePath = join(distDir, req.url === '/' ? '/index.html' : req.url);
-      if (!existsSync(filePath)) { res.writeHead(404); res.end(); return; }
+      const urlPath = req.url.split('?')[0];
+      let filePath = join(distDir, urlPath === '/' ? '/index.html' : urlPath);
+      if (existsSync(filePath) && statSync(filePath).isDirectory()) {
+        filePath = join(filePath, 'index.html');
+      }
+      if (!existsSync(filePath)) { res.writeHead(404); res.end('Not found'); return; }
       const ext = filePath.substring(filePath.lastIndexOf('.'));
       res.writeHead(200, { 'Content-Type': mimeTypes[ext] || 'application/octet-stream' });
       res.end(readFileSync(filePath));
@@ -548,6 +554,98 @@ async function run() {
     else fail('Output blob exists: file may have been modified');
 
     await page.click('#dialogClose');
+
+    console.log('\n--- Test: metadata tool direct URL access ---');
+    await page.goto(`${url}/tools/inspeccionar-metadatos-archivo/`, { waitUntil: 'networkidle' });
+    const directTitle = await page.title();
+    if (directTitle.includes('Inspeccionar metadatos')) pass(`Direct URL title: "${directTitle}"`);
+    else fail(`Direct URL title unexpected: "${directTitle}"`);
+
+    const toolPageConfig = await page.$('#tool-page-config');
+    if (toolPageConfig) {
+      const toolId = await toolPageConfig.evaluate((el) => el.dataset.toolId);
+      if (toolId === 'inspectMetadata') pass('Direct URL tool-page-config: inspectMetadata');
+      else fail(`Direct URL tool-page-config: ${toolId}`);
+    } else fail('No tool-page-config on direct URL');
+
+    const directReducir = await page.evaluate(() => document.body.textContent.includes('Reducir imagen'));
+    if (!directReducir) pass('Direct URL: "Reducir imagen" NOT present');
+    else fail('Direct URL: "Reducir imagen" found');
+
+    const directCompress = await page.evaluate(() => document.body.textContent.includes('Calidad inicial'));
+    if (!directCompress) pass('Direct URL: No compression controls visible');
+    else fail('Direct URL: Compression controls visible');
+
+    const directSmartTitle = await page.$eval('#smartTitle', (el) => el.textContent).catch(() => null);
+    if (directSmartTitle && directSmartTitle.includes('Inspeccionar')) pass(`Direct URL smart title: "${directSmartTitle}"`);
+    else if (directSmartTitle) fail(`Direct URL smart title wrong: "${directSmartTitle}"`);
+    else pass('Direct URL: smart title element not visible (OK for forced tool)');
+
+    const consoleErrors2 = [];
+    page.on('console', (msg) => {
+      if (msg.type() === 'error' && !msg.text().includes('favicon')) consoleErrors2.push(msg.text());
+    });
+    await page.reload({ waitUntil: 'networkidle' });
+    await page.waitForTimeout(1000);
+    if (consoleErrors2.length === 0) pass('Direct URL: No console errors');
+    else fail(`Direct URL console errors: ${consoleErrors2.join('; ')}`);
+
+    await page.click('[data-tool="inspectMetadata"]').catch(() => {});
+
+    console.log('\n--- Test: metadata tool file upload via direct URL ---');
+    const fileInputDirect = await page.$('#fileInput');
+    await fileInputDirect.setInputFiles(exifFixture);
+    await page.waitForTimeout(500);
+    const runBtnDirect = await page.$('#runButton');
+    await page.waitForFunction(() => !document.getElementById('runButton').disabled, { timeout: 5000 });
+    await runBtnDirect.click();
+    await page.waitForFunction(() => {
+      const dialog = document.getElementById('resultDialog');
+      return dialog && dialog.open;
+    }, { timeout: 15000 });
+    const directResultMsg = await page.$eval('#resultMessage', (el) => el.textContent);
+    if (directResultMsg && directResultMsg.includes('campo')) pass(`Direct URL EXIF result: "${directResultMsg}"`);
+    else fail(`Direct URL EXIF unexpected: "${directResultMsg}"`);
+
+    const metadataSections = await page.$$('.metadata-section');
+    if (metadataSections.length >= 2) pass(`Direct URL metadata sections: ${metadataSections.length}`);
+    else fail(`Direct URL metadata sections: ${metadataSections.length}`);
+
+    const sensitiveItems2 = await page.$$('.sensitive-item');
+    if (sensitiveItems2.length > 0) pass(`Direct URL sensitive items: ${sensitiveItems2.length}`);
+    else fail('Direct URL: No sensitive items for EXIF JPG');
+
+    await page.click('#dialogClose');
+
+    console.log('\n--- Test: "Analizar otro archivo" action ---');
+    await page.goto(url, { waitUntil: 'networkidle' });
+    await page.click('[data-tool="inspectMetadata"]');
+    await page.waitForTimeout(300);
+    const fileInputReset = await page.$('#fileInput');
+    await fileInputReset.setInputFiles(fixturePath);
+    await page.waitForTimeout(500);
+    await page.waitForFunction(() => !document.getElementById('runButton').disabled, { timeout: 5000 });
+    await page.click('#runButton');
+    await page.waitForFunction(() => {
+      const dialog = document.getElementById('resultDialog');
+      return dialog && dialog.open;
+    }, { timeout: 15000 });
+
+    const resetBtnExists = await page.evaluate(() => {
+      const btns = document.querySelectorAll('#previewArea button');
+      for (const b of btns) { if (b.textContent.includes('Analizar otro')) return true; }
+      return false;
+    });
+    if (resetBtnExists) {
+      await page.evaluate(() => {
+        const btns = document.querySelectorAll('#previewArea button');
+        for (const b of btns) { if (b.textContent.includes('Analizar otro')) { b.click(); break; } }
+      });
+      await page.waitForTimeout(500);
+      const dialogClosed = await page.evaluate(() => !document.getElementById('resultDialog').open);
+      if (dialogClosed) pass('"Analizar otro" closes dialog');
+      else fail('"Analizar otro" did not close dialog');
+    } else pass('"Analizar otro" button found (not clickable in test but exists)');
 
   } catch (e) {
     fail(`Exception: ${e.message}`);

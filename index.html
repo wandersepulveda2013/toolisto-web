@@ -53,13 +53,13 @@
         <input id="intentInput" type="hidden" value="" />
 
         <div class="drop-zone" id="dropZone" tabindex="0" role="button" aria-label="Seleccionar o arrastrar archivos">
-          <input id="fileInput" type="file" multiple accept="image/jpeg,image/png,image/webp,application/pdf" hidden />
+          <input id="fileInput" type="file" multiple accept="image/*,application/pdf,audio/*,video/*,.docx,.xlsx,.pptx" hidden />
           <div class="drop-tool-icon" aria-hidden="true">
             <span>＋</span>
           </div>
           <div class="drop-copy">
-            <strong>Arrastra aquí tu imagen o PDF</strong>
-            <span>También puedes pegar una imagen desde el portapapeles.</span>
+            <strong>Arrastra aquí tu archivo</strong>
+            <span>Imágenes, PDF, audio, video o documentos. También puedes pegar desde el portapapeles.</span>
           </div>
           <button class="primary-button" id="browseButton" type="button">Seleccionar archivo</button>
           <small class="privacy-note">🔒 Se procesa en este dispositivo · hasta 25 MB por archivo</small>
