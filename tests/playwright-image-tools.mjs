@@ -361,6 +361,43 @@ async function run() {
 
     await page.click('#dialogClose');
 
+    console.log('\n--- Test: pdf to images ---');
+    const pdfFixture = join(__dirname, 'fixtures', 'five-pages.pdf');
+    await page.goto(url, { waitUntil: 'networkidle' });
+    await page.click('[data-tool="pdfToImages"]');
+    await page.evaluate(() => {
+      const panel = document.getElementById('advancedPanel');
+      if (panel) { panel.hidden = false; panel.open = true; }
+    });
+    const fileInput7 = await page.$('#fileInput');
+    await fileInput7.setInputFiles(pdfFixture);
+    await page.waitForTimeout(500);
+
+    const ptiFormat = await page.$('#ptiFormat');
+    const ptiScale = await page.$('#ptiScale');
+    if (ptiFormat) pass('ptiFormat control found'); else fail('ptiFormat missing');
+    if (ptiScale) pass('ptiScale control found'); else fail('ptiScale missing');
+
+    const runBtn7 = await page.$('#runButton');
+    await page.waitForFunction(() => !document.getElementById('runButton').disabled, { timeout: 5000 });
+    await runBtn7.click();
+
+    await page.waitForFunction(() => {
+      const dialog = document.getElementById('resultDialog');
+      return dialog && dialog.open;
+    }, { timeout: 30000 });
+    pass('PdfToImages result dialog opened');
+
+    const ptiTitle = await page.$eval('#resultTitle', (el) => el.textContent);
+    if (ptiTitle && ptiTitle.includes('imágenes')) pass(`PdfToImages title: "${ptiTitle}"`);
+    else fail(`PdfToImages title unexpected: "${ptiTitle}"`);
+
+    const ptiMsg = await page.$eval('#resultMessage', (el) => el.textContent);
+    if (ptiMsg && ptiMsg.includes('5')) pass(`PdfToImages message confirms pages: "${ptiMsg}"`);
+    else fail(`PdfToImages message unexpected: "${ptiMsg}"`);
+
+    await page.click('#dialogClose');
+
   } catch (e) {
     fail(`Exception: ${e.message}`);
   } finally {

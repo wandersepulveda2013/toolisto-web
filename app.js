@@ -557,7 +557,7 @@
         case 'enhanceImage': result = await processEnhanceImage(); break;
         case 'removeBackground': result = await processRemoveBackground(); break;
         case 'batchConvert': result = await processBatchConvert(); break;
-        case 'pdfToImages': result = showToast('PDF a imágenes requiere Canvas'); break;
+        case 'pdfToImages': result = await processPdfToImages(); break;
         default: throw new Error('Selecciona una herramienta.');
       }
       if (result) presentResult(result);
@@ -1223,6 +1223,68 @@
         ['Fallidos', String(fail)],
         ['Formato', ext.toUpperCase()],
         ['Calidad', `${Math.round(quality * 100)}%`],
+      ],
+    };
+  }
+
+  async function processPdfToImages() {
+    const file = state.files[0];
+    if (!file) throw new Error('Selecciona un archivo PDF.');
+    if (!window.pdfjsLib) throw new Error('PDF.js no está cargado. Verifica tu conexión.');
+    const mime = valueOf('ptiFormat', 'image/png');
+    const scalePct = clamp(numberValue('ptiScale', 100), 50, 300) / 100;
+    const ext = mime === 'image/jpeg' ? 'jpg' : 'png';
+    const pdfData = new Uint8Array(await file.arrayBuffer());
+    pdfjsLib.GlobalWorkerOptions.workerSrc = '';
+    const pdf = await pdfjsLib.getDocument({ data: pdfData, useWorker: false }).promise;
+    const numPages = pdf.numPages;
+    const hasJSZip = !!window.JSZip;
+    const zip = hasJSZip ? new JSZip() : null;
+    let totalPages = 0;
+    const base = baseName(file.name);
+
+    for (let i = 1; i <= numPages; i++) {
+      try {
+        const page = await pdf.getPage(i);
+        const vp = page.getViewport({ scale: scalePct });
+        const canvas = document.createElement('canvas');
+        canvas.width = vp.width;
+        canvas.height = vp.height;
+        await page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
+        const blob = await canvasToBlob(canvas, mime, 1);
+        const name = `${base}-pagina${i}.${ext}`;
+        if (zip) zip.file(name, blob);
+        else { const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 1500); }
+        totalPages++;
+      } catch (e) { /* skip failed page */ }
+    }
+
+    if (zip) {
+      const zipBlob = await zip.generateAsync({ type: 'blob' });
+      return {
+        blob: zipBlob,
+        name: `${base}-${totalPages}paginas.zip`,
+        title: 'PDF convertido a imágenes',
+        message: `${totalPages} página(s) exportadas como ${ext.toUpperCase()}${scalePct !== 1 ? ` (escala ${Math.round(scalePct * 100)}%)` : ''}.`,
+        preview: null,
+        stats: [
+          ['Páginas', String(totalPages)],
+          ['Formato', ext.toUpperCase()],
+          ['Escala', `${Math.round(scalePct * 100)}%`],
+          ['Tamaño', formatBytes(zipBlob.size)],
+        ],
+      };
+    }
+    return {
+      blob: null,
+      name: '',
+      title: 'PDF convertido a imágenes',
+      message: `${totalPages} página(s) exportadas como ${ext.toUpperCase()}. Descargas individuales realizadas.`,
+      preview: null,
+      stats: [
+        ['Páginas', String(totalPages)],
+        ['Formato', ext.toUpperCase()],
+        ['Escala', `${Math.round(scalePct * 100)}%`],
       ],
     };
   }
