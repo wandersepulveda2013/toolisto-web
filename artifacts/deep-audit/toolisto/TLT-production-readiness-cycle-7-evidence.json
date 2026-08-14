@@ -1,0 +1,26 @@
+{
+  "cycle": 7,
+  "task": "PR-007",
+  "area": "Estados de error y feedback del sitio público",
+  "updatedAt": "2026-08-11",
+  "headInitial": "4b30361aaf5198dcad1f1a57d11420173c0673b0",
+  "change": {
+    "persistentFeedback": "El shell de las 167 herramientas muestra un mensaje persistente, recuperable y con rol alert junto a la acción cuando el procesado falla o no produce salida.",
+    "recovery": "El usuario puede reintentar conservando sus archivos; el foco vuelve al botón de ejecución si el reintento vuelve a fallar.",
+    "technicalDetails": "Los botones de detalles técnicos usan listeners registrados por app.js y copian herramienta, slug, fase, error, navegador y fecha al portapapeles.",
+    "console": "Los rechazos de procesamiento ya manejados no se emiten como console.error."
+  },
+  "tests": [
+    { "command": "npm run build", "result": "PASS", "detail": "179 páginas generadas y validadas" },
+    { "command": "node tests/gate-e2e-file-family-tools.mjs", "result": "PASS", "detail": "76/76; incluye error persistente, copiado, reintento, foco y cero errores de consola" },
+    { "command": "node tests/gate-e2e-data-tools.mjs", "result": "PASS", "detail": "58/58" },
+    { "command": "node tests/gate-e2e-qr-tools.mjs", "result": "PASS", "detail": "43/43" },
+    { "command": "node tests/gate-e2e-calc-tools.mjs", "result": "PASS", "detail": "22/22" },
+    { "command": "node tests/gate-e2e-spreadsheet-tools.mjs", "result": "PASS", "detail": "197/197" },
+    { "command": "node tests/run-all.mjs", "result": "PASS", "detail": "33/33 suites, 0 fallos" }
+  ],
+  "limitations": [
+    "Los modos especializados conservan sus propios mensajes de validación y toasts; esta corrección cubre el motor genérico de las páginas públicas.",
+    "El bloque se limpia al iniciar otra ejecución o al añadir archivos aceptados; los avisos no bloqueantes siguen usando toast."
+  ]
+}

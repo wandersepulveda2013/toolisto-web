@@ -1,0 +1,14 @@
+{
+  "cycle": 5,
+  "date": "2026-08-11",
+  "task": "PR-005 lazy-load de dependencias pesadas",
+  "headInitial": "f00954869af7b04b7e2d745048e7e74d5a6bfff0",
+  "result": "APPROVED",
+  "checks": {
+    "build": "PASS: 179 páginas",
+    "lazyDependencies": "PASS: 4/4",
+    "runAll": "PASS: 32/32 suites",
+    "npmTest": "PASS"
+  },
+  "notes": "PDFLib, pdf.js, JSZip, SheetJS y EngineLoader ya no se incluyen estáticamente; los motores se resuelven localmente por herramienta."
+}

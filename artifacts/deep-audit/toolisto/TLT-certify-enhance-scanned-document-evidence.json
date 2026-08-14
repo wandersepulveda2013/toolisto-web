@@ -1,0 +1,47 @@
+{
+  "checks": [
+    {
+      "detail": "",
+      "name": "controles específicos montados",
+      "pass": true
+    },
+    {
+      "detail": "{\"enhBrightness\":\"0\",\"enhContrast\":\"30\",\"enhSharpness\":\"0\",\"enhDenoise\":\"0\",\"enhOutputFormat\":\"image/jpeg\",\"enhQuality\":\"25\",\"enhAutoCrop\":true,\"enhAutoRotate\":false}",
+      "name": "la UI entrega su control de calidad al procesador",
+      "pass": true
+    },
+    {
+      "detail": "0.25",
+      "name": "el procesador normaliza calidad porcentual para JPEG",
+      "pass": true
+    },
+    {
+      "detail": "{\"w\":109,\"h\":59}",
+      "name": "recorte automático produce una salida real más pequeña",
+      "pass": true
+    },
+    {
+      "detail": "Documento escaneado optimizado correctamente.",
+      "name": "mensaje de resultado recuperable",
+      "pass": true
+    },
+    {
+      "detail": "{\"w\":200,\"h\":100}",
+      "name": "desactivar recorte conserva dimensiones de origen",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "sin errores de consola",
+      "pass": true
+    }
+  ],
+  "failed": 0,
+  "failures": [],
+  "passed": 7,
+  "suite": "gate-e2e-enhance-scanned-document",
+  "tools": [
+    "enhanceScannedDocument"
+  ],
+  "total": 7
+}

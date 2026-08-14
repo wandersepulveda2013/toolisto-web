@@ -1,0 +1,49 @@
+{
+  "timestamp": "2026-08-03T13:24:26.749Z",
+  "ocrMode": "ocr",
+  "lowCells": [
+    {
+      "row": 2,
+      "col": 0,
+      "confidence": 81
+    },
+    {
+      "row": 2,
+      "col": 1,
+      "confidence": 74
+    }
+  ],
+  "matrix": [
+    [
+      92,
+      97,
+      93
+    ],
+    [
+      92,
+      97,
+      93
+    ],
+    [
+      81,
+      74,
+      93
+    ],
+    [
+      91,
+      85,
+      85
+    ],
+    [
+      93,
+      96,
+      93
+    ]
+  ],
+  "initialStatus": "draft",
+  "chartsBeforeReview": 0,
+  "reviewedStatus": "reviewed",
+  "chartsAfterReview": 1,
+  "durationMs": 22874,
+  "jsErrors": []
+}

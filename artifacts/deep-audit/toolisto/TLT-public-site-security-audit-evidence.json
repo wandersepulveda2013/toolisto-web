@@ -1,0 +1,44 @@
+{
+  "checks": [
+    {
+      "detail": "",
+      "name": "dependencias de producción: ninguna dependencia de red",
+      "pass": true
+    },
+    {
+      "detail": "@ffmpeg/core, @ffmpeg/ffmpeg, @ffmpeg/util, playwright, tesseract.js",
+      "name": "dependencias de desarrollo: lista revisada",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "código propio: sin claves o secretos de proveedor",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "sink de resumen: sanitización obligatoria",
+      "pass": true
+    },
+    {
+      "detail": "<div class=\"file-pill\">\n        <span>TXT</span>\n        <strong title=\"&lt;img src=x onerror=window.__toolistoXss=1&gt;.txt\">&lt;img src=x onerror=wind…</strong>\n        <small>14 B</small>\n        \n        \n        <button type=\"button\" data-action=\"remove\" aria-label=\"Quitar &lt;img src=x onerror=window.__toolistoXss=1&gt;.txt\">×</button>\n      </div>",
+      "name": "nombre de archivo hostil: se muestra como texto, no HTML",
+      "pass": true
+    },
+    {
+      "detail": "{\"clean\":\"<img><strong>texto seguro</strong>\",\"xss\":false,\"dangerousNodes\":0,\"dangerousUrls\":0,\"text\":\"texto seguro\"}",
+      "name": "resumen hostil: se sanea antes de renderizar",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "navegador: sin errores de consola",
+      "pass": true
+    }
+  ],
+  "failed": 0,
+  "failures": [],
+  "passed": 7,
+  "suite": "public-site-security-audit",
+  "total": 7
+}

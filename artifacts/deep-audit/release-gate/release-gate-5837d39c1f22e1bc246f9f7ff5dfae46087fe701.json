@@ -1,0 +1,50 @@
+{
+  "sha": "5837d39c1f22e1bc246f9f7ff5dfae46087fe701",
+  "fecha": "2026-08-06T15:18:19.468Z",
+  "build": {
+    "ok": true,
+    "exit": 0
+  },
+  "sync": {
+    "ok": true,
+    "exit": 0
+  },
+  "suites": [
+    {
+      "label": "workspace-test",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "phase3a-test",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "phase3b-test",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "phase11-audit",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "ocr-source-selection",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "phase3c-star-flow E2E (OCR real)",
+      "ok": true,
+      "exit": 0
+    }
+  ],
+  "hashes": {
+    "workspace/workspace.js": "09b22ff13d0edfaafe9aa74357bf837f44b2579e98ecfc1deed522e5a86ba61b",
+    "dist/workspace/workspace.js": "09b22ff13d0edfaafe9aa74357bf837f44b2579e98ecfc1deed522e5a86ba61b"
+  },
+  "total": 6,
+  "fail": 0
+}

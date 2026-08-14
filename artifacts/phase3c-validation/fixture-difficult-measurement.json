@@ -1,0 +1,183 @@
+{
+  "fixture": {
+    "path": "tests/fixtures/star-flow/scan-difficult.png"
+  },
+  "method": "Levenshtein edit distance (mismo metodo que phase3c-star-flow.spec.mjs)",
+  "expectedText": "Nombre Valor Estado\nVentas Q1 150 Completado\nVentas Q2 80 En progreso\nDevoluciones -30 Pendiente\nCostos fijos -200 Pagado\nGanancia neta 0 Calculado\n",
+  "clearOcr": {
+    "text": "Nombre Valor Estado\nVentas Q1 150 Completado\nVentas Q2 80 En progreso\nDevoluciones -30 Pendiente\nCostos fijos -200 Pagado\nGanancia neta 0 Calculado",
+    "confidence": 89,
+    "width": 420,
+    "height": 260,
+    "charCount": 148,
+    "pipeline": "raw",
+    "charAccuracy": {
+      "expected": 147,
+      "matched": 147,
+      "edits": 0,
+      "pct": 100
+    },
+    "wordAccuracy": {
+      "expected": 23,
+      "matched": 23,
+      "edits": 0,
+      "pct": 100
+    }
+  },
+  "difficultPipeline": {
+    "text": "ER NEe\nVentas 01 150 - Completado\n\nVentas 02 C En progreso\nDevoluciones E Pendiénte\n\nCostos fjos 200 Pagado\n\nGanancia neta 9 Calculado |",
+    "confidence": 62,
+    "width": 420,
+    "height": 260,
+    "charCount": 137,
+    "pipeline": "raw",
+    "charAccuracy": {
+      "expected": 147,
+      "matched": 112,
+      "edits": 35,
+      "pct": 76
+    },
+    "wordAccuracy": {
+      "expected": 23,
+      "matched": 10,
+      "edits": 13,
+      "pct": 43
+    }
+  },
+  "difficultLegacyUpscale": {
+    "text": "e i |\n: Ventas 01 - 150 . - Completado . a\nVentaso2 -* — 80 - ¡Enprogreso — ,\n. Devoluciones — 30 — Pendime nR ee\n“Ganancía neta” E M -",
+    "confidence": 41,
+    "width": 1292,
+    "height": 800,
+    "charCount": 136,
+    "pipeline": "upscale800",
+    "charAccuracy": {
+      "expected": 147,
+      "matched": 60,
+      "edits": 87,
+      "pct": 41
+    },
+    "wordAccuracy": {
+      "expected": 23,
+      "matched": 0,
+      "edits": 29,
+      "pct": 0
+    }
+  },
+  "difficultContrast": {
+    "text": "Nombre Valor- — Estado ]\nVenaror 90 Gmpeado —\nvents 02 00 ** Enprogeso |\nDeucones — * 2 — ee\nCustos fjos 200 Pagado |\naanancia neta o caulado |",
+    "confidence": 54,
+    "width": 420,
+    "height": 260,
+    "charCount": 144,
+    "pipeline": "contrast",
+    "charAccuracy": {
+      "expected": 147,
+      "matched": 92,
+      "edits": 55,
+      "pct": 63
+    },
+    "wordAccuracy": {
+      "expected": 23,
+      "matched": 0,
+      "edits": 27,
+      "pct": 0
+    }
+  },
+  "difficultThreshold": {
+    "text": "Nombre - MA MMO OOOO\nventas 21 20 Completado H\nvents 02 80 Cnprogeso |\nDeroucenes 20 — Pendenie ;\nEa B\ncarancamela” —O caruinto ;",
+    "confidence": 37,
+    "width": 420,
+    "height": 260,
+    "charCount": 130,
+    "pipeline": "threshold",
+    "charAccuracy": {
+      "expected": 147,
+      "matched": 70,
+      "edits": 77,
+      "pct": 48
+    },
+    "wordAccuracy": {
+      "expected": 23,
+      "matched": 0,
+      "edits": 23,
+      "pct": 0
+    }
+  },
+  "difficultPsm4": {
+    "text": "",
+    "confidence": 95,
+    "width": 420,
+    "height": 260,
+    "charCount": 0,
+    "pipeline": "raw-psm4",
+    "charAccuracy": {
+      "expected": 147,
+      "matched": 0,
+      "edits": 147,
+      "pct": 0
+    },
+    "wordAccuracy": {
+      "expected": 23,
+      "matched": 0,
+      "edits": 23,
+      "pct": 0
+    }
+  },
+  "difficultPsm6": {
+    "text": "ER NEe\nVentas 01 150 - Completado\n\nVentas 02 C En progreso\nDevoluciones E Pendiénte\n\nCostos fjos 200 Pagado\n\nGanancia neta 9 Calculado |",
+    "confidence": 62,
+    "width": 420,
+    "height": 260,
+    "charCount": 137,
+    "pipeline": "raw-psm6",
+    "charAccuracy": {
+      "expected": 147,
+      "matched": 112,
+      "edits": 35,
+      "pct": 76
+    },
+    "wordAccuracy": {
+      "expected": 23,
+      "matched": 10,
+      "edits": 13,
+      "pct": 43
+    }
+  },
+  "difficultPsm11": {
+    "text": "Ventas 01\n\n50\n\nVentas 02\n\nEn progreso\n\n2\n\nDevoluciones\n\nCostos fjos\n\nPagado\n\nGanancia neta\n\nu.\n\nCalculado\n\n=",
+    "confidence": 67,
+    "width": 420,
+    "height": 260,
+    "charCount": 109,
+    "pipeline": "raw-psm11",
+    "charAccuracy": {
+      "expected": 147,
+      "matched": 73,
+      "edits": 74,
+      "pct": 50
+    },
+    "wordAccuracy": {
+      "expected": 23,
+      "matched": 8,
+      "edits": 15,
+      "pct": 35
+    }
+  },
+  "summary": {
+    "clearCharPct": 100,
+    "clearWordPct": 100,
+    "difficultPipelineCharPct": 76,
+    "difficultPipelineWordPct": 43,
+    "difficultLegacyUpscaleCharPct": 41,
+    "difficultLegacyUpscaleWordPct": 0,
+    "note": "Medicion honesta sin umbral reducido. extractTextFromScan ya NO hace upscale (el upscale >=800px degradaba imagenes ruidosas y producia el artefacto 1-30 en el fixture limpio). Pipeline con OEM 3 (DEFAULT: LSTM + legacy) desde 2026-08-03. Los experimentos contrast, umbral y PSM 4/6/11 se registran para impedir activar un candidato que degrade la referencia cruda.",
+    "experiments": {
+      "contrast": 63,
+      "threshold": 48,
+      "psm4": 0,
+      "psm6": 76,
+      "psm11": 50
+    }
+  }
+}

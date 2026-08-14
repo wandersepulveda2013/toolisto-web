@@ -1,0 +1,525 @@
+{
+  "secret": "TLST-P6-1785763401582-b1prce",
+  "requests": [
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/workspace/?preview=internal",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/workspace/workspace.css?v=20260803-local",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/assets/toolisto-mark.svg",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/vendor/pdfjs/pdf.min.js",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/vendor/jszip/jszip.min.js",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/workspace/workspace.js?v=20260729-ui5",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/vendor/js/engine-loader.js",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/js/ocr/pdf-ocr-engine.js",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/workspace/core/state.js",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/workspace/core/events.js",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/workspace/core/db.js",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/workspace/core/storage.js",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/workspace/tools-data.js",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/workspace/core/scanner-ui.js",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/workspace/core/design-report.js",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/workspace/core/pdf-generator.js",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/workspace/core/history-manager.js",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/workspace/core/workspace-storage.js",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/workspace/core/error-manager.js",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/workspace/core/operation-registry.js",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/workspace/core/workflow-operations.js",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/workspace/core/workflow-ui.js",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/workspace/core/instruction-assistant-ui.js",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/workspace/core/ocr-engine.js",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/workspace/core/model.js",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/workspace/core/migrations.js",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/workspace/core/integrity.js",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/workspace/core/bundle.js",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/workspace/core/models.js",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/workspace/core/image-processor.js",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/workspace/core/instruction-parser.js",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/workspace/core/instruction-planner.js",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/workspace/core/workflow-model.js",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/workspace/core/workflow-engine.js",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/workspace/core/job-queue.js",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/workspace/core/workflow-validator.js",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/vendor/tesseract/tesseract.min.js",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "HEAD",
+      "url": "http://localhost:8082/vendor/tesseract/lang-data/spa.traineddata.gz",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/vendor/tesseract/worker.min.js",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/vendor/tesseract/tesseract-core-simd.wasm.js",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/vendor/tesseract/lang-data/spa.traineddata.gz",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/workspace/?preview=internal",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/workspace/workspace.css?v=20260803-local",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/assets/toolisto-mark.svg",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/vendor/pdfjs/pdf.min.js",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/vendor/jszip/jszip.min.js",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/workspace/workspace.js?v=20260729-ui5",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/vendor/js/engine-loader.js",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/js/ocr/pdf-ocr-engine.js",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/workspace/core/state.js",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/workspace/core/events.js",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/workspace/core/db.js",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/workspace/core/storage.js",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/workspace/tools-data.js",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/workspace/core/scanner-ui.js",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/workspace/core/design-report.js",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/workspace/core/pdf-generator.js",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/workspace/core/history-manager.js",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/workspace/core/workspace-storage.js",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/workspace/core/error-manager.js",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/workspace/core/operation-registry.js",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/workspace/core/workflow-operations.js",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/workspace/core/workflow-ui.js",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/workspace/core/instruction-assistant-ui.js",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/workspace/core/ocr-engine.js",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/workspace/core/model.js",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/workspace/core/migrations.js",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/workspace/core/integrity.js",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/workspace/core/bundle.js",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/workspace/core/models.js",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/workspace/core/image-processor.js",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/workspace/core/workflow-model.js",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/workspace/core/workflow-engine.js",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/workspace/core/instruction-parser.js",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/workspace/core/instruction-planner.js",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/workspace/core/job-queue.js",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "GET",
+      "url": "http://localhost:8082/workspace/core/workflow-validator.js",
+      "postData": null,
+      "aborted": false
+    },
+    {
+      "method": "POST",
+      "url": "https://external.invalid/probe/fetch?marker=TLST-P6-1785763401582-b1prce",
+      "postData": "TLST-P6-1785763401582-b1prce",
+      "aborted": true
+    },
+    {
+      "method": "POST",
+      "url": "https://external.invalid/probe/beacon?marker=TLST-P6-1785763401582-b1prce",
+      "postData": "TLST-P6-1785763401582-b1prce",
+      "aborted": true
+    },
+    {
+      "method": "GET",
+      "url": "https://external.invalid/probe/img?marker=TLST-P6-1785763401582-b1prce",
+      "postData": null,
+      "aborted": true
+    }
+  ],
+  "websockets": [],
+  "probes": {
+    "probeRequests": [
+      {
+        "url": "https://external.invalid/probe/fetch?marker=TLST-P6-1785763401582-b1prce",
+        "aborted": true
+      },
+      {
+        "url": "https://external.invalid/probe/beacon?marker=TLST-P6-1785763401582-b1prce",
+        "aborted": true
+      },
+      {
+        "url": "https://external.invalid/probe/img?marker=TLST-P6-1785763401582-b1prce",
+        "aborted": true
+      }
+    ],
+    "websockets": [
+      {
+        "url": "ws://127.0.0.1:9/probe/ws?marker=TLST-P6-1785763401582-b1prce",
+        "sent": [],
+        "received": []
+      }
+    ]
+  },
+  "flow": {
+    "bundleHasManifest": 3,
+    "requests": 80,
+    "projectsAfterImport": "msd9fsi79er82mmyy"
+  },
+  "staticScan": {
+    "noNetworkPrimitives": true,
+    "noExternalHtml": true,
+    "noExternalCss": true
+  },
+  "pageErrors": [],
+  "consoleErrors": [],
+  "timestamp": "2026-08-03T13:23:55.390Z",
+  "pass": 51,
+  "fail": 0,
+  "failures": []
+}

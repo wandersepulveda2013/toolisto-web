@@ -1,0 +1,144 @@
+{
+  "catalogTools": 167,
+  "checks": [
+    {
+      "detail": "167",
+      "name": "Catálogo contiene exactamente 167 herramientas",
+      "pass": true
+    },
+    {
+      "detail": "167",
+      "name": "Las 167 herramientas del catálogo están habilitadas",
+      "pass": true
+    },
+    {
+      "detail": "240 PASS / 0 FAIL",
+      "name": "TLT-certify-23-tools-evidence.json: resultado aprobado",
+      "pass": true
+    },
+    {
+      "detail": "47 PASS / 0 FAIL",
+      "name": "TLT-certify-av-evidence.json: resultado aprobado",
+      "pass": true
+    },
+    {
+      "detail": "24 PASS / 0 FAIL",
+      "name": "TLT-certify-calc-family-evidence.json: resultado aprobado",
+      "pass": true
+    },
+    {
+      "detail": "240 PASS / 0 FAIL",
+      "name": "TLT-certify-converters-evidence.json: resultado aprobado",
+      "pass": true
+    },
+    {
+      "detail": "58 PASS / 0 FAIL",
+      "name": "TLT-certify-data-family-evidence.json: resultado aprobado",
+      "pass": true
+    },
+    {
+      "detail": "41 PASS / 0 FAIL",
+      "name": "TLT-certify-docs-extras-evidence.json: resultado aprobado",
+      "pass": true
+    },
+    {
+      "detail": "7 PASS / 0 FAIL",
+      "name": "TLT-certify-enhance-scanned-document-evidence.json: resultado aprobado",
+      "pass": true
+    },
+    {
+      "detail": "70 PASS / 0 FAIL",
+      "name": "TLT-certify-epub-family-evidence.json: resultado aprobado",
+      "pass": true
+    },
+    {
+      "detail": "35 PASS / 0 FAIL",
+      "name": "TLT-certify-file-family-evidence.json: resultado aprobado",
+      "pass": true
+    },
+    {
+      "detail": "76 PASS / 0 FAIL",
+      "name": "TLT-certify-file-family-extra-evidence.json: resultado aprobado",
+      "pass": true
+    },
+    {
+      "detail": "87 PASS / 0 FAIL",
+      "name": "TLT-certify-image-converters-evidence.json: resultado aprobado",
+      "pass": true
+    },
+    {
+      "detail": "93 PASS / 0 FAIL",
+      "name": "TLT-certify-image-family-evidence.json: resultado aprobado",
+      "pass": true
+    },
+    {
+      "detail": "21 PASS / 0 FAIL",
+      "name": "TLT-certify-image-interactive-evidence.json: resultado aprobado",
+      "pass": true
+    },
+    {
+      "detail": "34 PASS / 0 FAIL",
+      "name": "TLT-certify-ocr-pdf-evidence.json: resultado aprobado",
+      "pass": true
+    },
+    {
+      "detail": "35 PASS / 0 FAIL",
+      "name": "TLT-certify-pdf-encrypt-evidence.json: resultado aprobado",
+      "pass": true
+    },
+    {
+      "detail": "95 PASS / 0 FAIL",
+      "name": "TLT-certify-pdf-family-evidence.json: resultado aprobado",
+      "pass": true
+    },
+    {
+      "detail": "62 PASS / 0 FAIL",
+      "name": "TLT-certify-pdf-misc-evidence.json: resultado aprobado",
+      "pass": true
+    },
+    {
+      "detail": "43 PASS / 0 FAIL",
+      "name": "TLT-certify-qr-family-evidence.json: resultado aprobado",
+      "pass": true
+    },
+    {
+      "detail": "221 PASS / 0 FAIL",
+      "name": "TLT-certify-spreadsheet-family-evidence.json: resultado aprobado",
+      "pass": true
+    },
+    {
+      "detail": "37 PASS / 0 FAIL",
+      "name": "TLT-certify-structure-family-evidence.json: resultado aprobado",
+      "pass": true
+    },
+    {
+      "detail": "56 PASS / 0 FAIL",
+      "name": "TLT-certify-text-family-evidence.json: resultado aprobado",
+      "pass": true
+    },
+    {
+      "detail": "67 PASS / 0 FAIL",
+      "name": "TLT-certify-word-family-evidence.json: resultado aprobado",
+      "pass": true
+    },
+    {
+      "detail": "167/167",
+      "name": "Cada herramienta habilitada tiene evidencia funcional",
+      "pass": true
+    },
+    {
+      "detail": "167/167",
+      "name": "Cada evidencia asignada a una herramienta habilitada aprobó",
+      "pass": true
+    }
+  ],
+  "coveredTools": 167,
+  "enabledTools": 167,
+  "evidenceFiles": 22,
+  "failed": 0,
+  "passed": 26,
+  "suite": "production-tool-coverage",
+  "total": 26,
+  "uncertified": [],
+  "uncovered": []
+}

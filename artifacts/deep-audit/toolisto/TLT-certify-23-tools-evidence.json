@@ -1,0 +1,262 @@
+{
+  "failed": 0,
+  "herramientas": [
+    {
+      "accion": "Añadir a la matriz de certificación; permanece habilitada.",
+      "checks": 5,
+      "errores": [],
+      "estado": "CERTIFICADA",
+      "failed": 0,
+      "passed": 5,
+      "slug": "estadisticas-texto",
+      "toolId": "textStatistics",
+      "utilidad": "Estadísticas de texto (palabras, párrafos, caracteres)"
+    },
+    {
+      "accion": "Añadir a la matriz de certificación; permanece habilitada.",
+      "checks": 5,
+      "errores": [],
+      "estado": "CERTIFICADA",
+      "failed": 0,
+      "passed": 5,
+      "slug": "contar-palabras",
+      "toolId": "wordCount",
+      "utilidad": "Contador de palabras y caracteres"
+    },
+    {
+      "accion": "Añadir a la matriz de certificación; permanece habilitada.",
+      "checks": 5,
+      "errores": [],
+      "estado": "CERTIFICADA",
+      "failed": 0,
+      "passed": 5,
+      "slug": "comparar-textos",
+      "toolId": "textDiff",
+      "utilidad": "Comparación de dos textos línea a línea"
+    },
+    {
+      "accion": "Añadir a la matriz de certificación; permanece habilitada.",
+      "checks": 5,
+      "errores": [],
+      "estado": "CERTIFICADA",
+      "failed": 0,
+      "passed": 5,
+      "slug": "html-a-markdown",
+      "toolId": "htmlToMarkdown",
+      "utilidad": "Conversión de HTML a Markdown"
+    },
+    {
+      "accion": "Añadir a la matriz de certificación; permanece habilitada.",
+      "checks": 5,
+      "errores": [],
+      "estado": "CERTIFICADA",
+      "failed": 0,
+      "passed": 5,
+      "slug": "html-a-texto",
+      "toolId": "htmlToText",
+      "utilidad": "Extracción de texto plano desde HTML"
+    },
+    {
+      "accion": "Añadir a la matriz de certificación; permanece habilitada.",
+      "checks": 5,
+      "errores": [],
+      "estado": "CERTIFICADA",
+      "failed": 0,
+      "passed": 5,
+      "slug": "minificar-css",
+      "toolId": "cssMinifier",
+      "utilidad": "Minificación de CSS"
+    },
+    {
+      "accion": "Añadir a la matriz de certificación; permanece habilitada.",
+      "checks": 5,
+      "errores": [],
+      "estado": "CERTIFICADA",
+      "failed": 0,
+      "passed": 5,
+      "slug": "codificar-base64",
+      "toolId": "base64Encode",
+      "utilidad": "Codificación Base64 de texto"
+    },
+    {
+      "accion": "Añadir a la matriz de certificación; permanece habilitada.",
+      "checks": 5,
+      "errores": [],
+      "estado": "CERTIFICADA",
+      "failed": 0,
+      "passed": 5,
+      "slug": "decodificar-base64",
+      "toolId": "base64Decode",
+      "utilidad": "Decodificación Base64 a texto"
+    },
+    {
+      "accion": "Añadir a la matriz de certificación; permanece habilitada.",
+      "checks": 5,
+      "errores": [],
+      "estado": "CERTIFICADA",
+      "failed": 0,
+      "passed": 5,
+      "slug": "codificar-url",
+      "toolId": "urlEncode",
+      "utilidad": "Codificación URL de texto"
+    },
+    {
+      "accion": "Añadir a la matriz de certificación; permanece habilitada.",
+      "checks": 5,
+      "errores": [],
+      "estado": "CERTIFICADA",
+      "failed": 0,
+      "passed": 5,
+      "slug": "decodificar-url",
+      "toolId": "urlDecode",
+      "utilidad": "Decodificación URL a texto"
+    },
+    {
+      "accion": "Añadir a la matriz de certificación; permanece habilitada.",
+      "checks": 6,
+      "errores": [],
+      "estado": "CERTIFICADA",
+      "failed": 0,
+      "passed": 6,
+      "slug": "csv-a-markdown",
+      "toolId": "csvToMarkdown",
+      "utilidad": "Conversión de CSV a Markdown"
+    },
+    {
+      "accion": "Añadir a la matriz de certificación; permanece habilitada.",
+      "checks": 6,
+      "errores": [],
+      "estado": "CERTIFICADA",
+      "failed": 0,
+      "passed": 6,
+      "slug": "csv-a-html",
+      "toolId": "csvToHtml",
+      "utilidad": "Conversión de CSV a tabla HTML"
+    },
+    {
+      "accion": "Añadir a la matriz de certificación; permanece habilitada.",
+      "checks": 6,
+      "errores": [],
+      "estado": "CERTIFICADA",
+      "failed": 0,
+      "passed": 6,
+      "slug": "csv-a-yaml",
+      "toolId": "csvToYaml",
+      "utilidad": "Conversión de CSV a YAML"
+    },
+    {
+      "accion": "Añadir a la matriz de certificación; permanece habilitada.",
+      "checks": 6,
+      "errores": [],
+      "estado": "CERTIFICADA",
+      "failed": 0,
+      "passed": 6,
+      "slug": "estadisticas-csv",
+      "toolId": "csvStatistics",
+      "utilidad": "Estadísticas de columnas CSV"
+    },
+    {
+      "accion": "Añadir a la matriz de certificación; permanece habilitada.",
+      "checks": 7,
+      "errores": [],
+      "estado": "CERTIFICADA",
+      "failed": 0,
+      "passed": 7,
+      "slug": "filtrar-csv",
+      "toolId": "csvFilter",
+      "utilidad": "Filtrado de filas CSV por operador"
+    },
+    {
+      "accion": "Añadir a la matriz de certificación; permanece habilitada.",
+      "checks": 7,
+      "errores": [],
+      "estado": "CERTIFICADA",
+      "failed": 0,
+      "passed": 7,
+      "slug": "ordenar-csv",
+      "toolId": "csvSort",
+      "utilidad": "Ordenación de CSV por columna"
+    },
+    {
+      "accion": "Añadir a la matriz de certificación; permanece habilitada.",
+      "checks": 6,
+      "errores": [],
+      "estado": "CERTIFICADA",
+      "failed": 0,
+      "passed": 6,
+      "slug": "csv-a-sql",
+      "toolId": "csvToSql",
+      "utilidad": "Generación de sentencias SQL desde CSV"
+    },
+    {
+      "accion": "Añadir a la matriz de certificación; permanece habilitada.",
+      "checks": 6,
+      "errores": [],
+      "estado": "CERTIFICADA",
+      "failed": 0,
+      "passed": 6,
+      "slug": "formatear-json",
+      "toolId": "jsonFormatter",
+      "utilidad": "Formateo/ordenado de JSON"
+    },
+    {
+      "accion": "Añadir a la matriz de certificación; permanece habilitada.",
+      "checks": 6,
+      "errores": [],
+      "estado": "CERTIFICADA",
+      "failed": 0,
+      "passed": 6,
+      "slug": "validar-json",
+      "toolId": "jsonValidator",
+      "utilidad": "Validación de sintaxis JSON"
+    },
+    {
+      "accion": "Añadir a la matriz de certificación; permanece habilitada.",
+      "checks": 6,
+      "errores": [],
+      "estado": "CERTIFICADA",
+      "failed": 0,
+      "passed": 6,
+      "slug": "excel-a-html",
+      "toolId": "excelToHtml",
+      "utilidad": "Conversión de XLSX a tabla HTML"
+    },
+    {
+      "accion": "Añadir a la matriz de certificación; permanece habilitada.",
+      "checks": 6,
+      "errores": [],
+      "estado": "CERTIFICADA",
+      "failed": 0,
+      "passed": 6,
+      "slug": "excel-a-markdown",
+      "toolId": "excelToMarkdown",
+      "utilidad": "Conversión de XLSX a Markdown"
+    },
+    {
+      "accion": "Añadir a la matriz de certificación; permanece habilitada.",
+      "checks": 6,
+      "errores": [],
+      "estado": "CERTIFICADA",
+      "failed": 0,
+      "passed": 6,
+      "slug": "excel-a-xml",
+      "toolId": "excelToXml",
+      "utilidad": "Conversión de XLSX a XML"
+    },
+    {
+      "accion": "Añadir a la matriz de certificación; permanece habilitada.",
+      "checks": 7,
+      "errores": [],
+      "estado": "CERTIFICADA",
+      "failed": 0,
+      "passed": 7,
+      "slug": "xml-a-excel",
+      "toolId": "xmlToExcel",
+      "utilidad": "Conversión de XML a libro XLSX"
+    }
+  ],
+  "passed": 240,
+  "suite": "verify-23-tools",
+  "syncOk": true,
+  "totalChecks": 240
+}

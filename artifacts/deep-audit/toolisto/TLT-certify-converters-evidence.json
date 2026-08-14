@@ -1,0 +1,120 @@
+{
+  "failed": 0,
+  "herramientas": [
+    {
+      "accion": "Añadir a la matriz de certificación; permanece habilitada.",
+      "checks": 7,
+      "estado": "CERTIFICADA",
+      "failed": 0,
+      "passed": 7,
+      "slug": "jpg-a-png",
+      "toolId": "jpg-to-png",
+      "toolIdTecnico": "convert",
+      "utilidad": "Conversión de JPG a PNG"
+    },
+    {
+      "accion": "Añadir a la matriz de certificación; permanece habilitada.",
+      "checks": 7,
+      "estado": "CERTIFICADA",
+      "failed": 0,
+      "passed": 7,
+      "slug": "png-a-jpg",
+      "toolId": "png-to-jpg",
+      "toolIdTecnico": "convert",
+      "utilidad": "Conversión de PNG a JPG"
+    },
+    {
+      "accion": "Añadir a la matriz de certificación; permanece habilitada.",
+      "checks": 7,
+      "estado": "CERTIFICADA",
+      "failed": 0,
+      "passed": 7,
+      "slug": "jpg-a-webp",
+      "toolId": "jpg-to-webp",
+      "toolIdTecnico": "convert",
+      "utilidad": "Conversión de JPG a WebP"
+    },
+    {
+      "accion": "Añadir a la matriz de certificación; permanece habilitada.",
+      "checks": 7,
+      "estado": "CERTIFICADA",
+      "failed": 0,
+      "passed": 7,
+      "slug": "webp-a-jpg",
+      "toolId": "webp-to-jpg",
+      "toolIdTecnico": "convert",
+      "utilidad": "Conversión de WebP a JPG"
+    },
+    {
+      "accion": "Añadir a la matriz de certificación; permanece habilitada.",
+      "checks": 7,
+      "estado": "CERTIFICADA",
+      "failed": 0,
+      "passed": 7,
+      "slug": "png-a-webp",
+      "toolId": "png-to-webp",
+      "toolIdTecnico": "convert",
+      "utilidad": "Conversión de PNG a WebP"
+    },
+    {
+      "accion": "Añadir a la matriz de certificación; permanece habilitada.",
+      "checks": 7,
+      "estado": "CERTIFICADA",
+      "failed": 0,
+      "passed": 7,
+      "slug": "webp-a-png",
+      "toolId": "webp-to-png",
+      "toolIdTecnico": "convert",
+      "utilidad": "Conversión de WebP a PNG"
+    },
+    {
+      "accion": "Añadir a la matriz de certificación; permanece habilitada.",
+      "checks": 7,
+      "estado": "CERTIFICADA",
+      "failed": 0,
+      "passed": 7,
+      "slug": "jpg-a-pdf",
+      "toolId": "jpg-to-pdf",
+      "toolIdTecnico": "imagesPdf",
+      "utilidad": "Creación de PDF desde JPG"
+    },
+    {
+      "accion": "Añadir a la matriz de certificación; permanece habilitada.",
+      "checks": 7,
+      "estado": "CERTIFICADA",
+      "failed": 0,
+      "passed": 7,
+      "slug": "png-a-pdf",
+      "toolId": "png-to-pdf",
+      "toolIdTecnico": "imagesPdf",
+      "utilidad": "Creación de PDF desde PNG"
+    },
+    {
+      "accion": "Añadir a la matriz de certificación; permanece habilitada.",
+      "checks": 8,
+      "estado": "CERTIFICADA",
+      "failed": 0,
+      "passed": 8,
+      "slug": "pdf-a-jpg",
+      "toolId": "pdf-to-jpg",
+      "toolIdTecnico": "pdfToImages",
+      "utilidad": "Extracción de páginas PDF como JPG (ZIP)"
+    },
+    {
+      "accion": "Añadir a la matriz de certificación; permanece habilitada.",
+      "checks": 8,
+      "estado": "CERTIFICADA",
+      "failed": 0,
+      "passed": 8,
+      "slug": "pdf-a-png",
+      "toolId": "pdf-to-png",
+      "toolIdTecnico": "pdfToImages",
+      "utilidad": "Extracción de páginas PDF como PNG (ZIP)"
+    }
+  ],
+  "passed": 240,
+  "suite": "verify-converters",
+  "syncOk": true,
+  "totalChecks": 240,
+  "totalConverters": 10
+}

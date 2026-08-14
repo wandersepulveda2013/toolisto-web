@@ -1,0 +1,11 @@
+{
+  "series": [
+    { "label": "Ventas Q1", "value": 150 },
+    { "label": "Ventas Q2", "value": 80 },
+    { "label": "Devoluciones", "value": -30 },
+    { "label": "Costos fijos", "value": -200 },
+    { "label": "Ganancia neta", "value": 0 }
+  ],
+  "hasNegative": true,
+  "maxValue": 200
+}
