@@ -1,0 +1,46 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "username": "toolisto-dev",
+  "default_agent": "toolisto-autonomous",
+  "instructions": [
+    "AGENTS.md",
+    "workspace/AUTONOMOUS-CONTEXT.md"
+  ],
+  "permission": {
+    "edit": "allow",
+    "bash": {
+      "*": "allow",
+      "git push*": "deny",
+      "git push --force*": "deny",
+      "git push -f*": "deny",
+      "git merge*": "deny",
+      "git rebase*": "deny",
+      "git reset*": "deny",
+      "git clean*": "deny",
+      "git branch -D*": "deny",
+      "git branch --delete*": "deny",
+      "git checkout --*": "deny",
+      "rm -rf*": "deny",
+      "rm -fr*": "deny",
+      "rm -r -f*": "deny",
+      "Remove-Item -Recurse*": "deny",
+      "Remove-Item -Force*": "deny",
+      "Remove-Item* -Recurse*": "deny",
+      "Remove-Item* -Force*": "deny",
+      "ri -Recurse*": "deny",
+      "ri -Force*": "deny",
+      "del /s*": "deny",
+      "rd /s*": "deny",
+      "rmdir /s*": "deny"
+    },
+    "task": "allow",
+    "read": "allow",
+    "edit": "allow",
+    "glob": "allow",
+    "grep": "allow",
+    "list": "allow",
+    "todowrite": "allow",
+    "webfetch": "deny",
+    "websearch": "deny"
+  }
+}

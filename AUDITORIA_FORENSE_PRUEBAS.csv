@@ -1,0 +1,43 @@
+Suite,Comando,QuePruebaRealmente,Navegador,FixtureReal,Descarga,Reabre,ValidaSemantica,Clasificacion,ResultadoEnHEAD
+audit-count,npm test / node scripts/audit-count.mjs,Existencia y coherencia estructural: tools.json vs dist (cards, paginas, robots, categorias, cobertura procesador/handler, toolMeta),No,No,No,No,Parcial,ESTRUCTURAL,PASS (2026-08-06)
+verify-all-144,node tests/verify-all-144-tools.js,Existencia de 144 herramientas en paginas/JS (checks de presencia),No,No,No,No,No,ESTRUCTURAL/EXISTENCIA,segun roadmap 144/144
+verify-23-tools,node tests/verify-23-tools.mjs,23 herramientas fuera de matriz con checks por herramienta y syncOk (240 checks),Parcial,No,Parcial,No,Parcial,FUNCIONAL PARCIAL,240/240 evidencia 2026-08-05
+verify-115-tools,node tests/verify-115-tools.mjs,29 herramientas rebuild con UIs form-first (calc 2, estructura 3, archivos 3, QR 7, Excel/CSV/JSON/XML 14),Si,Si,Parcial,Parcial,Parcial,FUNCIONAL (navegador real),222/222 segun roadmap
+verify-image-family,node tests/verify-image-family.mjs,Familia visual certificada: pixeles/dimensiones/EXIF/JPEG/WebP con fixtures PNG reales,Si,Si,Si,Si,Si,FUNCIONAL REAL,93/93
+verify-pdf-family,node tests/verify-pdf-family.mjs,22 herramientas PDFLib: inspeccion en navegador + render/pdf.js + JSZip + drag&drop + firma dibujada,Si,Si,Si,Si,Si,FUNCIONAL REAL,95/95
+gate-e2e-image-tools,node tests/gate-e2e-image-tools.mjs,Editor visual: signature/removeObjects/workflow sobre dist real (pixeles antes/despues),Si,Si,Si,Si,Si,FUNCIONAL REAL E2E,21/21
+gate-e2e-word-tools,node tests/gate-e2e-word-tools.mjs,20 herramientas Word sobre dist real; fixtures DOCX/ODT/RTF en navegador; validacion mammoth/JSZip/pdfjs/XLSX,Si,Si,Si,Si,Si,FUNCIONAL REAL E2E,67/67 (54.7s)
+gate-e2e-epub-tools,node tests/gate-e2e-epub-tools.mjs,7 herramientas EPUB sobre dist real; fixtures EPUB en navegador; validacion estructural + revalidacion,Si,Si,Si,Si,Si,FUNCIONAL REAL E2E,70/70 (30.7s)
+gate-e2e-pdf-misc-tools,node tests/gate-e2e-pdf-misc-tools.mjs,8 herramientas (tablas PDF, censor, comparar, scanner, EXIF, APA7) sobre dist real; pdfjs/JSZip/docx/XLSX,Si,Si,Si,Si,Si,FUNCIONAL REAL E2E,62/62 (36.2s)
+gate-e2e-av-tools,node tests/gate-e2e-av-tools.mjs,9 herramientas FFmpeg.wasm sobre dist real; fixtures WAV/WebM generados con FFmpeg; magic bytes + streams/duration,Si,Si,Si,Si,Si,FUNCIONAL REAL E2E,47/47
+gate-e2e-ocr-pdf-tools,node tests/gate-e2e-ocr-pdf-tools.mjs,4 herramientas OCR-PDF sobre dist real; PDF escaneados/texto, PNG, WebP; OCR Tesseract local + pdfjs,Si,Si,Si,Si,Si,FUNCIONAL REAL E2E,34/34 (22s)
+batch1-3,npm run test:batch1/2/3,Esquema y pagina actuales validos (existen en dist),No,No,No,No,No,ESTRUCTURAL,PASS x3 (2026-08-06)
+comprehensive,node tests/comprehensive-test.js,Coherencia transversal del catalogo,No,No,No,No,No,ESTRUCTURAL,segun run-all PASS
+qa,node tests/qa-test.js,Reglas de calidad SEO/contenido,No,No,No,No,No,ESTRUCTURAL,segun run-all PASS
+homepage-audit,node tests/homepage-audit-test.js,Portada: tarjetas/contenido,No,No,No,No,No,ESTRUCTURAL,segun run-all PASS
+seo-functional,node tests/seo-functional-test.js,SEO funcional del sitio,No,No,No,No,No,ESTRUCTURAL,segun run-all PASS
+seo-audit,node scripts/seo-audit.mjs,Auditoria SEO 1989 checks (roadmap),No,No,No,No,No,ESTRUCTURAL,roadmap dice 0 errores
+test-slug-audit,node test-slug-audit.mjs,Slugs unicos/validos,No,No,No,No,No,ESTRUCTURAL,segun run-all PASS
+alias-restrictions,node tests/alias-restrictions-test.js,Alias restringidos,No,No,No,No,No,ESTRUCTURAL,segun run-all PASS
+test-embedpdf,node tests/test-embedpdf.js,Embed PDF,No,No,No,No,No,ESTRUCTURAL,segun run-all PASS
+workspace-test,node tests/workspace/workspace-test.mjs,Estructura de workspace/ y core (156 checks),No,No,No,No,No,ESTRUCTURAL,156/156 (release gate OK)
+phase3a/3b,node tests/workspace/phase3a-test.mjs / phase3b-test.mjs,Integridad P0 3a/3b (estructura + revision OCR),No,No,No,No,No,ESTRUCTURAL/INTEGRACION,45/45 y 59/59 (release gate OK)
+phase11-audit,node tests/workspace/phase11-audit.mjs,Auditoria Phase 11 incl. local-first y system font,No,No,No,No,No,ESTRUCTURAL,106/106 (release gate OK)
+ocr-source-selection,node tests/workspace/ocr-source-selection.mjs,Seleccion de fuente OCR,No,No,No,No,No,UNIT/INTEGRACION,34/34 (release gate OK)
+phase3c-star-flow,node tests/workspace/phase3c-star-flow.spec.mjs,E2E Star-Flow: escaneo->OCR->doc->tabla->grafico->PDF->export/import con OCR real y comparacion celda a celda,Si,Si,Si,Si,Si,FUNCIONAL REAL E2E,83/83 (release gate OK)
+production-validation,npm run test:workspace,Recorrido del workspace en navegador contra http://localhost:8080 (requiere server.js externo; no es hermetico),Si,Si,No,No,Si,NAVEGADOR (no autosuficiente),PASS con server levantado (2026-08-06); FALLA sin server
+workspace-stability,node tests/workspace/workspace-stability-e2e-test.mjs,Estabilidad E2E del workspace,Si,Si,No,No,Parcial,NAVEGADOR E2E,9/9 segun roadmap
+phase3-integrity,node tests/workspace/phase3-integrity-test.mjs,Integridad 3a/3b sobre IndexedDB real,No,Si,No,No,Si,INTEGRACION,52/52
+phase4-migrations,node tests/workspace/phase4-migrations-test.mjs,Migraciones IndexedDB v1/v2/v3 + backup/rollback,No,Si,No,No,Si,INTEGRACION,34/34
+phase4-integrity,node tests/workspace/phase4-integrity-test.mjs,Integridad referencial y cascada en IndexedDB real,No,Si,No,No,Si,INTEGRACION,43/43
+phase5-bundle-trust,node tests/workspace/phase5-bundle-trust-test.mjs,Manifiesto/checksums/import atomico sobre IndexedDB real,No,Si,No,No,Si,INTEGRACION,49/49
+phase6-network-negative,node tests/workspace/phase6-network-negative-test.mjs,Prueba negativa de red: marcador secreto nunca sale (intercepta fetch/XHR/beacon/WS),Si,Si,No,No,Si,SEGURIDAD E2E,51/51
+history-manager,node tests/workspace/history-manager-test.mjs,Undo/redo por snapshots,No,No,No,No,Si,UNIT,28/28
+workspace-storage,node tests/workspace/workspace-storage-test.mjs,Almacenamiento IndexedDB/localStorage,No,No,No,No,Parcial,UNIT,17/17
+error-manager,node tests/workspace/error-manager-test.mjs,Gestor de errores,No,No,No,No,Parcial,UNIT,13/13
+session-recovery,node tests/workspace/session-recovery-test.mjs,Recuperacion de sesion y UI,No,No,No,No,Parcial,INTEGRACION,24/24
+deep-regression,node tests/workspace/deep-regression-test.mjs,Regresion profunda del workspace,No,Parcial,No,No,Parcial,INTEGRACION,24/24
+tabular,node tests/workspace/tabular-detection-test.mjs,Deteccion tabular,No,No,No,No,Parcial,UNIT,21/21
+workflow-*,tests/workspace/workflow-*.mjs,Modelo/UI/engine/validator/e2e de workflows,No,No,No,No,Parcial,UNIT/INTEGRACION,15/15 y mas segun roadmap
+run-all,node tests/run-all.mjs,Aggregador de 18 suites (incluye gate harnesses),Si,Parcial,Parcial,Parcial,Parcial,AGREGADOR,15/18 en 2026-08-06 (3 flakes Word/EPUB/PDF-Misc que pasan standalone 67/70/62)
+release-gate,node scripts/test-workspace-release.mjs,Build limpio + sync + workspace-test + P3A + P3B + P11 + OCR source + Star-Flow E2E,Si,Si,Si,Si,Si,FUNCIONAL E2E,RELEASE GATE OK (2026-08-06, manifest 5837d39c)

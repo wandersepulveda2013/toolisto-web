@@ -1,58 +1,51 @@
-# Toolisto · versión directa
+# APLUNO
 
-Rediseño de Toolisto enfocado en utilidad inmediata. La portada deja de parecer una presentación promocional y funciona como una aplicación web desde el primer vistazo.
+APLUNO es la marca madre de una familia de productos digitales en español. Este repositorio genera un único sitio estático para `https://apluno.com`.
 
-## Cambios principales
+## Rutas públicas
 
-- Selector real de archivos como elemento principal de la portada.
-- Detección automática del formato y recomendación de una herramienta compatible.
-- Herramientas visibles inmediatamente debajo del selector.
-- Tarjetas compactas, completas y pulsables.
-- Filtros por Imágenes, PDF y Firmas.
-- Buscador de herramientas.
-- Diseño claro, cálido y reconocible, con tema oscuro opcional.
-- Eliminación de demostraciones ficticias, insignias repetidas y bloques de marketing innecesarios.
-- Interfaz responsive optimizada para móvil y escritorio.
-- Procesamiento local en el navegador.
+- `/` — portada institucional de APLUNO.
+- `/toolisto` — catálogo de Toolisto con 167 herramientas.
+- `/{slug}.html` — páginas funcionales de las herramientas de Toolisto.
+- `/ordia/` — presentación de Ordía.
+- `/workspace/` — presentación pública de Workspace.
+- `/about/`, `/contact/`, `/privacy/` y `/terms/` — páginas institucionales y legales.
 
-## Herramientas incluidas
+La aplicación interna de Workspace se genera aparte como `dist/workspace/preview.html`; no sustituye la landing pública.
 
-1. Comprimir imagen con objetivo de KB.
-2. Cambiar tamaño y recortar imágenes.
-3. Convertir entre JPG, PNG y WebP.
-4. Limpiar una firma y exportarla como PNG transparente.
-5. Unir archivos PDF.
-6. Convertir imágenes en PDF.
+## Estructura principal
 
-## Archivos importantes
+- `index.html` — se genera como portada APLUNO.
+- `toolisto.html` — fuente de la portada del catálogo Toolisto.
+- `src/apluno/` — estilos, comportamiento, manifest e imágenes de APLUNO.
+- `src/data/apluno.products.json` — contenido estructurado de productos.
+- `scripts/generate-seo-pages.mjs` — genera Toolisto y sus páginas SEO.
+- `scripts/generate-apluno-pages.mjs` — genera las rutas institucionales.
+- `scripts/build-public-site.mjs` — orquesta el build público completo en `dist/`.
+- `tests/apluno-site.mjs` — contrato de rutas, contenido, dominio y accesibilidad básica.
+- `DEPLOYMENT.md` — guía de publicación estática y validación del dominio.
 
-- `index.html`: estructura de la página.
-- `styles.css`: identidad visual y responsive.
-- `app.js`: procesamiento, detección, filtros y descargas.
-- `_headers`: encabezados de seguridad para Cloudflare Pages.
-- `404.html`: página de error.
-- `PREVIEW-DESKTOP.png`: vista previa de escritorio.
-- `PREVIEW-MOBILE.png`: vista previa móvil.
+## Desarrollo y validación
 
-## Publicar en Cloudflare Pages
+```powershell
+npm ci
+npm run build
+npm run test:apluno
+npm test
+node tests/run-all.mjs
+```
 
-1. Descomprime el ZIP.
-2. En Cloudflare abre **Workers & Pages**.
-3. Crea un proyecto mediante carga directa.
-4. Sube el contenido con `index.html` en la raíz.
-5. Publica y prueba las seis herramientas.
+Para comprobar `dist/` localmente:
 
-## Pruebas realizadas
+```powershell
+node server.js
+```
 
-- Validación sintáctica de `app.js`.
-- Carga completa sin errores JavaScript.
-- Filtros por categoría.
-- Buscador de herramientas.
-- Vista de escritorio.
-- Vista móvil.
-- Carga de una imagen real.
-- Compresión y generación de descarga.
+Abre `http://localhost:8080`. Si el puerto está ocupado, define otro con `$env:PORT`.
 
-## Dependencias
+## Compromisos
 
-`pdf-lib` y `JSZip` se cargan desde jsDelivr para las funciones de PDF y descargas múltiples. Los archivos seleccionados permanecen en el navegador y no se envían a Toolisto.
+- Dominio único: `apluno.com`; este proyecto no depende de `toolisto.com`.
+- Toolisto mantiene procesamiento local en el navegador para los archivos del usuario.
+- Sin registro, anuncios ni rastreo de terceros.
+- Interfaz responsive, accesible y en español.

@@ -1,0 +1,61 @@
+node_modules/
+dist/
+
+# Temp artifacts
+artifacts/autonomous-runs/
+artifacts/autonomous-logs/
+artifacts/instruction-e2e/
+artifacts/stability-e2e/
+artifacts/workflow-e2e/
+artifacts/pdf-image-embed/
+artifacts/workflow-chart-e2e/
+artifacts/workflow-builder-a11y/
+artifacts/workspace-csv-bom/tabla-*.csv
+artifacts/workspace-csv-bom/query-*.csv
+artifacts/release-toolisto-com-20260813-dist/
+_toolisto_autopilot/
+_toolisto_preview/
+
+# Generated scripts
+INICIAR-*
+REPARAR-*
+LEEME*
+README-INSTALL*
+DOBLE-CLIC-AQUI*
+ABRIR-TOOLISTO-LOCAL*
+start-toolisto-autonomous*
+validate-toolisto-autonomous*
+
+# Temp screenshots
+screenshot-tools.png
+screenshot-workspace.png
+
+# Autonomous runtime flags
+AUTONOMOUS_STOP
+
+# Diagnostic audit scripts (ad-hoc, not part of the test suite)
+tests/workspace/find-corrupt.mjs
+tests/workspace/ocr-diagnostic.mjs
+tests/workspace/visual-audit-all-modules.mjs
+tests/workspace/visual-audit-click-nav.mjs
+tests/workspace/visual-audit-detailed.mjs
+tests/workspace/visual-audit-localstorage.mjs
+tests/workspace/visual-audit-prestore.mjs
+tests/workspace/visual-audit-spa-modules.mjs
+tests/workspace/visual-audit-spa-navigate.mjs
+tests/workspace/visual-audit-with-project.mjs
+tests/workspace/visual-audit.mjs
+tests/workspace/visual-dom-dump.mjs
+tests/workspace/visual-text-audit.mjs
+
+# Generated fixture dirs and stray artifacts
+.audit-fixtures/
+.audit2-fixtures/
+.spot-data-fixtures/
+.spot-text-fixtures/
+artifacts/corrupt-lines.txt
+artifacts/toolisto-visual-review/
+
+# pnpm stray files (repo uses npm)
+pnpm-lock.yaml
+pnpm-workspace.yaml

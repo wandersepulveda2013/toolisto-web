@@ -1,0 +1,42 @@
+{
+  "name": "toolisto-directo-v2",
+  "version": "1.0.0",
+  "description": "Rediseño de Toolisto enfocado en utilidad inmediata. La portada deja de parecer una presentación promocional y funciona como una aplicación web desde el primer vistazo.",
+  "main": "app.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "node scripts/audit-count.mjs",
+    "test:batch1": "node tests/batch1-functional-test.js",
+    "test:batch2": "node tests/batch2-functional-test.js",
+    "test:batch3": "node tests/batch3-functional-test.js",
+    "build": "node scripts/build-public-site.mjs",
+    "build:toolisto": "node scripts/generate-seo-pages.mjs --production",
+    "build:apluno": "node scripts/generate-apluno-pages.mjs",
+    "test:workspace": "node tests/workspace/production-validation.mjs",
+    "test:apluno": "node tests/apluno-site.mjs",
+    "build:workspace": "node scripts/verify-workspace-sync.mjs",
+    "test:workspace:release": "node scripts/test-workspace-release.mjs",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wandersepulveda2013/toolisto-web.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/wandersepulveda2013/toolisto-web/issues"
+  },
+  "homepage": "https://github.com/wandersepulveda2013/toolisto-web#readme",
+  "devDependencies": {
+    "@ffmpeg/core": "^0.12.9",
+    "@ffmpeg/ffmpeg": "^0.12.15",
+    "@ffmpeg/util": "^0.12.2",
+    "playwright": "^1.62.0",
+    "tesseract.js": "^5.1.1"
+  }
+}
