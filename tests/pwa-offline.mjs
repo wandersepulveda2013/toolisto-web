@@ -66,6 +66,11 @@ check(!/https?:\/\//.test(sw) && /url\.origin !== self\.location\.origin/.test(s
 check(/await fetch\(request\)/.test(sw) && !/cache\.match\(request,\s*\{\s*ignoreSearch:\s*true\s*\}\)/.test(sw), 'El service worker revalida online y conserva variantes de URL versionadas');
 check(/cache\.match\(['"]\/offline\.html['"]\)/.test(sw) && !/cache\.match\(['"](?:\.\/|\/)index\.html['"]\)/.test(sw), 'Una navegación offline no visitada debe mostrar una recuperación explícita, no la portada equivocada');
 check(/serviceWorker\.register\(['"]\/service-worker\.js['"],\s*\{\s*scope:\s*['"]\/['"]\s*\}\)/.test(pwaRegister), 'El registro PWA no usa /service-worker.js con scope /');
+check(sw.includes('APLUNO_PUBLIC_ROUTES') && !sw.includes('const APLUNO_PUBLIC_ROUTES = [];'), 'El service worker de dist incluye la allowlist de rutas públicas de APLUNO inyectada en build');
+const swRoutesMatch = sw.match(/const APLUNO_PUBLIC_ROUTES = (\[[^\n]*\]);/);
+const swRoutes = swRoutesMatch ? JSON.parse(swRoutesMatch[1]) : [];
+check(swRoutes.includes('/') && swRoutes.includes('/about/') && swRoutes.includes('/contact/') && swRoutes.includes('/privacy/') && swRoutes.includes('/terms/') && swRoutes.includes('/ordia/') && swRoutes.includes('/workspace/') && swRoutes.includes('/apluno-assets/'), 'La allowlist cubre la portada, legal, contacto y productos públicos de APLUNO');
+check(!swRoutes.includes('/toolisto') && !swRoutes.includes('/offline.html'), 'La allowlist no excluye rutas de Toolisto (catálogo y recuperación offline)');
 
 const server = await startServer();
 const base = `http://127.0.0.1:${server.address().port}`;

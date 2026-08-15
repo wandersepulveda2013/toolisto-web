@@ -31,7 +31,7 @@ export function renderSeoMetadata({
   const canonical = absoluteUrl(pathname);
   const image = `${SITE_URL}/apluno-assets/og.png`;
   const imageTags = socialImage
-    ? `\n+  <meta property="og:image" content="${image}">
+    ? `\n  <meta property="og:image" content="${image}">
   <meta property="og:image:width" content="1731">
   <meta property="og:image:height" content="909">
   <meta property="og:image:alt" content="APLUNO — Menos pasos. Más hecho.">

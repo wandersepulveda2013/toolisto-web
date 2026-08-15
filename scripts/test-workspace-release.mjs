@@ -3,8 +3,9 @@
  * test:workspace:release — puerta de release para Toolisto Workspace
  *
  * Flujo:
- *   1. Build limpio canónico (scripts/generate-seo-pages.mjs --production)
- *      que copia workspace/ -> dist/workspace/ y regenera las páginas.
+ *   1. Build limpio canónico (scripts/generate-seo-pages.mjs --production
+ *      --include-workspace) que copia workspace/ -> dist/workspace/ SOLO para
+ *      esta puerta (el build público --production no publica el preview).
  *   2. Verificación source -> dist (scripts/verify-workspace-sync.mjs).
  *   3. Suites de línea base (Node + E2E real, sin mocks).
  *   4. Manifest de evidencia vinculado al SHA.
@@ -50,9 +51,9 @@ console.log(`HEAD: ${head}\n`);
 
 mkdirSync(ARTIFACTS, { recursive: true });
 
-// 1. Build canónico limpio
-const buildOk = run('Build limpio (generate-seo-pages --production)', 'node',
-  ['scripts/generate-seo-pages.mjs', '--production']);
+// 1. Build canónico limpio (incluye el runtime Workspace solo para este gate)
+const buildOk = run('Build limpio (generate-seo-pages --production --include-workspace)', 'node',
+  ['scripts/generate-seo-pages.mjs', '--production', '--include-workspace']);
 
 // 2. source -> dist
 const syncOk = run('Verificación source -> dist (workspace)', 'node', ['scripts/verify-workspace-sync.mjs']);
@@ -88,12 +89,12 @@ const evidence = {
   fecha: new Date().toISOString(),
   build: { ok: buildOk, exit: buildOk ? 0 : 1 },
   sync: { ok: syncOk, exit: syncOk ? 0 : 1 },
-  suites: results.filter(r => r.label !== 'Build limpio (generate-seo-pages --production)' && r.label !== 'Verificación source -> dist (workspace)'),
+  suites: results.filter(r => r.label !== 'Build limpio (generate-seo-pages --production --include-workspace)' && r.label !== 'Verificación source -> dist (workspace)'),
   hashes: {
     'workspace/workspace.js': shaOfFile(join(ROOT, 'workspace', 'workspace.js')),
     'dist/workspace/workspace.js': shaOfFile(join(ROOT, 'dist', 'workspace', 'workspace.js')),
   },
-  total: results.filter(r => r.label !== 'Build limpio (generate-seo-pages --production)' && r.label !== 'Verificación source -> dist (workspace)').length,
+  total: results.filter(r => r.label !== 'Build limpio (generate-seo-pages --production --include-workspace)' && r.label !== 'Verificación source -> dist (workspace)').length,
   fail: results.filter(r => !r.ok).length,
 };
 const manifestPath = join(ARTIFACTS, `release-gate-${head}.json`);

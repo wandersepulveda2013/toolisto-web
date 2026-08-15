@@ -1,5 +1,5 @@
 {
-  "checks": 23,
+  "checks": 26,
   "failed": 0,
   "failures": [],
   "gate": "pwa-offline",

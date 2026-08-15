@@ -244,9 +244,8 @@ const orphanPages = allSlugs.filter(s => {
 if (orphanPages.length) warn(`Possible orphan pages (not in sitemap): ${orphanPages.join(', ')}`);
 
 const disallowRules = robots.split(/\r?\n/).filter((line) => /^Disallow:/i.test(line.trim()));
-const unexpectedDisallow = disallowRules.filter((line) => line.trim() !== 'Disallow: /workspace/preview.html');
-if (unexpectedDisallow.length) warn(`robots.txt contains unexpected Disallow rules: ${unexpectedDisallow.join(', ')}`);
-else pass('robots.txt only excludes the internal Workspace preview');
+if (disallowRules.length) warn(`robots.txt contains unexpected Disallow rules: ${disallowRules.join(', ')}`);
+else pass('robots.txt has no Disallow rules (full public crawl allowed)');
 
 console.log(`\n=== RESULTS ===`);
 console.log(`  Passed:   ${passed}`);

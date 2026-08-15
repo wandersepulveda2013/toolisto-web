@@ -356,7 +356,7 @@ const sitemapUrls = [
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemapUrls.map((item) => `  <url>\n    <loc>${xmlEscape(absoluteUrl(item.path))}</loc>\n    <changefreq>${item.changefreq}</changefreq>\n    <priority>${item.priority}</priority>${item.lastmod ? `\n    <lastmod>${item.lastmod}</lastmod>` : ''}\n  </url>`).join('\n')}\n</urlset>\n`;
 writeFileSync(join(DIST, 'sitemap.xml'), sitemap, 'utf8');
 
-const robots = `User-agent: *\nAllow: /\nDisallow: /workspace/preview.html\n\nSitemap: ${absoluteUrl('/sitemap.xml')}\n`;
+const robots = `User-agent: *\nAllow: /\n\nSitemap: ${absoluteUrl('/sitemap.xml')}\n`;
 writeFileSync(join(DIST, 'robots.txt'), robots, 'utf8');
 
 const redirectLines = [
@@ -376,7 +376,6 @@ const required = [
   join('about', 'index.html'),
   join('ordia', 'index.html'),
   join('workspace', 'index.html'),
-  join('workspace', 'preview.html'),
   'sitemap.xml',
   'robots.txt',
   '_redirects',

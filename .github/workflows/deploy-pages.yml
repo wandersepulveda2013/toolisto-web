@@ -41,6 +41,9 @@ jobs:
       - name: APLUNO tests
         run: npm run test:apluno
 
+      - name: Public release gate
+        run: npm run test:release
+
       - name: Add custom domain
         run: cp CNAME dist/CNAME
 

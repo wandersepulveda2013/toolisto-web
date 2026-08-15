@@ -35,6 +35,11 @@ import { idbGetAll, idbGetById, waitForCount } from './idb-helpers.mjs';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..', '..');
 const DIST = join(ROOT, 'dist');
+// El build público --production ya no publica el runtime del Workspace; el
+// escaneo estático y el servidor usan la FUENTE workspace/ como fallback.
+const WS_SRC = join(ROOT, 'workspace');
+const WS_DIST = join(DIST, 'workspace');
+const wsBase = existsSync(WS_DIST) ? WS_DIST : WS_SRC;
 const FIXTURES = join(ROOT, 'tests', 'fixtures', 'star-flow');
 const ARTIFACTS = join(ROOT, 'artifacts', 'deep-audit');
 mkdirSync(ARTIFACTS, { recursive: true });
@@ -56,9 +61,12 @@ function startServer() {
     _srv = createServer((req, res) => {
       let file = req.url.split('?')[0];
       if (file === '/') file = '/index.html';
-      let fp = join(DIST, file);
+      const base = file.startsWith('/workspace/') ? wsBase : DIST;
+      let rel = file.startsWith('/workspace/') ? file.slice('/workspace/'.length) : file;
+      if (rel === 'preview.html') rel = 'index.html';
+      let fp = join(base, rel);
       if (existsSync(fp) && statSync(fp).isDirectory()) fp = join(fp, 'index.html');
-      if (!existsSync(fp)) fp = join(DIST, file + '.html');
+      if (!existsSync(fp)) fp = join(base, rel + '.html');
       const ext = extname(fp).toLowerCase();
       const data = readFileSync(fp);
       res.writeHead(200, { 'Content-Type': MIME[ext] || 'application/octet-stream' });
@@ -483,9 +491,9 @@ async function main() {
 
     // ─── Paso 17: escaneo estatico del codigo ────────────────────
     console.log('\n--- 17. Escaneo estatico local-first ---');
-    const js = readFileSync(join(DIST, 'workspace', 'workspace.js'), 'utf8');
-    const html = readFileSync(join(DIST, 'workspace', 'preview.html'), 'utf8');
-    const css = readFileSync(join(DIST, 'workspace', 'workspace.css'), 'utf8');
+    const js = readFileSync(join(wsBase, 'workspace.js'), 'utf8');
+    const html = readFileSync(join(wsBase, 'index.html'), 'utf8');
+    const css = readFileSync(join(wsBase, 'workspace.css'), 'utf8');
     const noNetworkPrimitives = !js.includes('fetch(') && !js.includes('XMLHttpRequest') && !js.includes('sendBeacon') && !js.includes('new WebSocket(') && !js.includes('wss://');
     const noExternalHtml = !html.includes('https://') && !html.includes('@import') && !html.includes('googleapis') && !html.includes('gstatic');
     const noExternalCss = !css.includes('@import') && !css.includes('https://');

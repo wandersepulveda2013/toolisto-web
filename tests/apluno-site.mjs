@@ -52,20 +52,19 @@ const requiredPages = [
   'about/index.html',
   'ordia/index.html',
   'workspace/index.html',
-  'workspace/preview.html',
   'contact/index.html',
   'privacy/index.html',
   'terms/index.html',
   '404.html'
 ];
 requiredPages.forEach((page) => check(existsSync(join(dist, page)), `${page} existe`));
+check(!existsSync(join(dist, 'workspace', 'preview.html')), 'El preview interno NO se publica en dist');
 
 const home = read('index.html');
 const toolisto = read('toolisto.html');
 const about = read('about/index.html');
 const ordia = read('ordia/index.html');
 const workspace = read('workspace/index.html');
-const preview = read('workspace/preview.html');
 const sitemap = read('sitemap.xml');
 const robots = read('robots.txt');
 const redirects = read('_redirects');
@@ -86,12 +85,12 @@ check(about.includes('No estamos construyendo una historia corporativa'), 'About
 check(ordia.includes('En desarrollo') && ordia.includes('Menos organización manual'), 'Ordía comunica estado y filosofía');
 check(!/play store|app store|descargar ahora/i.test(ordia), 'Ordía no ofrece descargas falsas');
 check(workspace.includes('En desarrollo') && workspace.includes('acceso público permanece cerrado'), 'Workspace es una landing honesta');
-check(!workspace.includes('id="ws-app"') && preview.includes('id="ws-app"'), 'La landing Workspace está separada del preview interno');
+check(!workspace.includes('id="ws-app"'), 'La landing Workspace no expone el runtime interno');
 
 check(sitemap.includes('<loc>https://apluno.com/toolisto</loc>'), 'Sitemap incluye /toolisto');
 ['about/', 'ordia/', 'workspace/', 'privacy/', 'terms/'].forEach((route) => check(sitemap.includes(`https://apluno.com/${route}`), `Sitemap incluye /${route}`));
 check(robots.includes('Sitemap: https://apluno.com/sitemap.xml'), 'robots.txt declara el sitemap de Apluno');
-check(robots.includes('Disallow: /workspace/preview.html'), 'robots.txt excluye el preview interno');
+check(!robots.includes('Disallow'), 'robots.txt no bloquea ninguna ruta pública');
 check(redirects.includes('/toolisto /toolisto.html 200') && redirects.includes('/toolisto/ /toolisto 301'), 'Redirects resuelven la ruta limpia de Toolisto');
 
 const toolManifest = JSON.parse(readFileSync(join(dist, 'assets', 'manifest.webmanifest'), 'utf8'));
@@ -104,7 +103,7 @@ const publicTextFiles = walk(dist).filter((file) => /\.(?:html|xml|txt|json|webm
 const foreignDomainHits = publicTextFiles.filter((file) => readFileSync(file, 'utf8').includes('toolisto.com'));
 check(foreignDomainHits.length === 0, `No quedan referencias públicas a toolisto.com (${foreignDomainHits.length})`);
 
-const aplunoPages = requiredPages.filter((page) => page !== 'workspace/preview.html').map((page) => join(dist, page));
+const aplunoPages = requiredPages.map((page) => join(dist, page));
 const broken = [];
 for (const file of aplunoPages) {
   const html = readFileSync(file, 'utf8');

@@ -2,10 +2,11 @@
 /**
  * verify-workspace-sync.mjs — verifica que dist/workspace/ coincide con workspace/
  *
- * El source canónico es workspace/. dist/ se genera con `npm run build`:
- * el index interno se publica como preview.html y la landing pública reserva index.html.
- * Este script compara hashes de los archivos de runtime y reporta cualquier
- * desincronización manual.
+ * El source canónico es workspace/. El build público (--production) NO publica
+ * el runtime interno (workspace/preview.html); solo la puerta de release del
+ * Workspace usa `generate-seo-pages --production --include-workspace` para
+ * copiar el runtime a dist/workspace/ y verificar sync. Si dist/workspace/ no
+ * existe es la situación esperada del build público y el script pasa.
  *
  * Salida: exit 0 si todo sincronizado; exit 1 si hay diferencias o faltan.
  */
@@ -46,6 +47,13 @@ let fail = 0;
 const diff = [];
 
 console.log('=== Verificación source -> dist (workspace) ===\n');
+
+if (!existsSync(join(DIST, 'preview.html'))) {
+  console.log('  OK: dist/workspace/preview.html no existe (build público sin --include-workspace):');
+  console.log('      el runtime interno NO se publica por diseño; la landing pública index.html sí.');
+  console.log('\n=== Resultado: SYNC OK (runtime no publicado en dist público) ===');
+  process.exit(0);
+}
 
 for (const rel of RUNTIME_FILES) {
   const s = join(SRC, rel);

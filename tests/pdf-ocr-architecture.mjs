@@ -25,7 +25,8 @@ check(workspaceEngine.includes('script clásico') && workspaceEngine.includes('n
 check(!/EngineLoader\.loadTesseract|worker\.recognize/.test(publicExtract), 'extractTextFromScannedPdf no crea un worker OCR paralelo');
 check(publicExtract.includes('window.PdfOcrEngine.ocrCanvas'), 'extractTextFromScannedPdf usa el adaptador OCR-PDF canónico');
 check(existsSync(join(root, 'dist/js/ocr/pdf-ocr-engine.js')), 'build publica el adaptador OCR-PDF');
-check(existsSync(join(root, 'dist/workspace/core/ocr-engine.js')), 'build conserva el motor aislado del Workspace');
+check(existsSync(join(root, 'workspace/core/ocr-engine.js')), 'el motor aislado del Workspace vive en la fuente workspace/');
+check(!existsSync(join(root, 'dist/workspace/core/ocr-engine.js')), 'el build público NO publica el motor aislado del Workspace');
 
 console.log(`=== Resultado: ${passed} PASS, ${failed} FAIL ===`);
 process.exit(failed ? 1 : 0);

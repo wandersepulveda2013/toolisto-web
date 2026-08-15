@@ -24,7 +24,7 @@ const tracked = execFileSync('git', ['ls-files'], { cwd: root, encoding: 'utf8' 
   .filter(Boolean);
 const trackedRoots = new Set(tracked.map((path) => path.split('/')[0]));
 const allowedDirectories = new Set([
-  '.opencode', 'artifacts', 'assets', 'js', 'screenshots', 'scripts', 'src', 'tests', 'vendor', 'workspace',
+  '.github', '.opencode', 'artifacts', 'assets', 'js', 'screenshots', 'scripts', 'src', 'tests', 'vendor', 'workspace',
 ]);
 const trackedDirectories = [...trackedRoots].filter((entry) => tracked.some((path) => path.startsWith(`${entry}/`)));
 const unexpectedDirectories = trackedDirectories.filter((directory) => !allowedDirectories.has(directory));

@@ -16,6 +16,7 @@
     "build:apluno": "node scripts/generate-apluno-pages.mjs",
     "test:workspace": "node tests/workspace/production-validation.mjs",
     "test:apluno": "node tests/apluno-site.mjs",
+    "test:release": "node scripts/test-public-release.mjs",
     "build:workspace": "node scripts/verify-workspace-sync.mjs",
     "test:workspace:release": "node scripts/test-workspace-release.mjs",
     "start": "node server.js"

@@ -5,6 +5,17 @@ const path = require('path');
 const PORT = parseInt(process.env.PORT, 10) || 8080;
 const dir = path.resolve(__dirname, 'dist');
 const srcDir = path.resolve(__dirname);
+// El runtime del Workspace se sirve desde la FUENTE (workspace/) como fallback:
+// el build público --production ya no publica el preview interno en dist.
+const wsSrcDir = path.resolve(__dirname, 'workspace');
+
+function workspaceSourcePath(file) {
+  if (!file.startsWith('/workspace/')) return null;
+  let rel = file.slice('/workspace/'.length);
+  if (rel === 'preview.html') rel = 'index.html';
+  const fp = path.join(wsSrcDir, rel);
+  return fs.existsSync(fp) ? fp : null;
+}
 
 const mime = {
   '.html':'text/html; charset=utf-8',
@@ -50,6 +61,10 @@ const server = http.createServer((req, res) => {
   }
   if (!fs.existsSync(fp)) {
     fp = path.join(dir, file + '.html');
+  }
+  if (!fs.existsSync(fp)) {
+    const wsFp = workspaceSourcePath(file);
+    if (wsFp) fp = wsFp;
   }
   if (!fs.existsSync(fp) && file.endsWith('.html')) {
     fp = path.join(dir, '404.html');

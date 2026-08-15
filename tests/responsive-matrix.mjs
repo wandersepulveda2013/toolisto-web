@@ -13,6 +13,9 @@ import { writeEvidence } from './evidence-helper.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const dist = join(root, 'dist');
+// El runtime del Workspace se sirve desde la FUENTE (workspace/): el build
+// público --production ya no publica el preview interno en dist.
+const wsSrc = join(root, 'workspace');
 const artifactDir = join(root, 'artifacts', 'deep-audit', 'toolisto');
 const tools = JSON.parse(readFileSync(join(root, 'src', 'data', 'tools.json'), 'utf8'))
   .filter((tool) => tool.enabled);
@@ -35,9 +38,13 @@ function check(condition, label) {
 function startServer() {
   const server = createServer((request, response) => {
     const pathname = decodeURIComponent(new URL(request.url, 'http://localhost').pathname);
-    const relative = pathname === '/' ? 'index.html' : pathname.replace(/^\/+/, '');
-    const candidate = normalize(join(dist, relative));
-    if (!candidate.startsWith(dist) || !existsSync(candidate)) {
+    const wsRel = pathname.startsWith('/workspace/')
+      ? (pathname.slice('/workspace/'.length) === 'preview.html' ? 'index.html' : pathname.slice('/workspace/'.length))
+      : null;
+    const baseDir = wsRel !== null ? wsSrc : dist;
+    const relative = wsRel !== null ? wsRel : (pathname === '/' ? 'index.html' : pathname.replace(/^\/+/, ''));
+    const candidate = normalize(join(baseDir, relative));
+    if (!candidate.startsWith(baseDir) || !existsSync(candidate)) {
       response.writeHead(404); response.end('Not found'); return;
     }
     const file = statSync(candidate).isDirectory() ? join(candidate, 'index.html') : candidate;

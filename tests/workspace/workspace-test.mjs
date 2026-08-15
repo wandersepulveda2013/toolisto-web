@@ -12,6 +12,10 @@ const ROOT = join(__dirname, '..', '..');
 const DIST = join(ROOT, 'dist');
 const WS_DIST = join(DIST, 'workspace');
 const WS_SRC = join(ROOT, 'workspace');
+// El build público --production ya no copia el runtime del Workspace a dist;
+// esta suite usa la copia publicada cuando existe (release gate con
+// --include-workspace) y, si no, verifica la fuente canónica.
+const WS_BASE = existsSync(WS_DIST) ? WS_DIST : WS_SRC;
 
 let pass = 0, fail = 0;
 
@@ -47,28 +51,31 @@ function productSize(dir) {
 
 console.log('=== Toolisto Workspace Tests ===\n');
 
-// Pre-read all dist files
-const wsHtml = existsSync(join(WS_DIST, 'preview.html')) ? readFileSync(join(WS_DIST, 'preview.html'), 'utf8') : '';
-const wsCss = existsSync(join(WS_DIST, 'workspace.css')) ? readFileSync(join(WS_DIST, 'workspace.css'), 'utf8') : '';
-const wsJs = existsSync(join(WS_DIST, 'workspace.js')) ? readFileSync(join(WS_DIST, 'workspace.js'), 'utf8') : '';
-const toolsJs = existsSync(join(WS_DIST, 'tools-data.js')) ? readFileSync(join(WS_DIST, 'tools-data.js'), 'utf8') : '';
-const dbJs = existsSync(join(WS_DIST, 'core', 'db.js')) ? readFileSync(join(WS_DIST, 'core', 'db.js'), 'utf8') : '';
-const stateJs = existsSync(join(WS_DIST, 'core', 'state.js')) ? readFileSync(join(WS_DIST, 'core', 'state.js'), 'utf8') : '';
-const eventsJs = existsSync(join(WS_DIST, 'core', 'events.js')) ? readFileSync(join(WS_DIST, 'core', 'events.js'), 'utf8') : '';
-const storageJs = existsSync(join(WS_DIST, 'core', 'storage.js')) ? readFileSync(join(WS_DIST, 'core', 'storage.js'), 'utf8') : '';
+// Pre-read all runtime files (published copy when present, source otherwise).
+// En dist/workspace el runtime vive en preview.html (index.html es la landing
+// pública APLUNO); en la fuente workspace/ el runtime es index.html.
+const wsIndex = existsSync(join(WS_BASE, 'preview.html')) ? 'preview.html' : 'index.html';
+const wsHtml = existsSync(join(WS_BASE, wsIndex)) ? readFileSync(join(WS_BASE, wsIndex), 'utf8') : '';
+const wsCss = existsSync(join(WS_BASE, 'workspace.css')) ? readFileSync(join(WS_BASE, 'workspace.css'), 'utf8') : '';
+const wsJs = existsSync(join(WS_BASE, 'workspace.js')) ? readFileSync(join(WS_BASE, 'workspace.js'), 'utf8') : '';
+const toolsJs = existsSync(join(WS_BASE, 'tools-data.js')) ? readFileSync(join(WS_BASE, 'tools-data.js'), 'utf8') : '';
+const dbJs = existsSync(join(WS_BASE, 'core', 'db.js')) ? readFileSync(join(WS_BASE, 'core', 'db.js'), 'utf8') : '';
+const stateJs = existsSync(join(WS_BASE, 'core', 'state.js')) ? readFileSync(join(WS_BASE, 'core', 'state.js'), 'utf8') : '';
+const eventsJs = existsSync(join(WS_BASE, 'core', 'events.js')) ? readFileSync(join(WS_BASE, 'core', 'events.js'), 'utf8') : '';
+const storageJs = existsSync(join(WS_BASE, 'core', 'storage.js')) ? readFileSync(join(WS_BASE, 'core', 'storage.js'), 'utf8') : '';
 
 // ─── File Structure ───
 console.log('--- File Structure ---');
 check('workspace/ directory exists in src', existsSync(WS_SRC));
-check('workspace/ exists in dist', existsSync(WS_DIST));
-check('workspace/preview.html in dist', existsSync(join(WS_DIST, 'preview.html')));
-check('workspace/workspace.css in dist', existsSync(join(WS_DIST, 'workspace.css')));
-check('workspace/workspace.js in dist', existsSync(join(WS_DIST, 'workspace.js')));
-check('workspace/tools-data.js in dist', existsSync(join(WS_DIST, 'tools-data.js')));
-check('workspace/core/db.js in dist', existsSync(join(WS_DIST, 'core', 'db.js')));
-check('workspace/core/state.js in dist', existsSync(join(WS_DIST, 'core', 'state.js')));
-check('workspace/core/events.js in dist', existsSync(join(WS_DIST, 'core', 'events.js')));
-check('workspace/core/storage.js in dist', existsSync(join(WS_DIST, 'core', 'storage.js')));
+check('workspace runtime present in dist (release gate) o fuente', existsSync(WS_BASE));
+check('workspace preview/index html present', wsHtml.length > 0);
+check('workspace/workspace.css present', existsSync(join(WS_BASE, 'workspace.css')));
+check('workspace/workspace.js present', existsSync(join(WS_BASE, 'workspace.js')));
+check('workspace/tools-data.js present', existsSync(join(WS_BASE, 'tools-data.js')));
+check('workspace/core/db.js present', existsSync(join(WS_BASE, 'core', 'db.js')));
+check('workspace/core/state.js present', existsSync(join(WS_BASE, 'core', 'state.js')));
+check('workspace/core/events.js present', existsSync(join(WS_BASE, 'core', 'events.js')));
+check('workspace/core/storage.js present', existsSync(join(WS_BASE, 'core', 'storage.js')));
 
 // ─── HTML Validation ───
 check('Has <!DOCTYPE html>', wsHtml.includes('<!DOCTYPE html>'));

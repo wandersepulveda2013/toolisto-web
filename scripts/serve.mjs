@@ -6,7 +6,19 @@ import { dirname } from 'path';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..', 'dist');
+// El runtime del Workspace se sirve desde la FUENTE (workspace/), no desde dist:
+// el build público --production ya no publica el preview interno.
+const WS_SRC = join(__dirname, '..', 'workspace');
 const PORT = 8080;
+
+// Resuelve la ruta de archivo que debe servirse. Devuelve { dir, rel } donde
+// rel==null indica que la ruta no pertenece al prefijo workspace.
+function resolveWorkspaceSource(urlPath) {
+  if (!urlPath.startsWith('/workspace/')) return null;
+  let rel = urlPath.slice('/workspace/'.length);
+  if (rel === 'preview.html') rel = 'index.html';
+  return { dir: WS_SRC, rel };
+}
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',
@@ -34,7 +46,8 @@ const server = createServer((req, res) => {
   let urlPath = decodeURIComponent(req.url.split('?')[0]);
   if (urlPath === '/') urlPath = '/index.html';
 
-  const filePath = join(ROOT, urlPath);
+  const wsSource = resolveWorkspaceSource(urlPath);
+  const filePath = wsSource ? join(wsSource.dir, wsSource.rel) : join(ROOT, urlPath);
 
   try {
     if (existsSync(filePath) && statSync(filePath).isDirectory()) {
