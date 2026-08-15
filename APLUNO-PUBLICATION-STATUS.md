@@ -60,6 +60,11 @@ Certificado dedicado emitido por GitHub Pages tras **un reprovisionamiento conse
   desean esos headers, se podrían servir mediante proxy Cloudflare (SSL/TLS Full strict) cuando
   exista token — sin HSTS preload.
 - Cloudflare: `CLOUDFLARE_API_TOKEN` ausente → sin inspección; mantener DNS-only como está.
+- **PWA ahora operativa en producción (consecuencia del HTTPS)**: antes el origin HTTP impedía
+  registrar el Service Worker; verificado con HTTPS (Playwright, 2026-08-15): `service-worker.js`
+  200 con la allowlist inyectada, SW registrado en `https://apluno.com/`, página controlada por el
+  SW, recarga offline de una herramienta servida desde caché sin errores de consola (11/11 PASS).
+  `robots.txt` 200 por HTTPS y `sitemap.xml` 190 URLs todas `https://apluno.com/` (sin `http://`).
 
 ## Publicación del 2026-08-15 (5480a97) — Portada launcher directo de herramientas
 
