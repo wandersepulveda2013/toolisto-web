@@ -8,7 +8,15 @@
 - [x] Añadir las páginas públicas de Ordía, Workspace, Sobre APLUNO, Contacto, Privacidad y Términos.
 - [x] Separar la landing pública de Workspace de su preview interno no indexable.
 - [x] Actualizar build, PWA, sitemap, robots, canónicos, pruebas y documentación al dominio único.
-- [ ] Publicar `dist/`, conectar DNS/TLS de `apluno.com` y completar validación real en producción (trabajo externo a este repositorio).
+- [x] Publicar `dist/`, conectar DNS/TLS de `apluno.com` y completar validación real en producción.
+  **COMPLETADO 2026-08-15**: publicado vía Git Data API (`main`=`5819ddd`, árbol verificado SHA a
+  SHA, run CI `31883117953` PASS); DNS correcto (4×A de GitHub Pages + CNAME www); certificado
+  dedicado válido (CN `apluno.com`, SAN incluye www, Let's Encrypt); `https_enforced=true`;
+  redirects 301 sin loops (`http://apluno.com/`→https, `http://www.apluno.com/`→https,
+  `https://www.apluno.com/`→`https://apluno.com/`); PWA operativa (SW registrado + offline
+  verificado 11/11); `sitemap.xml` 190 URLs todas https. Pendiente humano: Google Search Console
+  (verificar propiedad + sitemap) y Cloudflare (requiere `CLOUDFLARE_API_TOKEN`; GitHub Pages
+  ignora `_headers` para CSP/HSTS).
 
 **Objetivo:** Expandir de 83 a 200 herramientas funcionales con procesamiento real en el navegador.
 

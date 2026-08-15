@@ -4,6 +4,52 @@ Plan para terminar correctamente el trabajo en Toolisto, derivado de la auditor�
 
 **Regla de oro:** cada lote termina con (1) pruebas reales ejecutadas, (2) evidencia guardada en `artifacts/deep-audit/`, (3) commit descriptivo, (4) roadmap/matriz actualizados. Nunca declarar un lote cerrado con tests fallidos o solo con checks de existencia.
 
+## Estado actual — 2026-08-15 (verificado en esta sesión)
+
+La reconciliación matriz↔tools.json corre con **0 discrepancias** (`_toolisto_autopilot/tmp/reconcile-matrix.mjs`):
+167 filas, 167 toolIds únicos, 167 `enabled` en tools.json, matriz 167 `certified` / 167 `Publicar ahora=Sí`.
+Gates locales verdes en esta sesión: `npm test` (auditoría PASS), `npm run test:release` (10/10),
+`npm run test:apluno` (45/45); producción validada por HTTPS (cert válido, Enforce HTTPS, PWA
+operativa, sitemap 190 URLs https). La matriz es hoy la fuente única de verdad y coincide con
+tools.json; `pdfEncryptAdvanced` está `enabled` y certificado por su motor propio
+(`js/security/pdf-encryptor.js`, ISO 32000-1 §7.6) con harness `tests/gate-e2e-pdf-encrypt.mjs`.
+
+Estado por lote (detalle en cada sección):
+
+- **Lote 1** (baseline + commit OCR-PDF): COMPLETO. `tests/gate-e2e-ocr-pdf-tools.mjs` y su
+  evidencia `TLT-certify-ocr-pdf-evidence.json` están commiteados; HEAD verificado.
+- **Lote 2** (reconciliación matriz↔tools.json↔roadmap): COMPLETO — 0 discrepancias (ver arriba);
+  el roadmap declara 167 habilitadas y distingue certificación funcional (101 con harness E2E real)
+  de cobertura estructural, sin la frase "167 certificadas" engañosa.
+- **Lote 3** (P0 de integridad/honestidad): COMPLETO. WSP-022 cubierto por
+  `tests/public-site-security-audit.mjs` (SVG/XSS) con `TLT-security-honesty-evidence.json`;
+  WSP-041/WDX-004 documentado como límite OCR con mitigación en extracción; WSP-021/053 declarado
+  límite documentado (no existe modelo de bloques; ver matriz/roadmap).
+- **Lote 4** (certificación funcional por familias): COMPLETO — evidencia `TLT-certify-*-evidence.json`
+  por familia (text 56/56, word, epub, spreadsheet, data, image-converters, image-family,
+  image-interactive, qr, pdf-family, pdf-misc, pdf-encrypt 35/35, ocr-pdf, file-family,
+  calc, structure, av, docs-extras, enhance-scanned-document, converters).
+- **Lote 5** (extracción del monolito workspace.js): pertenece al repo de desarrollo del Workspace
+  (Default Project, ciclos CE). En este repositorio publicado no se toca `workspace/workspace.js`.
+- **Lote 6** (hermetismo de red): COMPLETO en el alcance publicado — `public-site-network-negative`
+  (51/51) y `pwa-offline` con allowlist; cero egress externo (ver AGENTS.md, total 712 tests).
+- **Lote 7** (accesibilidad/móvil): evidencia `TLT-accessibility-audit-evidence.json` y
+  `TLT-responsive-matrix-evidence.json`.
+- **Lote 8** (rendimiento): cubierto por `TLT-production-readiness-*.json` (lazy-load FFmpeg/
+  Tesseract documentado; upscale OCR retirado por degradar fixtures ruidosos).
+- **Lote 9** (SEO): COMPLETO — `TLT-seo-production-audit-evidence.json`; sitemap/canónicos en
+  `https://apluno.com/`; verificado en producción (190 URLs https, robots declara sitemap).
+- **Lote 10** (release): COMPLETO — release gate `npm run test:release` (10/10) y CI en cada
+  publicación (run `31883117953` PASS).
+
+**Pendientes reales restantes (no bloqueantes para el estado publicado):**
+
+1. **Humanos / credenciales**: Google Search Console (verificar propiedad de dominio `apluno.com`
+   + sitemap `https://apluno.com/sitemap.xml`); Cloudflare (`CLOUDFLARE_API_TOKEN` para evaluar
+   proxy y headers CSP/HSTS — GitHub Pages ignora `_headers`).
+2. **Decisiones de producto** (repo de desarrollo): PPTX (requiere librería `pptx`), modelo de
+   bloques, alcance Query/Dashboards/Flow, y la extracción del monolito workspace.js (Lote 5).
+
 ---
 
 ## Lote 1 — Preservación y baseline (sin riesgo)
@@ -50,21 +96,21 @@ Plan para terminar correctamente el trabajo en Toolisto, derivado de la auditor�
 **Criterio de cierre:** cada lote de familia verde con evidencia `TLT-certify-*.json` y matriz actualizada.
 **Riesgo:** alto en tiempo; medio en técnica. **No tocar:** el pipeline OCR del workspace.
 
-**Progreso:**
+**Progreso (verificado 2026-08-15 — todas las familias con harness E2E real y evidencia en `artifacts/deep-audit/toolisto/`):**
 - [x] **Familia texto (15 herramientas)** — `tests/gate-e2e-text-tools.mjs` **56 PASS / 0 FAIL (2026-08-07)**:
   `txtToPdf`, `mergeTxt`, `splitTxt`, `sortLines`, `removeDuplicates`, `textStatistics`, `wordCount`,
   `textDiff`, `htmlToMarkdown`, `htmlToText`, `cssMinifier`, `base64Encode`, `base64Decode`, `urlEncode`,
   `urlDecode`. Validación semántica real (pdfjs/JSZip/reportes), rechazo de incompatibles, cero egress
   externo, cero errores de consola. Evidencia: `artifacts/deep-audit/toolisto/TLT-certify-text-family-evidence.json`.
-- [ ] Familia HTML/JSON/XML/CSV (pendiente)
-- [ ] Familia hojas de cálculo (pendiente)
-- [ ] Familia imágenes simples (pendiente)
-- [ ] Familia archivos/ZIP/hash (pendiente)
-- [ ] Familia QR/códigos de barras (pendiente)
-- [ ] Familia PDF restante (pendiente)
-- [ ] Familia ebooks restante (pendiente)
-- [ ] Calculadoras (pendiente)
-- [ ] Documentos/formato restante (pendiente)
+- [x] Familia HTML/JSON/XML/CSV — `gate-e2e-data-tools.mjs` + `TLT-certify-data-family-evidence.json`
+- [x] Familia hojas de cálculo — `gate-e2e-spreadsheet-tools.mjs` + `TLT-certify-spreadsheet-family-evidence.json`
+- [x] Familia imágenes simples — `gate-e2e-image-converters.mjs` / `gate-e2e-image-tools.mjs` + `TLT-certify-image-converters-evidence.json`, `TLT-certify-image-family-evidence.json`, `TLT-certify-image-interactive-evidence.json`
+- [x] Familia archivos/ZIP/hash — `gate-e2e-file-tools.mjs` / `gate-e2e-file-family-tools.mjs` + `TLT-certify-file-family-evidence.json`, `TLT-certify-file-family-extra-evidence.json`
+- [x] Familia QR/códigos de barras — `gate-e2e-qr-tools.mjs` + `TLT-certify-qr-family-evidence.json`
+- [x] Familia PDF restante — `gate-e2e-pdf-misc-tools.mjs`, `gate-e2e-pdf-encrypt.mjs` (35/35), `gate-e2e-ocr-pdf-tools.mjs` + evidencias `TLT-certify-pdf-*`
+- [x] Familia ebooks restante — `gate-e2e-epub-tools.mjs` + `TLT-certify-epub-family-evidence.json`
+- [x] Calculadoras — `gate-e2e-calc-tools.mjs` + `TLT-certify-calc-family-evidence.json`
+- [x] Documentos/formato restante — `gate-e2e-word-tools.mjs`, `gate-e2e-docs-extras.mjs`, `gate-e2e-structure-tools.mjs` + evidencias `TLT-certify-word-family-evidence.json`, `TLT-certify-docs-extras-evidence.json`, `TLT-certify-structure-family-evidence.json`, `TLT-certify-av-evidence.json`
 
 ## Lote 5 — Corrección del Workspace (estructura)
 
