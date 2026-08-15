@@ -19,20 +19,47 @@ APLUNO Launcher:             PASS (34 checks, 0 fail)
 Public release gate:         PASS (npm run test:release, 10/10)
 Deployment:                  PASS (deploy-pages@v4)
 GitHub Pages:                HABILITADO, build_type=workflow, public=true
-URL GitHub Pages:            https://wandersepulveda2013.github.io/toolisto-web/ (redirige 301 a http://apluno.com/)
+URL GitHub Pages:            https://wandersepulveda2013.github.io/toolisto-web/ (redirige 301 a https://apluno.com/)
 Custom domain:               apluno.com (configurado via API)
 DNS:                         OK — propagado (apex 4x A a GitHub Pages; www CNAME wandersepulveda2013.github.io)
-apluno.com (HTTP):           ACCESIBLE — 200 (portada launcher)
-www.apluno.com (HTTP):       ACCESIBLE — 301 → http://apluno.com/
-HTTPS:                       EMITIÉNDOSE — 443 sirve con cert default *.github.io; el cert dedicado apluno.com sigue en provisioning
-Enforce HTTPS:               PENDIENTE — se activará cuando el certificado dedicado esté emitido (paso manual/API posterior)
+apluno.com (HTTP):           REDIRIGE 301 → https://apluno.com/
+www.apluno.com (HTTP):       REDIRIGE 301 → https://apluno.com/
+HTTPS:                       ACTIVO — certificado dedicado válido (CN/SAN apluno.com + www.apluno.com, Let's Encrypt, hasta 2026-11-13); sin aviso «No seguro»
+Enforce HTTPS:               ACTIVADO (https_enforced=true)
 CNAME:                       apluno.com (en repositorio y en artifact desplegado)
-Fecha/hora de verificación:  2026-08-15T02:58:00Z (UTC)
+Fecha/hora de verificación:  2026-08-15T03:35:00Z (UTC)
 Rutas verificadas:           200 en / (portada launcher), /toolisto, /ordia/, /workspace/, /about/, /contact/,
                              /privacy/, /terms/, /unir-pdf y categorías; assets 200 (apluno-assets/apluno-tools-data.js
                              167 tools, manifest, sitemap 190 URLs, robots); canonical correcto
 Paso manual pendiente:       activar Enforce HTTPS cuando el certificado dedicado esté emitido
 ```
+
+## HTTPS COMPLETE — 2026-08-15 (activación de Enforce HTTPS y verificación final)
+
+Certificado dedicado emitido por GitHub Pages tras **un reprovisionamiento conservador**
+(remove + re-add de `cname=apluno.com` vía API; sin cambios de DNS, sin tocar Pages):
+
+- Certificado apex `apluno.com`: **válido** — CN `apluno.com`, SAN `apluno.com, www.apluno.com`,
+  issuer Let's Encrypt (intermedio YR1), vigente 2026-08-15 → 2026-11-13, validación de
+  hostname OK (curl/Node sin `-k`).
+- Certificado `www.apluno.com`: **válido** — mismo certificado (SAN incluye `www.apluno.com`).
+- `https_enforced`: **true** (activado vía `PUT /pages` tras confirmar el certificado; `html_url=https://apluno.com/`).
+- Redirecciones (sin loops, 301 de una sola etapa):
+  - `http://apluno.com/` → 301 → `https://apluno.com/`
+  - `http://www.apluno.com/` → 301 → `https://apluno.com/`
+  - `https://www.apluno.com/` → 301 → `https://apluno.com/`
+- Verificación final en producción (sin `-k`):
+  - `https://apluno.com/` 200 (portada launcher), `/toolisto` 200, `/unir-pdf` 200,
+    `/imagenes-a-pdf.html` 200; sin mixed content (ninguna referencia `http://`).
+  - 26 recursos de la portada cargan por HTTPS sin fallos.
+  - Navegador real (Playwright, headless) contra HTTPS de producción: 14/14 PASS, 0 errores
+    de consola (búsqueda en vivo, un clic → herramienta, catálogo, páginas de herramienta).
+- **Limitación documentada**: GitHub Pages NO aplica el archivo `_headers` (CSP/HSTS/nosniff/immutable).
+  El archivo está en el artifact desplegado pero la plataforma lo ignora (es una feature de
+  Netlify/Cloudflare Pages). El aviso «No seguro» queda resuelto por el HTTPS válido; si se
+  desean esos headers, se podrían servir mediante proxy Cloudflare (SSL/TLS Full strict) cuando
+  exista token — sin HSTS preload.
+- Cloudflare: `CLOUDFLARE_API_TOKEN` ausente → sin inspección; mantener DNS-only como está.
 
 ## Publicación del 2026-08-15 (5480a97) — Portada launcher directo de herramientas
 
