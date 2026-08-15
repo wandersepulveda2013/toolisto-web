@@ -6,34 +6,58 @@ Estado REAL verificado por OpenCode el 2026-08-14 (actualizado tras configuraci�
 Repositorio:                 wandersepulveda2013/toolisto-web
 Rama producción:             main
 Rama APLUNO:                 feature/apluno-ecosystem
-SHA publicado:               8376fb90b6938737fd6923c8eec629b7ae4775f6
+SHA publicado:               5480a97e8c901baa92748c438ee2252084fded36
 Método de publicación:       GitHub REST API (Git Data API)
 Push/API:                    API (git push bloqueado por opencode.json; alternativa segura, sin force)
 Merge/PR:                    No (fast-forward de main vía API; historia preservada)
 Workflow:                    .github/workflows/deploy-pages.yml
-GitHub Actions Run:          31857241785
+GitHub Actions Run:          31860480238
 Build:                       PASS
 Tests:                       PASS
-Test APLUNO:                 PASS (38 pass, 0 fail)
-Public release gate:         PASS (npm run test:release, 6/6)
+Test APLUNO:                 PASS (45 pass, 0 fail)
+APLUNO Launcher:             PASS (34 checks, 0 fail)
+Public release gate:         PASS (npm run test:release, 10/10)
 Deployment:                  PASS (deploy-pages@v4)
 GitHub Pages:                HABILITADO, build_type=workflow, public=true
 URL GitHub Pages:            https://wandersepulveda2013.github.io/toolisto-web/ (redirige 301 a http://apluno.com/)
 Custom domain:               apluno.com (configurado via API)
 DNS:                         OK — propagado (apex 4x A a GitHub Pages; www CNAME wandersepulveda2013.github.io)
-apluno.com (HTTP):           ACCESIBLE — 200
+apluno.com (HTTP):           ACCESIBLE — 200 (portada launcher)
 www.apluno.com (HTTP):       ACCESIBLE — 301 → http://apluno.com/
-HTTPS:                       EMITIÉNDOSE — 443 sirve con cert default *.github.io (Let's Encrypt); el cert dedicado apluno.com está en provisioning
-Enforce HTTPS:               PENDIENTE — se activará en una sesión posterior (por indicación del usuario)
+HTTPS:                       EMITIÉNDOSE — 443 sirve con cert default *.github.io; el cert dedicado apluno.com sigue en provisioning
+Enforce HTTPS:               PENDIENTE — se activará cuando el certificado dedicado esté emitido (paso manual/API posterior)
 CNAME:                       apluno.com (en repositorio y en artifact desplegado)
-Fecha/hora de verificación:  2026-08-15T01:45:00Z (UTC)
-Rutas verificadas:           200 en /, /toolisto, /ordia/, /workspace/, /about/, /contact/,
-                             /privacy/, /terms/, /unir-pdf y categorías /pdf, /imagenes, /texto,
-                             /firmas, /qr-codigos, /calculadoras, /hojas-de-calculo, /documentos-word,
-                             /archivos, /audio, /video; assets 200 (styles.css, js/app.js, iconos,
-                             manifest, sitemap, robots); sin mixed content; canonical correcto
-Paso manual pendiente:       activar Enforce HTTPS cuando el certificado dedicado esté emitido (sesión posterior)
+Fecha/hora de verificación:  2026-08-15T02:58:00Z (UTC)
+Rutas verificadas:           200 en / (portada launcher), /toolisto, /ordia/, /workspace/, /about/, /contact/,
+                             /privacy/, /terms/, /unir-pdf y categorías; assets 200 (apluno-assets/apluno-tools-data.js
+                             167 tools, manifest, sitemap 190 URLs, robots); canonical correcto
+Paso manual pendiente:       activar Enforce HTTPS cuando el certificado dedicado esté emitido
 ```
+
+## Publicación del 2026-08-15 (5480a97) — Portada launcher directo de herramientas
+
+Publicado vía Git Data API (fast-forward de `main` desde `27e6b7e`, árbol local verificado
+SHA a SHA con `fix-tree.mjs`: 60 trees, 504 blobs). Run 31860480238: build, tests, test:apluno
+(45/45), nueva suite `APLUNO Launcher` (34/34) y `npm run test:release` (10/10) — TODO PASS;
+deployment `github-pages` creado para `5480a97`.
+
+Contenido nuevo en producción (verificado por HTTP en `apluno.com`):
+- **Portada = launcher**: H1 `¿Qué necesitas hacer?`, buscador central con búsqueda instantánea
+  local (sin red), chips de categorías reales (7 primarias + 5 secundarias bajo «Más»), vista
+  inicial con 12 populares y acceso a la herramienta en un solo clic (`/slug.html`). Enter abre
+  el primer resultado sin pasar por el catálogo. Sin hero ni cards de producto ni `#productos`.
+- **Data generada en build**: `apluno-assets/apluno-tools-data.js` → `window.APLUNO_TOOLS` con
+  167 tools / 12 categorías / 12 populares (validaciones de slugs, labels y categorías en build).
+- **Motor reutilizado**: `js/smart-search.js` expone `buildIndexFromData(data)` y `maxResults`.
+- **SEO**: title `APLUNO — Herramientas online para PDF, imágenes y archivos`, canonical `https://apluno.com/`,
+  schemas Organization + WebSite; sin scripts inline ejecutables (CSP se aplicará con HTTPS).
+- **Búsqueda local**: escribir en el buscador NO genera llamadas de red (verificado en E2E).
+
+Nota de infraestructura (importante): una primera publicación con `publish-tree.ps1` salió con el
+árbol incompleto (solo archivos de raíz: el script usaba `git ls-tree -r` sin `-t`, igual que la
+incidencia previa de `1019f16`). Se reparó de inmediato publicando el árbol completo verificado con
+`fix-tree.mjs` (`5480a97`). El `publish-tree.ps1`/`publish-tree-resume.ps1` fueron corregidos en
+`_toolisto_autopilot/tmp/` para incluir `-t`; usar `fix-tree.mjs` como publisher canónico.
 
 ## Publicación del 2026-08-15 (8376fb9) — arreglos de build, PWA y SEO
 
