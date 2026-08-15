@@ -1,0 +1,157 @@
+{
+  "checks": [
+    {
+      "name": "Server started on http://127.0.0.1:<port>",
+      "pass": true
+    },
+    {
+      "name": "fixture scanned1.pdf (1 página, solo imagen)",
+      "pass": true
+    },
+    {
+      "name": "fixture scanned2.pdf (2 páginas, solo imagen)",
+      "pass": true
+    },
+    {
+      "name": "fixture text.pdf (con texto real)",
+      "pass": true
+    },
+    {
+      "name": "fixture scan-clear.png real (tests/fixtures/star-flow)",
+      "pass": true
+    },
+    {
+      "name": "fixture webp.webp generado (imagen WebP)",
+      "pass": true
+    },
+    {
+      "name": "text.pdf tiene texto real extraíble (pdfjs)",
+      "pass": true
+    },
+    {
+      "name": "scanned1.pdf NO tiene capa de texto (imagen pura)",
+      "pass": true
+    },
+    {
+      "name": "detectOcrNeeded scanned: \"1 de 1 página(s) necesitan OCR.\"",
+      "pass": true
+    },
+    {
+      "name": "detectOcrNeeded: reporte contiene \"NECESITA OCR\"",
+      "pass": true
+    },
+    {
+      "name": "detectOcrNeeded: reporte lista página 1",
+      "pass": true
+    },
+    {
+      "name": "detectOcrNeeded text: \"El PDF ya tiene texto seleccionable en todas las páginas.\"",
+      "pass": true
+    },
+    {
+      "name": "detectOcrNeeded: reporte \"No necesita OCR\"",
+      "pass": true
+    },
+    {
+      "name": "detectOcrNeeded scanned2: \"2 de 2 página(s) necesitan OCR.\"",
+      "pass": true
+    },
+    {
+      "name": "extractTextFromScannedPdf: control ocrLanguage visible",
+      "pass": true
+    },
+    {
+      "name": "extractTextFromScannedPdf message: \"Texto extraído de 1 página(s).\"",
+      "pass": true
+    },
+    {
+      "name": "extractTextFromScannedPdf: TXT con texto OCR real",
+      "pass": true
+    },
+    {
+      "name": "scannedPdfToSearchablePdf: controles ocrLanguage + ocrPages visibles",
+      "pass": true
+    },
+    {
+      "name": "scannedPdfToSearchablePdf message: \"PDF buscable creado: 1 página(s) procesada(s). Confianza promedio: 92%\"",
+      "pass": true
+    },
+    {
+      "name": "scannedPdfToSearchablePdf: salida PDF real (magic)",
+      "pass": true
+    },
+    {
+      "name": "scannedPdfToSearchablePdf: PDF de 1 página",
+      "pass": true
+    },
+    {
+      "name": "scannedPdfToSearchablePdf: capa de texto buscable extraíble",
+      "pass": true
+    },
+    {
+      "name": "scannedPdfToSearchablePdf text: mensaje toast \"ya tiene texto\" sin generar archivo",
+      "pass": true
+    },
+    {
+      "name": "scannedPdfToSearchablePdf ocrPages=2 (solo página 2): \"PDF buscable creado: 1 página(s) procesada(s). Confianza promedio: 91%\"",
+      "pass": true
+    },
+    {
+      "name": "scannedPdfToSearchablePdf ocrPages=2: PDF con la página procesada",
+      "pass": true
+    },
+    {
+      "name": "scannedPdfToSearchablePdf ocrPages=2: texto de la página 2",
+      "pass": true
+    },
+    {
+      "name": "imageToSearchablePdf: control ocrLanguage visible",
+      "pass": true
+    },
+    {
+      "name": "imageToSearchablePdf message: \"Se procesaron 1 imagen(es) a PDF buscable.\"",
+      "pass": true
+    },
+    {
+      "name": "imageToSearchablePdf: salida PDF real (magic)",
+      "pass": true
+    },
+    {
+      "name": "imageToSearchablePdf: PDF de 1 página",
+      "pass": true
+    },
+    {
+      "name": "imageToSearchablePdf: OCR real del fixture (Ventas/150)",
+      "pass": true
+    },
+    {
+      "name": "imageToSearchablePdf WebP message: \"Se procesaron 1 imagen(es) a PDF buscable.\"",
+      "pass": true
+    },
+    {
+      "name": "imageToSearchablePdf WebP: OCR real del WebP (fix embed)",
+      "pass": true
+    },
+    {
+      "name": "Sin errores de consola en toda la suite",
+      "pass": true
+    }
+  ],
+  "excluded": {},
+  "failed": 0,
+  "failures": [],
+  "fixes": [
+    "app.js: htmlByTool (idioma + páginas), optionAliases (ocrLanguage/ocrPages) y validateToolFiles para las 4 herramientas; accepts pdf→pdfs para aceptar PDF en el input.",
+    "js/ocr/pdf-ocr-engine.js loadPdf y extractTextFromScannedPdf: pdfjs detachaba el ArrayBuffer al reutilizar el buffer (detectNeedsOcr → renderPageToCanvas) → slice(0).",
+    "tool-processors imageToSearchablePdf: incrusta la imagen vía canvas → JPEG (antes el blob original rompía con WebP/BMP/GIF/TIFF en embedPng/embedJpg)."
+  ],
+  "passed": 34,
+  "suite": "gate-e2e-ocr-pdf-tools",
+  "tools": [
+    "scannedPdfToSearchablePdf",
+    "imageToSearchablePdf",
+    "extractTextFromScannedPdf",
+    "detectOcrNeeded"
+  ],
+  "total": 34
+}

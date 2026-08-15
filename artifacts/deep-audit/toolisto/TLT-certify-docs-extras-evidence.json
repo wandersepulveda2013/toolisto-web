@@ -1,0 +1,186 @@
+{
+  "checks": [
+    {
+      "name": "Server started on http://127.0.0.1:<port>",
+      "pass": true
+    },
+    {
+      "name": "fixture EPUB generado",
+      "pass": true
+    },
+    {
+      "name": "fixture DOCX generado",
+      "pass": true
+    },
+    {
+      "name": "fixture PDF de 3 páginas generado",
+      "pass": true
+    },
+    {
+      "name": "EPUB contiene las entradas esperadas",
+      "pass": true
+    },
+    {
+      "name": "wordToTxt inicia con el botón deshabilitado",
+      "pass": true
+    },
+    {
+      "name": "wordToTxt habilita el botón con un DOCX",
+      "pass": true
+    },
+    {
+      "name": "wordToTxt message prometido",
+      "pass": true
+    },
+    {
+      "name": "wordToTxt descarga un archivo",
+      "pass": true
+    },
+    {
+      "name": "wordToTxt salida .txt",
+      "pass": true
+    },
+    {
+      "name": "wordToTxt extrae el texto del DOCX",
+      "pass": true
+    },
+    {
+      "name": "wordToTxt conserva múltiples párrafos",
+      "pass": true
+    },
+    {
+      "name": "wordToTxt negativo: un TXT mantiene el botón deshabilitado",
+      "pass": true
+    },
+    {
+      "name": "epubToTxt inicia con el botón deshabilitado",
+      "pass": true
+    },
+    {
+      "name": "epubToTxt habilita el botón con un EPUB",
+      "pass": true
+    },
+    {
+      "name": "epubToTxt message de extracción",
+      "pass": true
+    },
+    {
+      "name": "epubToTxt descarga un archivo",
+      "pass": true
+    },
+    {
+      "name": "epubToTxt salida .txt",
+      "pass": true
+    },
+    {
+      "name": "epubToTxt extrae el texto del capítulo",
+      "pass": true
+    },
+    {
+      "name": "epubToTxt negativo: un TXT mantiene el botón deshabilitado",
+      "pass": true
+    },
+    {
+      "name": "coverEpub inicia con el botón deshabilitado",
+      "pass": true
+    },
+    {
+      "name": "coverEpub habilita el botón con un EPUB",
+      "pass": true
+    },
+    {
+      "name": "coverEpub message de extracción",
+      "pass": true
+    },
+    {
+      "name": "coverEpub descarga un archivo",
+      "pass": true
+    },
+    {
+      "name": "coverEpub salida cover.jpg",
+      "pass": true
+    },
+    {
+      "name": "coverEpub portada es JPEG válido",
+      "pass": true
+    },
+    {
+      "name": "imagesEpub inicia con el botón deshabilitado",
+      "pass": true
+    },
+    {
+      "name": "imagesEpub habilita el botón con un EPUB",
+      "pass": true
+    },
+    {
+      "name": "imagesEpub message con conteo de imágenes",
+      "pass": true
+    },
+    {
+      "name": "imagesEpub descarga un archivo",
+      "pass": true
+    },
+    {
+      "name": "imagesEpub ZIP con sufijo _images",
+      "pass": true
+    },
+    {
+      "name": "imagesEpub ZIP con 3 imágenes",
+      "pass": true
+    },
+    {
+      "name": "pdfPageCounter inicia con el botón deshabilitado",
+      "pass": true
+    },
+    {
+      "name": "pdfPageCounter habilita el botón con un PDF",
+      "pass": true
+    },
+    {
+      "name": "pdfPageCounter message de análisis",
+      "pass": true
+    },
+    {
+      "name": "pdfPageCounter descarga un archivo",
+      "pass": true
+    },
+    {
+      "name": "pdfPageCounter informe .txt",
+      "pass": true
+    },
+    {
+      "name": "pdfPageCounter cuenta 3 páginas",
+      "pass": true
+    },
+    {
+      "name": "pdfPageCounter reporta dimensiones por página",
+      "pass": true
+    },
+    {
+      "name": "cero requests a hosts externos durante el procesado",
+      "pass": true
+    },
+    {
+      "name": "Sin errores de consola no controlados",
+      "pass": true
+    }
+  ],
+  "consoleErrors": [],
+  "externalRequests": [],
+  "failed": 0,
+  "failureReasons": [],
+  "passed": 41,
+  "suite": "gate-e2e-docs-extras",
+  "tools": [
+    "wordToTxt",
+    "epubToTxt",
+    "coverEpub",
+    "imagesEpub",
+    "pdfPageCounter"
+  ],
+  "total": 41,
+  "totals": {
+    "failed": 0,
+    "passed": 41
+  }
+}

@@ -1,0 +1,912 @@
+{
+  "bugFixed": "Las salidas compatibles ahora pueden continuar localmente en el siguiente conversor sin descargar ni volver a cargar el archivo; CSV → Excel → JSON conserva la tabla editable y los datos.",
+  "checks": [
+    {
+      "name": "Server started on http://127.0.0.1:<port>",
+      "pass": true
+    },
+    {
+      "name": "página del modo monta panel propio y oculta la UI genérica",
+      "pass": true
+    },
+    {
+      "name": "fixtures generados con el SheetJS del sitio",
+      "pass": true
+    },
+    {
+      "name": "csvToExcel muestra la vista editable 5 filas × 3 columnas",
+      "pass": true
+    },
+    {
+      "name": "csvToExcel detecta los tipos de columna",
+      "pass": true
+    },
+    {
+      "name": "csvToExcel sin errores por fila (badge 0)",
+      "pass": true
+    },
+    {
+      "name": "csvToExcel toast: \"CSV convertido a Excel\"",
+      "pass": true
+    },
+    {
+      "name": "csvToExcel genera un archivo descargable",
+      "pass": true
+    },
+    {
+      "name": "csvToExcel nombre de salida: toolisto-salida.xlsx",
+      "pass": true
+    },
+    {
+      "name": "csvToExcel firma de contenedor correcta",
+      "pass": true
+    },
+    {
+      "name": "csvToExcel genera XLSX con encabezado y 5 filas",
+      "pass": true
+    },
+    {
+      "name": "csvToExcel conserva todas las filas del CSV",
+      "pass": true
+    },
+    {
+      "name": "csvToExcel habilita \"Reabrir salida\" tras generar",
+      "pass": true
+    },
+    {
+      "name": "csvToExcel reabre la salida en la vista editable (6 filas)",
+      "pass": true
+    },
+    {
+      "name": "csvToExcel reapertura conserva la primera fila",
+      "pass": true
+    },
+    {
+      "name": "excelToCsv muestra la vista editable 2 filas × 2 columnas",
+      "pass": true
+    },
+    {
+      "name": "excelToCsv detecta los tipos de columna",
+      "pass": true
+    },
+    {
+      "name": "excelToCsv sin errores por fila (badge 0)",
+      "pass": true
+    },
+    {
+      "name": "excelToCsv toast: \"Excel convertido a CSV\"",
+      "pass": true
+    },
+    {
+      "name": "excelToCsv genera un archivo descargable",
+      "pass": true
+    },
+    {
+      "name": "excelToCsv nombre de salida: toolisto-salida.csv",
+      "pass": true
+    },
+    {
+      "name": "excelToCsv firma de contenedor correcta",
+      "pass": true
+    },
+    {
+      "name": "excelToCsv genera CSV con encabezado y filas",
+      "pass": true
+    },
+    {
+      "name": "excelToCsv conserva las 2 filas de datos",
+      "pass": true
+    },
+    {
+      "name": "excelToCsv habilita \"Reabrir salida\" tras generar",
+      "pass": true
+    },
+    {
+      "name": "excelToCsv reabre la salida en la vista editable (3 filas)",
+      "pass": true
+    },
+    {
+      "name": "excelToCsv reapertura conserva la primera fila",
+      "pass": true
+    },
+    {
+      "name": "excelToJson muestra la vista editable 2 filas × 2 columnas",
+      "pass": true
+    },
+    {
+      "name": "excelToJson detecta los tipos de columna",
+      "pass": true
+    },
+    {
+      "name": "excelToJson sin errores por fila (badge 0)",
+      "pass": true
+    },
+    {
+      "name": "excelToJson toast: \"Excel convertido a JSON\"",
+      "pass": true
+    },
+    {
+      "name": "excelToJson genera un archivo descargable",
+      "pass": true
+    },
+    {
+      "name": "excelToJson nombre de salida: toolisto-salida.json",
+      "pass": true
+    },
+    {
+      "name": "excelToJson firma de contenedor correcta",
+      "pass": true
+    },
+    {
+      "name": "excelToJson devuelve un array de 2 objetos",
+      "pass": true
+    },
+    {
+      "name": "excelToJson conserva claves y valores numéricos",
+      "pass": true
+    },
+    {
+      "name": "excelToJson habilita \"Reabrir salida\" tras generar",
+      "pass": true
+    },
+    {
+      "name": "excelToJson reabre la salida en la vista editable (3 filas)",
+      "pass": true
+    },
+    {
+      "name": "excelToJson reapertura conserva la primera fila",
+      "pass": true
+    },
+    {
+      "name": "jsonToExcel muestra la vista editable 2 filas × 2 columnas",
+      "pass": true
+    },
+    {
+      "name": "jsonToExcel detecta los tipos de columna",
+      "pass": true
+    },
+    {
+      "name": "jsonToExcel sin errores por fila (badge 0)",
+      "pass": true
+    },
+    {
+      "name": "jsonToExcel toast: \"JSON convertido a Excel\"",
+      "pass": true
+    },
+    {
+      "name": "jsonToExcel genera un archivo descargable",
+      "pass": true
+    },
+    {
+      "name": "jsonToExcel nombre de salida: toolisto-salida.xlsx",
+      "pass": true
+    },
+    {
+      "name": "jsonToExcel firma de contenedor correcta",
+      "pass": true
+    },
+    {
+      "name": "jsonToExcel convierte el array JSON en filas con números",
+      "pass": true
+    },
+    {
+      "name": "jsonToExcel conserva las 2 filas de datos",
+      "pass": true
+    },
+    {
+      "name": "jsonToExcel habilita \"Reabrir salida\" tras generar",
+      "pass": true
+    },
+    {
+      "name": "jsonToExcel reabre la salida en la vista editable (3 filas)",
+      "pass": true
+    },
+    {
+      "name": "jsonToExcel reapertura conserva la primera fila",
+      "pass": true
+    },
+    {
+      "name": "csvToJson muestra la vista editable 5 filas × 3 columnas",
+      "pass": true
+    },
+    {
+      "name": "csvToJson detecta los tipos de columna",
+      "pass": true
+    },
+    {
+      "name": "csvToJson sin errores por fila (badge 0)",
+      "pass": true
+    },
+    {
+      "name": "csvToJson toast: \"CSV convertido a JSON\"",
+      "pass": true
+    },
+    {
+      "name": "csvToJson genera un archivo descargable",
+      "pass": true
+    },
+    {
+      "name": "csvToJson nombre de salida: toolisto-salida.json",
+      "pass": true
+    },
+    {
+      "name": "csvToJson firma de contenedor correcta",
+      "pass": true
+    },
+    {
+      "name": "csvToJson genera 5 objetos",
+      "pass": true
+    },
+    {
+      "name": "csvToJson conserva los datos",
+      "pass": true
+    },
+    {
+      "name": "csvToJson habilita \"Reabrir salida\" tras generar",
+      "pass": true
+    },
+    {
+      "name": "csvToJson reabre la salida en la vista editable (6 filas)",
+      "pass": true
+    },
+    {
+      "name": "csvToJson reapertura conserva la primera fila",
+      "pass": true
+    },
+    {
+      "name": "jsonToCsv muestra la vista editable 2 filas × 2 columnas",
+      "pass": true
+    },
+    {
+      "name": "jsonToCsv detecta los tipos de columna",
+      "pass": true
+    },
+    {
+      "name": "jsonToCsv sin errores por fila (badge 0)",
+      "pass": true
+    },
+    {
+      "name": "jsonToCsv toast: \"JSON convertido a CSV\"",
+      "pass": true
+    },
+    {
+      "name": "jsonToCsv genera un archivo descargable",
+      "pass": true
+    },
+    {
+      "name": "jsonToCsv nombre de salida: toolisto-salida.csv",
+      "pass": true
+    },
+    {
+      "name": "jsonToCsv firma de contenedor correcta",
+      "pass": true
+    },
+    {
+      "name": "jsonToCsv genera CSV con encabezado y filas",
+      "pass": true
+    },
+    {
+      "name": "jsonToCsv conserva las 2 filas de datos",
+      "pass": true
+    },
+    {
+      "name": "jsonToCsv habilita \"Reabrir salida\" tras generar",
+      "pass": true
+    },
+    {
+      "name": "jsonToCsv reabre la salida en la vista editable (3 filas)",
+      "pass": true
+    },
+    {
+      "name": "jsonToCsv reapertura conserva la primera fila",
+      "pass": true
+    },
+    {
+      "name": "xmlToJson muestra la vista editable 3 filas × 2 columnas",
+      "pass": true
+    },
+    {
+      "name": "xmlToJson detecta los tipos de columna",
+      "pass": true
+    },
+    {
+      "name": "xmlToJson sin errores por fila (badge 0)",
+      "pass": true
+    },
+    {
+      "name": "xmlToJson toast: \"XML convertido a JSON\"",
+      "pass": true
+    },
+    {
+      "name": "xmlToJson genera un archivo descargable",
+      "pass": true
+    },
+    {
+      "name": "xmlToJson nombre de salida: toolisto-salida.json",
+      "pass": true
+    },
+    {
+      "name": "xmlToJson firma de contenedor correcta",
+      "pass": true
+    },
+    {
+      "name": "xmlToJson agrupa los nodos repetidos",
+      "pass": true
+    },
+    {
+      "name": "xmlToJson conserva el texto de los nodos",
+      "pass": true
+    },
+    {
+      "name": "xmlToJson habilita \"Reabrir salida\" tras generar",
+      "pass": true
+    },
+    {
+      "name": "xmlToJson reabre la salida en la vista editable (2 filas)",
+      "pass": true
+    },
+    {
+      "name": "xmlToJson reapertura muestra la salida (primera fila no aplica)",
+      "pass": true
+    },
+    {
+      "name": "jsonToXml muestra la vista editable 1 filas × 2 columnas",
+      "pass": true
+    },
+    {
+      "name": "jsonToXml detecta los tipos de columna",
+      "pass": true
+    },
+    {
+      "name": "jsonToXml sin errores por fila (badge 0)",
+      "pass": true
+    },
+    {
+      "name": "jsonToXml toast: \"JSON convertido a XML\"",
+      "pass": true
+    },
+    {
+      "name": "jsonToXml genera un archivo descargable",
+      "pass": true
+    },
+    {
+      "name": "jsonToXml nombre de salida: toolisto-salida.xml",
+      "pass": true
+    },
+    {
+      "name": "jsonToXml firma de contenedor correcta",
+      "pass": true
+    },
+    {
+      "name": "jsonToXml genera XML con prolog y raíz <root>",
+      "pass": true
+    },
+    {
+      "name": "jsonToXml mapea claves a nodos con su valor",
+      "pass": true
+    },
+    {
+      "name": "jsonToXml habilita \"Reabrir salida\" tras generar",
+      "pass": true
+    },
+    {
+      "name": "jsonToXml reapertura muestra el XML plano en filas vacías (limitación del modo)",
+      "pass": true
+    },
+    {
+      "name": "mergeExcel muestra la vista editable 4 filas × 2 columnas",
+      "pass": true
+    },
+    {
+      "name": "mergeExcel detecta los tipos de columna",
+      "pass": true
+    },
+    {
+      "name": "mergeExcel sin errores por fila (badge 0)",
+      "pass": true
+    },
+    {
+      "name": "mergeExcel toast: \"1 archivos combinados\"",
+      "pass": true
+    },
+    {
+      "name": "mergeExcel genera un archivo descargable",
+      "pass": true
+    },
+    {
+      "name": "mergeExcel nombre de salida: archivos-unidos.xlsx",
+      "pass": true
+    },
+    {
+      "name": "mergeExcel firma de contenedor correcta",
+      "pass": true
+    },
+    {
+      "name": "mergeExcel combina las filas de ambos libros",
+      "pass": true
+    },
+    {
+      "name": "mergeExcel conserva el contenido de ambos archivos",
+      "pass": true
+    },
+    {
+      "name": "mergeExcel habilita \"Reabrir salida\" tras generar",
+      "pass": true
+    },
+    {
+      "name": "mergeExcel reabre la salida en la vista editable (5 filas)",
+      "pass": true
+    },
+    {
+      "name": "mergeExcel reapertura conserva la primera fila",
+      "pass": true
+    },
+    {
+      "name": "splitExcel muestra la vista editable 2 filas × 2 columnas",
+      "pass": true
+    },
+    {
+      "name": "splitExcel detecta los tipos de columna",
+      "pass": true
+    },
+    {
+      "name": "splitExcel sin errores por fila (badge 0)",
+      "pass": true
+    },
+    {
+      "name": "splitExcel toast: \"Dividido en 1 archivo\"",
+      "pass": true
+    },
+    {
+      "name": "splitExcel genera un archivo descargable",
+      "pass": true
+    },
+    {
+      "name": "splitExcel nombre de salida: Datos.xlsx",
+      "pass": true
+    },
+    {
+      "name": "splitExcel firma de contenedor correcta",
+      "pass": true
+    },
+    {
+      "name": "splitExcel conserva la hoja única con sus datos",
+      "pass": true
+    },
+    {
+      "name": "splitExcel conserva las filas",
+      "pass": true
+    },
+    {
+      "name": "splitExcel habilita \"Reabrir salida\" tras generar",
+      "pass": true
+    },
+    {
+      "name": "splitExcel reabre la salida en la vista editable (3 filas)",
+      "pass": true
+    },
+    {
+      "name": "splitExcel reapertura conserva la primera fila",
+      "pass": true
+    },
+    {
+      "name": "compareExcel-identical muestra la vista editable 2 filas × 2 columnas",
+      "pass": true
+    },
+    {
+      "name": "compareExcel-identical detecta los tipos de columna",
+      "pass": true
+    },
+    {
+      "name": "compareExcel-identical sin errores por fila (badge 0)",
+      "pass": true
+    },
+    {
+      "name": "compareExcel-identical toast: \"Los archivos son idénticos. Se generó un informe sin diferencias.\"",
+      "pass": true
+    },
+    {
+      "name": "compareExcel-identical genera un archivo descargable",
+      "pass": true
+    },
+    {
+      "name": "compareExcel-identical nombre de salida: comparacion.xlsx",
+      "pass": true
+    },
+    {
+      "name": "compareExcel-identical firma de contenedor correcta",
+      "pass": true
+    },
+    {
+      "name": "compareExcel (idénticos) genera el informe",
+      "pass": true
+    },
+    {
+      "name": "compareExcel (idénticos) reporta 0 diferencias",
+      "pass": true
+    },
+    {
+      "name": "compareExcel-identical habilita \"Reabrir salida\" tras generar",
+      "pass": true
+    },
+    {
+      "name": "compareExcel-identical reabre la salida en la vista editable (4 filas)",
+      "pass": true
+    },
+    {
+      "name": "compareExcel-identical reapertura conserva la primera fila",
+      "pass": true
+    },
+    {
+      "name": "compareExcel-diff muestra la vista editable 2 filas × 2 columnas",
+      "pass": true
+    },
+    {
+      "name": "compareExcel-diff detecta los tipos de columna",
+      "pass": true
+    },
+    {
+      "name": "compareExcel-diff sin errores por fila (badge 0)",
+      "pass": true
+    },
+    {
+      "name": "compareExcel-diff toast: \"1 diferencias encontradas\"",
+      "pass": true
+    },
+    {
+      "name": "compareExcel-diff genera un archivo descargable",
+      "pass": true
+    },
+    {
+      "name": "compareExcel-diff nombre de salida: comparacion.xlsx",
+      "pass": true
+    },
+    {
+      "name": "compareExcel-diff firma de contenedor correcta",
+      "pass": true
+    },
+    {
+      "name": "compareExcel (diff) genera la tabla de diferencias",
+      "pass": true
+    },
+    {
+      "name": "compareExcel (diff) detecta la celda modificada",
+      "pass": true
+    },
+    {
+      "name": "compareExcel-diff habilita \"Reabrir salida\" tras generar",
+      "pass": true
+    },
+    {
+      "name": "compareExcel-diff reabre la salida en la vista editable (2 filas)",
+      "pass": true
+    },
+    {
+      "name": "compareExcel-diff reapertura conserva la primera fila",
+      "pass": true
+    },
+    {
+      "name": "xlsToXlsx muestra la vista editable 2 filas × 2 columnas",
+      "pass": true
+    },
+    {
+      "name": "xlsToXlsx detecta los tipos de columna",
+      "pass": true
+    },
+    {
+      "name": "xlsToXlsx sin errores por fila (badge 0)",
+      "pass": true
+    },
+    {
+      "name": "xlsToXlsx toast: \"XLS convertido a XLSX\"",
+      "pass": true
+    },
+    {
+      "name": "xlsToXlsx genera un archivo descargable",
+      "pass": true
+    },
+    {
+      "name": "xlsToXlsx nombre de salida: toolisto-salida.xlsx",
+      "pass": true
+    },
+    {
+      "name": "xlsToXlsx firma de contenedor correcta",
+      "pass": true
+    },
+    {
+      "name": "xlsToXlsx convierte el XLS (BIFF) a XLSX conservando los datos",
+      "pass": true
+    },
+    {
+      "name": "xlsToXlsx conserva las filas",
+      "pass": true
+    },
+    {
+      "name": "xlsToXlsx habilita \"Reabrir salida\" tras generar",
+      "pass": true
+    },
+    {
+      "name": "xlsToXlsx reabre la salida en la vista editable (3 filas)",
+      "pass": true
+    },
+    {
+      "name": "xlsToXlsx reapertura conserva la primera fila",
+      "pass": true
+    },
+    {
+      "name": "xlsxToOds muestra la vista editable 2 filas × 2 columnas",
+      "pass": true
+    },
+    {
+      "name": "xlsxToOds detecta los tipos de columna",
+      "pass": true
+    },
+    {
+      "name": "xlsxToOds sin errores por fila (badge 0)",
+      "pass": true
+    },
+    {
+      "name": "xlsxToOds toast: \"XLSX convertido a ODS\"",
+      "pass": true
+    },
+    {
+      "name": "xlsxToOds genera un archivo descargable",
+      "pass": true
+    },
+    {
+      "name": "xlsxToOds nombre de salida: toolisto-salida.ods",
+      "pass": true
+    },
+    {
+      "name": "xlsxToOds firma de contenedor correcta",
+      "pass": true
+    },
+    {
+      "name": "xlsxToOds genera ODS reabierto con el XLSX del sitio",
+      "pass": true
+    },
+    {
+      "name": "xlsxToOds conserva las filas",
+      "pass": true
+    },
+    {
+      "name": "xlsxToOds habilita \"Reabrir salida\" tras generar",
+      "pass": true
+    },
+    {
+      "name": "xlsxToOds reabre la salida en la vista editable (3 filas)",
+      "pass": true
+    },
+    {
+      "name": "xlsxToOds reapertura conserva la primera fila",
+      "pass": true
+    },
+    {
+      "name": "odsToXlsx muestra la vista editable 2 filas × 2 columnas",
+      "pass": true
+    },
+    {
+      "name": "odsToXlsx detecta los tipos de columna",
+      "pass": true
+    },
+    {
+      "name": "odsToXlsx sin errores por fila (badge 0)",
+      "pass": true
+    },
+    {
+      "name": "odsToXlsx toast: \"ODS convertido a XLSX\"",
+      "pass": true
+    },
+    {
+      "name": "odsToXlsx genera un archivo descargable",
+      "pass": true
+    },
+    {
+      "name": "odsToXlsx nombre de salida: toolisto-salida.xlsx",
+      "pass": true
+    },
+    {
+      "name": "odsToXlsx firma de contenedor correcta",
+      "pass": true
+    },
+    {
+      "name": "odsToXlsx convierte el ODS a XLSX conservando los datos",
+      "pass": true
+    },
+    {
+      "name": "odsToXlsx conserva las filas",
+      "pass": true
+    },
+    {
+      "name": "odsToXlsx habilita \"Reabrir salida\" tras generar",
+      "pass": true
+    },
+    {
+      "name": "odsToXlsx reabre la salida en la vista editable (3 filas)",
+      "pass": true
+    },
+    {
+      "name": "odsToXlsx reapertura conserva la primera fila",
+      "pass": true
+    },
+    {
+      "name": "excel-a-csv descarga el CSV",
+      "pass": true
+    },
+    {
+      "name": "excel-a-csv CSV empieza por EF BB BF (UTF-8 BOM)",
+      "pass": true
+    },
+    {
+      "name": "excel-a-csv primer carácter es \\uFEFF",
+      "pass": true
+    },
+    {
+      "name": "excel-a-csv acentos intactos en el CSV",
+      "pass": true
+    },
+    {
+      "name": "excel-a-csv sin mojibake (Ã¡, Ã©, Ã±, ï¿½)",
+      "pass": true
+    },
+    {
+      "name": "excel-a-csv reabre el CSV con BOM en la vista editable",
+      "pass": true
+    },
+    {
+      "name": "excel-a-csv reapertura sin BOM en la primera celda",
+      "pass": true
+    },
+    {
+      "name": "json-a-csv descarga el CSV",
+      "pass": true
+    },
+    {
+      "name": "json-a-csv CSV empieza por EF BB BF (UTF-8 BOM)",
+      "pass": true
+    },
+    {
+      "name": "json-a-csv primer carácter es \\uFEFF",
+      "pass": true
+    },
+    {
+      "name": "json-a-csv acentos intactos en el CSV",
+      "pass": true
+    },
+    {
+      "name": "json-a-csv sin mojibake (Ã¡, Ã©, Ã±, ï¿½)",
+      "pass": true
+    },
+    {
+      "name": "json-a-csv reabre el CSV con BOM en la vista editable",
+      "pass": true
+    },
+    {
+      "name": "json-a-csv reapertura sin BOM en la primera celda",
+      "pass": true
+    },
+    {
+      "name": "excelToCsv genera CSV para la continuación con BOM",
+      "pass": true
+    },
+    {
+      "name": "continuación desde CSV con BOM mantiene la tabla limpia",
+      "pass": true
+    },
+    {
+      "name": "el JSON continuado desde CSV con BOM no filtra BOM en sus claves",
+      "pass": true
+    },
+    {
+      "name": "el JSON continuado conserva los acentos",
+      "pass": true
+    },
+    {
+      "name": "la continuación permanece oculta antes de generar",
+      "pass": true
+    },
+    {
+      "name": "CSV a Excel genera la salida que se reutilizará localmente",
+      "pass": true
+    },
+    {
+      "name": "CSV a Excel ofrece la continuación compatible",
+      "pass": true
+    },
+    {
+      "name": "la salida XLSX entra en Excel a JSON sin recargar archivo",
+      "pass": true
+    },
+    {
+      "name": "la continuación genera JSON descargable",
+      "pass": true
+    },
+    {
+      "name": "la continuación conserva encabezados y filas del CSV inicial",
+      "pass": true
+    },
+    {
+      "name": "editar una celda actualiza la vista editable",
+      "pass": true
+    },
+    {
+      "name": "el botón \"+ Fila\" añade una fila nueva",
+      "pass": true
+    },
+    {
+      "name": "la fila añadida acepta datos sin errores",
+      "pass": true
+    },
+    {
+      "name": "cambiar el tipo de columna a Número marca las 6 filas de texto como error (badge 6)",
+      "pass": true
+    },
+    {
+      "name": "volver a Texto limpia los errores (badge 0)",
+      "pass": true
+    },
+    {
+      "name": "tras editar, la conversión sigue funcionando",
+      "pass": true
+    },
+    {
+      "name": "la salida incluye la celda editada y la fila añadida",
+      "pass": true
+    },
+    {
+      "name": "la reapertura verifica la salida editada",
+      "pass": true
+    },
+    {
+      "name": "excelToCsv rechaza un binario no soportado: \"PNG Image File is not a spreadsheet\"",
+      "pass": true
+    },
+    {
+      "name": "jsonToExcel con JSON malformado muestra toast: \"Unexpected end of JSON input\"",
+      "pass": true
+    },
+    {
+      "name": "xmlToJson con XML malformado muestra toast: \"XML inválido: This page contains the fol...\"",
+      "pass": true
+    },
+    {
+      "name": "compareExcel con 1 archivo se bloquea sin descarga: \"Selecciona al menos dos archivos para comparar\"",
+      "pass": true
+    },
+    {
+      "name": "csvToExcel funciona con toda la red externa bloqueada",
+      "pass": true
+    },
+    {
+      "name": "cero requests a hosts externos durante el procesado",
+      "pass": true
+    },
+    {
+      "name": "Sin errores de consola en toda la suite",
+      "pass": true
+    }
+  ],
+  "failed": 0,
+  "failures": [],
+  "limitation": "El modo re-construye el archivo desde la cuadrícula editable; los valores numéricos entrados por CSV/XML salen como texto en la salida re-generada. Al reabrir la salida XML de jsonToXml (estructura plana de hojas <root><clave>valor</clave>) el grid muestra filas vacías porque el parser del modo espera XML de filas anidadas.",
+  "mode": "js/modes/excel.js",
+  "passed": 221,
+  "suite": "gate-e2e-spreadsheet-tools",
+  "tools": [
+    "csvToExcel",
+    "excelToCsv",
+    "excelToJson",
+    "jsonToExcel",
+    "csvToJson",
+    "jsonToCsv",
+    "xmlToJson",
+    "jsonToXml",
+    "mergeExcel",
+    "splitExcel",
+    "compareExcel",
+    "xlsToXlsx",
+    "xlsxToOds",
+    "odsToXlsx"
+  ],
+  "total": 221
+}

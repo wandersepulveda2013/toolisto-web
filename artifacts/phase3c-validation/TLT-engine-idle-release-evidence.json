@@ -1,0 +1,18 @@
+{
+  "assertions": {
+    "apiDisponible": true,
+    "destroyLimpio": true,
+    "reaperLiberaSolo": true,
+    "recargaBajoDemanda": true,
+    "releaseManualIdempotente": true,
+    "reutilizacionSinDuplicado": true,
+    "sinErroresConsola": true,
+    "workerCargado": true
+  },
+  "engine": "Tesseract.js (vía EngineLoader)",
+  "result": {
+    "fail": 0,
+    "pass": 10
+  },
+  "suite": "engine-idle-release"
+}

@@ -1,0 +1,238 @@
+{
+  "ocrMode": "ocr",
+  "ocrDuration": 3228,
+  "ocrExpected": "Nombre Valor Estado\nVentas Q1 150 Completado\nVentas Q2 80 En progreso\nDevoluciones -30 Pendiente\nCostos fijos -200 Pagado\nGanancia neta 0 Calculado\n",
+  "ocrActual": "Nombre Valor Estado\nVentas Q1 150 Completado\nVentas Q2 80 En progreso\nDevoluciones -30 Pendiente\nCostos fijos -200 Pagado\nGanancia neta 0 Calculado",
+  "ocrCharAccuracy": {
+    "expected": 147,
+    "matched": 147,
+    "edits": 0,
+    "pct": 100
+  },
+  "ocrWordAccuracy": {
+    "expected": 23,
+    "matched": 23,
+    "edits": 0,
+    "pct": 100
+  },
+  "tableHeaders": [
+    "Nombre",
+    "Valor",
+    "Estado"
+  ],
+  "tableRows": [
+    [
+      "Ventas Q1",
+      "150",
+      "Completado"
+    ],
+    [
+      "Ventas Q2",
+      "80",
+      "En progreso"
+    ],
+    [
+      "Devoluciones",
+      "-30",
+      "Pendiente"
+    ],
+    [
+      "Costos fijos",
+      "-200",
+      "Pagado"
+    ],
+    [
+      "Ganancia neta",
+      "0",
+      "Calculado"
+    ]
+  ],
+  "tableExpected": {
+    "headers": [
+      "Nombre",
+      "Valor",
+      "Estado"
+    ],
+    "rows": [
+      [
+        "Ventas Q1",
+        "150",
+        "Completado"
+      ],
+      [
+        "Ventas Q2",
+        "80",
+        "En progreso"
+      ],
+      [
+        "Devoluciones",
+        "-30",
+        "Pendiente"
+      ],
+      [
+        "Costos fijos",
+        "-200",
+        "Pagado"
+      ],
+      [
+        "Ganancia neta",
+        "0",
+        "Calculado"
+      ]
+    ]
+  },
+  "tableActual": {
+    "headers": [
+      "Nombre",
+      "Valor",
+      "Estado"
+    ],
+    "rows": [
+      [
+        "Ventas Q1",
+        "150",
+        "Completado"
+      ],
+      [
+        "Ventas Q2",
+        "80",
+        "En progreso"
+      ],
+      [
+        "Devoluciones",
+        "-30",
+        "Pendiente"
+      ],
+      [
+        "Costos fijos",
+        "-200",
+        "Pagado"
+      ],
+      [
+        "Ganancia neta",
+        "0",
+        "Calculado"
+      ]
+    ]
+  },
+  "tableCellAccuracy": {
+    "expected": 15,
+    "correct": 15,
+    "missing": 0,
+    "invented": 0,
+    "pct": 100
+  },
+  "tableReviewStatus": "reviewed",
+  "chartSeries": [
+    {
+      "label": "Ventas Q1",
+      "value": 150
+    },
+    {
+      "label": "Ventas Q2",
+      "value": 80
+    },
+    {
+      "label": "Devoluciones",
+      "value": -30
+    },
+    {
+      "label": "Costos fijos",
+      "value": -200
+    },
+    {
+      "label": "Ganancia neta",
+      "value": 0
+    }
+  ],
+  "svgSafe": true,
+  "pdfSize": 905,
+  "relationCount": 10,
+  "executions": [
+    {
+      "id": "mshnu1yhfnarvc",
+      "toolId": "perspective-correction",
+      "status": "completed",
+      "toolName": "Corrección de perspectiva",
+      "resultType": "scan-document",
+      "resultAssetId": "mshnu1ydfwqyr8"
+    },
+    {
+      "id": "mshnu1ywdvvf71",
+      "toolId": "image-import",
+      "status": "completed",
+      "toolName": "Importar imagen",
+      "resultType": "image-asset",
+      "resultAssetId": "mshnu1ykc744ng"
+    },
+    {
+      "id": "mshnu6bgx4lkoe",
+      "toolId": "ocr-extract",
+      "status": "completed",
+      "toolName": "Extracción de texto (OCR)",
+      "resultType": "text-document",
+      "resultAssetId": "mshnu6bbm6ij99"
+    },
+    {
+      "id": "mshnu70gi28elu",
+      "toolId": "text-to-table",
+      "status": "completed",
+      "toolName": "Texto a tabla",
+      "resultType": "table-document",
+      "resultAssetId": "mshnu70cev026l"
+    },
+    {
+      "id": "mshnucjs96s55x",
+      "toolId": "chart-create",
+      "status": "completed",
+      "toolName": "Crear grafico",
+      "resultType": "chart",
+      "resultAssetId": "mshnucjqj2yqnj"
+    },
+    {
+      "id": "mshnufm6yxkyqh",
+      "toolId": "pdf-export",
+      "status": "completed",
+      "toolName": "Exportar PDF",
+      "resultType": "export-artifact",
+      "resultAssetId": null
+    },
+    {
+      "id": "mshnug0f0nruoe",
+      "toolId": "design-create",
+      "status": "completed",
+      "toolName": "Crear diseno",
+      "resultType": "design-document",
+      "resultAssetId": "mshnug0fjxslat"
+    }
+  ],
+  "bundle": {
+    "project": true,
+    "documents": 1,
+    "dataTables": 1,
+    "assets": 5,
+    "executions": 7,
+    "captures": 1
+  },
+  "importResult": {
+    "counts": {
+      "projects": 2,
+      "documents": 2,
+      "data": 2,
+      "captures": 2,
+      "assets": 10,
+      "executions": 15
+    },
+    "newProjectId": "mshnuljg7fzs1zimv",
+    "origProjId": "mshntzoail3qmz",
+    "projChanged": true,
+    "hasOldIds": false,
+    "importedDocCount": 1
+  },
+  "timestamp": "2026-08-06T15:18:19.295Z",
+  "pass": 83,
+  "fail": 0,
+  "failures": [],
+  "jsErrors": [],
+  "consoleErrors": []
+}

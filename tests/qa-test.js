@@ -1,0 +1,137 @@
+const { readFileSync, existsSync } = require('fs');
+const { join, dirname } = require('path');
+
+const root = join(__dirname, '..');
+let failures = 0;
+
+function fail(msg) { console.error(`  FAIL: ${msg}`); failures++; }
+function pass(msg) { console.log(`  PASS: ${msg}`); }
+
+console.log('=== QA Test ===\n');
+
+// Check the Toolisto catalogue build template. APLUNO's root page is generated in dist/.
+const indexPath = join(root, 'toolisto.html');
+if (!existsSync(indexPath)) { fail('toolisto.html no existe'); } else {
+  const html = readFileSync(indexPath, 'utf8');
+  pass('toolisto.html existe');
+
+  // HTML structure
+  if (!html.includes('<!doctype html>') && !html.includes('<!DOCTYPE html>')) fail('DOCTYPE no encontrado');
+  else pass('DOCTYPE presente');
+
+  if (!/<html\b[^>]*\blang="es(?:-[^"]+)?"/i.test(html)) fail('Atributo lang español no encontrado');
+  else pass('Atributo lang español presente');
+
+  if (!html.includes('charset="utf-8"') && !html.includes('charset=utf-8')) fail('Charset no encontrado');
+  else pass('Charset presente');
+
+  if (!html.includes('viewport')) fail('Viewport no encontrado');
+  else pass('Viewport presente');
+
+  // No broken references (check root AND dist, since toolisto.html is a build template)
+  const distDir = join(root, 'dist');
+  const scriptRefs = html.match(/src="([^"]+)"/g) || [];
+  for (const ref of scriptRefs) {
+      const refPath = ref.replace(/src="|"/g, '').split('?')[0].split('#')[0];
+    if (!refPath.startsWith('http')) {
+      const existsAtRoot = existsSync(join(root, refPath));
+      const existsAtDist = existsSync(join(distDir, refPath));
+      if (!existsAtRoot && !existsAtDist) {
+        fail(`Referencia rota: ${refPath}`);
+      }
+    }
+  }
+  pass(`${scriptRefs.length} referencias verificadas`);
+
+  // No inline scripts that could cause errors
+  const inlineScripts = (html.match(/<script(?![^>]*src=)[^>]*>/g) || []).length;
+  if (inlineScripts > 0) {
+    pass(`${inlineScripts} scripts inline presentes`);
+  }
+}
+
+// Check app.js syntax
+const appPath = join(root, 'app.js');
+if (!existsSync(appPath)) { fail('app.js no existe'); } else {
+  const appContent = readFileSync(appPath, 'utf8');
+  pass('app.js existe');
+
+  try {
+    new Function(appContent);
+    pass('app.js: sintaxis válida');
+  } catch (e) {
+    fail(`app.js: error de sintaxis: ${e.message}`);
+  }
+
+  // Check essential functions
+  const essentialFns = ['chooseTool', 'runCurrentTool', 'updateRecommendation', 'filterTools', 'addFiles'];
+  for (const fn of essentialFns) {
+    if (!appContent.includes(`function ${fn}`)) {
+      fail(`Función "${fn}" no encontrada`);
+    } else {
+      pass(`Función "${fn}" encontrada`);
+    }
+  }
+
+  // Check state object
+  if (!appContent.includes('const state')) {
+    fail('Objeto state no encontrado');
+  } else {
+    pass('Objeto state encontrado');
+  }
+
+  // Check tool-page-config handling
+  if (!appContent.includes('tool-page-config')) {
+    fail('Lectura de tool-page-config no encontrada');
+  } else {
+    pass('tool-page-config manejado en app.js');
+  }
+}
+
+// Check styles.css
+const cssPath = join(root, 'styles.css');
+if (!existsSync(cssPath)) { fail('styles.css no existe'); } else {
+  const css = readFileSync(cssPath, 'utf8');
+  pass('styles.css existe');
+
+  const essentialClasses = ['.tool-card', '.tool-grid', '.filter-chip', '.drop-zone', '.smart-result'];
+  for (const cls of essentialClasses) {
+    if (!css.includes(cls)) {
+      fail(`Clase CSS "${cls}" no encontrada`);
+    } else {
+      pass(`Clase CSS "${cls}" encontrada`);
+    }
+  }
+}
+
+// Check tool-processors.js (root level, not src/)
+const procPath = join(root, 'tool-processors.js');
+if (!existsSync(procPath)) { fail('tool-processors.js no existe en raíz'); } else {
+  const procContent = readFileSync(procPath, 'utf8');
+  pass('tool-processors.js existe');
+
+  try {
+    const m = {};
+    const fn = new Function('module', 'exports', 'require', 'window', 'globalThis', 'self', procContent);
+    fn(m, m.exports || {}, () => ({ PDFDocument: {} }), {}, {}, {});
+    pass('tool-processors.js: sintaxis válida');
+  } catch (e) {
+    fail(`tool-processors.js: error de sintaxis: ${e.message}`);
+  }
+}
+
+// Check tools.json
+const toolsPath = join(root, 'src', 'data', 'tools.json');
+if (!existsSync(toolsPath)) { fail('src/data/tools.json no existe'); } else {
+  try {
+    const tools = JSON.parse(readFileSync(toolsPath, 'utf8'));
+    pass(`tools.json: ${tools.length} herramientas`);
+    if (!Array.isArray(tools)) fail('tools.json no es un array');
+    else pass('tools.json es un array válido');
+  } catch (e) {
+    fail(`tools.json: error de JSON: ${e.message}`);
+  }
+}
+
+console.log(`\n=== Resultado: ${failures === 0 ? 'APROBADO' : `${failures} FALLO(S)`} ===`);
+process.exit(failures > 0 ? 1 : 0);

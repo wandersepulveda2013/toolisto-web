@@ -1,0 +1,324 @@
+{
+  "checks": [
+    {
+      "name": "Server started on http://127.0.0.1:<port>",
+      "pass": true
+    },
+    {
+      "name": "PNG 1x1 válido generado (firma + CRC)",
+      "pass": true
+    },
+    {
+      "name": "sha256 del payload determinista",
+      "pass": true
+    },
+    {
+      "name": "ZIP fixture con 2 entradas (STORE) construido",
+      "pass": true
+    },
+    {
+      "name": "unzipFile inicia con el botón deshabilitado",
+      "pass": true
+    },
+    {
+      "name": "unzipFile habilita el botón tras elegir ZIP",
+      "pass": true
+    },
+    {
+      "name": "unzipFile message prometido en el diálogo",
+      "pass": true
+    },
+    {
+      "name": "unzipFile con 2 salidas descarga resultados.zip",
+      "pass": true
+    },
+    {
+      "name": "unzipFile resultados.zip contiene 2 entradas",
+      "pass": true
+    },
+    {
+      "name": "unzipFile conserva hola.txt intacto",
+      "pass": true
+    },
+    {
+      "name": "unzipFile conserva datos.bin (100 bytes)",
+      "pass": true
+    },
+    {
+      "name": "unzipFile procesa ZIP con entrada ../evil.txt",
+      "pass": true
+    },
+    {
+      "name": "unzipFile neutraliza la ruta: descarga evil.txt sin \"..\"",
+      "pass": true
+    },
+    {
+      "name": "unzipFile contenido extraído intacto tras sanitizado",
+      "pass": true
+    },
+    {
+      "name": "unzipFile rechaza ZIP vacío",
+      "pass": true
+    },
+    {
+      "name": "unzipFile conserva el error recuperable junto a la acción",
+      "pass": true
+    },
+    {
+      "name": "unzipFile copia detalles técnicos del rechazo",
+      "pass": true
+    },
+    {
+      "name": "unzipFile reintenta desde el feedback y devuelve el foco a ejecutar",
+      "pass": true
+    },
+    {
+      "name": "unzipFile rehabilita el botón tras el ZIP vacío",
+      "pass": true
+    },
+    {
+      "name": "createZipAdvanced inicia con el botón deshabilitado",
+      "pass": true
+    },
+    {
+      "name": "createZipAdvanced habilita el botón con 2 archivos",
+      "pass": true
+    },
+    {
+      "name": "createZipAdvanced message prometido",
+      "pass": true
+    },
+    {
+      "name": "createZipAdvanced descarga toolisto-archivo.zip",
+      "pass": true
+    },
+    {
+      "name": "ZIP generado contiene 2 archivos",
+      "pass": true
+    },
+    {
+      "name": "createZipAdvanced conserva hola.txt",
+      "pass": true
+    },
+    {
+      "name": "createZipAdvanced conserva nota.txt",
+      "pass": true
+    },
+    {
+      "name": "checksumFile inicia con el botón deshabilitado",
+      "pass": true
+    },
+    {
+      "name": "checksumFile habilita el botón tras elegir archivo",
+      "pass": true
+    },
+    {
+      "name": "checksumFile message prometido",
+      "pass": true
+    },
+    {
+      "name": "checksumFile descarga <nombre>.checksum.txt",
+      "pass": true
+    },
+    {
+      "name": "checksumFile SHA-1 coincide con Web Crypto del fixture",
+      "pass": true
+    },
+    {
+      "name": "checksumFile SHA-256 coincide con Web Crypto del fixture",
+      "pass": true
+    },
+    {
+      "name": "checksumFile registra el tamaño real",
+      "pass": true
+    },
+    {
+      "name": "fileInspector inicia con el botón deshabilitado",
+      "pass": true
+    },
+    {
+      "name": "fileInspector habilita el botón con una imagen",
+      "pass": true
+    },
+    {
+      "name": "fileInspector message prometido",
+      "pass": true
+    },
+    {
+      "name": "fileInspector descarga <nombre>.inspeccion.txt",
+      "pass": true
+    },
+    {
+      "name": "fileInspector detecta PNG por magic bytes",
+      "pass": true
+    },
+    {
+      "name": "fileInspector confirma coincidencia extensión/firma",
+      "pass": true
+    },
+    {
+      "name": "fileInspector muestra el hex del encabezado",
+      "pass": true
+    },
+    {
+      "name": "fileInspector bloquea en la carga el PNG falso por magic bytes",
+      "pass": true
+    },
+    {
+      "name": "fileInspector mantiene el botón deshabilitado tras el rechazo",
+      "pass": true
+    },
+    {
+      "name": "fileInspector procesa archivo de tipo desconocido",
+      "pass": true
+    },
+    {
+      "name": "fileInspector NO se deja engañar por el contenido desconocido",
+      "pass": true
+    },
+    {
+      "name": "fileInspector advierte extensión incorrecta",
+      "pass": true
+    },
+    {
+      "name": "inspectFileMetadata inicia con el botón deshabilitado",
+      "pass": true
+    },
+    {
+      "name": "inspectFileMetadata habilita el botón con una imagen",
+      "pass": true
+    },
+    {
+      "name": "inspectFileMetadata abre el diálogo de metadatos",
+      "pass": true
+    },
+    {
+      "name": "inspectFileMetadata message con nombre del archivo",
+      "pass": true
+    },
+    {
+      "name": "inspectFileMetadata muestra el SHA-256 en el informe",
+      "pass": true
+    },
+    {
+      "name": "inspectFileMetadata muestra nombre y sección general",
+      "pass": true
+    },
+    {
+      "name": "inspectFileMetadata muestra el tipo detectado por magic bytes",
+      "pass": true
+    },
+    {
+      "name": "inspectFileMetadata descarga JSON (pic.png.json)",
+      "pass": true
+    },
+    {
+      "name": "inspectFileMetadata JSON con sección general",
+      "pass": true
+    },
+    {
+      "name": "inspectFileMetadata SHA-256 del JSON coincide con el fixture",
+      "pass": true
+    },
+    {
+      "name": "inspectFileMetadata descarga TXT con informe",
+      "pass": true
+    },
+    {
+      "name": "encryptDecryptFile inicia con el botón deshabilitado",
+      "pass": true
+    },
+    {
+      "name": "encryptDecryptFile expone los controles funcionales Cifrar/Descifrar (#mode + #password)",
+      "pass": true
+    },
+    {
+      "name": "encryptDecryptFile habilita el botón con un archivo",
+      "pass": true
+    },
+    {
+      "name": "encryptDecryptFile exige contraseña",
+      "pass": true
+    },
+    {
+      "name": "encryptDecryptFile valida longitud mínima",
+      "pass": true
+    },
+    {
+      "name": "encryptDecryptFile message de cifrado",
+      "pass": true
+    },
+    {
+      "name": "encryptDecryptFile descarga <nombre>.toolistoenc",
+      "pass": true
+    },
+    {
+      "name": "encrypted no es más pequeño que el original (header + tag)",
+      "pass": true
+    },
+    {
+      "name": "encrypted comienza con la firma TOOLISTOENC",
+      "pass": true
+    },
+    {
+      "name": "encrypted NO es igual al original (datos cifrados)",
+      "pass": true
+    },
+    {
+      "name": "encryptDecryptFile message de descifrado",
+      "pass": true
+    },
+    {
+      "name": "encryptDecryptFile restaura el nombre original",
+      "pass": true
+    },
+    {
+      "name": "descifrado reproduce los bytes exactos del original (round-trip)",
+      "pass": true
+    },
+    {
+      "name": "encryptDecryptFile rechaza contraseña incorrecta",
+      "pass": true
+    },
+    {
+      "name": "encryptDecryptFile rehabilita el botón tras el rechazo",
+      "pass": true
+    },
+    {
+      "name": "encryptDecryptFile rechaza archivo sin firma",
+      "pass": true
+    },
+    {
+      "name": "encryptDecryptFile rehabilita el botón tras el rechazo",
+      "pass": true
+    },
+    {
+      "name": "cifrado funciona con toda la red externa bloqueada",
+      "pass": true
+    },
+    {
+      "name": "cero requests a hosts externos durante el procesado",
+      "pass": true
+    },
+    {
+      "name": "Sin errores de consola, incluidos los rechazos recuperables",
+      "pass": true
+    }
+  ],
+  "failed": 0,
+  "failures": [],
+  "passed": 76,
+  "suite": "gate-e2e-file-family-tools",
+  "tools": [
+    "unzipFile",
+    "createZipAdvanced",
+    "checksumFile",
+    "fileInspector",
+    "inspectFileMetadata",
+    "encryptDecryptFile"
+  ],
+  "total": 76,
+  "uiFixed": [
+    "encryptDecryptFile no era usable desde su página (cifrar-descifrar-archivo.html es UI genérica sin campo de contraseña ni selector de operación; sin entrada en htmlByTool de renderAdvancedControls ni options en tools.json): el procesador solo podía responder \"Ingresa una contraseña.\" Se añadió la entrada funcional encryptDecryptFile a renderAdvancedControls en app.js con selector #mode (Cifrar/Descifrar) y campo #password, permitiendo el round-trip AES-GCM por la UI real."
+  ]
+}

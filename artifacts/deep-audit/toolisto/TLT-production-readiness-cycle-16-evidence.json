@@ -1,0 +1,22 @@
+{
+  "cycle": 16,
+  "task": "PR-009",
+  "generatedAt": "2026-08-11",
+  "headInitial": "729c59f7673385028213013b742857c37f06c47c",
+  "result": "BLOCKED",
+  "tests": [
+    { "command": "npm run build", "result": "PASS", "detail": "179 páginas" },
+    { "command": "node tests/public-site-network-negative.mjs", "result": "PASS", "detail": "343/343; 167 herramientas; cero egress externo y marcador secreto ausente" },
+    { "command": "npm test", "result": "PASS", "detail": "audit-count" },
+    { "command": "node tests/run-all.mjs", "result": "FAIL", "detail": "39/40 suites; Responsive Matrix falló durante la pasada integral" },
+    { "command": "node tests/responsive-matrix.mjs", "result": "PASS", "detail": "4.198/4.198 en reproducción enfocada" },
+    { "command": "node tests/gate-e2e-docs-extras.mjs", "result": "PASS", "detail": "41/41; reprodujo verde el fallo efímero observado durante la primera pasada integral" }
+  ],
+  "blocker": "La regresión integral no quedó verde: Responsive Matrix falló una vez tras la estabilización PDF. La matriz enfocada posterior pasó completa, pero no sustituye una pasada integral verde.",
+  "privacyGate": {
+    "tools": 167,
+    "checksPassed": 343,
+    "externalEgress": 0,
+    "secretLeaked": false
+  }
+}

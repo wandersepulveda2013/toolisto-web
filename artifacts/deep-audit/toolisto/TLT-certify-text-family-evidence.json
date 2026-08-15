@@ -1,0 +1,250 @@
+{
+  "checks": [
+    {
+      "name": "Server started on http://127.0.0.1:<port>",
+      "pass": true
+    },
+    {
+      "name": "fixtures generados",
+      "pass": true
+    },
+    {
+      "name": "txtToPdf message: \"Converted 1 file(s) to PDF.\"",
+      "pass": true
+    },
+    {
+      "name": "txtToPdf output es PDF",
+      "pass": true
+    },
+    {
+      "name": "txtToPdf reabre con pdfjs y contiene el texto",
+      "pass": true
+    },
+    {
+      "name": "mergeTxt message: \"Merged 2 file(s).\"",
+      "pass": true
+    },
+    {
+      "name": "mergeTxt contiene el contenido del primer archivo",
+      "pass": true
+    },
+    {
+      "name": "mergeTxt contiene el contenido del segundo archivo",
+      "pass": true
+    },
+    {
+      "name": "splitTxt message: \"Split into 2 part(s).\"",
+      "pass": true
+    },
+    {
+      "name": "splitTxt genera un ZIP válido",
+      "pass": true
+    },
+    {
+      "name": "splitTxt genera ≥2 partes",
+      "pass": true
+    },
+    {
+      "name": "splitTxt conserva el contenido en las partes",
+      "pass": true
+    },
+    {
+      "name": "splitTxt respeta el límite de 100 líneas por parte",
+      "pass": true
+    },
+    {
+      "name": "sortLines message: \"Sorted 9 line(s) in asc order.\"",
+      "pass": true
+    },
+    {
+      "name": "sortLines ordena asc (case-insensitive default)",
+      "pass": true
+    },
+    {
+      "name": "removeDuplicates message: \"Removed 2 duplicate line(s). 7 unique line(s) remain.\"",
+      "pass": true
+    },
+    {
+      "name": "removeDuplicates conserva 6 únicas (case-sensitive por defecto)",
+      "pass": true
+    },
+    {
+      "name": "removeDuplicates distingue mayúsculas por defecto",
+      "pass": true
+    },
+    {
+      "name": "removeDuplicates conserva las líneas únicas",
+      "pass": true
+    },
+    {
+      "name": "textStatistics message: \"Estadísticas de texto calculadas.\"",
+      "pass": true
+    },
+    {
+      "name": "textStatistics reporta palabras y caracteres",
+      "pass": true
+    },
+    {
+      "name": "textStatistics cuenta las 8 palabras reales",
+      "pass": true
+    },
+    {
+      "name": "wordCount message: \"Conteo completado: 8 palabras.\"",
+      "pass": true
+    },
+    {
+      "name": "wordCount cuenta las 8 palabras reales",
+      "pass": true
+    },
+    {
+      "name": "textDiff message: \"Comparación completada: 2 añadidas, 8 eliminadas.\"",
+      "pass": true
+    },
+    {
+      "name": "textDiff reporta líneas añadidas/eliminadas",
+      "pass": true
+    },
+    {
+      "name": "textDiff produce un diff con marcadores",
+      "pass": true
+    },
+    {
+      "name": "textDiff incluye líneas comunes",
+      "pass": true
+    },
+    {
+      "name": "htmlToMarkdown message: \"HTML convertido a Markdown correctamente.\"",
+      "pass": true
+    },
+    {
+      "name": "htmlToMarkdown convierte el h1",
+      "pass": true
+    },
+    {
+      "name": "htmlToMarkdown conserva el texto",
+      "pass": true
+    },
+    {
+      "name": "htmlToText message: \"Texto extraído del HTML correctamente.\"",
+      "pass": true
+    },
+    {
+      "name": "htmlToText extrae el título",
+      "pass": true
+    },
+    {
+      "name": "htmlToText extrae el texto visible",
+      "pass": true
+    },
+    {
+      "name": "htmlToText elimina scripts",
+      "pass": true
+    },
+    {
+      "name": "cssMinifier message: \"CSS minificado correctamente.\"",
+      "pass": true
+    },
+    {
+      "name": "cssMinifier reduce el tamaño",
+      "pass": true
+    },
+    {
+      "name": "cssMinifier elimina comentarios",
+      "pass": true
+    },
+    {
+      "name": "cssMinifier conserva las reglas",
+      "pass": true
+    },
+    {
+      "name": "base64Encode message: \"Archivo codificado en Base64.\"",
+      "pass": true
+    },
+    {
+      "name": "base64Encode genera Base64 válido",
+      "pass": true
+    },
+    {
+      "name": "base64Encode es decodificable al original",
+      "pass": true
+    },
+    {
+      "name": "base64Decode message: \"Base64 decodificado correctamente.\"",
+      "pass": true
+    },
+    {
+      "name": "base64Decode devuelve el texto original",
+      "pass": true
+    },
+    {
+      "name": "urlEncode message: \"Contenido codificado para URL.\"",
+      "pass": true
+    },
+    {
+      "name": "urlEncode codifica espacios y @",
+      "pass": true
+    },
+    {
+      "name": "urlEncode es decodificable al original",
+      "pass": true
+    },
+    {
+      "name": "urlDecode message: \"Contenido decodificado correctamente.\"",
+      "pass": true
+    },
+    {
+      "name": "urlDecode devuelve el texto original",
+      "pass": true
+    },
+    {
+      "name": "sortLines desactiva run con archivo no TXT",
+      "pass": true
+    },
+    {
+      "name": "sortLines muestra validación en smartDescription: \"Selecciona uno o varios archivos TXT.\"",
+      "pass": true
+    },
+    {
+      "name": "htmlToMarkdown desactiva run con archivo no HTML",
+      "pass": true
+    },
+    {
+      "name": "textDiff exige exactamente dos archivos",
+      "pass": true
+    },
+    {
+      "name": "txtToPdf funciona con toda la red externa bloqueada",
+      "pass": true
+    },
+    {
+      "name": "cero requests a hosts externos durante el procesado",
+      "pass": true
+    },
+    {
+      "name": "Sin errores de consola en toda la suite",
+      "pass": true
+    }
+  ],
+  "failed": 0,
+  "failures": [],
+  "passed": 56,
+  "suite": "gate-e2e-text-tools",
+  "tools": [
+    "txtToPdf",
+    "mergeTxt",
+    "splitTxt",
+    "sortLines",
+    "removeDuplicates",
+    "textStatistics",
+    "wordCount",
+    "textDiff",
+    "htmlToMarkdown",
+    "htmlToText",
+    "cssMinifier",
+    "base64Encode",
+    "base64Decode",
+    "urlEncode",
+    "urlDecode"
+  ],
+  "total": 56
+}

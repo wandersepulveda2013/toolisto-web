@@ -1,0 +1,77 @@
+{
+  "timestamp": "2026-08-02T19:36:00.853Z",
+  "fixture": {
+    "path": "tests/fixtures/star-flow/scan-difficult.png"
+  },
+  "method": "Levenshtein edit distance (mismo metodo que phase3c-star-flow.spec.mjs)",
+  "expectedText": "Nombre Valor Estado\nVentas Q1 150 Completado\nVentas Q2 80 En progreso\nDevoluciones -30 Pendiente\nCostos fijos -200 Pagado\nGanancia neta 0 Calculado\n",
+  "clearOcr": {
+    "text": "Nombre Valor Estado\nVentas Q1 150 Completado\nVentas Q2 80 En progreso\nDevoluciones -30 Pendiente\nCostos fijos -200 Pagado\nGanancia neta 0 Calculado",
+    "confidence": 92,
+    "width": 420,
+    "height": 260,
+    "charCount": 148,
+    "pipeline": "raw",
+    "charAccuracy": {
+      "expected": 147,
+      "matched": 147,
+      "edits": 0,
+      "pct": 100
+    },
+    "wordAccuracy": {
+      "expected": 23,
+      "matched": 23,
+      "edits": 0,
+      "pct": 100
+    }
+  },
+  "difficultPipeline": {
+    "text": "SER ee\nVentas 01 150. - Completado\n\nVentas 02 LC En progreso\nDevoluciones E Pendiénte\n\nCostos jos 200 Pagado\n\nGanancia neta 9 Calculado |",
+    "confidence": 72,
+    "width": 420,
+    "height": 260,
+    "charCount": 138,
+    "pipeline": "raw",
+    "charAccuracy": {
+      "expected": 147,
+      "matched": 109,
+      "edits": 38,
+      "pct": 74
+    },
+    "wordAccuracy": {
+      "expected": 23,
+      "matched": 9,
+      "edits": 14,
+      "pct": 39
+    }
+  },
+  "difficultLegacyUpscale": {
+    "text": "Re ie |\n: Ventas 01 150. - Completado a\nVentas m0 ¡Enprogreso :\n:. Devoluciones —: 30 -—-—Pendime non ee\n“Ganancia neta” E ME",
+    "confidence": 44,
+    "width": 1292,
+    "height": 800,
+    "charCount": 126,
+    "pipeline": "upscale800",
+    "charAccuracy": {
+      "expected": 147,
+      "matched": 69,
+      "edits": 78,
+      "pct": 47
+    },
+    "wordAccuracy": {
+      "expected": 23,
+      "matched": 1,
+      "edits": 22,
+      "pct": 4
+    }
+  },
+  "summary": {
+    "clearCharPct": 100,
+    "clearWordPct": 100,
+    "difficultPipelineCharPct": 74,
+    "difficultPipelineWordPct": 39,
+    "difficultLegacyUpscaleCharPct": 47,
+    "difficultLegacyUpscaleWordPct": 4,
+    "note": "Medicion honesta sin umbral reducido. extractTextFromScan ya NO hace upscale (el upscale >=800px degradaba imagenes ruidosas y producia el artefacto 1-30 en el fixture limpio)."
+  }
+}

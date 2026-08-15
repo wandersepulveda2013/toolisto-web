@@ -1,0 +1,378 @@
+{
+  "checks": [
+    {
+      "name": "Server started on http://127.0.0.1:<port>",
+      "pass": true
+    },
+    {
+      "name": "fixture PNG válido",
+      "pass": true
+    },
+    {
+      "name": "fixture JPG válido",
+      "pass": true
+    },
+    {
+      "name": "fixture WebP válido",
+      "pass": true
+    },
+    {
+      "name": "fixture JPG grande para comprimir",
+      "pass": true
+    },
+    {
+      "name": "fixture PDF de 2 páginas",
+      "pass": true
+    },
+    {
+      "name": "JPG a PNG inicia con el botón deshabilitado",
+      "pass": true
+    },
+    {
+      "name": "JPG a PNG habilita el botón tras elegir JPG",
+      "pass": true
+    },
+    {
+      "name": "JPG a PNG message prometido en el diálogo",
+      "pass": true
+    },
+    {
+      "name": "JPG a PNG descarga un archivo",
+      "pass": true
+    },
+    {
+      "name": "JPG a PNG salida con extensión .png",
+      "pass": true
+    },
+    {
+      "name": "JPG a PNG magic bytes de PNG correctos",
+      "pass": true
+    },
+    {
+      "name": "JPG a PNG dimensiones preservadas 320×220",
+      "pass": true
+    },
+    {
+      "name": "PNG a JPG inicia con el botón deshabilitado",
+      "pass": true
+    },
+    {
+      "name": "PNG a JPG habilita el botón tras elegir PNG",
+      "pass": true
+    },
+    {
+      "name": "PNG a JPG message prometido en el diálogo",
+      "pass": true
+    },
+    {
+      "name": "PNG a JPG descarga un archivo",
+      "pass": true
+    },
+    {
+      "name": "PNG a JPG salida con extensión .jpg",
+      "pass": true
+    },
+    {
+      "name": "PNG a JPG magic bytes de JPG correctos",
+      "pass": true
+    },
+    {
+      "name": "JPG a WebP inicia con el botón deshabilitado",
+      "pass": true
+    },
+    {
+      "name": "JPG a WebP habilita el botón tras elegir JPG",
+      "pass": true
+    },
+    {
+      "name": "JPG a WebP message prometido en el diálogo",
+      "pass": true
+    },
+    {
+      "name": "JPG a WebP descarga un archivo",
+      "pass": true
+    },
+    {
+      "name": "JPG a WebP salida con extensión .webp",
+      "pass": true
+    },
+    {
+      "name": "JPG a WebP magic bytes de WEBP correctos",
+      "pass": true
+    },
+    {
+      "name": "WebP a JPG inicia con el botón deshabilitado",
+      "pass": true
+    },
+    {
+      "name": "WebP a JPG habilita el botón tras elegir WEBP",
+      "pass": true
+    },
+    {
+      "name": "WebP a JPG message prometido en el diálogo",
+      "pass": true
+    },
+    {
+      "name": "WebP a JPG descarga un archivo",
+      "pass": true
+    },
+    {
+      "name": "WebP a JPG salida con extensión .jpg",
+      "pass": true
+    },
+    {
+      "name": "WebP a JPG magic bytes de JPG correctos",
+      "pass": true
+    },
+    {
+      "name": "PNG a WebP inicia con el botón deshabilitado",
+      "pass": true
+    },
+    {
+      "name": "PNG a WebP habilita el botón tras elegir PNG",
+      "pass": true
+    },
+    {
+      "name": "PNG a WebP message prometido en el diálogo",
+      "pass": true
+    },
+    {
+      "name": "PNG a WebP descarga un archivo",
+      "pass": true
+    },
+    {
+      "name": "PNG a WebP salida con extensión .webp",
+      "pass": true
+    },
+    {
+      "name": "PNG a WebP magic bytes de WEBP correctos",
+      "pass": true
+    },
+    {
+      "name": "WebP a PNG inicia con el botón deshabilitado",
+      "pass": true
+    },
+    {
+      "name": "WebP a PNG habilita el botón tras elegir WEBP",
+      "pass": true
+    },
+    {
+      "name": "WebP a PNG message prometido en el diálogo",
+      "pass": true
+    },
+    {
+      "name": "WebP a PNG descarga un archivo",
+      "pass": true
+    },
+    {
+      "name": "WebP a PNG salida con extensión .png",
+      "pass": true
+    },
+    {
+      "name": "WebP a PNG magic bytes de PNG correctos",
+      "pass": true
+    },
+    {
+      "name": "WebP a PNG dimensiones preservadas 320×220",
+      "pass": true
+    },
+    {
+      "name": "JPG a PDF inicia con el botón deshabilitado",
+      "pass": true
+    },
+    {
+      "name": "JPG a PDF habilita el botón con una imagen",
+      "pass": true
+    },
+    {
+      "name": "JPG a PDF message con conteo de páginas",
+      "pass": true
+    },
+    {
+      "name": "JPG a PDF descarga un PDF válido (%PDF)",
+      "pass": true
+    },
+    {
+      "name": "JPG a PDF tiene 1 página",
+      "pass": true
+    },
+    {
+      "name": "PNG a PDF habilita el botón con dos imágenes",
+      "pass": true
+    },
+    {
+      "name": "PNG a PDF descarga un PDF válido",
+      "pass": true
+    },
+    {
+      "name": "PNG a PDF tiene 2 páginas (una por imagen)",
+      "pass": true
+    },
+    {
+      "name": "PDF a JPG inicia con el botón deshabilitado",
+      "pass": true
+    },
+    {
+      "name": "PDF a JPG habilita el botón con un PDF",
+      "pass": true
+    },
+    {
+      "name": "PDF a JPG message con 2 páginas exportadas",
+      "pass": true
+    },
+    {
+      "name": "PDF a JPG descarga ZIP de páginas",
+      "pass": true
+    },
+    {
+      "name": "PDF a JPG ZIP con nombre base-paginas",
+      "pass": true
+    },
+    {
+      "name": "PDF a JPG ZIP con 2 entradas",
+      "pass": true
+    },
+    {
+      "name": "PDF a JPG entradas con extensión .jpg",
+      "pass": true
+    },
+    {
+      "name": "PDF a PNG inicia con el botón deshabilitado",
+      "pass": true
+    },
+    {
+      "name": "PDF a PNG habilita el botón con un PDF",
+      "pass": true
+    },
+    {
+      "name": "PDF a PNG message con 2 páginas exportadas",
+      "pass": true
+    },
+    {
+      "name": "PDF a PNG descarga ZIP de páginas",
+      "pass": true
+    },
+    {
+      "name": "PDF a PNG ZIP con nombre base-paginas",
+      "pass": true
+    },
+    {
+      "name": "PDF a PNG ZIP con 2 entradas",
+      "pass": true
+    },
+    {
+      "name": "PDF a PNG entradas con extensión .png",
+      "pass": true
+    },
+    {
+      "name": "PDF a JPG negativo: dos PDFs mantiene el botón deshabilitado",
+      "pass": true
+    },
+    {
+      "name": "compress inicia con el botón deshabilitado",
+      "pass": true
+    },
+    {
+      "name": "compress habilita el botón con una imagen",
+      "pass": true
+    },
+    {
+      "name": "compress message prometido",
+      "pass": true
+    },
+    {
+      "name": "compress descarga JPEG válido",
+      "pass": true
+    },
+    {
+      "name": "compress reduce el peso respecto al original",
+      "pass": true
+    },
+    {
+      "name": "compress nombre con sufijo -optimizada",
+      "pass": true
+    },
+    {
+      "name": "compress negativo: un archivo no-imagen mantiene el botón deshabilitado",
+      "pass": true
+    },
+    {
+      "name": "convert inicia con el botón deshabilitado",
+      "pass": true
+    },
+    {
+      "name": "convert habilita el botón con una imagen",
+      "pass": true
+    },
+    {
+      "name": "convert (1 archivo) descarga JPG",
+      "pass": true
+    },
+    {
+      "name": "convert salida con extensión .jpg",
+      "pass": true
+    },
+    {
+      "name": "convert (2 archivos) descarga ZIP",
+      "pass": true
+    },
+    {
+      "name": "convert ZIP con 2 entradas",
+      "pass": true
+    },
+    {
+      "name": "batchCompress inicia con el botón deshabilitado",
+      "pass": true
+    },
+    {
+      "name": "batchCompress habilita el botón con dos imágenes",
+      "pass": true
+    },
+    {
+      "name": "batchCompress descarga ZIP",
+      "pass": true
+    },
+    {
+      "name": "batchCompress ZIP con nombre toolisto-imagenes-comprimidas",
+      "pass": true
+    },
+    {
+      "name": "batchCompress ZIP con 2 entradas",
+      "pass": true
+    },
+    {
+      "name": "cero requests a hosts externos durante el procesado",
+      "pass": true
+    },
+    {
+      "name": "Sin errores de consola no controlados",
+      "pass": true
+    }
+  ],
+  "consoleErrors": [],
+  "externalRequests": [],
+  "failed": 0,
+  "failureReasons": [],
+  "passed": 87,
+  "suite": "gate-e2e-image-converters",
+  "tools": [
+    "jpg-to-png",
+    "png-to-jpg",
+    "jpg-to-webp",
+    "webp-to-jpg",
+    "png-to-webp",
+    "webp-to-png",
+    "jpg-to-pdf",
+    "png-to-pdf",
+    "pdf-to-jpg",
+    "pdf-to-png",
+    "compress",
+    "convert",
+    "batchCompress"
+  ],
+  "total": 87,
+  "totals": {
+    "failed": 0,
+    "passed": 87
+  }
+}

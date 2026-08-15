@@ -1,0 +1,38 @@
+﻿{
+    "sha":  "9980596026a8c59ba2a5a4e0e1f2aa6fbfc15cb9",
+    "rama":  "feature/workspace-star-flow",
+    "fecha":  "2026-08-02T16:04:00",
+    "suites":  {
+                   "workspace_test":  {
+                                          "exitcode":  0,
+                                          "result":  "156/156"
+                                      },
+                   "phase3a":  {
+                                   "exitcode":  0,
+                                   "result":  "45/45"
+                               },
+                   "phase3b":  {
+                                   "exitcode":  0,
+                                   "result":  "59/59"
+                               },
+                   "phase11":  {
+                                   "exitcode":  0,
+                                   "result":  "106/106"
+                               },
+                   "ocr_source_selection":  {
+                                                "exitcode":  0,
+                                                "result":  "34/34"
+                                            },
+                   "star_flow_e2e":  {
+                                         "exitcode":  0,
+                                         "result":  "79/79",
+                                         "ocr_ms":  2054,
+                                         "chars":  "100%",
+                                         "words":  "100%"
+                                     }
+               },
+    "totales":  "156+45+59+106+34+79 = 479/479",
+    "e2e_evidencia":  "094EC7A58AF791040419DBAD321E742E8E650AE2483800C21E5E3E076625320D",
+    "toolisto_export":  "FEDFB7FA1CBBA50C444F86B949400A71C960DE63DACADBCEF071D4912702F556",
+    "notas":  "Ninguna suite modificada. Dist servido tal cual. No hubo reintentos ni umbrales relajados."
+}

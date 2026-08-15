@@ -1,0 +1,21 @@
+{
+  "suite": "pdf-ocr-architecture",
+  "updatedAt": "2026-08-11",
+  "task": "PR-014",
+  "result": "approved",
+  "checks": 6,
+  "passed": 6,
+  "failed": 0,
+  "architecture": {
+    "workspace": "workspace/core/ocr-engine.js sigue siendo el módulo ES canónico del Workspace.",
+    "publicSite": "js/ocr/pdf-ocr-engine.js es el adaptador clásico aislado para OCR de PDF en las 167 rutas públicas.",
+    "boundary": "El adaptador evita cargar el bundle del Workspace en el sitio público; extractTextFromScannedPdf delega ahora en PdfOcrEngine.ocrCanvas y no crea un worker paralelo."
+  },
+  "validation": [
+    "npm run build: PASS (179 páginas)",
+    "node tests/pdf-ocr-architecture.mjs: 6/6 PASS",
+    "node tests/gate-e2e-ocr-pdf-tools.mjs: 34/34 PASS, cero errores de consola",
+    "node tests/run-all.mjs: 39/40 suites PASS; único fallo preexistente Responsive Matrix (3 cargas PDF locales efímeras, PR-015)",
+    "npm test: PASS"
+  ]
+}

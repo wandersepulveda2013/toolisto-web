@@ -1,0 +1,75 @@
+{
+  "sha": "bfb66cd2df3dc3fb9cb0cb803e912b2216c5805f",
+  "fecha": "2026-08-15T00:07:11.815Z",
+  "build": {
+    "ok": true,
+    "exit": 0
+  },
+  "sync": {
+    "ok": true,
+    "exit": 0
+  },
+  "suites": [
+    {
+      "label": "workspace-test",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "phase3a-test",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "phase3b-test",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "phase11-audit",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "ocr-source-selection",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "phase3c-star-flow E2E (OCR real)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "csv-export-bom E2E (UTF-8 BOM)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "engine-idle-release (memoria Tesseract)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "workflow-export-md (Markdown/texto plano)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "workflow-ui (resultados al Workspace, CE-047/048/049)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "capture-flow-chain E2E (captura -> flujo -> OCR, CE-050)",
+      "ok": true,
+      "exit": 0
+    }
+  ],
+  "hashes": {
+    "workspace/workspace.js": "099dc9c7a9f141e3b820ffbbed7d7f580e56cd4bf98d9e577ebd2e6f5933d7ea",
+    "dist/workspace/workspace.js": "099dc9c7a9f141e3b820ffbbed7d7f580e56cd4bf98d9e577ebd2e6f5933d7ea"
+  },
+  "total": 11,
+  "fail": 0
+}

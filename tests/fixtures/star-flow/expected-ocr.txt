@@ -1,0 +1,6 @@
+Nombre Valor Estado
+Ventas Q1 150 Completado
+Ventas Q2 80 En progreso
+Devoluciones -30 Pendiente
+Costos fijos -200 Pagado
+Ganancia neta 0 Calculado
