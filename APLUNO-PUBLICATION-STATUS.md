@@ -1,22 +1,24 @@
 # APLUNO — Estado de publicación
 
-Estado REAL verificado por OpenCode el 2026-08-15 (cierre: HTTPS completo, PWA operativa, docs al día).
+Estado REAL verificado por OpenCode el 2026-08-15 (cierre de infraestructura: HTTPS, redirects, SEO con URLs limpias, protección de main).
 
 ```text
 Repositorio:                 wandersepulveda2013/toolisto-web
 Rama producción:             main
 Rama APLUNO:                 feature/apluno-ecosystem
-SHA publicado:               298f8ab421150f29d4b196ea0464df78663bc8c0
+SHA publicado:               267ab5d8803cd350ca4006b40309049453ad87d3
 Método de publicación:       GitHub REST API (Git Data API)
 Push/API:                    API (git push bloqueado por opencode.json; alternativa segura, sin force)
 Merge/PR:                    No (fast-forward de main vía API; historia preservada)
 Workflow:                    .github/workflows/deploy-pages.yml
-GitHub Actions Run:          31884301441
+GitHub Actions Run:          31887498035
 Build:                       PASS
 Tests:                       PASS
 Test APLUNO:                 PASS (45 pass, 0 fail)
 APLUNO Launcher:             PASS (34 checks, 0 fail)
-Public release gate:         PASS (npm run test:release, 10/10)
+Public release gate:         PASS (npm run test:release, 13/13)
+Suites completas:            PASS (node tests/run-all.mjs, 45/45 — incluye SEO audits y evidencia determinista)
+SEO Production Audit:        PASS (2569/2569 contra producción, 190 URLs indexables)
 Deployment:                  PASS (deploy-pages@v4)
 GitHub Pages:                HABILITADO, build_type=workflow, public=true
 URL GitHub Pages:            https://wandersepulveda2013.github.io/toolisto-web/ (redirige 301 a https://apluno.com/)
@@ -24,17 +26,50 @@ Custom domain:               apluno.com (configurado via API)
 DNS:                         OK — propagado (apex 4x A a GitHub Pages; www CNAME wandersepulveda2013.github.io)
 apluno.com (HTTP):           REDIRIGE 301 → https://apluno.com/
 www.apluno.com (HTTP):       REDIRIGE 301 → https://apluno.com/
-HTTPS:                       ACTIVO — certificado dedicado válido (CN/SAN apluno.com + www.apluno.com, Let's Encrypt, hasta 2026-11-13); sin aviso «No seguro»
+HTTPS:                       ACTIVO — certificado dedicado válido (CN/SAN apluno.com + www.apluno.com, Let's Encrypt); sin aviso «No seguro»
 Enforce HTTPS:               ACTIVADO (https_enforced=true)
 PWA:                         OPERATIVA — SW registrado en https://apluno.com/, offline verificado (11/11), allowlist de rutas públicas inyectada
 CNAME:                       apluno.com (en repositorio y en artifact desplegado)
-Fecha/hora de verificación:  2026-08-15 (HTTPS COMPLETE + cierre de docs)
+Ruleset de main:             main-protection-ff (id 20888427, ACTIVE) — no_fast_forward + deletion sobre refs/heads/main;
+                             SIN pull_request (compatible con el deploy fast-forward por Git Data API, verificado)
+SEO canónico:                URLs limpias sin .html (canonical, og:url, schema, enlaces internos y sitemap) — /unir-pdf, no /unir-pdf.html;
+                             las URLs .html siguen sirviendo (compatibilidad GitHub Pages)
+Redirects estáticos:         52 alias de redirects.json materializados como páginas noindex con canonical + meta refresh al destino
+Sitemap:                     190 URLs https://apluno.com/ limpias (0 .html)
+Fecha/hora de verificación:  2026-08-15 (cierre: URLs limpias + redirects + ruleset)
 Rutas verificadas:           200 en / (portada launcher), /toolisto, /ordia/, /workspace/, /about/, /contact/,
-                             /privacy/, /terms/, /unir-pdf y categorías; assets 200 (apluno-assets/apluno-tools-data.js
-                             167 tools, manifest, sitemap 190 URLs https, robots); canonical correcto
-Pendiente humano:            Google Search Console (verificar propiedad de dominio + sitemap) y Cloudflare
+                             /privacy/, /terms/, /unir-pdf (URL limpia) y /unir-pdf.html (compat); alias /merge-pdf.html →
+                             noindex → /unir-pdf; assets 200 (apluno-assets/apluno-tools-data.js 167 tools, manifest,
+                             sitemap, robots); canonical limpio verificado en vivo; navegador real 0 errores de consola
+Pendiente humano:            Google Search Console (verificar propiedad de dominio + sitemap para indexación) y Cloudflare
                              (CLOUDFLARE_API_TOKEN para proxy/headers CSP-HSTS; GitHub Pages ignora _headers)
 ```
+
+## Publicación del 2026-08-15 (267ab5d) — URLs limpias canónicas + redirects estáticos + ruleset de main
+
+Publicado vía Git Data API (fast-forward de `main` desde `2166567`; árbol local verificado SHA a
+SHA con `fix-tree.mjs`: 53 trees, 556 entradas, 13 blobs nuevos). Run 31887498035: build, tests,
+test:apluno (45/45), launcher (34/34), `npm run test:release` (13/13, incluye los 3 gates nuevos) y
+`node tests/run-all.mjs` (45/45) — TODO PASS; deployment `github-pages` creado para `267ab5d`.
+
+Cambios canónicos del sitio (fase 10 del cierre): la forma canónica de las URLs deja de llevar
+`.html` (GitHub Pages sirve ambas formas, por lo que la compatibilidad se mantiene):
+
+- `canonical`, `og:url`, schema JSON-LD y sitemap apuntan a URLs limpias (`https://apluno.com/unir-pdf`).
+- Enlaces internos (toolisto.html 167 cards, quick actions, sugerencias, footer, launcher data,
+  migas/relacionados/404) usan hrefs limpios; verificado en producción: `apluno-tools-data.js`
+  sin ningún href `.html` y todas las rutas del sitemap sin `.html`.
+- Fase 9 del cierre — redirects estáticos: los 52 alias de `redirects.json` (inglés → español)
+  ahora existen como páginas físicas en `dist/` con `noindex, nofollow` + canonical al destino +
+  `meta refresh` (sin JS). Antes devolvían 404; ahora `https://apluno.com/merge-pdf` (y `.html`)
+  responden 200 y apuntan a `/unir-pdf`. Verificado en vivo.
+- Protección de `main` (fase 19): ruleset `main-protection-ff` activo con `non_fast_forward` +
+  `deletion` sobre `refs/heads/main` (sin `pull_request`, para que el deploy fast-forward por Git
+  Data API siga funcionando — verificado empíricamente en esta misma publicación).
+- Validez en producción (2026-08-15, sin `-k`): `/unir-pdf` canonical limpio + schema WebApplication;
+  `/merge-pdf.html` noindex + refresh a `/unir-pdf`; sitemap 190 URLs, 0 `.html`; `http://apluno.com/unir-pdf`
+  → 301 → https limpio; portada launcher con buscador y navegación real (Playwright) a URL limpia,
+  sin errores de consola ni requests fallidos; auditoría SEO en vivo 2569/2569 PASS.
 
 ## HTTPS COMPLETE — 2026-08-15 (activación de Enforce HTTPS y verificación final)
 
