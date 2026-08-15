@@ -107,7 +107,7 @@ if (existsSync(distToolisto)) {
   // Check each enabled tool has a card (by href slug, ids may share toolId)
   let missingCards = 0;
   for (const tool of enabledTools) {
-    const hasCard = indexContent.includes(`href="./${tool.slug}.html"`);
+    const hasCard = indexContent.includes(`href="./${tool.slug}"`);
     if (!hasCard) {
       fail(`Tool habilitada "${tool.id}" no tiene tarjeta en la portada`);
       missingCards++;
@@ -120,7 +120,7 @@ if (existsSync(distToolisto)) {
   // Check disabled tools have NO card
   let strayCards = 0;
   for (const tool of disabledTools) {
-    if (indexContent.includes(`href="./${tool.slug}.html"`)) {
+    if (indexContent.includes(`href="./${tool.slug}"`)) {
       fail(`Tool en revisión "${tool.id}" aparece como tarjeta en la portada`);
       strayCards++;
     }

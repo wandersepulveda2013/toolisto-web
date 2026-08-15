@@ -42,7 +42,10 @@ function publicTarget(value, sourceFile) {
   const candidate = join(dist, webPath.replace(/^\/+/, ''));
   if (existsSync(candidate) && statSync(candidate).isDirectory()) return join(candidate, 'index.html');
   if (existsSync(candidate)) return candidate;
-  if (!webPath.includes('.')) return join(candidate, 'index.html');
+  if (!webPath.includes('.')) {
+    const htmlCandidate = candidate + '.html';
+    if (existsSync(htmlCandidate)) return htmlCandidate;
+  }
   return candidate;
 }
 

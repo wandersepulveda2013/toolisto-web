@@ -54,6 +54,17 @@ check(dataRaw.startsWith('window.APLUNO_TOOLS = {') && dataRaw.trimEnd().endsWit
 let launcherPayload = null;
 try { launcherPayload = JSON.parse(dataRaw.replace(/^window\.APLUNO_TOOLS = /, '').replace(/;?[\r\n]*$/, '')); } catch { launcherPayload = null; }
 check(launcherPayload && launcherPayload.tools.length === tools.filter((t) => t.enabled).length && launcherPayload.categories.length === 12, `la data del launcher refleja tools.json (${launcherPayload ? launcherPayload.tools.length : 0} tools, ${launcherPayload ? launcherPayload.categories.length : 0} categorías)`);
+check(launcherPayload.tools.every((t) => /^\/[a-z0-9-]+$/.test(t.href)), 'los enlaces del launcher usan URLs limpias (sin .html)');
+
+const redirects = JSON.parse(readFileSync(join(ROOT, 'src', 'data', 'redirects.json'), 'utf8'));
+const missingRedirectPages = redirects.filter((r) => {
+  const from = r.from.replace(/^\/+/, '').replace(/\/+$/, '');
+  return !from || from.includes('/') ? true : !existsSync(join(ROOT, 'dist', `${from}.html`));
+});
+check(missingRedirectPages.length === 0, 'los aliases de redirects.json se materializan como páginas estáticas (GitHub Pages no procesa _redirects)');
+if (missingRedirectPages.length) console.error(`    Faltan: ${missingRedirectPages.map((r) => r.from).join(', ')}`);
+const sampleRedirect = readFileSync(join(ROOT, 'dist', 'merge-pdf.html'), 'utf8');
+check(sampleRedirect.includes('rel="canonical"') && sampleRedirect.includes('href="https://apluno.com/unir-pdf"') && sampleRedirect.includes('noindex'), 'la página de redirect de /merge-pdf apunta al destino canónico sin indexarse');
 
 console.log(`\n=== Resultado: ${passed} PASS, ${failed} FAIL ===`);
 process.exit(failed ? 1 : 0);

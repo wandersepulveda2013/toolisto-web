@@ -31,14 +31,15 @@ function canonical(html) {
 function pageFor(url) {
   const pathname = new URL(url).pathname;
   if (pathname === '/toolisto' || pathname === '/toolisto/') return join(dist, 'toolisto.html');
-  return join(dist, pathname.replace(/^\/+/, ''));
+  const relative = pathname.replace(/^\/+/, '');
+  return join(dist, relative.endsWith('.html') ? relative : relative + '.html');
 }
 
 const expectedToolistoUrls = [
   `${site.siteUrl}/toolisto`,
-  ...['privacidad', 'condiciones', 'apoyar'].map(slug => `${site.siteUrl}/${slug}.html`),
-  ...categories.filter(category => category.enabled).map(category => `${site.siteUrl}/${category.slug}.html`),
-  ...tools.filter(tool => tool.enabled && tool.indexable && tool.enabledInSitemap).map(tool => `${site.siteUrl}/${tool.slug}.html`)
+  ...['privacidad', 'condiciones', 'apoyar'].map(slug => `${site.siteUrl}/${slug}`),
+  ...categories.filter(category => category.enabled).map(category => `${site.siteUrl}/${category.slug}`),
+  ...tools.filter(tool => tool.enabled && tool.indexable && tool.enabledInSitemap).map(tool => `${site.siteUrl}/${tool.slug}`)
 ];
 
 assert(existsSync(join(dist, 'sitemap.xml')), 'Falta dist/sitemap.xml');

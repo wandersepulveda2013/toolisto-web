@@ -141,7 +141,7 @@ function buildLauncherData() {
 
   const toolsData = enabledTools.map((tool) => ({
     slug: tool.slug,
-    href: `/${tool.slug}.html`,
+    href: `/${tool.slug}`,
     toolId: tool.toolId,
     category: tool.category,
     name: tool.name,
@@ -155,7 +155,7 @@ function buildLauncherData() {
     id: category.id,
     label: LAUNCHER_CATEGORY_LABELS[category.id] || category.name,
     primary: PRIMARY_CATEGORIES.includes(category.id),
-    href: `/${category.slug}.html`
+    href: `/${category.slug}`
   }));
 
   const payload = { tools: toolsData, categories: categoriesData, popular: POPULAR_SLUGS };
@@ -397,11 +397,11 @@ const sitemapUrls = [
   { path: '/contact/', priority: '0.3', changefreq: 'yearly' },
   { path: '/privacy/', priority: '0.2', changefreq: 'yearly' },
   { path: '/terms/', priority: '0.2', changefreq: 'yearly' },
-  { path: '/privacidad.html', priority: '0.2', changefreq: 'yearly' },
-  { path: '/condiciones.html', priority: '0.2', changefreq: 'yearly' },
-  { path: '/apoyar.html', priority: '0.3', changefreq: 'monthly' },
-  ...enabledCategories.map((category) => ({ path: `/${category.slug}.html`, priority: '0.7', changefreq: 'weekly' })),
-  ...indexableTools.map((tool) => ({ path: `/${tool.slug}.html`, priority: '0.7', changefreq: 'monthly', lastmod: tool.lastModified }))
+  { path: '/privacidad', priority: '0.2', changefreq: 'yearly' },
+  { path: '/condiciones', priority: '0.2', changefreq: 'yearly' },
+  { path: '/apoyar', priority: '0.3', changefreq: 'monthly' },
+  ...enabledCategories.map((category) => ({ path: `/${category.slug}`, priority: '0.7', changefreq: 'weekly' })),
+  ...indexableTools.map((tool) => ({ path: `/${tool.slug}`, priority: '0.7', changefreq: 'monthly', lastmod: tool.lastModified }))
 ];
 
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemapUrls.map((item) => `  <url>\n    <loc>${xmlEscape(absoluteUrl(item.path))}</loc>\n    <changefreq>${item.changefreq}</changefreq>\n    <priority>${item.priority}</priority>${item.lastmod ? `\n    <lastmod>${item.lastmod}</lastmod>` : ''}\n  </url>`).join('\n')}\n</urlset>\n`;
@@ -416,6 +416,36 @@ const redirectLines = [
   ...redirects.map((redirect) => `${redirect.from} ${redirect.to} ${redirect.code}`)
 ];
 writeFileSync(join(DIST, '_redirects'), `${redirectLines.join('\n')}\n`, 'utf8');
+
+// FASE 9: páginas estáticas de redirect (GitHub Pages ignora _redirects; los aliases deben responder
+// con una página indexable-solo-vía-canonical que reenvía al destino canónico sin crear cadenas).
+function buildRedirectPage(from, to) {
+  const url = absoluteUrl(to);
+  const safe = escapeHtml(url);
+  return `<!doctype html>
+<html lang="es-419">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Redirección a ${to}</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="canonical" href="${safe}">
+  <meta http-equiv="refresh" content="0; url=${safe}">
+</head>
+<body>
+  <p>Esta página se ha movido. <a href="${safe}">Ir a ${to}</a></p>
+</body>
+</html>`;
+}
+
+let redirectPages = 0;
+for (const redirect of redirects) {
+  const from = redirect.from.replace(/^\/+/, '').replace(/\/+$/, '');
+  if (!from || from.includes('/') || redirect.to.startsWith('/') !== true) continue;
+  writeFileSync(join(DIST, `${from}.html`), buildRedirectPage(redirect.from, redirect.to), 'utf8');
+  redirectPages++;
+}
+console.log(`  ✓ ${redirectPages} páginas estáticas de redirect (aliases desde redirects.json)`);
 
 const headersSource = join(ROOT, '_headers');
 if (existsSync(headersSource)) cpSync(headersSource, join(DIST, '_headers'));

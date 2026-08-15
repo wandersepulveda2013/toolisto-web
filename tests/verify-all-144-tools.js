@@ -50,7 +50,7 @@ function partial_(label) { partial++; }
     const report = { id: tool.id, toolId: tool.toolId, slug: tool.slug, checks: {} };
 
     // 2a. Card exists on homepage (invertido para herramientas en revisión)
-    report.checks.card = tool.enabled ? cardHrefs.includes(`./${tool.slug}.html`) : !cardHrefs.includes(`./${tool.slug}.html`);
+    report.checks.card = tool.enabled ? cardHrefs.includes(`./${tool.slug}`) : !cardHrefs.includes(`./${tool.slug}`);
 
     // 2b. Page exists
     const pagePath = join(DIST, `${tool.slug}.html`);
@@ -76,7 +76,7 @@ function partial_(label) { partial++; }
     if (report.checks.pageExists) {
       const consoleErrorsBefore = consoleErrors.length;
       try {
-        await page.goto(`${BASE}/${tool.slug}.html`, { waitUntil: 'domcontentloaded', timeout: 10000 });
+        await page.goto(`${BASE}/${tool.slug}`, { waitUntil: 'domcontentloaded', timeout: 10000 });
         await page.waitForTimeout(500);
         report.checks.pageLoads = true;
         report.checks.newConsoleErrors = consoleErrors.length - consoleErrorsBefore;

@@ -30,7 +30,7 @@ if (cardCount !== enabledTools.length) {
 // Check each enabled tool has a card (by href slug; ids compartidas comparten toolId)
 let missingCards = 0;
 for (const tool of enabledTools) {
-  if (!html.includes(`href="./${tool.slug}.html"`)) {
+  if (!html.includes(`href="./${tool.slug}"`)) {
     fail(`${tool.id}: sin tarjeta`);
     missingCards++;
   }
@@ -40,7 +40,7 @@ if (missingCards === 0) pass(`Todas las ${enabledTools.length} herramientas habi
 // Check disabled tools have no card
 let strayCards = 0;
 for (const tool of disabledTools) {
-  if (html.includes(`href="./${tool.slug}.html"`)) {
+  if (html.includes(`href="./${tool.slug}"`)) {
     fail(`${tool.id}: aparece como tarjeta en el catálogo (en revisión)`);
     strayCards++;
   }

@@ -169,7 +169,7 @@ const appJsTag = (rel) => `<script src="${rel}app.js?v=${ASSET_VERSION}"></scrip
 
 const headerNav = `<header class="site-header"><div class="header-inner"><a class="brand" href="${escAttr(catalogHref)}" aria-label="Ir al catálogo de ${escAttr(productName)}"><img class="brand-mark-img" src="./assets/toolisto-mark.svg" alt="" width="36" height="36" /><span class="brand-text">${escHtml(productShortName)}</span></a><a class="apluno-parent-link" href="${escAttr(brandHref)}" aria-label="Ir al inicio de ${escAttr(brandName)}">by ${escHtml(brandName)}</a><nav class="desktop-nav" aria-label="Categorías de herramientas"><a href="${escAttr(catalogHref)}" data-nav-filter="images">Imágenes</a><a href="${escAttr(catalogHref)}" data-nav-filter="pdf">PDF</a><a href="${escAttr(catalogHref)}" data-nav-filter="signatures">Firmas</a><a href="${escAttr(catalogHref)}" data-nav-filter="documents">Documentos</a><a href="${escAttr(catalogHref)}" data-nav-filter="spreadsheets">Hojas de cálculo</a><a href="${escAttr(catalogHref)}" data-nav-filter="all">Todas</a></nav><div class="header-actions"><a class="header-action-btn" href="${escAttr(catalogHref)}" aria-label="Buscar herramientas"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg></a><button class="header-action-btn" id="themeToggle" type="button" aria-label="Cambiar tema"><svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg><svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button><button class="menu-button" id="menuToggle" type="button" aria-expanded="false" aria-controls="mobileNav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button></div></div></header><nav class="mobile-nav" id="mobileNav" hidden><a href="${escAttr(catalogHref)}" data-nav-filter="images">Imágenes</a><a href="${escAttr(catalogHref)}" data-nav-filter="pdf">PDF</a><a href="${escAttr(catalogHref)}" data-nav-filter="signatures">Firmas</a><a href="${escAttr(catalogHref)}" data-nav-filter="all">Todas las herramientas</a><a href="${escAttr(brandHref)}">${escHtml(brandName)}</a></nav>`;
 
-const footerHTML = `<footer class="site-footer"><div class="footer-inner"><div class="footer-top"><div class="footer-brand-col"><a class="brand" href="${escAttr(catalogHref)}" aria-label="Ir al catálogo de ${escAttr(productName)}"><img class="brand-mark-img" src="./assets/toolisto-mark.svg" alt="" width="28" height="28" /><span class="brand-text">${escHtml(productShortName)}</span></a><p>Herramientas de archivos directas, rápidas y privadas. Todo se procesa en tu navegador.</p><p>Un producto de <a href="${escAttr(brandHref)}">${escHtml(brandName)}</a>.</p></div><div class="footer-col"><h4>Herramientas</h4><nav aria-label="Categorías"><a href="${escAttr(catalogHref)}">Ver todas</a><a href="${escAttr(catalogHref)}" data-nav-filter="images">Imágenes</a><a href="${escAttr(catalogHref)}" data-nav-filter="pdf">PDF</a><a href="${escAttr(catalogHref)}" data-nav-filter="documents">Documentos</a></nav></div><div class="footer-col"><h4>Productos</h4><nav aria-label="Productos de ${escAttr(brandName)}"><a href="${escAttr(brandHref)}">${escHtml(brandName)}</a><a href="/workspace">Workspace</a><a href="/ordia">Ordía</a></nav></div><div class="footer-col"><h4>Legal</h4><nav aria-label="Legal"><a href="./privacidad.html">Política de privacidad</a><a href="./condiciones.html">Condiciones de uso</a><a href="./apoyar.html">Apoyar</a></nav></div><div class="footer-col"><h4>Contacto</h4><nav aria-label="Contacto"><a href="mailto:toolistoweb@gmail.com">toolistoweb@gmail.com</a></nav></div></div><div class="footer-bottom"><small>© 2026 ${escHtml(productShortName)} · Un producto de ${escHtml(brandName)}.</small><div class="footer-bottom-links"><a href="${escAttr(brandHref)}">${escHtml(brandName)}</a><a href="./privacidad.html">Privacidad</a><a href="./condiciones.html">Condiciones</a></div></div></div></footer>`;
+const footerHTML = `<footer class="site-footer"><div class="footer-inner"><div class="footer-top"><div class="footer-brand-col"><a class="brand" href="${escAttr(catalogHref)}" aria-label="Ir al catálogo de ${escAttr(productName)}"><img class="brand-mark-img" src="./assets/toolisto-mark.svg" alt="" width="28" height="28" /><span class="brand-text">${escHtml(productShortName)}</span></a><p>Herramientas de archivos directas, rápidas y privadas. Todo se procesa en tu navegador.</p><p>Un producto de <a href="${escAttr(brandHref)}">${escHtml(brandName)}</a>.</p></div><div class="footer-col"><h4>Herramientas</h4><nav aria-label="Categorías"><a href="${escAttr(catalogHref)}">Ver todas</a><a href="${escAttr(catalogHref)}" data-nav-filter="images">Imágenes</a><a href="${escAttr(catalogHref)}" data-nav-filter="pdf">PDF</a><a href="${escAttr(catalogHref)}" data-nav-filter="documents">Documentos</a></nav></div><div class="footer-col"><h4>Productos</h4><nav aria-label="Productos de ${escAttr(brandName)}"><a href="${escAttr(brandHref)}">${escHtml(brandName)}</a><a href="/workspace">Workspace</a><a href="/ordia">Ordía</a></nav></div><div class="footer-col"><h4>Legal</h4><nav aria-label="Legal"><a href="./privacidad">Política de privacidad</a><a href="./condiciones">Condiciones de uso</a><a href="./apoyar">Apoyar</a></nav></div><div class="footer-col"><h4>Contacto</h4><nav aria-label="Contacto"><a href="mailto:toolistoweb@gmail.com">toolistoweb@gmail.com</a></nav></div></div><div class="footer-bottom"><small>© 2026 ${escHtml(productShortName)} · Un producto de ${escHtml(brandName)}.</small><div class="footer-bottom-links"><a href="${escAttr(brandHref)}">${escHtml(brandName)}</a><a href="./privacidad">Privacidad</a><a href="./condiciones">Condiciones</a></div></div></div></footer>`;
 
 function buildAccessibleHeaderNav() {
   return headerNav
@@ -183,7 +183,7 @@ function buildRelatedToolGrid(tool) {
   const links = slugs.map(slug => {
     const found = tools.find(t => t.slug === slug);
     if (!found || !found.enabled) return '';
-    return `<a class="tool-card" data-tool="${escAttr(found.toolId)}" data-category="${escAttr(found.category)}" href="./${slug}.html"><span class="tool-icon">${escHtml(found.icon)}</span><span class="tool-body"><strong>${escHtml(found.name)}</strong></span><span class="tool-arrow" aria-hidden="true">→</span></a>`;
+    return `<a class="tool-card" data-tool="${escAttr(found.toolId)}" data-category="${escAttr(found.category)}" href="./${slug}"><span class="tool-icon">${escHtml(found.icon)}</span><span class="tool-body"><strong>${escHtml(found.name)}</strong></span><span class="tool-arrow" aria-hidden="true">→</span></a>`;
   }).filter(Boolean).join('\n');
   if (!links) return '';
   return `<section class="related-tools"><h2>Herramientas relacionadas</h2><div class="tool-grid">${links}</div><p><a href="${escAttr(catalogHref)}">Ver todas las herramientas →</a></p></section>`;
@@ -280,10 +280,10 @@ function buildToolPage(tool) {
   const breadcrumbs = [
     { label: brandName, href: brandHref },
     { label: productName, href: catalogHref },
-    { label: tool.name, href: `./${tool.slug}.html` }
+    { label: tool.name, href: `./${tool.slug}` }
   ];
   const catDef = categories.find(c => c.toolIds.includes(tool.toolId));
-  if (catDef) breadcrumbs.splice(2, 0, { label: catDef.name, href: `./${catDef.slug}.html` });
+  if (catDef) breadcrumbs.splice(2, 0, { label: catDef.name, href: `./${catDef.slug}` });
 
   const toolPageConfig = `<script type="application/json" id="tool-page-config">${JSON.stringify(config)}</script>`;
 
@@ -294,13 +294,13 @@ function buildToolPage(tool) {
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>${escHtml(tool.title)}</title>
   <meta name="description" content="${escAttr(tool.description)}">
-  <link rel="canonical" href="${site.siteUrl}/${tool.slug}.html">
+  <link rel="canonical" href="${site.siteUrl}/${tool.slug}">
   <meta name="robots" content="${disabled ? 'noindex, nofollow' : 'index, follow'}">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="${escAttr(brandName)}">
   <meta property="og:title" content="${escAttr(tool.title)}">
   <meta property="og:description" content="${escAttr(tool.description)}">
-  <meta property="og:url" content="${site.siteUrl}/${tool.slug}.html">
+  <meta property="og:url" content="${site.siteUrl}/${tool.slug}">
   <meta property="og:image" content="${site.siteUrl}${tool.ogImage || site.defaultOgImage}">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="${escAttr(tool.title)}">
@@ -316,7 +316,7 @@ function buildToolPage(tool) {
     "@context": "https://schema.org",
     "@type": "WebApplication",
     "name": tool.name,
-    "url": `${site.siteUrl}/${tool.slug}.html`,
+    "url": `${site.siteUrl}/${tool.slug}`,
     "description": tool.description,
     "applicationCategory": "MultimediaApplication",
     "operatingSystem": "Web Browser",
@@ -425,13 +425,13 @@ function buildCategoryPage(cat) {
   const catTools = cat.slugs.map(slug => tools.find(t => t.slug === slug)).filter(t => t && t.enabled);
 
   const toolListHTML = catTools.map(t => {
-    return `<li class="category-tool-item"><a href="./${t.slug}.html"><strong>${escHtml(t.name)}</strong></a><p>${escHtml(t.summary)}</p></li>`;
+    return `<li class="category-tool-item"><a href="./${t.slug}"><strong>${escHtml(t.name)}</strong></a><p>${escHtml(t.summary)}</p></li>`;
   }).join('\n');
 
   const breadcrumbs = [
     { label: brandName, href: brandHref },
     { label: productName, href: catalogHref },
-    { label: cat.name, href: `./${cat.slug}.html` }
+    { label: cat.name, href: `./${cat.slug}` }
   ];
 
   return `<!doctype html>
@@ -441,13 +441,13 @@ function buildCategoryPage(cat) {
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>${escHtml(cat.name)} - Herramientas online | Toolisto</title>
   <meta name="description" content="${escAttr(cat.description)}">
-  <link rel="canonical" href="${site.siteUrl}/${cat.slug}.html">
+  <link rel="canonical" href="${site.siteUrl}/${cat.slug}">
   <meta name="robots" content="index, follow">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="${escAttr(brandName)}">
   <meta property="og:title" content="${escAttr(cat.name)} - Herramientas online | Toolisto">
   <meta property="og:description" content="${escAttr(cat.description)}">
-  <meta property="og:url" content="${site.siteUrl}/${cat.slug}.html">
+  <meta property="og:url" content="${site.siteUrl}/${cat.slug}">
   <meta property="og:image" content="${site.siteUrl}${site.defaultOgImage}">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="${escAttr(cat.name)} - Herramientas online | Toolisto">
@@ -491,11 +491,11 @@ function build404Page() {
   const popularTools = ['comprimir-imagen', 'unir-pdf', 'convertir-imagen', 'dividir-pdf', 'comprimir-imagenes'];
   const links = popularTools.map(slug => {
     const t = tools.find(x => x.slug === slug && x.enabled);
-    return t ? `<li><a href="./${t.slug}.html">${escHtml(t.name)}</a></li>` : '';
+    return t ? `<li><a href="./${t.slug}">${escHtml(t.name)}</a></li>` : '';
   }).filter(Boolean).join('\n');
 
   const catLinks = categories.filter(c => c.enabled).map(c =>
-    `<li><a href="./${c.slug}.html">${escHtml(c.name)}</a></li>`
+    `<li><a href="./${c.slug}">${escHtml(c.name)}</a></li>`
   ).join('\n');
 
   return `<!doctype html>
@@ -554,7 +554,7 @@ function buildLegalPage(slug, title, description, sections) {
   const breadcrumbs = [
     { label: brandName, href: brandHref },
     { label: productName, href: catalogHref },
-    { label: title, href: `./${slug}.html` }
+    { label: title, href: `./${slug}` }
   ];
 
   return `<!doctype html>
@@ -564,13 +564,13 @@ function buildLegalPage(slug, title, description, sections) {
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>${escHtml(title)} | Toolisto</title>
   <meta name="description" content="${escAttr(description)}">
-  <link rel="canonical" href="${site.siteUrl}/${slug}.html">
+  <link rel="canonical" href="${site.siteUrl}/${slug}">
   <meta name="robots" content="index, follow">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="${escAttr(brandName)}">
   <meta property="og:title" content="${escAttr(title)} | Toolisto">
   <meta property="og:description" content="${escAttr(description)}">
-  <meta property="og:url" content="${site.siteUrl}/${slug}.html">
+  <meta property="og:url" content="${site.siteUrl}/${slug}">
   <meta property="og:image" content="${site.siteUrl}${site.defaultOgImage}">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="${escAttr(title)} | Toolisto">
@@ -615,7 +615,7 @@ function buildApoyarPage() {
   const breadcrumbs = [
     { label: brandName, href: brandHref },
     { label: productName, href: catalogHref },
-    { label: 'Apoyar', href: './apoyar.html' }
+    { label: 'Apoyar', href: './apoyar' }
   ];
 
   return `<!doctype html>
@@ -625,13 +625,13 @@ function buildApoyarPage() {
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Apoyar Toolisto | Donaciones</title>
   <meta name="description" content="Apoya a Toolisto con una donación para seguir mejorando las herramientas.">
-  <link rel="canonical" href="${site.siteUrl}/apoyar.html">
+  <link rel="canonical" href="${site.siteUrl}/apoyar">
   <meta name="robots" content="index, follow">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="${escAttr(brandName)}">
   <meta property="og:title" content="Apoyar Toolisto | Donaciones">
   <meta property="og:description" content="Apoya a Toolisto con una donación para seguir mejorando las herramientas.">
-  <meta property="og:url" content="${site.siteUrl}/apoyar.html">
+  <meta property="og:url" content="${site.siteUrl}/apoyar">
   <meta property="og:image" content="${site.siteUrl}${site.defaultOgImage}">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Apoyar Toolisto | Donaciones">
@@ -682,15 +682,15 @@ function buildSitemap() {
   const urls = [
     { loc: `${site.siteUrl}/`, changefreq: 'weekly', priority: '1.0' },
     { loc: catalogUrl, changefreq: 'weekly', priority: '0.9' },
-    { loc: `${site.siteUrl}/privacidad.html`, changefreq: 'monthly', priority: '0.3' },
-    { loc: `${site.siteUrl}/condiciones.html`, changefreq: 'monthly', priority: '0.3' },
-    { loc: `${site.siteUrl}/apoyar.html`, changefreq: 'monthly', priority: '0.4' }
+    { loc: `${site.siteUrl}/privacidad`, changefreq: 'monthly', priority: '0.3' },
+    { loc: `${site.siteUrl}/condiciones`, changefreq: 'monthly', priority: '0.3' },
+    { loc: `${site.siteUrl}/apoyar`, changefreq: 'monthly', priority: '0.4' }
   ];
   categories.filter(c => c.enabled).forEach(c => {
-    urls.push({ loc: `${site.siteUrl}/${c.slug}.html`, changefreq: 'weekly', priority: '0.8' });
+    urls.push({ loc: `${site.siteUrl}/${c.slug}`, changefreq: 'weekly', priority: '0.8' });
   });
   tools.filter(t => t.enabled && t.indexable && t.enabledInSitemap).forEach(t => {
-    urls.push({ loc: `${site.siteUrl}/${t.slug}.html`, changefreq: 'monthly', priority: '0.7', lastmod: t.lastModified });
+    urls.push({ loc: `${site.siteUrl}/${t.slug}`, changefreq: 'monthly', priority: '0.7', lastmod: t.lastModified });
   });
   const items = urls.map(u => {
     let xml = `  <url>\n    <loc>${u.loc}</loc>\n    <changefreq>${u.changefreq}</changefreq>\n    <priority>${u.priority}</priority>`;

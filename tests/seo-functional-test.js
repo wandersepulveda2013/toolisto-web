@@ -109,7 +109,7 @@ if (existsSync(sitemapPath)) {
 
   let missingSlugs = 0;
   for (const tool of enabledTools) {
-    if (!new RegExp(`<loc>[^<]*\\/${tool.slug}\\.html<\\/loc>`).test(sitemap)) {
+    if (!new RegExp(`<loc>[^<]*\\/${tool.slug}<\\/loc>`).test(sitemap)) {
       fail(`${tool.toolId}: slug no en sitemap`);
       missingSlugs++;
     }
@@ -118,7 +118,7 @@ if (existsSync(sitemapPath)) {
 
   let straySlugs = 0;
   for (const tool of disabledTools) {
-    if (new RegExp(`<loc>[^<]*\\/${tool.slug}\\.html<\\/loc>`).test(sitemap)) {
+    if (new RegExp(`<loc>[^<]*\\/${tool.slug}<\\/loc>`).test(sitemap)) {
       fail(`${tool.toolId}: herramienta en revisión presente en sitemap`);
       straySlugs++;
     }

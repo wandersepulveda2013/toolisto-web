@@ -70,7 +70,7 @@ const knownSiteUrls = new Set([
   `${site.siteUrl}/contact/`,
   `${site.siteUrl}/privacy/`,
   `${site.siteUrl}/terms/`,
-  ...['privacidad', 'condiciones', 'apoyar'].map((slug) => `${site.siteUrl}/${slug}.html`),
+  ...['privacidad', 'condiciones', 'apoyar'].map((slug) => `${site.siteUrl}/${slug}`),
 ]);
 
 const htmlFiles = readdirSync(DIST).filter(f => f.endsWith('.html') && f !== '404.html');
@@ -111,7 +111,7 @@ toolPages.forEach(file => {
   const canonical = extractCanonical(html);
   if (!canonical) error(`${slug}: missing canonical`);
   else if (!canonical.includes(site.siteUrl)) error(`${slug}: canonical does not contain siteUrl: ${canonical}`);
-  else if (canonical !== site.siteUrl + '/' + slug + '.html') error(`${slug}: canonical does not match deployed URL: ${canonical}`);
+  else if (canonical !== site.siteUrl + '/' + slug) error(`${slug}: canonical does not match deployed URL: ${canonical}`);
   else pass(`canonical: ${canonical}`);
 
   const ogTitle = extractMeta(html, 'og:title');
@@ -122,7 +122,7 @@ toolPages.forEach(file => {
 
   const ogUrl = extractMeta(html, 'og:url');
   if (!ogUrl) error(`${slug}: missing og:url`);
-  else if (ogUrl !== site.siteUrl + '/' + slug + '.html') error(`${slug}: og:url mismatch: ${ogUrl}`);
+  else if (ogUrl !== site.siteUrl + '/' + slug) error(`${slug}: og:url mismatch: ${ogUrl}`);
   else pass(`og:url correct`);
 
   if (!hasBreadcrumbs(html)) error(`${slug}: missing breadcrumbs`); else pass(`breadcrumbs present`);
@@ -131,7 +131,7 @@ toolPages.forEach(file => {
 
   if (!html.includes('dropZone')) error(`${slug}: missing drop zone`); else pass(`drop zone present`);
 
-  const inSitemap = sitemap.includes(site.siteUrl + '/' + slug + '.html');
+  const inSitemap = sitemap.includes(site.siteUrl + '/' + slug);
   if (tool.enabled && !inSitemap && tool.enabledInSitemap) error(`${slug}: not in sitemap.xml`);
   else if (tool.enabled && inSitemap) pass(`in sitemap.xml`);
   else if (!tool.enabled && inSitemap) error(`${slug}: disabled tool present in sitemap`);
@@ -160,21 +160,21 @@ catPages.forEach(file => {
 
   const canonical = extractCanonical(html);
   if (!canonical) error(`${slug}: missing canonical`);
-  else if (canonical !== site.siteUrl + '/' + slug + '.html') error(`${slug}: canonical does not match deployed URL: ${canonical}`);
+  else if (canonical !== site.siteUrl + '/' + slug) error(`${slug}: canonical does not match deployed URL: ${canonical}`);
   else pass(`canonical: ${canonical}`);
 
   const ogUrl = extractMeta(html, 'og:url');
   if (!ogUrl) error(`${slug}: missing og:url`);
-  else if (ogUrl !== site.siteUrl + '/' + slug + '.html') error(`${slug}: og:url mismatch: ${ogUrl}`);
+  else if (ogUrl !== site.siteUrl + '/' + slug) error(`${slug}: og:url mismatch: ${ogUrl}`);
   else pass(`og:url correct`);
 
   if (!hasBreadcrumbs(html)) error(`${slug}: missing breadcrumbs`); else pass(`breadcrumbs present`);
 
-  const toolLinks = (html.match(/href="\.\/[^"]*\.html"/g) || []).length;
+  const toolLinks = (html.match(/href="\.\/[a-z0-9-]+"/g) || []).length;
   if (toolLinks < 3) warn(`${slug}: only ${toolLinks} tool links (aim for 3+)`);
   else pass(`${toolLinks} tool links`);
 
-  const inSitemap = sitemap.includes(site.siteUrl + '/' + slug + '.html');
+  const inSitemap = sitemap.includes(site.siteUrl + '/' + slug);
   if (inSitemap) pass(`in sitemap.xml`); else warn(`${slug}: not in sitemap.xml`);
 
   indexablePages.push(slug);
@@ -230,16 +230,16 @@ if (dupCanonicals.length) error(`Duplicate canonicals: ${dupCanonicals.join(', '
 else pass('No duplicate canonicals');
 
 const sitemapUrls = [...sitemap.matchAll(/<loc>([^<]*)<\/loc>/g)].map(m => m[1]);
-const missingFromSitemap = indexablePages.filter(s => !sitemapUrls.includes(site.siteUrl + '/' + s + '.html'));
+const missingFromSitemap = indexablePages.filter(s => !sitemapUrls.includes(site.siteUrl + '/' + s));
 if (missingFromSitemap.length) error(`Missing from sitemap: ${missingFromSitemap.join(', ')}`);
 else pass('All indexable pages in sitemap');
 
-const extraInSitemap = sitemapUrls.filter(u => !allSlugs.some(s => u === site.siteUrl + '/' + s + '.html') && !knownSiteUrls.has(u));
+const extraInSitemap = sitemapUrls.filter(u => !allSlugs.some(s => u === site.siteUrl + '/' + s) && !knownSiteUrls.has(u));
 if (extraInSitemap.length) warn(`In sitemap but no page: ${extraInSitemap.join(', ')}`);
 
 const orphanPages = allSlugs.filter(s => {
   const html = readFileSync(join(DIST, s + '.html'), 'utf-8');
-  return !sitemapUrls.includes(site.siteUrl + '/' + s + '.html') && !html.includes('noindex');
+  return !sitemapUrls.includes(site.siteUrl + '/' + s) && !html.includes('noindex');
 });
 if (orphanPages.length) warn(`Possible orphan pages (not in sitemap): ${orphanPages.join(', ')}`);
 

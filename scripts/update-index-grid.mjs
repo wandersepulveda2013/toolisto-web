@@ -9,7 +9,7 @@ const toolCardsHTML = enabledTools.map(t => {
   const inputFormats = (t.inputFormats || []).join(' ');
   const outputFormats = (t.outputFormats || []).join(' ');
   const keywords = (t.keywords || []).join(' ');
-  return `        <a class="tool-card" data-tool="${t.toolId}" data-category="${cat}" data-input-formats="${inputFormats}" data-output-formats="${outputFormats}" data-keywords="${keywords}" href="./${t.slug}.html">
+  return `        <a class="tool-card" data-tool="${t.toolId}" data-category="${cat}" data-input-formats="${inputFormats}" data-output-formats="${outputFormats}" data-keywords="${keywords}" href="./${t.slug}">
           <span class="tool-icon">${t.icon}</span>
           <span class="tool-body"><strong>${t.name}</strong><small>${t.summary}</small></span>
           <span class="tool-arrow" aria-hidden="true">→</span>

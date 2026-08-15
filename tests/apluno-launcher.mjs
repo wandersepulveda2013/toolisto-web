@@ -23,8 +23,14 @@ function startServer() {
     const relative = pathname === '/' ? 'index.html'
       : pathname === '/toolisto' || pathname === '/toolisto/' ? 'toolisto.html'
       : pathname.replace(/^\/+/, '');
-    const candidate = normalize(join(dist, relative));
-    if (!candidate.startsWith(dist) || !existsSync(candidate)) { response.writeHead(404); response.end('Not found'); return; }
+    let candidate = normalize(join(dist, relative));
+    if (!candidate.startsWith(dist) || !existsSync(candidate)) {
+      if (candidate.startsWith(dist) && !extname(relative) && existsSync(candidate + '.html')) {
+        candidate += '.html';
+      } else {
+        response.writeHead(404); response.end('Not found'); return;
+      }
+    }
     const file = statSync(candidate).isDirectory() ? join(candidate, 'index.html') : candidate;
     response.writeHead(200, { 'Content-Type': mime[extname(file)] || 'application/octet-stream', 'Cache-Control': 'no-cache' });
     response.end(readFileSync(file));
@@ -54,7 +60,10 @@ if (existsSync(dataFile)) {
   const missingLabels = enabledCategories.filter((c) => !labelByCat[c.id]);
   check(missingLabels.length === 0, 'Todas las categorías habilitadas tienen etiqueta en el launcher');
   const hrefs = payload.tools.map((t) => t.href);
-  const missingPages = hrefs.filter((href) => !existsSync(join(dist, href.replace(/^\//, ''))));
+  const missingPages = hrefs.filter((href) => {
+    const rel = href.replace(/^\//, '');
+    return !existsSync(join(dist, rel)) && !existsSync(join(dist, rel + '.html'));
+  });
   check(missingPages.length === 0, `Cada herramienta del launcher apunta a una página existente${missingPages.length ? `: ${missingPages.slice(0, 3).join(', ')}` : ''}`);
   const badSlugs = payload.tools.filter((t) => !enabledTools.some((tool) => tool.slug === t.slug));
   check(badSlugs.length === 0, 'La data del launcher usa slugs válidos de tools.json');
@@ -97,11 +106,11 @@ try {
   check(searchResults > 0, 'Escribir «unir pdf» muestra coincidencias al instante');
   check(requestsSinceStart === requestsBeforeTyping, 'La búsqueda no realiza llamadas de red (datos locales de build)');
   const firstHref = await page.locator('#apluno-launcher-list a').first().getAttribute('href');
-  check(firstHref === '/unir-pdf.html', `El primer resultado enlaza directo a /unir-pdf.html (actual: ${firstHref})`);
+  check(firstHref === '/unir-pdf', `El primer resultado enlaza directo a /unir-pdf (actual: ${firstHref})`);
 
   // Un clic abre la herramienta
   const [navigation] = await Promise.all([page.waitForNavigation({ waitUntil: 'networkidle' }), page.locator('#apluno-launcher-list a').first().click()]);
-  check(navigation.url().endsWith('/unir-pdf.html'), `Un clic navega a la herramienta (${navigation.url()})`);
+  check(navigation.url().endsWith('/unir-pdf'), `Un clic navega a la herramienta (${navigation.url()})`);
   check(navigation.status() === 200, 'La herramienta abre con status 200');
   check((await page.locator('h1').textContent() || '').trim().length > 0, 'La herramienta muestra su título');
 
@@ -109,8 +118,8 @@ try {
   await page.goto(`${base}/`, { waitUntil: 'networkidle' });
   await page.fill('#apluno-search-input', 'unir pdf');
   await page.press('#apluno-search-input', 'Enter');
-  await page.waitForURL('**/unir-pdf.html', { timeout: 10000 });
-  check(new URL(page.url()).pathname === '/unir-pdf.html', 'Enter abre la herramienta recomendada sin pasar por el catálogo');
+  await page.waitForURL('**/unir-pdf', { timeout: 10000 });
+  check(new URL(page.url()).pathname === '/unir-pdf', 'Enter abre la herramienta recomendada sin pasar por el catálogo');
 
   // Chips de categorías reales filtran en la misma pantalla
   await page.goto(`${base}/`, { waitUntil: 'networkidle' });
@@ -150,7 +159,7 @@ try {
   const mobileResults = await mobilePage.locator('#apluno-launcher-list > li').count();
   check(mobileResults > 0, 'En móvil la búsqueda responde al instante');
   const mobileHref = await mobilePage.locator('#apluno-launcher-list a').first().getAttribute('href');
-  check(mobileHref === '/comprimir-imagen.html', `En móvil el resultado directo es correcto (${mobileHref})`);
+  check(mobileHref === '/comprimir-imagen', `En móvil el resultado directo es correcto (${mobileHref})`);
   await mobileContext.close();
 } finally {
   await browser.close();
