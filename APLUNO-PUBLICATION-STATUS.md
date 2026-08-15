@@ -1,17 +1,17 @@
 # APLUNO — Estado de publicación
 
-Estado REAL verificado por OpenCode el 2026-08-14 (actualizado tras configuración DNS en Cloudflare).
+Estado REAL verificado por OpenCode el 2026-08-15 (cierre: HTTPS completo, PWA operativa, docs al día).
 
 ```text
 Repositorio:                 wandersepulveda2013/toolisto-web
 Rama producción:             main
 Rama APLUNO:                 feature/apluno-ecosystem
-SHA publicado:               5480a97e8c901baa92748c438ee2252084fded36
+SHA publicado:               298f8ab421150f29d4b196ea0464df78663bc8c0
 Método de publicación:       GitHub REST API (Git Data API)
 Push/API:                    API (git push bloqueado por opencode.json; alternativa segura, sin force)
 Merge/PR:                    No (fast-forward de main vía API; historia preservada)
 Workflow:                    .github/workflows/deploy-pages.yml
-GitHub Actions Run:          31860480238
+GitHub Actions Run:          31884301441
 Build:                       PASS
 Tests:                       PASS
 Test APLUNO:                 PASS (45 pass, 0 fail)
@@ -26,12 +26,14 @@ apluno.com (HTTP):           REDIRIGE 301 → https://apluno.com/
 www.apluno.com (HTTP):       REDIRIGE 301 → https://apluno.com/
 HTTPS:                       ACTIVO — certificado dedicado válido (CN/SAN apluno.com + www.apluno.com, Let's Encrypt, hasta 2026-11-13); sin aviso «No seguro»
 Enforce HTTPS:               ACTIVADO (https_enforced=true)
+PWA:                         OPERATIVA — SW registrado en https://apluno.com/, offline verificado (11/11), allowlist de rutas públicas inyectada
 CNAME:                       apluno.com (en repositorio y en artifact desplegado)
-Fecha/hora de verificación:  2026-08-15T03:35:00Z (UTC)
+Fecha/hora de verificación:  2026-08-15 (HTTPS COMPLETE + cierre de docs)
 Rutas verificadas:           200 en / (portada launcher), /toolisto, /ordia/, /workspace/, /about/, /contact/,
                              /privacy/, /terms/, /unir-pdf y categorías; assets 200 (apluno-assets/apluno-tools-data.js
-                             167 tools, manifest, sitemap 190 URLs, robots); canonical correcto
-Paso manual pendiente:       activar Enforce HTTPS cuando el certificado dedicado esté emitido
+                             167 tools, manifest, sitemap 190 URLs https, robots); canonical correcto
+Pendiente humano:            Google Search Console (verificar propiedad de dominio + sitemap) y Cloudflare
+                             (CLOUDFLARE_API_TOKEN para proxy/headers CSP-HSTS; GitHub Pages ignora _headers)
 ```
 
 ## HTTPS COMPLETE — 2026-08-15 (activación de Enforce HTTPS y verificación final)
