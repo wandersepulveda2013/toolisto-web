@@ -1,9 +1,0 @@
-{
-  "approved": true,
-  "failed": 0,
-  "passed": 30,
-  "schemaVersion": 1,
-  "scope": "static-hosting-apluno-com",
-  "suite": "toolisto-domain-gate",
-  "total": 30
-}

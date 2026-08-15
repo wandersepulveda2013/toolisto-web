@@ -1,9 +1,0 @@
-{
-    "npmTest":  "167 herramientas / build 179 paginas",
-    "node":  "v24.18.0",
-    "branch":  "feature/workspace-star-flow",
-    "date":  "2026-08-03T09:33:22",
-    "head":  "4b21924",
-    "certifiedMatrix":  "19 certified",
-    "npm":  "11.16.0"
-}

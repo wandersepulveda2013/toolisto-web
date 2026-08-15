@@ -1,9 +1,0 @@
-{
-  "approved": true,
-  "failed": 0,
-  "passed": 10,
-  "schemaVersion": 1,
-  "scope": "static-hosting-apluno-com",
-  "suite": "deployment-guide-audit",
-  "total": 10
-}

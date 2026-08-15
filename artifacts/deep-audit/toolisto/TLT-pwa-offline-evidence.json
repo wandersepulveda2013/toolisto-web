@@ -1,8 +1,0 @@
-{
-  "checks": 26,
-  "failed": 0,
-  "failures": [],
-  "gate": "pwa-offline",
-  "pages": 183,
-  "result": "PASS"
-}
