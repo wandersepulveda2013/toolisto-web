@@ -6,15 +6,16 @@ Estado REAL verificado por OpenCode el 2026-08-14 (actualizado tras configuraci�
 Repositorio:                 wandersepulveda2013/toolisto-web
 Rama producción:             main
 Rama APLUNO:                 feature/apluno-ecosystem
-SHA publicado:               a43087ec1d9874c01849ebfd76058e3baaf03f25
+SHA publicado:               8376fb90b6938737fd6923c8eec629b7ae4775f6
 Método de publicación:       GitHub REST API (Git Data API)
 Push/API:                    API (git push bloqueado por opencode.json; alternativa segura, sin force)
 Merge/PR:                    No (fast-forward de main vía API; historia preservada)
 Workflow:                    .github/workflows/deploy-pages.yml
-GitHub Actions Run:          31821618794
+GitHub Actions Run:          31857241785
 Build:                       PASS
 Tests:                       PASS
 Test APLUNO:                 PASS (38 pass, 0 fail)
+Public release gate:         PASS (npm run test:release, 6/6)
 Deployment:                  PASS (deploy-pages@v4)
 GitHub Pages:                HABILITADO, build_type=workflow, public=true
 URL GitHub Pages:            https://wandersepulveda2013.github.io/toolisto-web/ (redirige 301 a http://apluno.com/)
@@ -25,7 +26,7 @@ www.apluno.com (HTTP):       ACCESIBLE — 301 → http://apluno.com/
 HTTPS:                       EMITIÉNDOSE — 443 sirve con cert default *.github.io (Let's Encrypt); el cert dedicado apluno.com está en provisioning
 Enforce HTTPS:               PENDIENTE — se activará en una sesión posterior (por indicación del usuario)
 CNAME:                       apluno.com (en repositorio y en artifact desplegado)
-Fecha/hora de verificación:  2026-08-14T19:23:20Z (UTC)
+Fecha/hora de verificación:  2026-08-15T01:45:00Z (UTC)
 Rutas verificadas:           200 en /, /toolisto, /ordia/, /workspace/, /about/, /contact/,
                              /privacy/, /terms/, /unir-pdf y categorías /pdf, /imagenes, /texto,
                              /firmas, /qr-codigos, /calculadoras, /hojas-de-calculo, /documentos-word,
@@ -33,6 +34,33 @@ Rutas verificadas:           200 en /, /toolisto, /ordia/, /workspace/, /about/,
                              manifest, sitemap, robots); sin mixed content; canonical correcto
 Paso manual pendiente:       activar Enforce HTTPS cuando el certificado dedicado esté emitido (sesión posterior)
 ```
+
+## Publicación del 2026-08-15 (8376fb9) — arreglos de build, PWA y SEO
+
+Publicado vía Git Data API (fast-forward de `main` desde `a43087e`, árbol local verificado
+SHA a SHA: 53 trees, 555 entradas, 24 blobs nuevos subidos). Run 31857241785: build, tests,
+test:apluno (38/38) y la nueva puerta `npm run test:release` (6/6) — TODO PASS; deployment
+`github-pages` creado para `8376fb9`.
+
+Contenido nuevo en producción:
+- **Build público sin runtime interno del Workspace**: `--production` ya no publica
+  `workspace/workspace.js`; `/workspace/` conserva su landing pública (`dist/workspace/index.html`).
+- **Service Worker aislado de las rutas públicas de APLUNO**: el build inyecta la allowlist
+  `APLUNO_PUBLIC_ROUTES` (/, /about/, /contact/, /privacy/, /terms/, /ordia/, /workspace/ y
+  /apluno-assets/*) en `dist/service-worker.js`; esas rutas nunca se interceptan (van por red).
+  Verificado en producción: `service-worker.js` lleva la allowlist inyectada.
+- **Puerta de release en CI**: `.github/workflows/deploy-pages.yml` ejecuta `npm run test:release`
+  (nuevo `scripts/test-public-release.mjs`, 6/6) que verifica allowlist en dist, exclusión del
+  runtime Workspace y catálogo esperado (comprimir-imagen presente, recortar-imagen ausente).
+- **Fix OpenGraph**: `scripts/apluno-components.mjs` generaba `<meta property="og:image">` con
+  un `+` literal heredado (`\n+  <meta`); corregido a salto de línea real. Verificado en
+  producción: la línea OG es limpia y `og:image` apunta a `/apluno-assets/og.png`.
+- **PWA offline**: `tests/pwa-offline.mjs` ahora 26/26 (3 asserts nuevos sobre la allowlist
+  inyectada); la recuperación offline sigue mostrando `offline.html` para rutas no visitadas.
+- Verificado en producción: 200 en /, /toolisto, /about/, /contact/, /privacy/, /terms/, /ordia/,
+  /workspace/ y /unir-pdf; sin el `+` heredado en la meta OG.
+
+## Publicación previa (a43087e)
 
 ## Verificaciones completadas
 
@@ -103,9 +131,10 @@ No se modificó nada de Cloudflare desde este entorno (sin credenciales; se resp
   la publicación se hizo con la GitHub REST API (Git Data API): se subieron los blobs del árbol de
   HEAD y se creó un commit con parent = SHA real de `main` y el árbol completo verificado, luego se
   actualizó `refs/heads/main` como fast-forward (sin force, sin reescritura de historia).
-- Hubo dos publicaciones previas corregidas durante el proceso:
+- Hubo tres publicaciones previas corregidas durante el proceso inicial:
   - `1019f16` publicó el árbol incompleto (solo blobs de raíz, sin directorios).
   - `2886a97` publicó el árbol completo pero sobrescribió el workflow con una versión previa.
-  - `a43087e` (actual) alinea el workflow al contenido requerido y mantiene el árbol completo verificado.
+  - `a43087e` alineó el workflow al contenido requerido y mantuvo el árbol completo verificado.
+  - `8376fb9` (2026-08-15) publicó los arreglos de build/PWA/SEO sobre `a43087e`.
 - No se guardaron tokens ni secretos en archivos.
 - No se modificaron rutas existentes ni se rediseñó APLUNO.
