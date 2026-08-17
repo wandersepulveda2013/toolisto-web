@@ -219,7 +219,7 @@
   function initReadTool(cfg, hint) {
     var panel = mountPanel(cfg, 'Leer código', [
       { id: 'readFile', type: 'file', label: 'Imagen con el código', required: true, accept: 'image/*' }
-    ], hint || 'Sube una imagen que contenga un código QR o de barras.');
+    ], hint || 'Selecciona una imagen que contenga un código QR o de barras.');
     var input = panel.querySelector('#readFile');
     var form = panel.querySelector('#qrForm');
     var previewBox = panel.querySelector('#qrPreview');

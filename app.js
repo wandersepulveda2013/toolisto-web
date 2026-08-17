@@ -6520,22 +6520,7 @@
 
   function showSupportBlock() {
     if (!els.resultSupport) return;
-    var hasValidOutput = false;
-    try {
-      if (state.outputFiles && state.outputFiles.length > 0) {
-        hasValidOutput = state.outputFiles.some(function(f) { return f.blob && f.blob.size > 0; });
-      } else if (state.outputBlob) {
-        hasValidOutput = state.outputBlob.size > 0;
-      }
-    } catch (_) { /* blob access may fail */ }
-    if (state.processError) {
-      els.resultSupport.hidden = true;
-      return;
-    }
-    els.resultSupport.hidden = !hasValidOutput;
-    if (hasValidOutput) {
-      trackEvent('support_shown', { tool: state.tool || '' });
-    }
+    els.resultSupport.hidden = true;
   }
 
   function downloadBlob(blob, name) {
