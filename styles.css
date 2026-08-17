@@ -433,6 +433,9 @@ html[data-theme="dark"] .icon-moon{display:none}
 .stat{padding:10px;border:1px solid var(--c-border);border-radius:9px}
 .stat span,.stat strong{display:block}
 .stat span{color:var(--c-muted);font-size:.68rem}
+.result-inspector{margin:8px 0 14px;padding:10px 14px;border:1px solid var(--c-border);border-radius:9px;background:var(--c-surface-soft);font-size:.82rem}
+.inspector-row{display:flex;justify-content:space-between;padding:3px 0}
+.inspector-label{color:var(--c-muted)}
 .preview-area{min-height:90px;display:grid;place-items:center;overflow:hidden;border:1px solid var(--c-border);border-radius:10px;background:repeating-conic-gradient(rgba(0,0,0,.03) 0 25%,transparent 0 50%) 0/16px 16px}
 .preview-area img{display:block;max-width:100%;max-height:300px}
 .dialog-actions{margin-top:14px;display:flex;gap:7px}

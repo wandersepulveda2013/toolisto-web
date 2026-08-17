@@ -431,6 +431,11 @@
     resultTitle: $('#resultTitle'),
     resultMessage: $('#resultMessage'),
     resultStats: $('#resultStats'),
+    resultInspector: $('#resultInspector'),
+    inspectorInput: $('#inspectorInput'),
+    inspectorOutput: $('#inspectorOutput'),
+    inspectorRatio: $('#inspectorRatio'),
+    inspectorTime: $('#inspectorTime'),
     resultSupport: $('#resultSupport'),
     previewArea: $('#previewArea'),
     downloadButton: $('#downloadButton'),
@@ -948,6 +953,7 @@
     }
 
     clearProcessFeedback();
+    state.inputTotalSize = state.files.reduce(function(s, f) { return s + f.size; }, 0);
     renderFiles();
     updateRecommendation();
   }
@@ -2537,6 +2543,7 @@
     }
 
     state.processing = true;
+    state.processStartTime = Date.now();
     state.processError = null;
     state.processPhase = '';
     clearProcessFeedback();
@@ -2625,6 +2632,7 @@
   }
 
   async function runBuiltinTool(tool, files, options) {
+    state.processStartTime = Date.now();
     clearPreviousOutput();
     let result;
     switch (tool) {
@@ -6283,8 +6291,30 @@
     } else {
       els.previewArea.hidden = true;
     }
+    populateInspector(result);
     trackEvent('result_shown', { tool: state.tool || '', files: (state.outputFiles || []).length });
     els.resultDialog.showModal();
+  }
+
+  function populateInspector(result) {
+    if (!els.resultInspector) return;
+    var inputSize = state.inputTotalSize || 0;
+    var outputSize = 0;
+    if (result.blob) outputSize = result.blob.size;
+    else if (state.outputFiles && state.outputFiles.length > 0) {
+      outputSize = state.outputFiles.reduce(function(s, f) { return s + (f.blob ? f.blob.size : 0); }, 0);
+    }
+    var elapsed = state.processStartTime ? Date.now() - state.processStartTime : 0;
+    els.inspectorInput.textContent = inputSize > 0 ? formatBytes(inputSize) : '—';
+    els.inspectorOutput.textContent = outputSize > 0 ? formatBytes(outputSize) : '—';
+    if (inputSize > 0 && outputSize > 0) {
+      var ratio = ((1 - outputSize / inputSize) * 100).toFixed(1);
+      els.inspectorRatio.textContent = (outputSize <= inputSize ? '-' + ratio + '%' : '+' + ((outputSize / inputSize - 1) * 100).toFixed(1) + '%');
+    } else {
+      els.inspectorRatio.textContent = '—';
+    }
+    els.inspectorTime.textContent = elapsed > 0 ? (elapsed < 1000 ? elapsed + ' ms' : (elapsed / 1000).toFixed(1) + ' s') : '—';
+    els.resultInspector.hidden = false;
   }
 
   function presentSummaryResult(result) {
