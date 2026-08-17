@@ -302,6 +302,24 @@ if (existsSync(appJsPath)) {
   }
 }
 
+// 14. ResultInspector exists in generated tool pages
+if (existsSync(distDir)) {
+  let missingInspector = 0;
+  for (const tool of enabledTools.slice(0, 5)) {
+    const pagePath = join(distDir, `${tool.slug}.html`);
+    if (!existsSync(pagePath)) continue;
+    const content = readFileSync(pagePath, 'utf8');
+    if (!content.includes('resultInspector') || !content.includes('inspectorInput')) {
+      missingInspector++;
+    }
+  }
+  if (missingInspector === 0) {
+    pass(`ResultInspector presente en páginas de herramientas verificadas`);
+  } else {
+    fail(`ResultInspector ausente en ${missingInspector} páginas verificadas`);
+  }
+}
+
 console.log(`\n=== Resultado ===`);
 if (issues.length > 0) {
   console.error(`${issues.length} problema(s) detectado(s)`);
