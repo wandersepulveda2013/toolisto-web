@@ -24,3 +24,4 @@ function run(script, args = []) {
 
 run('scripts/generate-seo-pages.mjs', ['--production']);
 run('scripts/generate-apluno-pages.mjs');
+run('scripts/inject-adsense.mjs');
