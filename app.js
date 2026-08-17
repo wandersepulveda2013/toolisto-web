@@ -2569,14 +2569,14 @@
         }
         return;
       }
-      const maxX = (_cropPrev.imgW - _cropPrev.cropW) / 2;
-      const maxY = (_cropPrev.imgH - _cropPrev.cropH) / 2;
+      const dragMaxX = (_cropPrev.imgW - _cropPrev.cropW) / 2;
+      const dragMaxY = (_cropPrev.imgH - _cropPrev.cropH) / 2;
       const dxImg = (px - _cropPrev.dragStartX) / (_cropPrev.scale || 1);
       const dyImg = (py - _cropPrev.dragStartY) / (_cropPrev.scale || 1);
-      const newOffX = clamp(_cropPrev.startOffsetX + (dxImg / (maxX || 1)) * 100, -100, 100);
-      const newOffY = clamp(_cropPrev.startOffsetY + (dyImg / (maxY || 1)) * 100, -100, 100);
-      $('#cropOffsetX').value = Math.round(newOffX * 100) / 100;
-      $('#cropOffsetY').value = Math.round(newOffY * 100) / 100;
+      const dragOffX = clamp(_cropPrev.startOffsetX + (dxImg / (dragMaxX || 1)) * 100, -100, 100);
+      const dragOffY = clamp(_cropPrev.startOffsetY + (dyImg / (dragMaxY || 1)) * 100, -100, 100);
+      $('#cropOffsetX').value = Math.round(dragOffX * 100) / 100;
+      $('#cropOffsetY').value = Math.round(dragOffY * 100) / 100;
       renderCropPreview();
     });
     canvas.addEventListener('pointerup', () => { _cropPrev.dragging = false; _cropPrev.resizeHandle = undefined; canvas.style.cursor = 'grab'; });
@@ -4493,7 +4493,14 @@
     });
     const outBytes = await newPdf.save();
     const blob = new Blob([outBytes], { type: 'application/pdf' });
-    return { blob, name: `${file.name.replace(/\.pdf$/i, '')}-girado.pdf`, title: 'PDF girado', message: `${rotatedCount} página${rotatedCount !== 1 ? 's' : ''} girada${rotatedCount !== 1 ? 's'}.`, stats: [['Páginas rotadas', String(rotatedCount)], ['Total', String(pageCount)], ['Tamaño', formatBytes(blob.size)]] };
+    const rotMsg = `${rotatedCount} página${rotatedCount !== 1 ? 's' : ''} girada${rotatedCount !== 1 ? 's' : ''}.`;
+    return {
+      blob,
+      name: `${file.name.replace(/\.pdf$/i, '')}-girado.pdf`,
+      title: 'PDF girado',
+      message: rotMsg,
+      stats: [['Páginas rotadas', String(rotatedCount)], ['Total', String(pageCount)], ['Tamaño', formatBytes(blob.size)]]
+    };
   }
 
   async function processDeletePagesPdf() {
