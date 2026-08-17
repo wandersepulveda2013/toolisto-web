@@ -50,6 +50,7 @@ const tests = [
   { name: 'File Family Extra', cmd: 'node tests/gate-e2e-file-family-tools.mjs' },
   { name: 'Production Tool Coverage', cmd: 'node tests/production-tool-coverage.mjs' },
   { name: 'APLUNO Launcher', cmd: 'node tests/apluno-launcher.mjs' },
+  { name: 'AdSense Integration', cmd: 'node tests/adsense-integration.mjs' },
 ];
 
 let passed = 0;
