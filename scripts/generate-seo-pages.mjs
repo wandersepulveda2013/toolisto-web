@@ -68,14 +68,6 @@ function buildGoogleAnalyticsTag() {
   return `<script async src="https://www.googletagmanager.com/gtag/js?id=${escAttr(id)}"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${escAttr(id)}');</script>`;
 }
 
-function getSupportButtonHtml() {
-  if (!supportCfg.enabled || !supportCfg.url) return '';
-  const logoPath = supportCfg.logo ? join(ROOT, supportCfg.logo) : null;
-  const logoExists = logoPath && existsSync(logoPath);
-  const logoImg = logoExists ? `<img src="${escAttr(supportCfg.logo)}" alt="" width="24" height="24" style="vertical-align:middle;margin-right:6px">` : '';
-  return `<a class="support-donate-btn" href="${escAttr(supportCfg.url)}" target="_blank" rel="noopener noreferrer">${logoImg}${escHtml(supportCfg.buttonText || 'Apoyar con PayPal')}</a>`;
-}
-
 function getFeedbackHtml() {
   const reportLink = (feedbackCfg.enabled && feedbackCfg.url)
     ? `<a href="${escAttr(feedbackCfg.url)}" target="_blank" rel="noopener noreferrer" id="reportProblemLink">Reportar un problema</a> · `
@@ -393,7 +385,7 @@ function buildToolPage(tool) {
       </section>
     </main>
 
-    <dialog class="result-dialog" id="resultDialog"><div class="dialog-header"><h2 id="resultTitle">Resultado</h2><button class="dialog-close" id="dialogClose" type="button" aria-label="Cerrar">×</button></div><p id="resultMessage"></p><div class="result-stats" id="resultStats"></div><div class="result-inspector" id="resultInspector" hidden><div class="inspector-row"><span class="inspector-label">Entrada</span><span id="inspectorInput">—</span></div><div class="inspector-row"><span class="inspector-label">Salida</span><span id="inspectorOutput">—</span></div><div class="inspector-row"><span class="inspector-label">Reducción</span><span id="inspectorRatio">—</span></div><div class="inspector-row"><span class="inspector-label">Tiempo</span><span id="inspectorTime">—</span></div></div><div class="preview-area" id="previewArea" hidden></div><div class="result-support" id="resultSupport" hidden><p>${escHtml(supportCfg.message || 'Si Toolisto te ha sido útil, considera apoyarnos con una donación.')}</p>${getSupportButtonHtml()}</div>${getFeedbackHtml()}<div class="dialog-actions"><button class="primary-button" id="downloadButton" type="button">Descargar</button><button class="quiet-button" id="resetButton" type="button">Cerrar</button></div></dialog>
+    <dialog class="result-dialog" id="resultDialog"><div class="dialog-header"><h2 id="resultTitle">Resultado</h2><button class="dialog-close" id="dialogClose" type="button" aria-label="Cerrar">×</button></div><p id="resultMessage"></p><div class="result-stats" id="resultStats"></div><div class="result-inspector" id="resultInspector" hidden><div class="inspector-row"><span class="inspector-label">Entrada</span><span id="inspectorInput">—</span></div><div class="inspector-row"><span class="inspector-label">Salida</span><span id="inspectorOutput">—</span></div><div class="inspector-row"><span class="inspector-label">Reducción</span><span id="inspectorRatio">—</span></div><div class="inspector-row"><span class="inspector-label">Tiempo</span><span id="inspectorTime">—</span></div></div><div class="preview-area" id="previewArea" hidden></div>${getFeedbackHtml()}<div class="dialog-actions"><button class="primary-button" id="downloadButton" type="button">Descargar</button><button class="quiet-button" id="resetButton" type="button">Cerrar</button></div></dialog>
     <dialog class="picker-dialog" id="pickerDialog"><div class="dialog-header"><h2>Elegir herramienta</h2><button class="dialog-close" id="pickerClose" type="button" aria-label="Cerrar">×</button></div><div class="picker-grid" id="pickerGrid"></div></dialog>
     ${footerHTML}
     <div class="toast" id="toast" role="status" aria-live="polite"></div>

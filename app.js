@@ -436,7 +436,6 @@
     inspectorOutput: $('#inspectorOutput'),
     inspectorRatio: $('#inspectorRatio'),
     inspectorTime: $('#inspectorTime'),
-    resultSupport: $('#resultSupport'),
     previewArea: $('#previewArea'),
     downloadButton: $('#downloadButton'),
     resetButton: $('#resetButton'),
@@ -6295,7 +6294,6 @@
     els.resultMessage.textContent = result.message;
     els.resultStats.innerHTML = (result.stats || []).map(([label,value]) => `<div class="stat"><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong></div>`).join('');
     els.previewArea.innerHTML = '';
-    if (els.resultSupport) els.resultSupport.hidden = true;
     if (result.preview && state.files.length && state.files[0] && state.files[0].type && state.files[0].type.startsWith('image/') && window.ToolistoBAV) {
       var bavWrap = document.createElement('div');
       bavWrap.className = 'result-bav-wrap';
@@ -6308,12 +6306,49 @@
         labelAfter: 'Resultado'
       });
     } else if (result.preview) {
+      var mime = result.preview.type || '';
+      var name = (result.name || '').toLowerCase();
       state.previewUrl = URL.createObjectURL(result.preview);
-      const img = document.createElement('img');
-      img.src = state.previewUrl;
-      img.alt = 'Vista previa del resultado';
-      els.previewArea.appendChild(img);
-      els.previewArea.hidden = false;
+      if (mime === 'application/pdf' || name.endsWith('.pdf')) {
+        var embed = document.createElement('iframe');
+        embed.src = state.previewUrl;
+        embed.style.cssText = 'width:100%;height:360px;border:none;border-radius:6px';
+        embed.title = 'Vista previa del PDF';
+        els.previewArea.appendChild(embed);
+        els.previewArea.hidden = false;
+      } else if (mime === 'text/plain' || name.endsWith('.txt') || name.endsWith('.csv') || name.endsWith('.json') || name.endsWith('.xml') || name.endsWith('.html') || name.endsWith('.md')) {
+        result.preview.text().then(function(txt) {
+          var pre = document.createElement('pre');
+          pre.style.cssText = 'max-height:320px;overflow:auto;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:6px;font-size:.85rem;line-height:1.5;font-family:monospace;white-space:pre-wrap;word-break:break-word';
+          pre.textContent = txt.length > 8000 ? txt.slice(0, 8000) + '\n\n[Truncado — ' + formatBytes(result.preview.size) + ']' : txt;
+          els.previewArea.appendChild(pre);
+          els.previewArea.hidden = false;
+        });
+        els.previewArea.hidden = false;
+      } else if (mime === 'application/zip' || mime === 'application/x-zip-compressed' || name.endsWith('.zip')) {
+        var listWrap = document.createElement('div');
+        listWrap.style.cssText = 'padding:12px;background:var(--card);border:1px solid var(--border);border-radius:6px';
+        listWrap.innerHTML = '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg><strong>Archivo ZIP</strong><span style="color:var(--muted);font-size:.85rem">' + escapeHtml(result.name || 'resultado.zip') + '</span></div>';
+        if (state.outputFiles && state.outputFiles.length > 1) {
+          var ul = document.createElement('ul');
+          ul.style.cssText = 'list-style:none;padding:0;margin:0;max-height:200px;overflow-y:auto';
+          state.outputFiles.forEach(function(f) {
+            var li = document.createElement('li');
+            li.style.cssText = 'padding:6px 0;border-bottom:1px solid var(--border);font-size:.85rem;display:flex;justify-content:space-between;align-items:center';
+            li.innerHTML = '<span>' + escapeHtml(f.name) + '</span><span style="color:var(--muted)">' + formatBytes(f.size) + '</span>';
+            ul.appendChild(li);
+          });
+          listWrap.appendChild(ul);
+        }
+        els.previewArea.appendChild(listWrap);
+        els.previewArea.hidden = false;
+      } else {
+        var img = document.createElement('img');
+        img.src = state.previewUrl;
+        img.alt = 'Vista previa del resultado';
+        els.previewArea.appendChild(img);
+        els.previewArea.hidden = false;
+      }
     } else {
       els.previewArea.hidden = true;
     }
@@ -6376,7 +6411,6 @@
     els.resultStats.innerHTML = (result.stats || []).map(([label, value]) => `<div class="stat"><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong></div>`).join('');
     els.previewArea.innerHTML = sanitizeSummaryHtml(result.html || '');
     els.previewArea.hidden = false;
-    if (els.resultSupport) els.resultSupport.hidden = true;
     trackEvent('result_shown', { tool: state.tool || '', files: 0 });
     els.resultDialog.showModal();
   }
@@ -6388,7 +6422,6 @@
     els.resultStats.innerHTML = '';
     els.previewArea.innerHTML = '';
     els.previewArea.hidden = false;
-    if (els.resultSupport) els.resultSupport.hidden = true;
 
     const r = result.metadata;
     const sections = [];
@@ -6594,30 +6627,21 @@
     if (state.outputFiles && state.outputFiles.length > 1) {
       if (!window.JSZip) {
         state.outputFiles.forEach(f => downloadBlob(f.blob, f.name));
-        showSupportBlock();
         return;
       }
       const zip = new window.JSZip();
       state.outputFiles.forEach(f => zip.file(f.name, f.blob));
       const blob = await zip.generateAsync({ type: 'blob', compression: 'DEFLATE', compressionOptions: { level: 6 } });
       downloadBlob(blob, 'resultados.zip');
-      showSupportBlock();
       return;
     }
     if (state.outputFiles && state.outputFiles.length === 1) {
       downloadBlob(state.outputFiles[0].blob, state.outputFiles[0].name);
-      showSupportBlock();
       return;
     }
     if (state.outputBlob) {
       downloadBlob(state.outputBlob, state.outputName || 'toolisto-resultado');
-      showSupportBlock();
     }
-  }
-
-  function showSupportBlock() {
-    if (!els.resultSupport) return;
-    els.resultSupport.hidden = true;
   }
 
   function downloadBlob(blob, name) {

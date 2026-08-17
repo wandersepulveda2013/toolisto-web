@@ -859,6 +859,8 @@ async function initApp() {
       $('#ws-sidebar').classList.add('collapsed');
     }
   } catch(e) {}
+  var toolsCountEl = document.getElementById('ws-sidebar-tools-count');
+  if (toolsCountEl) toolsCountEl.textContent = TOOLS_DATA.length + ' Herramientas';
 
   $$('.sidebar-item[data-view]').forEach(btn => {
     btn.addEventListener('click', () => navigateTo(btn.dataset.view));
@@ -1484,7 +1486,7 @@ function renderDashboardView(container, project) {
     { icon: 'chart', color: 'orange', title: 'Dashboards', desc: 'Visualiza metricas', span: false, onClick: () => navigateTo('dashboards') },
     { icon: 'flow', color: 'blue', title: 'Toolisto Flow', desc: 'Automatiza procesos', span: false, onClick: () => navigateTo('flow') },
     { icon: 'tool', color: 'blue', title: 'Flujos por lotes', desc: 'Operaciones encadenadas', span: false, onClick: () => navigateTo('flujos') },
-    { icon: 'wrench', color: 'green', title: '144 Herramientas', desc: 'Herramientas de productividad', span: false, onClick: () => navigateTo('tools') },
+    { icon: 'wrench', color: 'green', title: TOOLS_DATA.length + ' Herramientas', desc: 'Herramientas de productividad', span: false, onClick: () => navigateTo('tools') },
   ];
   items.forEach(item => {
     const cls = 'ws-bento-card' + (item.span ? ' span-2' : '');
@@ -1495,7 +1497,7 @@ function renderDashboardView(container, project) {
     ));
   });
   el.appendChild(h('section', { className: 'ws-dashboard-tools' },
-    h('div', { className: 'ws-dashboard-panel-heading' }, h('div', null, h('span', { className: 'ws-dashboard-kicker' }, 'SUPERFICIES TOOLISTO'), h('h2', null, 'Todo lo que puedes hacer aquí')), h('button', { className: 'ws-text-link', onClick: () => navigateTo('tools') }, 'Ver las 144 herramientas ↗')),
+    h('div', { className: 'ws-dashboard-panel-heading' }, h('div', null, h('span', { className: 'ws-dashboard-kicker' }, 'SUPERFICIES TOOLISTO'), h('h2', null, 'Todo lo que puedes hacer aquí')), h('button', { className: 'ws-text-link', onClick: () => navigateTo('tools') }, 'Ver las ' + TOOLS_DATA.length + ' herramientas ↗')),
     bento
   ));
   container.appendChild(el);
@@ -6695,7 +6697,7 @@ function renderToolsView(container) {
   const recentTools = appStore.get('recentTools');
   const el = h('div', { className: 'ws-start', style: 'animation:fadeIn 0.3s ease' });
   el.appendChild(h('div', { className: 'hero' },
-    h('h1', null, '144 Herramientas'),
+    h('h1', null, TOOLS_DATA.length + ' Herramientas'),
     h('p', null, 'Todas las herramientas de Toolisto en un solo lugar')
   ));
   const search = h('input', {
