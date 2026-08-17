@@ -2544,15 +2544,180 @@ async function extractTextFromScan(project, capture) {
       showManualTextEntry(project, capture, start);
       return;
     }
+    showExtractionModeChooser(project, capture, text, words, confidence, start);
+  } catch (e) {
+    await updateScanOcrState(capture, { status: 'error', confidence: 0 });
+    closeModal();
+    toast('Error en OCR: ' + e.message + '. Intenta ingreso manual.', 'error');
+    await registerExecution(project.id, 'ocr-extract', 'Extracción de texto (OCR)', {
+      inputAssetIds: [capture.id],
+      sourceAssetId: capture.id,
+      parameters: { engine: 'tesseract.js', error: e.message },
+      status: 'failed',
+      errors: [e.message],
+      startedAt: start,
+    }).catch(e => reportError(e, 'register-execution', { action: 'ocr-fail-log' }));
+    showManualTextEntry(project, capture, start);
+  }
+}
+
+/* §53-55 — Extraction mode chooser + post-processing */
+
+function cleanOcrText(text) {
+  let cleaned = text;
+  cleaned = cleaned.replace(/\r\n/g, '\n');
+  cleaned = cleaned.replace(/(.)\1{3,}/g, '$1$1');
+  cleaned = cleaned.replace(/^[^\S\n]{2,}$/gm, '');
+  cleaned = cleaned.replace(/\n{3,}/g, '\n\n');
+  cleaned = cleaned.replace(/^(\d{1,4})\s*$/gm, '');
+  cleaned = cleaned.replace(/^[\s\-=*_~#]{3,}$/gm, '');
+  cleaned = cleaned.replace(/\b(Página|Pagina|Page)\s*\d+\b/gi, '');
+  cleaned = cleaned.replace(/\b(página|pag|pg|p)\.?\s*\d+/gi, '');
+  cleaned = cleaned.replace(/^\d{1,4}\s*$/gm, '');
+  const lines = cleaned.split('\n');
+  const wordCounts = lines.filter(l => l.trim()).map(l => l.trim().split(/\s+/).length);
+  const median = wordCounts.sort((a, b) => a - b)[Math.floor(wordCounts.length / 2)] || 0;
+  const cleanedLines = lines.filter(l => {
+    const t = l.trim();
+    if (!t) return true;
+    if (t.length <= 2 && !/\d/.test(t)) return false;
+    const wc = t.split(/\s+/).length;
+    if (median > 0 && wc === 1 && median > 4 && t.length < 4) return false;
+    return true;
+  });
+  cleaned = cleanedLines.join('\n');
+  cleaned = cleaned.replace(/\b\s{2,}\b/g, ' ');
+  cleaned = cleaned.replace(/\s+([.,;:!?])/g, '$1');
+  cleaned = cleaned.replace(/([.,;:!?])([^\s\d])/g, '$1 $2');
+  cleaned = cleaned.replace(/\b([a-z])([A-Z])/g, '$1 $2');
+  cleaned = cleaned.trim();
+  return cleaned;
+}
+
+function faithfulOcrText(text, words) {
+  if (!words || !words.length) return text;
+  const lines = text.split(/\r?\n/);
+  const wordList = words.filter(w => w.confidence < 70);
+  if (!wordList.length) return text;
+  return lines.map(line => {
+    let result = line;
+    wordList.forEach(w => {
+      if (result.includes(w.text)) {
+        const low = '<span class="ws-ocr-low-confidence" title="Confianza: ' + Math.round(w.confidence) + '%">' + w.text + '</span>';
+        result = result.replace(w.text, low);
+      }
+    });
+    return result;
+  }).join('\n');
+}
+
+function buildExtractionSummary(text, confidence) {
+  const words = text.trim().split(/\s+/).filter(Boolean);
+  const uniqueWords = new Set(words.map(w => w.toLowerCase()));
+  const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
+  const paragraphs = text.split(/\n\n+/).filter(p => p.trim().length > 0);
+  const lexicalDiversity = words.length > 0 ? (uniqueWords.size / words.length).toFixed(2) : '0';
+  const avgWordsPerSentence = sentences.length > 0 ? (words.length / sentences.length).toFixed(1) : '0';
+  const longWords = words.filter(w => w.length >= 7).length;
+  const wordFreq = {};
+  words.forEach(w => { const k = w.toLowerCase().replace(/[^a-záéíóúñü]/g, ''); if (k.length > 2) wordFreq[k] = (wordFreq[k] || 0) + 1; });
+  const topWords = Object.entries(wordFreq).sort((a, b) => b[1] - a[1]).slice(0, 5);
+  const confLabel = confidence >= 85 ? 'alta' : confidence >= 60 ? 'media' : 'baja';
+  const confColor = confidence >= 85 ? 'var(--ws-success)' : confidence >= 60 ? 'var(--ws-warning)' : 'var(--ws-error)';
+  const parts = [];
+  parts.push('El documento contiene ' + words.length.toLocaleString('es') + ' palabras (' + uniqueWords.size.toLocaleString('es') + ' únicas) distribuidas en ' + sentences.length + ' oraciones y ' + paragraphs.length + ' párrafos.');
+  parts.push('La diversidad léxica es de ' + lexicalDiversity + ' (proporción de vocabulario diferente). La longitud media por oración es de ' + avgWordsPerSentence + ' palabras.');
+  if (topWords.length) parts.push('Palabras más frecuentes: ' + topWords.map(([w, c]) => w + ' (' + c + ')').join(', ') + '.');
+  if (longWords) parts.push('Hay ' + longWords + ' palabras largas (7+ letras), lo que sugiere un vocabulario técnico o formal.');
+  parts.push('Confianza OCR: ' + Math.round(confidence) + '% (' + confLabel + ').');
+  return parts.join(' ');
+}
+
+function showExtractionModeChooser(project, capture, rawText, words, confidence, start) {
+  const confLabel = confidence >= 85 ? 'alta' : confidence >= 60 ? 'media' : 'baja';
+  const confColor = confidence >= 85 ? 'var(--ws-success)' : confidence >= 60 ? 'var(--ws-warning)' : 'var(--ws-error)';
+  const previewClean = cleanOcrText(rawText).substring(0, 300);
+  const previewFaithful = rawText.substring(0, 300);
+  const previewRaw = rawText.substring(0, 300);
+  const modes = [
+    { id: 'clean', label: 'Texto limpio', desc: 'Elimina ruido OCR, encabezados repetidos, números de página y basura', recommended: true, preview: previewClean },
+    { id: 'faithful', label: 'Fiel al original', desc: 'Preserva la estructura del OCR. Resalta palabras dudosas en amarillo', recommended: false, preview: previewFaithful },
+    { id: 'raw', label: 'Solo texto', desc: 'Texto crudo sin procesar', recommended: false, preview: previewRaw },
+  ];
+  const cards = modes.map(mode => {
+    const badge = mode.recommended ? h('span', { className: 'ws-extraction-badge', style: 'background:var(--ws-primary);color:var(--ws-surface);padding:2px 8px;border-radius:4px;font-size:11px;margin-left:6px' }, 'Recomendado') : null;
+    const card = h('div', {
+      className: 'ws-extraction-mode-card',
+      style: 'border:2px solid var(--ws-border);border-radius:8px;padding:12px 14px;cursor:pointer;background:var(--ws-surface);transition:border-color .15s',
+      onClick: (e) => {
+        card.parentElement.querySelectorAll('.ws-extraction-mode-card').forEach(c => c.style.borderColor = 'var(--ws-border)');
+        card.style.borderColor = 'var(--ws-primary)';
+        selectedMode = mode.id;
+      },
+      onMouseEnter: () => { card.style.background = 'var(--ws-surface-hover)'; },
+      onMouseLeave: () => { card.style.background = 'var(--ws-surface)'; },
+    },
+      h('div', { style: 'display:flex;align-items:center;gap:6px' },
+        h('strong', { style: 'color:var(--ws-text);font-size:13px' }, mode.label),
+        badge
+      ),
+      h('div', { style: 'color:var(--ws-text-secondary);font-size:12px;margin-top:4px' }, mode.desc),
+      h('div', { style: 'margin-top:8px;padding:6px 8px;background:var(--ws-bg);border-radius:4px;font-size:11px;color:var(--ws-text-tertiary);font-family:monospace;max-height:60px;overflow:hidden;line-height:1.4' }, mode.preview + (mode.preview.length >= 300 ? '...' : ''))
+    );
+    return card;
+  });
+  let selectedMode = 'clean';
+  const confBadge = h('span', { style: 'display:inline-block;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:600;background:' + confColor + '20;color:' + confColor }, Math.round(confidence) + '% confianza — ' + confLabel);
+  const body = h('div', { style: 'display:flex;flex-direction:column;gap:12px' },
+    h('div', { style: 'display:flex;align-items:center;justify-content:space-between' },
+      h('div', { style: 'color:var(--ws-text-secondary);font-size:13px' }, 'Selecciona cómo procesar el texto extraído:'),
+      confBadge
+    ),
+    h('div', { style: 'display:flex;flex-direction:column;gap:8px' }, ...cards)
+  );
+  const footer = h('div', { className: 'ws-modal-footer' },
+    h('button', { className: 'ws-btn', onClick: () => { closeModal(); showManualTextEntry(project, capture, start); } }, 'Ingreso manual'),
+    h('button', { className: 'ws-btn ws-btn-primary', onClick: async () => {
+      closeModal();
+      await finalizeExtraction(project, capture, rawText, words, confidence, selectedMode, start);
+    } }, 'Extraer texto')
+  );
+  showModal({ title: 'Modo de extracción (§53)', body: [body], footer, size: 'medium' });
+  const firstCard = document.querySelector('.ws-extraction-mode-card');
+  if (firstCard) firstCard.style.borderColor = 'var(--ws-primary)';
+}
+
+async function finalizeExtraction(project, capture, rawText, words, confidence, mode, start) {
+  const statusEl = h('div', { style: 'padding:12px;text-align:center;color:var(--ws-text-secondary)' }, 'Procesando texto...');
+  showModal({ title: 'Generando documento...', body: [statusEl], footer: null });
+  try {
+    const scannerMeta = capture.scannerMetadata || {};
+    let processedText;
+    let blockType = 'paragraph';
+    if (mode === 'clean') {
+      processedText = cleanOcrText(rawText);
+      statusEl.textContent = 'Aplicando limpieza OCR...';
+    } else if (mode === 'faithful') {
+      processedText = rawText;
+      statusEl.textContent = 'Preservando estructura original...';
+    } else {
+      processedText = rawText;
+      statusEl.textContent = 'Preparando texto crudo...';
+    }
+    statusEl.textContent = 'Creando documento...';
     const doc = createTextDocument(capture.name || 'Texto extraido', project.id);
-    const lines = text.split(/\r?\n/);
-    doc.blocks = lines.map((line, idx) => createTextBlock('paragraph', line, idx));
+    const lines = processedText.split(/\r?\n/);
+    doc.blocks = lines.map((line, idx) => createTextBlock(blockType, line, idx));
     if (doc.blocks.length === 0) doc.blocks = [createTextBlock('paragraph', '', 0)];
     doc.sourceAssetId = capture.id;
     doc.ocrConfidence = Number(confidence || 0);
-    if (words.length) doc.ocrWords = words;
+    doc.extractionMode = mode;
+    if (mode === 'faithful' && words && words.length) doc.ocrWords = words;
+    if (words && words.length) doc.ocrWords = words;
     addRelation(doc, capture.id, 'source-capture');
     await saveDoc(project.id, doc);
+    const text = rawText;
+    const ocrSourceLabel = scannerMeta.ocrSource || 'corrected';
     await updateScanOcrState(capture, { status: 'completed', confidence, text, words });
     await registerExecution(project.id, 'ocr-extract', 'Extracción de texto (OCR)', {
       inputAssetIds: [capture.id],
@@ -2561,14 +2726,10 @@ async function extractTextFromScan(project, capture) {
         engine: 'tesseract.js',
         language: 'spa',
         confidence: Math.round(confidence),
-        charCount: text.length,
-        lineCount: lines.length,
+        charCount: rawText.length,
+        lineCount: rawText.split(/\r?\n/).length,
         ocrSource: ocrSourceLabel,
-        ocrWidth: canvas.width,
-        ocrHeight: canvas.height,
-        originalWidth: canvas.width,
-        originalHeight: canvas.height,
-        scaled: false,
+        extractionMode: mode,
         autoDetectionFallback: scannerMeta.autoDetectionFallback || false,
         cornersModified: scannerMeta.cornersModified || false,
         filterMode: scannerMeta.filterMode || 'original',
@@ -2582,19 +2743,11 @@ async function extractTextFromScan(project, capture) {
     });
     await refreshProjectCounts(project.id);
     appStore.set({ currentDoc: doc, currentView: 'doc-editor' });
-    toast('Texto extraido (' + Math.round(confidence) + '% confianza) y documento creado', 'success');
+    const modeLabels = { clean: 'Texto limpio', faithful: 'Fiel al original', raw: 'Solo texto' };
+    toast('Documento creado (' + modeLabels[mode] + ', ' + Math.round(confidence) + '% confianza)', 'success');
   } catch (e) {
-    await updateScanOcrState(capture, { status: 'error', confidence: 0 });
     closeModal();
-    toast('Error en OCR: ' + e.message + '. Intenta ingreso manual.', 'error');
-    await registerExecution(project.id, 'ocr-extract', 'Extracción de texto (OCR)', {
-      inputAssetIds: [capture.id],
-      sourceAssetId: capture.id,
-      parameters: { engine: 'tesseract.js', error: e.message },
-      status: 'failed',
-      errors: [e.message],
-      startedAt: start,
-    }).catch(e => reportError(e, 'register-execution', { action: 'ocr-fail-log' }));
+    toast('Error al crear documento: ' + e.message, 'error');
     showManualTextEntry(project, capture, start);
   }
 }
@@ -3042,19 +3195,79 @@ function clearDocFormatting() {
 }
 
 function openDocumentStats(doc) {
-  const words = documentWordCount(doc);
-  const chars = (doc.blocks || []).map(block => block.content || '').join('').length;
+  const text = (doc.blocks || []).map(block => block.content || '').join(' ');
+  const trimmed = text.trim();
+  const words = trimmed ? trimmed.split(/\s+/).length : 0;
+  const uniqueWords = new Set(trimmed.toLowerCase().split(/\s+/).filter(Boolean));
+  const charsNoSpace = trimmed.replace(/\s/g, '').length;
+  const charsWithSpace = text.length;
+  const sentences = trimmed.split(/[.!?]+/).filter(s => s.trim().length > 0);
+  const paragraphs = trimmed.split(/\n\n+/).filter(p => p.trim().length > 0);
+  const lines = trimmed.split('\n');
+  const blocks = (doc.blocks || []).length;
   const headings = (doc.blocks || []).filter(block => String(block.type || '').startsWith('heading')).length;
+  const readMinutes = Math.max(1, Math.ceil(words / 200));
+  const speakMinutes = Math.max(1, Math.ceil(words / 130));
+  const wordsPerSentence = sentences.length > 0 ? (words / sentences.length).toFixed(1) : '0';
+  const wordsPerParagraph = paragraphs.length > 0 ? (words / paragraphs.length).toFixed(1) : '0';
+  const avgWordLength = words > 0 ? (trimmed.replace(/[^a-záéíóúñü]/gi, '').length / words).toFixed(1) : '0';
+  const wordList = trimmed.toLowerCase().split(/\s+/).filter(w => w.length > 2);
+  const wordFreq = {};
+  wordList.forEach(w => { const k = w.replace(/[^a-záéíóúñü]/g, ''); if (k.length > 2) wordFreq[k] = (wordFreq[k] || 0) + 1; });
+  const topWords = Object.entries(wordFreq).sort((a, b) => b[1] - a[1]).slice(0, 8);
+  const hapax = Object.entries(wordFreq).filter(([, c]) => c === 1).length;
+  const longWords = wordList.filter(w => w.length >= 7).length;
+  const lexicalDiversity = wordList.length > 0 ? (uniqueWords.size / wordList.length).toFixed(2) : '0';
+  const conf = doc.ocrConfidence;
+  const confSection = conf ? h('div', { style: 'margin-top:12px;padding:8px 12px;background:var(--ws-surface);border-radius:6px;border:1px solid var(--ws-border)' },
+    h('strong', { style: 'color:var(--ws-text)' }, 'Confianza OCR: '),
+    h('span', { style: 'color:' + (conf >= 85 ? 'var(--ws-success)' : conf >= 60 ? 'var(--ws-warning)' : 'var(--ws-error)') }, Math.round(conf) + '%')
+  ) : null;
+  const explanation = h('div', { className: 'ws-stats-explanation', style: 'margin-top:10px;font-size:12px;color:var(--ws-text-tertiary);line-height:1.5;padding:8px 12px;background:var(--ws-bg);border-radius:6px' },
+    h('div', { style: 'margin-bottom:6px;font-weight:600;color:var(--ws-text-secondary)' }, 'Glosario de métricas (§51)'),
+    h('div', null, h('strong', null, 'Diversidad léxica'), ' — Proporción del vocabulario total que es diferente. 1.0 = todas las palabras únicas; 0.0 = se repite todo.'),
+    h('div', null, h('strong', null, 'Palabras/oración'), ' — Promedio de palabras por oración. Texto claro: 12-20; académico: 20-30.'),
+    h('div', null, h('strong', null, 'Palabras/párrafo'), ' — Promedio de palabras por párrafo. Indica densidad de bloques.'),
+    h('div', null, h('strong', null, 'Hapax'), ' — Palabras que aparecen exactamente una vez. Indica riqueza vocabular.'),
+    h('div', null, h('strong', null, 'Palabras largas'), ' — Palabras de 7+ letras. Sugiere vocabulario técnico o formal.'),
+    h('div', null, h('strong', null, 'Tiempo lectura'), ' — Basado en 200 palabras/minuto (lectura silenciosa promedio).'),
+    h('div', null, h('strong', null, 'Tiempo voz alta'), ' — Basado en 130 palabras/minuto (lectura en voz alta promedio).')
+  );
+  const topWordsSection = topWords.length ? h('div', { style: 'margin-top:10px' },
+    h('div', { style: 'font-weight:600;font-size:12px;color:var(--ws-text-secondary);margin-bottom:4px' }, 'Palabras más frecuentes (top 8)'),
+    h('div', { style: 'display:flex;flex-wrap:wrap;gap:4px' },
+      ...topWords.map(([word, count]) => h('span', { style: 'padding:2px 8px;background:var(--ws-surface);border:1px solid var(--ws-border);border-radius:4px;font-size:11px;color:var(--ws-text-secondary)' }, word + ' (' + count + ')'))
+    )
+  ) : null;
+  const summary = h('div', { style: 'margin-top:10px;padding:10px 12px;background:var(--ws-primary-light);border-radius:6px;border:1px solid var(--ws-primary-medium)' },
+    h('div', { style: 'font-weight:600;font-size:12px;color:var(--ws-text);margin-bottom:4px' }, 'Resumen automático (§52)'),
+    h('div', { style: 'font-size:12px;color:var(--ws-text-secondary);line-height:1.5' }, buildExtractionSummary(trimmed, conf || 85))
+  );
+  const grid = h('div', { className: 'ws-doc-stats-grid' },
+    h('div', null, h('strong', null, words.toLocaleString('es')), h('span', null, 'palabras')),
+    h('div', null, h('strong', null, uniqueWords.size.toLocaleString('es')), h('span', null, 'únicas')),
+    h('div', null, h('strong', null, charsWithSpace.toLocaleString('es')), h('span', null, 'con espacio')),
+    h('div', null, h('strong', null, charsNoSpace.toLocaleString('es')), h('span', null, 'sin espacio')),
+    h('div', null, h('strong', null, String(sentences.length)), h('span', null, 'oraciones')),
+    h('div', null, h('strong', null, String(paragraphs.length)), h('span', null, 'párrafos')),
+    h('div', null, h('strong', null, String(lines.length)), h('span', null, 'líneas')),
+    h('div', null, h('strong', null, String(blocks)), h('span', null, 'bloques')),
+    h('div', null, h('strong', null, String(headings)), h('span', null, 'títulos')),
+    h('div', null, h('strong', null, readMinutes + ' min'), h('span', null, 'lectura')),
+    h('div', null, h('strong', null, speakMinutes + ' min'), h('span', null, 'voz alta')),
+    h('div', null, h('strong', null, wordsPerSentence), h('span', null, 'palabras/oración')),
+    h('div', null, h('strong', null, wordsPerParagraph), h('span', null, 'palabras/párrafo')),
+    h('div', null, h('strong', null, avgWordLength), h('span', null, 'long. media')),
+    h('div', null, h('strong', null, lexicalDiversity), h('span', null, 'diversidad léxica')),
+    h('div', null, h('strong', null, String(hapax)), h('span', null, 'hapax')),
+    h('div', null, h('strong', null, String(longWords)), h('span', null, 'palabras largas'))
+  );
+  const body = h('div', null, grid, confSection, topWordsSection, summary, explanation);
   showModal({
-    title: 'Estadísticas del documento',
-    content: h('div', { className: 'ws-doc-stats-grid' },
-      h('div', null, h('strong', null, words.toLocaleString('es')), h('span', null, 'palabras')),
-      h('div', null, h('strong', null, chars.toLocaleString('es')), h('span', null, 'caracteres')),
-      h('div', null, h('strong', null, String((doc.blocks || []).length)), h('span', null, 'bloques')),
-      h('div', null, h('strong', null, String(headings)), h('span', null, 'títulos'))
-    ),
-    confirmText: 'Cerrar',
-    size: 'small',
+    title: 'Estadísticas del documento (§50)',
+    body: [body],
+    footer: h('div', { className: 'ws-modal-footer' }, h('button', { className: 'ws-btn ws-btn-primary', onClick: () => closeModal() }, 'Cerrar')),
+    size: 'medium',
   });
 }
 

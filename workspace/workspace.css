@@ -3669,6 +3669,18 @@ html.theme-dark .ws-hero-drawing { filter: invert(1) hue-rotate(180deg); }
   :root:not(.theme-light) .ws-hero-drawing { filter: invert(1) hue-rotate(180deg); }
 }
 
+/* ── §53-55 Extraction mode chooser ──────────────────────────────── */
+.ws-extraction-mode-card:hover { border-color: var(--ws-primary) !important; }
+.ws-extraction-mode-card:focus-visible { outline: 2px solid var(--ws-primary); outline-offset: 2px; }
+
+/* ── §50-52 Document stats enhanced ──────────────────────────────── */
+.ws-doc-stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 6px; }
+.ws-doc-stats-grid > div { display: flex; flex-direction: column; align-items: center; padding: 8px 4px; background: var(--ws-surface); border-radius: 6px; border: 1px solid var(--ws-border-light); }
+.ws-doc-stats-grid > div strong { font-size: 18px; color: var(--ws-text); font-weight: 700; }
+.ws-doc-stats-grid > div span { font-size: 11px; color: var(--ws-text-tertiary); margin-top: 2px; }
+.ws-stats-explanation div + div { margin-top: 3px; }
+.ws-ocr-low-confidence { background: #E8B06030; color: var(--ws-warning); border-bottom: 1px dashed var(--ws-warning); padding: 0 1px; border-radius: 2px; }
+
 @keyframes wsReveal {
   from { opacity: 0; transform: translateY(18px); }
   to { opacity: 1; transform: translateY(0); }
