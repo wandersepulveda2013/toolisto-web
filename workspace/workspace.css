@@ -3681,6 +3681,100 @@ html.theme-dark .ws-hero-drawing { filter: invert(1) hue-rotate(180deg); }
 .ws-stats-explanation div + div { margin-top: 3px; }
 .ws-ocr-low-confidence { background: #E8B06030; color: var(--ws-warning); border-bottom: 1px dashed var(--ws-warning); padding: 0 1px; border-radius: 2px; }
 
+/* ── §80 — Compact hero ─────────────────────────────────────────── */
+.ws-project-hero-compact { padding: 14px 20px !important; min-height: auto !important; }
+.ws-project-hero-compact h1 { font-size: clamp(20px, 2.5vw, 28px) !important; margin: 0 0 8px !important; }
+.ws-project-hero-compact p { display: none; }
+.ws-project-hero-compact .ws-project-context { display: none; }
+
+/* ── §81 — Action icon primitive ─────────────────────────────────── */
+.ws-action-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: var(--ws-radius-sm, 4px);
+  background: transparent;
+  color: var(--ws-text-secondary);
+  cursor: pointer;
+  transition: background .12s, color .12s, border-color .12s;
+  flex-shrink: 0;
+}
+.ws-action-icon:hover { background: var(--ws-surface-hover); color: var(--ws-text); border-color: var(--ws-border); }
+.ws-action-icon:focus-visible { outline: 2px solid var(--ws-primary); outline-offset: 1px; }
+.ws-action-icon svg { pointer-events: none; }
+
+/* ── §82 — Continuous flow breadcrumb path ───────────────────────── */
+.ws-flow-path {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 6px 0 10px;
+  border-bottom: 1px solid var(--ws-border-light);
+  margin-bottom: 12px;
+  overflow-x: auto;
+  flex-shrink: 0;
+}
+.ws-flow-step {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--ws-text-tertiary);
+  font: 600 11px/1 inherit;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background .12s, color .12s, border-color .12s;
+}
+.ws-flow-step:hover { background: var(--ws-surface-hover); color: var(--ws-text-secondary); }
+.ws-flow-step.completed { color: var(--ws-success); }
+.ws-flow-step.completed:hover { background: var(--ws-success-light); }
+.ws-flow-step.active {
+  background: var(--ws-primary);
+  color: var(--ws-surface);
+  border-color: var(--ws-primary);
+  font-weight: 700;
+}
+.ws-flow-step.active:hover { opacity: .9; }
+.ws-flow-step:focus-visible { outline: 2px solid var(--ws-primary); outline-offset: 1px; }
+.ws-flow-step-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--ws-surface-hover);
+  font-size: 10px;
+  color: inherit;
+  flex-shrink: 0;
+}
+.ws-flow-step.active .ws-flow-step-num { background: rgba(255,255,255,.2); }
+.ws-flow-step.completed .ws-flow-step-num { background: rgba(126,207,160,.15); }
+.ws-flow-step-label { font-size: 11px; }
+.ws-flow-connector {
+  display: inline-block;
+  width: 12px;
+  height: 1px;
+  background: var(--ws-border);
+  flex-shrink: 0;
+}
+.ws-flow-connector.completed { background: var(--ws-success); }
+
+@media (max-width: 600px) {
+  .ws-flow-path { gap: 0; padding: 4px 0 8px; }
+  .ws-flow-step { padding: 2px 5px; font-size: 10px; }
+  .ws-flow-step-label { display: none; }
+  .ws-flow-step-num { width: 20px; height: 20px; font-size: 11px; }
+  .ws-flow-connector { width: 8px; }
+}
+
 @keyframes wsReveal {
   from { opacity: 0; transform: translateY(18px); }
   to { opacity: 1; transform: translateY(0); }

@@ -1081,6 +1081,8 @@ function renderView(view) {
   const main = $('#ws-main-content');
   main.replaceChildren();
   const project = appStore.get('currentProject');
+  const isProjectView = project && !['projects', 'intake', 'tools', 'flujos'].includes(view);
+  if (isProjectView) renderFlowPath(main);
   switch (view) {
     case 'projects': renderProjectsView(main); break;
     case 'intake': renderIntakeView(main); break;
@@ -1419,22 +1421,15 @@ function renderDashboardView(container, project) {
   const tables = project.dataCount || 0;
   const totalAssets = captures + documents + tables;
   const el = h('div', { className: 'ws-dashboard-home', style: 'animation:fadeIn 0.3s ease' });
-  const hero = h('section', { className: 'ws-project-hero' },
+  const hero = h('section', { className: 'ws-project-hero ws-project-hero-compact' },
     h('div', { className: 'ws-project-hero-copy' },
       h('span', { className: 'ws-dashboard-kicker' }, 'PROYECTO / ESPACIO LOCAL'),
       h('h1', null, project.name),
-      h('p', null, project.description || 'Un centro de trabajo para capturar, ordenar y convertir tus archivos en resultados.'),
       h('div', { className: 'ws-project-actions' },
-        h('button', { className: 'ws-btn ws-btn-primary', onClick: () => navigateTo('intake') }, svgIcon('camera', 16), ' Capturar algo'),
-        h('button', { className: 'ws-btn ws-btn-secondary', onClick: () => navigateTo('documents') }, svgIcon('doc', 16), ' Abrir documentos'),
-        h('button', { className: 'ws-btn ws-btn-ghost', onClick: () => appStore.set({ paletteOpen: true }) }, svgIcon('search', 16), ' Buscar')
+        h('button', { className: 'ws-btn ws-btn-primary ws-btn-sm', onClick: () => navigateTo('intake') }, svgIcon('camera', 14), ' Capturar'),
+        h('button', { className: 'ws-btn ws-btn-secondary ws-btn-sm', onClick: () => navigateTo('documents') }, svgIcon('doc', 14), ' Documentos'),
+        h('button', { className: 'ws-btn ws-btn-ghost ws-btn-sm', onClick: () => appStore.set({ paletteOpen: true }) }, svgIcon('search', 14), ' Buscar')
       )
-    ),
-    h('div', { className: 'ws-project-context' },
-      h('div', { className: 'ws-context-orbit' }, svgIcon('sparkle', 23)),
-      h('span', { className: 'ws-context-label' }, 'Todo listo'),
-      h('strong', null, totalAssets ? totalAssets + ' elementos en movimiento' : 'Tu espacio está listo'),
-      h('small', null, 'Procesamiento local · sin subir tus archivos')
     )
   );
   el.appendChild(hero);
@@ -1454,15 +1449,6 @@ function renderDashboardView(container, project) {
   el.appendChild(metrics);
 
   const lower = h('div', { className: 'ws-dashboard-lower' });
-  const next = h('section', { className: 'ws-dashboard-panel ws-next-panel' },
-    h('div', { className: 'ws-dashboard-panel-heading' }, h('div', null, h('span', { className: 'ws-dashboard-kicker' }, 'SIGUIENTE MOVIMIENTO'), h('h2', null, 'Avanza sin fricción')), h('span', { className: 'ws-panel-status' }, 'LOCAL')),
-    h('p', { className: 'ws-panel-intro' }, totalAssets ? 'Elige el paso que mejor encaja con lo que ya tienes en este espacio.' : 'Empieza con una captura y deja que el proyecto se organice alrededor de tu trabajo.'),
-    h('div', { className: 'ws-next-actions' },
-      h('button', { onClick: () => navigateTo('intake') }, svgIcon('camera', 16), h('span', null, 'Traer un archivo', h('small', null, 'Captura, pega o arrastra'))),
-      h('button', { onClick: () => navigateTo('data') }, svgIcon('table', 16), h('span', null, 'Ordenar datos', h('small', null, 'Crea una tabla útil'))),
-      h('button', { onClick: () => navigateTo('flow') }, svgIcon('flow', 16), h('span', null, 'Automatizar', h('small', null, 'Repite lo que funciona')))
-    )
-  );
   const signalList = h('div', { className: 'ws-signal-list' },
     h('button', { onClick: () => navigateTo('capture') },
       h('span', { className: 'ws-signal-index' }, '01'),
@@ -1484,7 +1470,7 @@ function renderDashboardView(container, project) {
     ),
     signalList
   );
-  lower.append(next, signal);
+  lower.append(signal);
   el.appendChild(lower);
 
   const bento = h('div', { className: 'ws-bento' });
@@ -1510,6 +1496,65 @@ function renderDashboardView(container, project) {
     bento
   ));
   container.appendChild(el);
+}
+
+/* §81 — Common action icon primitive */
+function actionIcon(icon, size, label, onClick) {
+  return h('button', {
+    className: 'ws-action-icon',
+    type: 'button',
+    title: label,
+    ariaLabel: label,
+    onClick,
+  }, svgIcon(icon, size || 16));
+}
+
+/* §82 — Continuous flow guide (7-step breadcrumb path) */
+const FLOW_STEPS = [
+  { id: 'capture', label: 'Capturar', icon: 'camera', view: 'intake', altViews: ['capture', 'scanner'] },
+  { id: 'documents', label: 'Documentos', icon: 'doc', view: 'documents', altViews: ['doc-editor'] },
+  { id: 'data', label: 'Datos', icon: 'table', view: 'data', altViews: ['data-table'] },
+  { id: 'prepare', label: 'Preparar', icon: 'wrench', view: 'flujos', altViews: ['flow', 'tools'] },
+  { id: 'analyze', label: 'Analizar', icon: 'chart', view: 'query', altViews: ['model'] },
+  { id: 'visualize', label: 'Visualizar', icon: 'chart', view: 'dashboards', altViews: ['design'] },
+  { id: 'export', label: 'Exportar', icon: 'download', view: null, altViews: [] },
+];
+
+function getFlowStepIndex(currentView) {
+  for (let i = 0; i < FLOW_STEPS.length; i++) {
+    const step = FLOW_STEPS[i];
+    if (step.view === currentView || (step.altViews && step.altViews.includes(currentView))) return i;
+  }
+  return -1;
+}
+
+function renderFlowPath(container) {
+  const currentView = appStore.get('currentView');
+  const activeIdx = getFlowStepIndex(currentView);
+  const path = h('div', { className: 'ws-flow-path', role: 'navigation', ariaLabel: 'Flujo de trabajo' });
+  FLOW_STEPS.forEach((step, idx) => {
+    const isActive = idx === activeIdx;
+    const isPast = activeIdx >= 0 && idx < activeIdx;
+    const cls = 'ws-flow-step' + (isActive ? ' active' : '') + (isPast ? ' completed' : '');
+    const btn = h('button', {
+      className: cls,
+      type: 'button',
+      'aria-current': isActive ? 'step' : undefined,
+      title: step.label,
+      onClick: () => {
+        if (step.view) navigateTo(step.view);
+        else toast('Exporta desde el documento o tabla actual', 'info');
+      },
+    },
+      h('span', { className: 'ws-flow-step-num' }, isPast ? svgIcon('check', 12) : String(idx + 1)),
+      h('span', { className: 'ws-flow-step-label' }, step.label)
+    );
+    path.appendChild(btn);
+    if (idx < FLOW_STEPS.length - 1) {
+      path.appendChild(h('span', { className: 'ws-flow-connector' + (isPast ? ' completed' : '') }));
+    }
+  });
+  container.appendChild(path);
 }
 
 function renderIntakeView(container) {
