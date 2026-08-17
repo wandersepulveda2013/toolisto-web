@@ -1471,10 +1471,28 @@
 
     const htmlByTool = {
       compress: `
-        ${controlNumber('targetKb', 'Peso máximo objetivo (KB)', targetFromIntent || suggestedKb, 20, 10000)}
-        ${controlSelect('compressFormat', 'Formato de salida', [['auto','Automático'],['image/webp','WebP'],['image/jpeg','JPG'],['image/png','PNG']])}
-        ${controlNumber('compressWidth', 'Ancho máximo (0 = automático)', 0, 0, 10000)}
-        ${controlNumber('compressQuality', 'Calidad inicial (%)', 84, 25, 100)}
+        ${controlSelect('compressPreset', 'Modo de compresión', [['auto','Automático — recomendado'],['quality','Máxima calidad'],['balanced','Equilibrado'],['max','Máxima reducción'],['custom','Personalizado']])}
+        <div id="compressPurposeWrap" class="control">
+          <label for="compressPurpose">¿Para qué la necesitas?</label>
+          <select id="compressPurpose" data-ctrl="compressPurpose">
+            <option value="auto">Automático</option>
+            <option value="whatsapp">WhatsApp</option>
+            <option value="email">Correo electrónico</option>
+            <option value="web">Página web</option>
+            <option value="document">Documento</option>
+          </select>
+        </div>
+        <details id="compressAdvancedWrap" class="control" style="grid-column:1/-1">
+          <summary style="cursor:pointer;font-size:.85rem;color:var(--muted)">Ajustes avanzados</summary>
+          <div style="margin-top:8px;display:grid;gap:8px">
+            ${controlNumber('targetKb', 'Peso máximo (KB)', targetFromIntent || suggestedKb, 20, 10000)}
+            ${controlSelect('compressFormat', 'Formato de salida', [['auto','Automático'],['image/webp','WebP'],['image/jpeg','JPG'],['image/png','PNG']])}
+            ${controlNumber('compressWidth', 'Ancho máximo (0 = automático)', 0, 0, 10000)}
+            ${controlNumber('compressQuality', 'Calidad inicial (%)', 84, 25, 100)}
+          </div>
+        </details>
+        <div id="compressPreviewInfo" class="control" style="grid-column:1/-1;display:none;padding:10px 14px;border:1px solid var(--c-border);border-radius:8px;background:var(--c-surface-soft)">
+        </div>
       `,
       signature: `
         ${controlNumber('signatureThreshold', 'Blanco a eliminar', 215, 120, 250)}
@@ -1500,8 +1518,9 @@
         ${controlNumber('cropOffsetX', 'Mover horizontal (%)', 0, -100, 100)}
         ${controlNumber('cropOffsetY', 'Mover vertical (%)', 0, -100, 100)}
         <div class="control" style="grid-column:1/-1;color:var(--muted);font-size:.82rem">
-          Vista previa: arrastra el marco para reposicionar el recorte. El zoom y los valores numéricos se reflejan en tiempo real.
+          Arrastra el marco para reposicionar. Arrastra las esquinas o bordes para redimensionar. El zoom y los valores se reflejan en tiempo real.
         </div>
+        <div id="cropPreviewInfo" class="control" style="grid-column:1/-1;display:none"></div>
         <div id="cropPreviewWrap" style="grid-column:1/-1;position:relative;display:none;margin-top:8px"></div>
       `,
       convert: `
@@ -2407,6 +2426,30 @@
       ctx.moveTo(rx, ry + rh * g / 3); ctx.lineTo(rx + rw, ry + rh * g / 3);
     }
     ctx.stroke();
+    var handleSize = 8;
+    ctx.fillStyle = '#ffffff';
+    ctx.strokeStyle = 'rgba(0,0,0,0.3)';
+    ctx.lineWidth = 1;
+    var handles = [
+      [rx, ry], [rx + rw, ry], [rx, ry + rh], [rx + rw, ry + rh],
+      [rx + rw / 2, ry], [rx + rw / 2, ry + rh],
+      [rx, ry + rh / 2], [rx + rw, ry + rh / 2]
+    ];
+    handles.forEach(function(h) {
+      ctx.fillRect(h[0] - handleSize / 2, h[1] - handleSize / 2, handleSize, handleSize);
+      ctx.strokeRect(h[0] - handleSize / 2, h[1] - handleSize / 2, handleSize, handleSize);
+    });
+    _cropPrev.handles = handles;
+    var cursors = ['nwse-resize','nesw-resize','nesw-resize','nwse-resize','ns-resize','ns-resize','ew-resize','ew-resize'];
+    _cropPrev.handleCursors = cursors;
+    var infoEl = document.getElementById('cropPreviewInfo');
+    if (infoEl) {
+      infoEl.style.display = '';
+      infoEl.innerHTML = '<div style="display:flex;gap:16px;font-size:.78rem;color:var(--muted)">' +
+        '<span>X: ' + Math.round(sx) + '</span><span>Y: ' + Math.round(sy) + '</span>' +
+        '<span>Ancho: ' + Math.round(cropW) + '</span><span>Alto: ' + Math.round(cropH) + '</span>' +
+        '</div>';
+    }
   }
 
   function initCropPreview() {
@@ -2440,18 +2483,75 @@
       const px = (e.clientX - rect.left) * (canvas.width / rect.width);
       const py = (e.clientY - rect.top) * (canvas.height / rect.height);
       const r = _cropPrev.rect;
-      if (!r || px < r.rx || px > r.rx + r.rw || py < r.ry || py > r.ry + r.rh) return;
-      _cropPrev.dragging = true;
-      _cropPrev.dragStartX = px; _cropPrev.dragStartY = py;
-      _cropPrev.startOffsetX = numberValue('cropOffsetX', 0);
-      _cropPrev.startOffsetY = numberValue('cropOffsetY', 0);
-      canvas.style.cursor = 'grabbing';
+      if (!r) return;
+      var handleIdx = -1;
+      if (_cropPrev.handles) {
+        for (var hi = 0; hi < _cropPrev.handles.length; hi++) {
+          var hx = _cropPrev.handles[hi][0], hy = _cropPrev.handles[hi][1];
+          if (Math.abs(px - hx) < 12 && Math.abs(py - hy) < 12) { handleIdx = hi; break; }
+        }
+      }
+      if (handleIdx >= 0) {
+        _cropPrev.resizeHandle = handleIdx;
+        _cropPrev.resizeStartX = px; _cropPrev.resizeStartY = py;
+        _cropPrev.resizeStartOffX = numberValue('cropOffsetX', 0);
+        _cropPrev.resizeStartOffY = numberValue('cropOffsetY', 0);
+        _cropPrev.resizeStartW = _cropPrev.cropW;
+        _cropPrev.resizeStartH = _cropPrev.cropH;
+        canvas.style.cursor = _cropPrev.handleCursors ? _cropPrev.handleCursors[handleIdx] : 'crosshair';
+        e.preventDefault();
+        return;
+      }
+      if (px >= r.rx && px <= r.rx + r.rw && py >= r.ry && py <= r.ry + r.rh) {
+        _cropPrev.dragging = true;
+        _cropPrev.dragStartX = px; _cropPrev.dragStartY = py;
+        _cropPrev.startOffsetX = numberValue('cropOffsetX', 0);
+        _cropPrev.startOffsetY = numberValue('cropOffsetY', 0);
+        canvas.style.cursor = 'grabbing';
+      }
     });
     canvas.addEventListener('pointermove', (e) => {
-      if (!_cropPrev.dragging) return;
       const rect = canvas.getBoundingClientRect();
       const px = (e.clientX - rect.left) * (canvas.width / rect.width);
       const py = (e.clientY - rect.top) * (canvas.height / rect.height);
+      if (_cropPrev.resizeHandle !== undefined && _cropPrev.resizeHandle >= 0) {
+        const sc = _cropPrev.scale || 1;
+        const dxPx = px - _cropPrev.resizeStartX;
+        const dyPx = py - _cropPrev.resizeStartY;
+        const hi = _cropPrev.resizeHandle;
+        var newOffX = _cropPrev.resizeStartOffX;
+        var newOffY = _cropPrev.resizeStartOffY;
+        if (hi === 0 || hi === 3 || hi === 6 || hi === 7) {
+          newOffX = clamp(_cropPrev.resizeStartOffX + (dxPx / sc / ((_cropPrev.imgW - _cropPrev.resizeStartW) / 2 || 1)) * 100, -100, 100);
+        }
+        if (hi === 0 || hi === 1 || hi === 4 || hi === 5) {
+          newOffY = clamp(_cropPrev.resizeStartOffY + (dyPx / sc / ((_cropPrev.imgH - _cropPrev.resizeStartH) / 2 || 1)) * 100, -100, 100);
+        }
+        var zoomCtrl = $('#cropZoom');
+        if (zoomCtrl) {
+          var curZoom = clamp(numberValue('cropZoom', 100), 100, 300);
+          var zoomDelta = -(dxPx + dyPx) / 200 * 10;
+          zoomCtrl.value = clamp(Math.round(curZoom + zoomDelta), 100, 300);
+        }
+        $('#cropOffsetX').value = Math.round(newOffX * 100) / 100;
+        $('#cropOffsetY').value = Math.round(newOffY * 100) / 100;
+        renderCropPreview();
+        return;
+      }
+      if (!_cropPrev.dragging) {
+        if (_cropPrev.handles) {
+          var overHandle = false;
+          for (var hi2 = 0; hi2 < _cropPrev.handles.length; hi2++) {
+            var hx2 = _cropPrev.handles[hi2][0], hy2 = _cropPrev.handles[hi2][1];
+            if (Math.abs(px - hx2) < 12 && Math.abs(py - hy2) < 12) { canvas.style.cursor = _cropPrev.handleCursors[hi2]; overHandle = true; break; }
+          }
+          if (!overHandle) {
+            var r2 = _cropPrev.rect;
+            canvas.style.cursor = (r2 && px >= r2.rx && px <= r2.rx + r2.rw && py >= r2.ry && py <= r2.ry + r2.rh) ? 'grab' : 'default';
+          }
+        }
+        return;
+      }
       const maxX = (_cropPrev.imgW - _cropPrev.cropW) / 2;
       const maxY = (_cropPrev.imgH - _cropPrev.cropH) / 2;
       const dxImg = (px - _cropPrev.dragStartX) / (_cropPrev.scale || 1);
@@ -2462,8 +2562,8 @@
       $('#cropOffsetY').value = Math.round(newOffY * 100) / 100;
       renderCropPreview();
     });
-    canvas.addEventListener('pointerup', () => { _cropPrev.dragging = false; canvas.style.cursor = 'grab'; });
-    canvas.addEventListener('pointerleave', () => { _cropPrev.dragging = false; canvas.style.cursor = 'grab'; });
+    canvas.addEventListener('pointerup', () => { _cropPrev.dragging = false; _cropPrev.resizeHandle = undefined; canvas.style.cursor = 'grab'; });
+    canvas.addEventListener('pointerleave', () => { _cropPrev.dragging = false; _cropPrev.resizeHandle = undefined; canvas.style.cursor = 'grab'; });
   }
 
   const WORD_PROCESSOR_TOOLS = new Set([
@@ -2735,10 +2835,32 @@
   async function processCompress() {
     const file = state.files[0];
     const image = await loadImage(file);
-    const targetBytes = clamp(numberValue('targetKb', 500), 20, 10000) * 1024;
-    const requestedMime = valueOf('compressFormat', 'auto');
-    const maxWidth = clamp(numberValue('compressWidth', 0), 0, 10000);
-    const initialQuality = clamp(numberValue('compressQuality', 84) / 100, .25, 1);
+    const preset = valueOf('compressPreset', 'auto');
+    const purpose = valueOf('compressPurpose', 'auto');
+    const isAdvanced = preset === 'custom';
+    let targetKb, maxWidth, initialQuality, requestedMime;
+    if (preset === 'auto' || preset === 'balanced') {
+      targetKb = purpose === 'whatsapp' ? 300 : purpose === 'email' ? 400 : purpose === 'web' ? 250 : purpose === 'document' ? 500 : Math.max(150, Math.round(file.size / 1024 * 0.45));
+      maxWidth = purpose === 'web' ? 1200 : purpose === 'whatsapp' ? 1600 : 0;
+      initialQuality = purpose === 'whatsapp' ? .72 : purpose === 'web' ? .78 : .82;
+      requestedMime = 'auto';
+    } else if (preset === 'quality') {
+      targetKb = Math.max(200, Math.round(file.size / 1024 * 0.85));
+      maxWidth = 0;
+      initialQuality = .92;
+      requestedMime = 'auto';
+    } else if (preset === 'max') {
+      targetKb = Math.max(20, Math.round(file.size / 1024 * 0.2));
+      maxWidth = 800;
+      initialQuality = .55;
+      requestedMime = 'auto';
+    } else {
+      targetKb = clamp(numberValue('targetKb', 500), 20, 10000);
+      maxWidth = clamp(numberValue('compressWidth', 0), 0, 10000);
+      initialQuality = clamp(numberValue('compressQuality', 84) / 100, .25, 1);
+      requestedMime = valueOf('compressFormat', 'auto');
+    }
+    const targetBytes = targetKb * 1024;
     const mime = requestedMime === 'auto' ? (file.type === 'image/jpeg' ? 'image/jpeg' : 'image/webp') : requestedMime;
 
     let width = image.naturalWidth;
@@ -2789,16 +2911,28 @@
     }
 
     const extension = extensionForMime(mime);
+    const reduction = Math.max(0, Math.round((1 - blob.size / file.size) * 100));
+    const outW = canvas.width;
+    const outH = canvas.height;
+    const previewInfoEl = document.getElementById('compressPreviewInfo');
+    if (previewInfoEl) {
+      previewInfoEl.style.display = '';
+      previewInfoEl.innerHTML = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:.85rem">' +
+        '<div><div style="font-weight:700;margin-bottom:4px;color:var(--muted)">ORIGINAL</div><div>' + formatBytes(file.size) + '</div><div>' + image.naturalWidth + ' × ' + image.naturalHeight + '</div></div>' +
+        '<div><div style="font-weight:700;margin-bottom:4px;color:var(--c-primary)">RESULTADO</div><div>' + formatBytes(blob.size) + '</div><div>' + outW + ' × ' + outH + '</div></div>' +
+        '</div><div style="margin-top:8px;font-weight:700;color:var(--c-success,#16835b)">' + reduction + '% menos peso</div>';
+    }
     return {
       blob,
       name: `${baseName(file.name)}-optimizada.${extension}`,
       title: 'Imagen optimizada',
-      message: blob.size <= targetBytes ? 'La imagen quedó por debajo del peso máximo indicado.' : 'La imagen se redujo todo lo posible sin hacerla demasiado pequeña.',
+      message: blob.size <= targetBytes ? 'La imagen quedó por debajo del peso objetivo.' : 'La imagen se redujo al máximo posible.',
       preview: blob,
       stats: [
         ['Antes', formatBytes(file.size)],
         ['Después', formatBytes(blob.size)],
-        ['Reducción', `${Math.max(0, Math.round((1 - blob.size / file.size) * 100))}%`],
+        ['Reducción', `${reduction}%`],
+        ['Dimensiones', `${outW} × ${outH}`],
       ],
     };
   }
