@@ -98,12 +98,39 @@
 
 ---
 
+## P1 — Document extraction + statistics (§48-55)
+
+### §53: Tres modos de extracción
+- **Texto limpio** (recomendado): Elimina ruido OCR (líneas de un solo carácter, encabezados repetidos, números de página, separadores decorativos), normaliza espaciado y puntuación, une palabras partidas.
+- **Fiel al original**: Preserva la estructura cruda del OCR. Resalta palabras con confianza <70% con borde amarillo punteado.
+- **Solo texto**: Texto crudo sin procesamiento.
+
+### §54: Chooser de modo
+- Modal interactivo que se muestra después del OCR, antes de crear el documento.
+- Muestra preview de cada modo, badge "Recomendado" en Texto limpio, badge de confianza OCR.
+- Botón "Ingreso manual" como fallback.
+
+### §55: Confianza OCR visible
+- Badge de confianza en el chooser (verde ≥85%, ámbar 60-84%, rojo <60%).
+- En modo "Fiel al original", palabras con confianza <70% llevan `<span class="ws-ocr-low-confidence">` con borde amarillo.
+- Sección de confianza en el modal de estadísticas.
+
+### §50-51: Estadísticas extendidas + glosario
+- **17 métricas**: palabras, únicas, caracteres con/sin espacio, oraciones, párrafos, líneas, bloques, títulos, tiempo lectura (200 wpm), tiempo voz alta (130 wpm), palabras/oración, palabras/párrafo, longitud media, diversidad léxica, top 8 palabras, hapax, palabras largas.
+- **Glosario** (§51): Explicación de cada métrica no obvia (diversidad léxica, hapax, etc.).
+
+### §52: Resumen automático
+- Genera párrafo natural: "El documento contiene X palabras (Y únicas) distribuidas en Z oraciones..."
+- Incluye diversidad léxica, palabras frecuentes, confianza OCR.
+
+---
+
 ## Pendiente para futuras sesiones
 
 | Sección | Descripción | Prioridad |
 |---------|-------------|-----------|
-| §22 | Extract audio from video (existe pero bloqueado por P0, ahora desbloqueado) | P0→Hecho |
-| §48-55 | Document extraction modes (clean/faithful/raw OCR) | P1 |
+| §22 | Extract audio from video (desbloqueado tras P0) | P0→Hecho |
+| §48-55 | Document extraction modes + stats + confidence | P1→Hecho |
 | §70+ | Freeze panes, autofill, merge cells, borders, conditional formatting | P2 |
 | §80 | Dashboard auto+manual refresh (polling o debounce post-cambio) | P2 |
 | §81 | Decentralized icons (reemplazar emojis por SVGs) | P3 |
