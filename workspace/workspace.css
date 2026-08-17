@@ -33,9 +33,9 @@
   --ws-cream-deep: #E8D9C3;
   --ws-font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --ws-display: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --ws-sidebar-width: 264px;
-  --ws-sidebar-collapsed: 64px;
-  --ws-topbar-height: 62px;
+  --ws-sidebar-width: 236px;
+  --ws-sidebar-collapsed: 68px;
+  --ws-topbar-height: 48px;
   --ws-statusbar-height: 28px;
   --ws-context-panel-width: 320px;
   --ws-density-scale: 1;
@@ -414,16 +414,16 @@ html.theme-dark .ws-studio-dropzone.drag-over {
 .sidebar-header {
   display: flex;
   align-items: center;
-  gap: calc(10px * var(--ws-density-scale));
-  padding: calc(16px * var(--ws-density-scale)) calc(16px * var(--ws-density-scale));
+  gap: calc(8px * var(--ws-density-scale));
+  padding: calc(10px * var(--ws-density-scale)) calc(12px * var(--ws-density-scale));
   border-bottom: 1px solid var(--ws-border-light);
-  min-height: calc(60px * var(--ws-density-scale));
+  min-height: calc(48px * var(--ws-density-scale));
 }
 
 .sidebar-logo {
-  width: 32px;
-  height: 32px;
-  min-width: 32px;
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -440,8 +440,8 @@ html.theme-dark .ws-studio-dropzone.drag-over {
 
 .sidebar-logo-img {
   display: block;
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   border-radius: inherit;
 }
 
@@ -472,11 +472,11 @@ html.theme-dark .ws-studio-dropzone.drag-over {
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: calc(8px * var(--ws-density-scale)) calc(8px * var(--ws-density-scale));
+  padding: calc(6px * var(--ws-density-scale)) calc(6px * var(--ws-density-scale));
 }
 
 .sidebar-section {
-  margin-bottom: calc(8px * var(--ws-density-scale));
+  margin-bottom: calc(4px * var(--ws-density-scale));
 }
 
 .sidebar-section-title {
@@ -485,7 +485,7 @@ html.theme-dark .ws-studio-dropzone.drag-over {
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--ws-text-tertiary);
-  padding: calc(8px * var(--ws-density-scale)) calc(8px * var(--ws-density-scale)) calc(4px * var(--ws-density-scale));
+  padding: calc(6px * var(--ws-density-scale)) calc(8px * var(--ws-density-scale)) calc(2px * var(--ws-density-scale));
   white-space: nowrap;
   overflow: hidden;
 }
@@ -510,8 +510,8 @@ html.theme-dark .ws-studio-dropzone.drag-over {
   width: 100%;
   display: flex;
   align-items: center;
-  gap: calc(10px * var(--ws-density-scale));
-  padding: calc(7px * var(--ws-density-scale)) calc(10px * var(--ws-density-scale));
+  gap: calc(8px * var(--ws-density-scale));
+  padding: calc(5px * var(--ws-density-scale)) calc(8px * var(--ws-density-scale));
   border-radius: var(--ws-radius-md);
   cursor: pointer;
   color: var(--ws-text-secondary);
@@ -570,7 +570,7 @@ html.theme-dark .ws-studio-dropzone.drag-over {
 
 .sidebar-footer {
   border-top: 1px solid var(--ws-border-light);
-  padding: calc(8px * var(--ws-density-scale));
+  padding: calc(6px * var(--ws-density-scale));
   display: flex;
   align-items: center;
   gap: calc(4px * var(--ws-density-scale));
@@ -4892,8 +4892,8 @@ html.theme-dark .ws-art-index {
 
 /* Compact workspace pass: keep the canvas generous and make the chrome earn its space. */
 :root {
-  --ws-sidebar-width: 240px;
-  --ws-topbar-height: 56px;
+  --ws-sidebar-width: 236px;
+  --ws-topbar-height: 48px;
   --ws-statusbar-height: 24px;
 }
 
@@ -4907,38 +4907,38 @@ html.theme-dark .ws-art-index {
 
 .sidebar-header {
   gap: 8px;
-  padding: 13px 14px 12px;
-  min-height: 56px;
+  padding: 10px 12px;
+  min-height: 48px;
 }
 
 .sidebar-logo-text {
-  font-size: 18px;
+  font-size: 15px;
 }
 
 .sidebar-nav {
-  padding: 6px;
+  padding: 5px;
 }
 
 .sidebar-section {
-  margin-bottom: 5px;
+  margin-bottom: 3px;
 }
 
 .sidebar-section-title {
-  padding: 6px 7px 3px;
+  padding: 5px 6px 2px;
 }
 
 .sidebar-item {
-  gap: 8px;
-  padding: 5px 8px;
+  gap: 7px;
+  padding: 4px 7px;
 }
 
 .sidebar-item .icon {
-  width: 19px;
-  min-width: 19px;
+  width: 18px;
+  min-width: 18px;
 }
 
 .sidebar-footer {
-  padding: 6px;
+  padding: 5px;
 }
 
 .sidebar-footer-btn {
