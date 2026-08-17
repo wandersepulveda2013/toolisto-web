@@ -131,10 +131,10 @@
 |---------|-------------|-----------|
 | §22 | Extract audio from video (desbloqueado tras P0) | P0→Hecho |
 | §48-55 | Document extraction modes + stats + confidence | P1→Hecho |
+| §80 | Dashboard compact hero (removed verbose hero, flow path replaces next actions) | P2→Hecho |
+| §81 | Common action icon primitive (actionIcon function) | P3→Hecho |
+| §82 | Continuous flow guide (7-step breadcrumb path) | P2→Hecho |
 | §70+ | Freeze panes, autofill, merge cells, borders, conditional formatting | P2 |
-| §80 | Dashboard auto+manual refresh (polling o debounce post-cambio) | P2 |
-| §81 | Decentralized icons (reemplazar emojis por SVGs) | P3 |
-| §82 | Flujo continuo visible (pipeline progress tracker) | P2 |
 | §87 | Mouse optional audit completo | P2 |
 | §88-92 | Accessibility, responsive, performance, privacy | P3 |
 
