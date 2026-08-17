@@ -349,10 +349,11 @@ function renderContact() {
 }
 
 function renderPrivacy() {
-  const content = `<section class="apluno-page-hero apluno-section" data-reveal><p class="apluno-eyebrow">Legal / Privacidad</p><h1>Privacidad, explicada sin rodeos.</h1><p>Última actualización: 14 de agosto de 2026.</p></section>
+  const content = `<section class="apluno-page-hero apluno-section" data-reveal><p class="apluno-eyebrow">Legal / Privacidad</p><h1>Privacidad, explicada sin rodeos.</h1><p>Última actualización: 17 de agosto de 2026.</p></section>
     <section class="apluno-section apluno-legal-copy">
-      <article data-reveal><h2>El sitio de Apluno</h2><p>Apluno no requiere una cuenta para visitar sus páginas públicas. No usamos analítica ni cookies de seguimiento en la configuración actual.</p></article>
-      <article data-reveal><h2>Archivos procesados en Toolisto</h2><p>Las herramientas de Toolisto están diseñadas para procesar los archivos en tu navegador. Apluno no recibe ni almacena el contenido que seleccionas para procesar. Algunas funciones pueden descargar librerías necesarias para operar, pero tus archivos no se envían con ese fin.</p></article>
+      <article data-reveal><h2>El sitio de Apluno</h2><p>Apluno no requiere una cuenta para visitar sus páginas públicas. En las páginas públicas de navegación y catálogo (portada, catálogo de herramientas y páginas de categorías) Apluno puede usar Google AdSense para mostrar anuncios. Google puede utilizar cookies u otros identificadores para la publicación y medición de anuncios, conforme a las opciones de consentimiento aplicables y a la configuración del navegador.</p></article>
+      <article data-reveal><h2>Herramientas de archivos (Toolisto)</h2><p>Las herramientas de Toolisto están diseñadas para procesar los archivos en tu navegador. Apluno no recibe ni almacena el contenido que seleccionas para procesar. Por ahora, el código publicitario de Google AdSense no se incluye en las páginas donde Toolisto procesa archivos, y Apluno no envía a Google el contenido de los archivos que seleccionas para procesar. Algunas funciones pueden descargar librerías necesarias para operar, pero tus archivos no se envían con ese fin.</p></article>
+      <article data-reveal><h2>Analítica</h2><p>Google Analytics no está activo en este sitio. Si se habilita en el futuro, se actualizará esta página antes de presentarlo como parte del servicio.</p></article>
       <article data-reveal><h2>Mensajes por correo</h2><p>Si nos escribes, recibiremos la dirección, el contenido y los adjuntos que decidas enviar. Usaremos esa información para responder a tu mensaje.</p></article>
       <article data-reveal><h2>Cambios</h2><p>Si incorporamos medición, cuentas u otro tratamiento de datos, actualizaremos esta página antes de presentarlo como parte del servicio.</p></article>
     </section>`;
