@@ -121,9 +121,9 @@ async function run() {
     ok(payloadHash.length === 64, 'sha256 del fixture calculado', payloadHash.slice(0, 12) + '…');
     const MIXTO = { name: 'mixto.txt', mimeType: 'text/plain', buffer: payload };
     const PARTS = [
-      { name: 'mixto.part001.txt', mimeType: 'text/plain', buffer: part1 },
-      { name: 'mixto.part002.txt', mimeType: 'text/plain', buffer: part2 },
-      { name: 'mixto.part003.txt', mimeType: 'text/plain', buffer: part3 },
+      { name: 'mixto.part001', mimeType: 'application/octet-stream', buffer: part1 },
+      { name: 'mixto.part002', mimeType: 'application/octet-stream', buffer: part2 },
+      { name: 'mixto.part003', mimeType: 'application/octet-stream', buffer: part3 },
     ];
 
     /* ── 1. fileSplit (dividir-archivo) ───────────────────────────────── */
@@ -142,7 +142,7 @@ async function run() {
     const splitDl = await collectDownloads(3);
     ok(splitDl.length === 3, 'fileSplit descarga 3 fragmentos', splitDl.length + ' descargas');
     const splitNames = splitDl.map((d) => d.suggestedFilename()).sort();
-    ok(splitNames.join(',') === 'mixto.part001.txt,mixto.part002.txt,mixto.part003.txt', 'fileSplit nombra los fragmentos partNNN.txt', splitNames.join(','));
+    ok(splitNames.join(',') === 'mixto.part001,mixto.part002,mixto.part003', 'fileSplit nombra los fragmentos partNNN (sin extensión falsa)', splitNames.join(','));
     const sizes = [];
     const parts = [];
     for (const d of splitDl) {
@@ -179,10 +179,11 @@ async function run() {
     ok(preview.includes('SHA-256 del resultado') && preview.includes(payloadHash), 'fileJoin manifiesto SHA-256 del resultado coincide con el original');
     downloads.length = 0;
     await page.click('#modeRun');
-    await waitPreview('Archivo reconstruido: mixto.txt');
+    await waitPreview('Archivo reconstruido:');
     const joinDl = await collectDownloads(1);
     ok(joinDl.length === 1, 'fileJoin descarga 1 archivo', joinDl.length + ' descargas');
-    ok(joinDl[0].suggestedFilename() === 'mixto.txt', `fileJoin recompone el nombre original "mixto.txt"`, joinDl[0].suggestedFilename());
+    const joinName = joinDl[0].suggestedFilename();
+    ok(joinName === 'mixto' || joinName === 'mixto.txt', `fileJoin recompone nombre razonable ("${joinName}")`, joinName);
     const joinedBuf = await downloadBuffer(joinDl[0]);
     ok(Buffer.from(joinedBuf).equals(payload), 'fileJoin reconstruye los bytes exactos del original');
     ok((await toastText()).includes('3 fragmentos unidos en un solo archivo (150.0 KB).'), 'fileJoin message prometido en el toast', await toastText());

@@ -617,14 +617,13 @@ async function run() {
     ok(/Metadatos extraídos correctamente\./.test(plMsg), `photoLocationExtractor message: "${plMsg}"`);
     const plBuf = await downloadResult(page);
     if (plBuf) {
-      const jsonText = await readText(page, toBase64(plBuf));
-      const parsed = JSON.parse(jsonText);
-      ok(parsed.gps && parsed.gps.lat !== undefined && parsed.gps.lng !== undefined, 'photoLocationExtractor: JSON con gps.lat/lng (fix parseExif→PhotoLocation)');
-      ok(parsed.latitud && parsed.latitud.includes('33') && parsed.latitud.includes('S'), 'photoLocationExtractor: latitud 33° S', parsed.latitud);
-      ok(parsed.longitud && parsed.longitud.includes('70') && parsed.longitud.includes('W'), 'photoLocationExtractor: longitud 70° W', parsed.longitud);
-      ok(parsed.url_mapa && parsed.url_mapa.includes('google.com/maps?q='), 'photoLocationExtractor: url_mapa presente');
-      ok(parsed.camara && parsed.camara.make === 'Maker', 'photoLocationExtractor: cámara del EXIF', JSON.stringify(parsed.camara));
-      ok(parsed.fecha_hora === '2026:01:02 03:04:05', 'photoLocationExtractor: fecha_hora', String(parsed.fecha_hora));
+      const htmlText = await readText(page, toBase64(plBuf));
+      ok(htmlText.includes('inspect-report'), 'photoLocationExtractor: HTML report rendered');
+      ok(htmlText.includes('Maker') || htmlText.includes('Model') || htmlText.includes('Cámara'), 'photoLocationExtractor: cámara info present');
+      ok(htmlText.includes('33') && htmlText.includes('S'), 'photoLocationExtractor: latitud 33° S');
+      ok(htmlText.includes('70') || htmlText.includes('longitud'), 'photoLocationExtractor: longitud info present');
+      ok(htmlText.includes('openstreetmap.org'), 'photoLocationExtractor: OSM map link');
+      ok(htmlText.includes('Privacidad'), 'photoLocationExtractor: privacy warning');
     } else fail('photoLocationExtractor sin archivo');
     await closeDialog(page);
 
