@@ -3251,9 +3251,9 @@
       var chunk = data.slice(start, end);
       var blob = new Blob([chunk]);
       var partNum = String(i + 1).padStart(3, '0');
-      results.push({ name: baseName + '.part' + partNum + ext, blob: blob, size: blob.size });
+      results.push({ name: baseName + '.part' + partNum, blob: blob, size: blob.size, _originalExt: ext });
     }
-    return { files: results, message: 'Archivo dividido en ' + numChunks + ' fragmentos de ~' + (chunkSize / 1024).toFixed(0) + ' KB.' };
+    return { files: results, message: 'Archivo dividido en ' + numChunks + ' fragmentos de ~' + (chunkSize / 1024).toFixed(0) + ' KB. Los fragmentos se nombran SIN extensión para evitar confusión con archivos reales.' };
   };
 
   window.ToolProcessors.fileJoin = async function(files, options, onProgress) {
@@ -3274,7 +3274,8 @@
     }
     var blob = new Blob([result]);
     var firstName = sorted[0].name;
-    var stripped = firstName.replace(/\.part\d+(?=\.[^.]+$|$)/, '');
+    var stripped = firstName.replace(/\.part\d+$/, '');
+    if (stripped === firstName) stripped = firstName.replace(/\.part\d+(?=\.[^.]+$)/, '');
     var extMatch = stripped.match(/\.[^.]+$/);
     var baseName = extMatch ? stripped.slice(0, -extMatch[0].length) : stripped;
     var fileExt = extMatch ? extMatch[0] : '';
@@ -3327,7 +3328,7 @@
       '25504446': 'PDF', '504b0304': 'ZIP/DOCX/XLSX', '52617221': 'RAR',
       '377abcaf': '7Z', '1f8b': 'GZIP', '425a68': 'BZ2',
       'd0cf11e0': 'OLE/DOC/XLS', 'efbbbf': 'UTF-8 BOM', 'fffe': 'UTF-16 LE BOM',
-      '00000020': 'MP4/MOV', '1a45dfa3': 'MKV/WebM', '49492a00': 'TIFF (LE)',
+      '1a45dfa3': 'MKV/WebM', '49492a00': 'TIFF (LE)',
       '4d4d002a': 'TIFF (BE)', '4f676753': 'OGG', '494433': 'MP3',
     };
     for (var i = 0; i < files.length; i++) {
@@ -3339,8 +3340,33 @@
       for (var sig in signatures) {
         if (hex.startsWith(sig)) { detectedType = signatures[sig]; break; }
       }
+      if (detectedType === 'Desconocido') {
+        var ftypIdx = hex.indexOf('66747970');
+        if (ftypIdx >= 4 && ftypIdx <= 12) detectedType = 'MP4/MOV';
+      }
       var extension = files[i].name.split('.').pop().toUpperCase();
+      var extLower = files[i].name.split('.').pop().toLowerCase();
       var match = detectedType.toUpperCase().includes(extension) || extension.includes(detectedType.toUpperCase().split('/')[0]);
+      var hashArray = await crypto.subtle.digest('SHA-256', data);
+      var hashHex = Array.from(new Uint8Array(hashArray)).map(function(b) { return b.toString(16).padStart(2, '0'); }).join('');
+      var imageInfo = '';
+      if (['png','jpg','jpeg','gif','webp','bmp','tiff','tif'].indexOf(extLower) !== -1) {
+        try {
+          var blob = new Blob([data]);
+          var url = URL.createObjectURL(blob);
+          var dims = await new Promise(function(resolve) {
+            var img = new Image();
+            img.onload = function() { resolve(img.naturalWidth + ' × ' + img.naturalHeight + ' px'); URL.revokeObjectURL(url); };
+            img.onerror = function() { resolve('No readable'); URL.revokeObjectURL(url); };
+            img.src = url;
+          });
+          imageInfo = '\nDimensiones: ' + dims;
+        } catch(e) { imageInfo = '\nDimensiones: No readable'; }
+      }
+      var privacy = '';
+      if (['jpg','jpeg'].indexOf(extLower) !== -1) {
+        privacy = '\n⚠ Privacidad: JPEG puede contener datos EXIF (ubicación, cámara, fecha)';
+      }
       var lines = [
         'Archivo: ' + files[i].name,
         'Tamaño: ' + files[i].size + ' bytes (' + (files[i].size / 1024).toFixed(1) + ' KB)',
@@ -3349,6 +3375,9 @@
         'Hex del encabezado: ' + hex,
         'Extensión: .' + extension,
         'Coincidencia: ' + (match ? 'SÍ ✓' : 'NO - posible extensión incorrecta'),
+        'SHA-256: ' + hashHex,
+        imageInfo,
+        privacy,
       ];
       var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
       results.push({ name: files[i].name + '.inspeccion.txt', blob: blob, size: blob.size });
@@ -4581,7 +4610,6 @@
       { bytes: [0xFF, 0xD8, 0xFF], type: 'image/jpeg', name: 'JPEG' },
       { bytes: [0x50, 0x4B, 0x03, 0x04], type: 'application/zip', name: 'ZIP/Office' },
       { bytes: [0x47, 0x49, 0x46, 0x38], type: 'image/gif', name: 'GIF' },
-      { bytes: [0x52, 0x49, 0x46, 0x46], type: 'audio/wav', name: 'WAV' },
       { bytes: [0x66, 0x74, 0x79, 0x70], type: 'video/mp4', name: 'MP4' },
       { bytes: [0x1A, 0x45, 0xDF, 0xA3], type: 'video/webm', name: 'WebM/MKV' },
       { bytes: [0x4F, 0x67, 0x67, 0x53], type: 'audio/ogg', name: 'OGG' },
@@ -4592,6 +4620,13 @@
       { bytes: [0x52, 0x61, 0x72, 0x21], type: 'application/x-rar', name: 'RAR' },
       { bytes: [0x37, 0x7A, 0xBC, 0xAF], type: 'application/x-7z', name: '7Z' },
     ];
+    if (bytes.length >= 12 && bytes[0] === 0x52 && bytes[1] === 0x49 && bytes[2] === 0x46 && bytes[3] === 0x46) {
+      if (bytes[8] === 0x57 && bytes[9] === 0x45 && bytes[10] === 0x42 && bytes[11] === 0x50) return { type: 'image/webp', name: 'WebP' };
+      return { type: 'audio/wav', name: 'WAV' };
+    }
+    if (bytes.length >= 8 && ((bytes[4] === 0x66 && bytes[5] === 0x74 && bytes[6] === 0x79 && bytes[7] === 0x70) || (bytes[8] === 0x66 && bytes[9] === 0x74 && bytes[10] === 0x79 && bytes[11] === 0x70))) {
+      return { type: 'video/mp4', name: 'MP4/MOV' };
+    }
     for (var i = 0; i < signatures.length; i++) {
       var sig = signatures[i];
       var match = true;
@@ -4972,26 +5007,47 @@
     }
     
     onProgress(2, 2, 'Generando reporte...');
-    var result = { archivo: file.name, tamanho: file.size };
-    if (exifData.gps) {
-      result.gps = exifData.gps;
-      if (exifData.gps.latitude !== undefined && exifData.gps.longitude !== undefined) {
-        var latRef = exifData.gps.latitudeRef || 'N';
-        var lngRef = exifData.gps.longitudeRef || 'E';
-        result.latitud = exifData.gps.latitude + '° ' + latRef;
-        result.longitud = exifData.gps.longitude + '° ' + lngRef;
-        result.url_mapa = 'https://www.google.com/maps?q=' + exifData.gps.latitude + ',' + exifData.gps.longitude;
-      }
-    }
-    if (exifData.camera) result.camara = exifData.camera;
-    if (exifData.datetime) result.fecha_hora = exifData.datetime;
-    if (!exifData.gps && !exifData.camera && !exifData.datetime) {
-      result.mensaje = 'No se encontraron metadatos EXIF significativos.';
-    }
+    var hasGps = exifData.gps && exifData.gps.lat !== null && exifData.gps.lng !== null;
+    var hasCamera = exifData.camera && (exifData.camera.make || exifData.camera.model);
+    var hasDatetime = !!exifData.datetime;
+    var hasAny = hasGps || hasCamera || hasDatetime;
     
-    var json = JSON.stringify(result, null, 2);
-    var blob = new Blob([json], { type: 'application/json;charset=utf-8' });
-    return makeSingleResult(blob, file.name.replace(/\.[^.]+$/, '') + '-ubicacion.json', 'Metadatos extraídos correctamente.');
+    var html = '<div class="inspect-report">';
+    html += '<h3 style="margin:0 0 12px">Ubicación y metadatos de foto</h3>';
+    html += '<table style="width:100%;border-collapse:collapse;font-size:.85rem">';
+    html += '<tr><td style="padding:6px 8px;border-bottom:1px solid var(--border);font-weight:600;width:40%">Archivo</td><td style="padding:6px 8px;border-bottom:1px solid var(--border)">' + _escapeHtml(file.name) + '</td></tr>';
+    html += '<tr><td style="padding:6px 8px;border-bottom:1px solid var(--border);font-weight:600">Tamaño</td><td style="padding:6px 8px;border-bottom:1px solid var(--border)">' + (file.size / 1024).toFixed(1) + ' KB</td></tr>';
+    
+    if (hasCamera) {
+      html += '<tr><td style="padding:6px 8px;border-bottom:1px solid var(--border);font-weight:600">Cámara</td><td style="padding:6px 8px;border-bottom:1px solid var(--border)">' + _escapeHtml((exifData.camera.make || '') + ' ' + (exifData.camera.model || '')).trim() + '</td></tr>';
+    }
+    if (hasDatetime) {
+      html += '<tr><td style="padding:6px 8px;border-bottom:1px solid var(--border);font-weight:600">Fecha de captura</td><td style="padding:6px 8px;border-bottom:1px solid var(--border)">' + _escapeHtml(exifData.datetime) + '</td></tr>';
+    }
+    if (hasGps) {
+      var lat = exifData.gps.lat;
+      var lng = exifData.gps.lng;
+      html += '<tr><td style="padding:6px 8px;border-bottom:1px solid var(--border);font-weight:600">Latitud</td><td style="padding:6px 8px;border-bottom:1px solid var(--border)">' + lat + '°</td></tr>';
+      html += '<tr><td style="padding:6px 8px;border-bottom:1px solid var(--border);font-weight:600">Longitud</td><td style="padding:6px 8px;border-bottom:1px solid var(--border)">' + lng + '°</td></tr>';
+      if (exifData.gps.alt !== null && exifData.gps.alt !== undefined) {
+        html += '<tr><td style="padding:6px 8px;border-bottom:1px solid var(--border);font-weight:600">Altitud</td><td style="padding:6px 8px;border-bottom:1px solid var(--border)">' + exifData.gps.alt.toFixed(1) + ' m</td></tr>';
+      }
+      html += '<tr><td style="padding:6px 8px;border-bottom:1px solid var(--border);font-weight:600">Mapa</td><td style="padding:6px 8px;border-bottom:1px solid var(--border)"><a href="https://www.openstreetmap.org/?mlat=' + lat + '&mlon=' + lng + '#map=16/' + lat + '/' + lng + '" target="_blank" rel="noopener" style="color:var(--accent)">Ver en OpenStreetMap ↗</a></td></tr>';
+    }
+    html += '</table>';
+    
+    if (hasGps) {
+      html += '<div style="margin-top:12px;border:1px solid var(--border);border-radius:8px;overflow:hidden">';
+      html += '<iframe src="https://www.openstreetmap.org/export/embed.html?bbox=' + (lng - 0.01) + ',' + (lat - 0.01) + ',' + (lng + 0.01) + ',' + (lat + 0.01) + '&layer=mapnik&marker=' + lat + ',' + lng + '" style="width:100%;height:280px;border:none" loading="lazy" title="Mapa de ubicación"></iframe>';
+      html += '</div>';
+      html += '<div style="margin-top:8px;padding:10px 12px;border-radius:6px;background:#FFF3E0;border:1px solid #FFE0B2;font-size:.85rem">⚠ <b>Privacidad:</b> Esta foto contiene coordenadas GPS que revelan la ubicación exacta donde fue tomada. Considera eliminar los metadatos antes de compartirla.</div>';
+    } else if (!hasAny) {
+      html += '<div style="margin-top:12px;padding:10px 12px;border-radius:6px;background:var(--bg);border:1px solid var(--border);font-size:.85rem;color:var(--muted)">No se encontraron metadatos EXIF significativos. La imagen puede haber sido procesada o exportada sin preservar los metadatos.</div>';
+    }
+    html += '</div>';
+    
+    var blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+    return makeSingleResult(blob, file.name.replace(/\.[^.]+$/, '') + '-ubicacion.html', 'Metadatos extraídos correctamente.');
   };
 
   window.ToolProcessors.simpleCalculator = async function(files, options, onProgress) {

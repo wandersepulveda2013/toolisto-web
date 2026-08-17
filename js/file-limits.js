@@ -233,6 +233,7 @@
   }
 
   // TLT-041 — Validación por firma interna (magic bytes), no solo MIME/extensión.
+  // MP4/MOV se detecta por 'ftyp' a offset 4 o 8 (no por hex fijo que depende del box size).
   var SIGNATURES = [
     { hex: '89504e47', label: 'PNG' },
     { hex: 'ffd8ff', label: 'JPEG' },
@@ -247,13 +248,17 @@
     { hex: '425a68', label: 'BZ2' },
     { hex: 'd0cf11e0', label: 'OLE/DOC/XLS' },
     { hex: 'efbbbf', label: 'TXT-UTF8' },
-    { hex: '00000020', label: 'MP4/MOV' },
     { hex: '1a45dfa3', label: 'MKV/WebM' },
     { hex: '49492a00', label: 'TIFF-LE' },
     { hex: '4d4d002a', label: 'TIFF-BE' },
     { hex: '4f676753', label: 'OGG' },
     { hex: '494433', label: 'MP3' }
   ];
+
+  function detectMp4Mov(hex) {
+    var ftyp = '66747970';
+    return hex.length >= 16 && (hex.indexOf(ftyp, 8) === 4 || hex.indexOf(ftyp, 8) === 8 || hex.indexOf(ftyp, 8) === 12);
+  }
 
   function readHeaderHex(file, maxBytes) {
     var n = maxBytes || 16;
@@ -271,6 +276,7 @@
     for (var i = 0; i < SIGNATURES.length; i++) {
       if (hex.indexOf(SIGNATURES[i].hex) === 0) return SIGNATURES[i].label;
     }
+    if (detectMp4Mov(hex)) return 'MP4/MOV';
     return '';
   }
 
@@ -287,8 +293,10 @@
     if (name.endsWith('.doc') || name.endsWith('.xls')) return ['OLE/DOC/XLS'];
     if (file.type === 'text/plain' || /\.(txt|log|md|csv)$/.test(name)) return ['TXT-UTF8', ''];
     if (file.type === 'video/mp4' || name.endsWith('.mp4')) return ['MP4/MOV'];
+    if (file.type === 'video/quicktime' || name.endsWith('.mov')) return ['MP4/MOV'];
     if (file.type === 'video/webm' || name.endsWith('.webm') || name.endsWith('.mkv')) return ['MKV/WebM'];
     if (file.type === 'audio/mpeg' || name.endsWith('.mp3')) return ['MP3'];
+    if (file.type === 'audio/wav' || name.endsWith('.wav')) return ['WAV'];
     return [];
   }
 

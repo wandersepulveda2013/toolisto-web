@@ -1489,6 +1489,32 @@ html.theme-dark .ws-topbar {
   color: var(--ws-text-tertiary);
 }
 
+.ws-grid-table th {
+  cursor: pointer;
+  user-select: none;
+}
+
+.ws-grid-table th:hover {
+  background: var(--ws-bg-hover, rgba(0,0,0,0.03));
+}
+
+.ws-grid-table th .ws-col-header-text {
+  pointer-events: none;
+}
+
+.ws-grid-table th .ws-col-filter-btn {
+  margin-left: 4px;
+  font-size: 10px;
+  color: var(--ws-text-tertiary);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.ws-grid-table th:hover .ws-col-filter-btn {
+  opacity: 1;
+}
+
 .ws-grid-table th .resize-handle {
   position: absolute;
   right: 0;

@@ -410,6 +410,7 @@
     smartTitle: $('#smartTitle'),
     smartDescription: $('#smartDescription'),
     changeToolButton: $('#changeToolButton'),
+    changeToolResultButton: $('#changeToolResultButton'),
     fileStatus: $('#fileStatus'),
     runButtonLabel: $('#runButtonLabel'),
     advancedPanel: $('#advancedPanel'),
@@ -521,6 +522,7 @@
     });
 
     els.changeToolButton?.addEventListener('click', openPicker);
+    els.changeToolResultButton?.addEventListener('click', () => { els.resultDialog?.close(); openPicker(); });
     els.pickerClose?.addEventListener('click', () => els.pickerDialog?.close());
     els.dialogClose?.addEventListener('click', () => els.resultDialog?.close());
 
@@ -1004,6 +1006,12 @@
       els.fileStatus.dataset.hasFiles = count ? 'true' : 'false';
     }
 
+    function imageLabel(f) {
+      if (!f.type.startsWith('image/')) return 'IMG';
+      var m = { 'image/png': 'PNG', 'image/jpeg': 'JPG', 'image/webp': 'WEBP', 'image/gif': 'GIF', 'image/bmp': 'BMP', 'image/tiff': 'TIFF', 'image/svg+xml': 'SVG', 'image/avif': 'AVIF', 'image/heic': 'HEIC', 'image/heif': 'HEIF', 'image/x-icon': 'ICO' };
+      return m[f.type] || 'IMG';
+    }
+
     state.files.forEach((file, index) => {
       const pill = document.createElement('div');
       pill.className = 'file-pill';
@@ -1013,7 +1021,7 @@
       const isTxt = isTxtFile(file);
       const isEpub = isEpubFile(file);
       const isMobi = isMobiFile(file);
-      const typeLabel = file.type === 'application/pdf' ? 'PDF' : isDoc ? 'DOC' : isOdt ? 'ODT' : isRtf ? 'RTF' : isTxt ? 'TXT' : isEpub ? 'EPUB' : isMobi ? 'MOBI' : isVideoFile(file) ? 'VID' : isAudioFile(file) ? 'AUD' : 'IMG';
+      const typeLabel = file.type === 'application/pdf' ? 'PDF' : isDoc ? 'DOC' : isOdt ? 'ODT' : isRtf ? 'RTF' : isTxt ? 'TXT' : isEpub ? 'EPUB' : isMobi ? 'MOBI' : isVideoFile(file) ? 'VID' : isAudioFile(file) ? 'AUD' : imageLabel(file);
       pill.innerHTML = `
         <span>${typeLabel}</span>
         <strong title="${escapeHtml(file.name)}">${escapeHtml(shorten(file.name, 24))}</strong>

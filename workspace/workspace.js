@@ -1052,6 +1052,10 @@ async function initApp() {
               const found = w.documents.find(d => d.id === w.currentDocId);
               if (found) appStore.set({ currentDoc: found });
             }
+            if (w.currentDataTableId && w.dataTables) {
+              const dtFound = w.dataTables.find(d => d.id === w.currentDataTableId);
+              if (dtFound) appStore.set({ currentDataTable: dtFound });
+            }
             if (w.workflowDefinition && workflowUI) {
               workflowUI.setWorkflowFromSnapshot(w.workflowDefinition);
             }
@@ -4553,6 +4557,24 @@ function renderDataTableView(container) {
       setSelection(Math.max(0, Math.min(table.rows.length - 1, selection.focusRow + rowMove)), Math.max(0, Math.min(table.headers.length - 1, selection.focusCol + colMove)), event.shiftKey);
       return;
     }
+    if (meta && event.key.toLowerCase() === 'a') {
+      event.preventDefault();
+      setSelection(0, 0, false);
+      selection.endRow = table.rows.length - 1;
+      selection.endCol = table.headers.length - 1;
+      markTableSelection(tableEl, selection, table);
+      return;
+    }
+    if (event.key === 'Home') {
+      event.preventDefault();
+      if (meta) { setSelection(0, 0); } else { setSelection(selection.focusRow, 0); }
+      return;
+    }
+    if (event.key === 'End') {
+      event.preventDefault();
+      if (meta) { setSelection(table.rows.length - 1, table.headers.length - 1); } else { setSelection(selection.focusRow, table.headers.length - 1); }
+      return;
+    }
     if (event.key === 'Delete' || event.key === 'Backspace') {
       event.preventDefault();
       const bounds = tableSelectionBounds(selection);
@@ -4570,9 +4592,12 @@ function renderDataTableView(container) {
   const headerRow = h('tr');
   headerRow.appendChild(h('th', { className: 'row-number' }, '#'));
   (table.headers || []).forEach((hdr, ci) => {
+    const filterIcon = h('span', { className: 'ws-col-filter-btn', title: 'Filtrar columna' }, '\u25BD');
     const th = h('th', null,
       h('span', { className: 'ws-data-type-badge' }, table.columnTypes?.[ci] || queryColumnType(table.rows || [], ci)),
-      h('span', null, hdr)
+      h('span', { className: 'ws-col-header-text' }, hdr),
+      h('span', { className: 'sort-indicator' }),
+      filterIcon
     );
     th.addEventListener('dblclick', () => {
       const newName = prompt('Nombre de columna:', hdr);
@@ -4584,14 +4609,128 @@ function renderDataTableView(container) {
         rerenderTable();
       }
     });
+    th.addEventListener('click', (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.classList.contains('ws-col-filter-btn')) return;
+      const descending = e.shiftKey;
+      checkpointTableEdit(table);
+      table.rows.sort((left, right) => {
+        const a = String(left[ci] ?? '');
+        const b = String(right[ci] ?? '');
+        const na = Number(a.replace(',', '.'));
+        const nb = Number(b.replace(',', '.'));
+        const result = Number.isFinite(na) && Number.isFinite(nb)
+          ? na - nb
+          : a.localeCompare(b, 'es', { numeric: true, sensitivity: 'base' });
+        return descending ? -result : result;
+      });
+      commitTableEdit(table);
+      autoSaveTable(table);
+      rerenderTable();
+    });
+    filterIcon.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const existingDrop = tableEl.querySelector('.ws-col-filter-dropdown');
+      if (existingDrop) { existingDrop.remove(); return; }
+      const uniqueValues = new Map();
+      (table.rows || []).forEach(row => {
+        const val = String(row[ci] ?? '').trim();
+        uniqueValues.set(val, (uniqueValues.get(val) || 0) + 1);
+      });
+      const activeFilters = table._colFilters?.[ci] || null;
+      const drop = document.createElement('div');
+      drop.className = 'ws-col-filter-dropdown';
+      drop.style.cssText = 'position:fixed;z-index:9999;background:var(--ws-card,#fff);border:1px solid var(--ws-border);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,0.15);padding:8px;min-width:200px;max-height:280px;overflow:auto;font-size:12px';
+      const searchInput = document.createElement('input');
+      searchInput.type = 'text';
+      searchInput.placeholder = 'Buscar...';
+      searchInput.style.cssText = 'width:100%;padding:6px 8px;border:1px solid var(--ws-border);border-radius:4px;font-size:12px;margin-bottom:6px;box-sizing:border-box';
+      drop.appendChild(searchInput);
+      const selectAll = document.createElement('label');
+      selectAll.style.cssText = 'display:flex;align-items:center;gap:6px;padding:4px 0;font-weight:600;cursor:pointer;border-bottom:1px solid var(--ws-border-light);margin-bottom:4px';
+      const selectAllCb = document.createElement('input');
+      selectAllCb.type = 'checkbox';
+      selectAllCb.checked = !activeFilters;
+      selectAll.appendChild(selectAllCb);
+      selectAll.appendChild(document.createTextNode('Seleccionar todo'));
+      drop.appendChild(selectAll);
+      const listDiv = document.createElement('div');
+      listDiv.style.cssText = 'display:flex;flex-direction:column;gap:1px';
+      const sorted = Array.from(uniqueValues.entries()).sort((a, b) => a[0].localeCompare(b[0], 'es', { numeric: true, sensitivity: 'base' }));
+      sorted.forEach(([val, count]) => {
+        const lbl = document.createElement('label');
+        lbl.style.cssText = 'display:flex;align-items:center;gap:6px;padding:3px 4px;border-radius:3px;cursor:pointer';
+        const cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.checked = !activeFilters || activeFilters.has(val);
+        cb.dataset.filterVal = val;
+        lbl.appendChild(cb);
+        lbl.appendChild(document.createTextNode((val || '(vacío)') + ' (' + count + ')'));
+        listDiv.appendChild(lbl);
+      });
+      drop.appendChild(listDiv);
+      const thRect = th.getBoundingClientRect();
+      drop.style.left = thRect.left + 'px';
+      drop.style.top = thRect.bottom + 'px';
+      document.body.appendChild(drop);
+      searchInput.focus();
+      searchInput.addEventListener('input', () => {
+        const q = searchInput.value.toLowerCase();
+        listDiv.querySelectorAll('label').forEach(l => {
+          l.style.display = l.textContent.toLowerCase().includes(q) ? '' : 'none';
+        });
+      });
+      const applyFilter = () => {
+        const checked = new Set();
+        let allChecked = true;
+        listDiv.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+          if (cb.dataset.filterVal !== undefined) {
+            if (cb.checked) checked.add(cb.dataset.filterVal);
+            else allChecked = false;
+          }
+        });
+        if (!table._colFilters) table._colFilters = {};
+        if (allChecked || checked.size === sorted.length) {
+          delete table._colFilters[ci];
+        } else {
+          table._colFilters[ci] = checked;
+        }
+        drop.remove();
+        rerenderTable();
+      };
+      selectAllCb.addEventListener('change', () => {
+        listDiv.querySelectorAll('input[type="checkbox"]').forEach(cb => { cb.checked = selectAllCb.checked; });
+      });
+      const closeHandler = (ev) => {
+        if (!drop.contains(ev.target) && ev.target !== filterIcon) {
+          drop.remove();
+          document.removeEventListener('click', closeHandler);
+        }
+      };
+      setTimeout(() => document.addEventListener('click', closeHandler), 0);
+      const applyBtn = document.createElement('button');
+      applyBtn.textContent = 'Aplicar';
+      applyBtn.style.cssText = 'margin-top:6px;width:100%;padding:6px;border:none;border-radius:4px;background:var(--ws-primary,#17191C);color:#fff;cursor:pointer;font-size:12px;font-weight:600';
+      applyBtn.addEventListener('click', applyFilter);
+      drop.appendChild(applyBtn);
+    });
     headerRow.appendChild(th);
   });
   thead.appendChild(headerRow);
   tableEl.appendChild(thead);
   const tbody = h('tbody');
+  const colFilters = table._colFilters || {};
+  const hasFilters = Object.keys(colFilters).length > 0;
+  let visibleRowIndex = 0;
   (table.rows || []).forEach((row, ri) => {
+    if (hasFilters) {
+      for (const fci in colFilters) {
+        const fVal = String(row[fci] ?? '').trim();
+        if (!colFilters[fci].has(fVal)) return;
+      }
+    }
     const tr = h('tr');
     tr.appendChild(h('td', { className: 'row-number' }, String(ri + 1)));
+    visibleRowIndex++;
     row.forEach((cell, ci) => {
       const rawCell = cell == null ? '' : String(cell);
       const displayCell = rawCell.trim().startsWith('=') ? evaluateDataFormula(table, rawCell) : rawCell;

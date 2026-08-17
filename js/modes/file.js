@@ -98,7 +98,7 @@
             + Array.from({ length: count }, function (_, i) {
               var start = i * chunkSize;
               var end = Math.min(start + chunkSize, buf.byteLength);
-              return manifestRow(f.name.replace(/\.[^.]+$/, '') + '.part' + String(i + 1).padStart(3, '0') + (f.name.includes('.') ? '.' + f.name.split('.').pop() : ''), end - start);
+              return manifestRow(f.name.replace(/\.[^.]+$/, '') + '.part' + String(i + 1).padStart(3, '0'), end - start);
             }).join('')
             + '</tbody></table>'
             + '<p class="manifest-hash">SHA-256 original: <code>' + hash + '</code></p>'
