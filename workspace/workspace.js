@@ -4607,6 +4607,21 @@ function renderDataTableView(container) {
     ariaLabel: 'Crear una nueva hoja',
   }, '+ Nueva hoja'));
   el.appendChild(sheetTabs);
+  if ((table.rows || []).length > 0) {
+    const nextStep = h('div', { className: 'ws-next-step-banner' },
+      h('span', { className: 'ws-next-step-icon' }, '\u2713'),
+      h('div', { className: 'ws-next-step-copy' },
+        h('strong', null, 'Datos listos \u2713'),
+        h('span', null, 'Siguiente paso recomendado: Analizar datos o crear un grafico')
+      ),
+      h('div', { className: 'ws-next-step-actions' },
+        h('button', { className: 'ws-btn ws-btn-secondary ws-btn-sm', onClick: () => createChartFromTable(appStore.get('currentProject'), table) }, svgIcon('chart', 14), ' Grafico'),
+        h('button', { className: 'ws-btn ws-btn-ghost ws-btn-sm', onClick: sendDataTableToQuery }, svgIcon('flow', 14), ' Query'),
+        h('button', { className: 'ws-btn ws-btn-ghost ws-btn-sm', onClick: () => createReportFromTable(appStore.get('currentProject'), table) }, svgIcon('file', 14), ' Informe')
+      )
+    );
+    el.appendChild(nextStep);
+  }
   container.appendChild(el);
 }
 
