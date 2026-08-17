@@ -1564,6 +1564,9 @@ html.theme-dark .ws-topbar {
 }
 
 .ws-sheet-tab {
+  display: flex;
+  align-items: center;
+  gap: 4px;
   padding: calc(5px * var(--ws-density-scale)) calc(14px * var(--ws-density-scale));
   border-radius: var(--ws-radius-sm) var(--ws-radius-sm) 0 0;
   font-size: calc(12px * var(--ws-density-scale));
@@ -1574,6 +1577,7 @@ html.theme-dark .ws-topbar {
   border-bottom: 2px solid transparent;
   font-family: inherit;
   background: transparent;
+  user-select: none;
 }
 
 .ws-sheet-tab:hover {
@@ -1601,6 +1605,46 @@ html.theme-dark .ws-topbar {
   background: var(--ws-primary-light);
 }
 
+.ws-sheet-tab-label {
+  cursor: inherit;
+}
+
+.ws-sheet-tab-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border: none;
+  border-radius: 3px;
+  background: transparent;
+  color: var(--ws-text-tertiary);
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+  margin-left: 2px;
+  transition: background 0.1s, color 0.1s;
+}
+
+.ws-sheet-tab-close:hover {
+  background: #ffe0e0;
+  color: #d32f2f;
+}
+
+.ws-sheet-tab-rename-input {
+  width: 80px;
+  height: 22px;
+  border: 1px solid var(--ws-primary);
+  border-radius: 3px;
+  padding: 0 4px;
+  font-size: 12px;
+  font-family: inherit;
+  background: var(--ws-surface);
+  color: var(--ws-text);
+  outline: none;
+}
+
 .ws-query-layout {
   display: flex;
   flex-direction: column;
@@ -1609,9 +1653,26 @@ html.theme-dark .ws-topbar {
   margin: 0 auto;
 }
 
+.ws-query-heading-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.ws-query-title {
+  margin: 0;
+}
+
+.ws-query-desc {
+  font-size: 13px;
+  color: var(--ws-text-secondary);
+  margin-bottom: 12px;
+}
+
 .ws-query-editor {
   flex: 1;
-  padding: calc(24px * var(--ws-density-scale));
+  padding: calc(12px * var(--ws-density-scale)) calc(24px * var(--ws-density-scale));
   overflow-y: auto;
 }
 

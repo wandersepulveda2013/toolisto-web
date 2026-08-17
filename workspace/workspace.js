@@ -3607,6 +3607,62 @@ async function createNewDataSheet(table, container) {
   toast('Hoja creada: ' + sheet.name, 'success');
 }
 
+async function duplicateDataSheet(sheet, container) {
+  const project = appStore.get('currentProject');
+  if (!project || !sheet) return;
+  const newSheet = {
+    id: generateId(),
+    projectId: project.id,
+    workbookId: sheet.workbookId,
+    name: (sheet.name || 'Hoja') + ' (copia)',
+    headers: [...(sheet.headers || [])],
+    rows: (sheet.rows || []).map(row => [...row]),
+    columnTypes: sheet.columnTypes ? { ...sheet.columnTypes } : undefined,
+    cellConfidence: sheet.cellConfidence ? sheet.cellConfidence.map(r => [...r]) : undefined,
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+  };
+  await saveData(project.id, newSheet);
+  await refreshProjectCounts(project.id);
+  const tables = await loadData(project.id);
+  appStore.set({ dataTables: tables, currentDataTable: newSheet });
+  container.replaceChildren();
+  renderDataTableView(container);
+  toast('Hoja duplicada: ' + newSheet.name, 'success');
+}
+
+async function deleteDataSheet(sheet, container) {
+  const project = appStore.get('currentProject');
+  if (!project || !sheet) return;
+  const allTables = appStore.get('dataTables') || [];
+  const workbookId = dataWorkbookId(sheet);
+  const siblings = [sheet, ...allTables].filter((item, index, list) => {
+    return dataWorkbookId(item) === workbookId && list.findIndex(c => c.id === item.id) === index;
+  });
+  if (siblings.length <= 1) {
+    toast('No puedes eliminar la ultima hoja del libro', 'warning');
+    return;
+  }
+  showConfirm({
+    title: 'Eliminar hoja "' + (sheet.name || 'Hoja') + '"',
+    body: 'Esta accion es permanente. Se perderan todos los datos de esta hoja.',
+    confirmText: 'Eliminar',
+    onConfirm: async () => {
+      await deleteData(project.id, sheet.id);
+      await refreshProjectCounts(project.id);
+      const tables = await loadData(project.id);
+      const next = [sheet, ...tables].filter((item, index, list) => {
+        return dataWorkbookId(item) === workbookId && list.findIndex(c => c.id === item.id) === index;
+      }).find(t => t.id !== sheet.id) || null;
+      appStore.set({ dataTables: tables, currentDataTable: next });
+      container.replaceChildren();
+      if (next) renderDataTableView(container);
+      else navigateTo('data');
+      toast('Hoja eliminada', 'success');
+    }
+  });
+}
+
 function renderDataView(container, project) {
   const tables = appStore.get('dataTables');
   const el = h('div', { className: 'ws-start', style: 'animation:fadeIn 0.3s ease' });
@@ -4160,6 +4216,42 @@ function applyClipboardGrid(table, selection, text, container) {
   return true;
 }
 
+function startCellEdit(table, ri, ci, tableEl, selection, container, rerenderFn, initialKey) {
+  const td = tableEl.querySelector(`td[data-row="${ri}"][data-col="${ci}"]`);
+  if (!td) return;
+  const rawCell = String(table.rows[ri]?.[ci] ?? '');
+  checkpointTableEdit(table);
+  td.classList.add('editing');
+  let draftValue = initialKey != null ? initialKey : rawCell;
+  let finished = false;
+  const finishEdit = (save) => {
+    if (finished) return;
+    finished = true;
+    const value = save ? draftValue : rawCell;
+    table.rows[ri][ci] = value;
+    td.classList.remove('editing');
+    td.textContent = String(value).trim().startsWith('=') ? evaluateDataFormula(table, value) : value;
+    if (save) { commitTableEdit(table); autoSaveTable(table); }
+  };
+  const input = h('input', {
+    type: 'text',
+    value: initialKey != null ? initialKey : rawCell,
+    style: 'width:100%;height:100%;border:2px solid var(--ws-primary);border-radius:0;padding:5px 10px;font-family:var(--ws-font);font-size:13px;background:var(--ws-surface);color:var(--ws-text);outline:none',
+    onInput: (e) => { draftValue = e.target.value; },
+    onKeydown: (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); finishEdit(true); const nextRow = e.shiftKey ? Math.max(0, ri - 1) : Math.min(table.rows.length - 1, ri + 1); selection.hasValue = false; selection.anchorRow = nextRow; selection.anchorCol = ci; selection.focusRow = nextRow; selection.focusCol = ci; selection.hasValue = true; markTableSelection(tableEl, selection); tableEl.focus(); }
+      if (e.key === 'Escape') { e.preventDefault(); finishEdit(false); }
+      if (e.key === 'Tab') { e.preventDefault(); finishEdit(true); const nextCol = e.shiftKey ? Math.max(0, ci - 1) : Math.min(table.headers.length - 1, ci + 1); selection.hasValue = false; selection.anchorRow = ri; selection.anchorCol = nextCol; selection.focusRow = ri; selection.focusCol = nextCol; selection.hasValue = true; markTableSelection(tableEl, selection); tableEl.focus(); }
+    },
+    onblur: () => finishEdit(true)
+  });
+  td.textContent = '';
+  td.appendChild(input);
+  if (initialKey != null) { input.value = initialKey; input.setSelectionRange(1, 1); }
+  else { input.select(); }
+  input.focus();
+}
+
 function renderDataTableView(container) {
   const table = appStore.get('currentDataTable');
   if (!table) return;
@@ -4195,6 +4287,8 @@ function renderDataTableView(container) {
     h('span', { className: 'ws-data-ribbon-kicker' }, 'TABLA / LOCAL'),
     h('button', { className: 'ws-data-ribbon-tab active', type: 'button', role: 'tab', id: 'ws-data-tab-Inicio', 'aria-controls': 'ws-data-ribbon-panel', 'aria-selected': 'true' }, 'Inicio'),
     h('button', { className: 'ws-data-ribbon-tab', type: 'button', role: 'tab', id: 'ws-data-tab-Datos', 'aria-controls': 'ws-data-ribbon-panel', 'aria-selected': 'false', title: 'Acciones de datos y columnas' }, 'Datos'),
+    h('button', { className: 'ws-data-ribbon-tab', type: 'button', role: 'tab', id: 'ws-data-tab-Formulas', 'aria-controls': 'ws-data-ribbon-panel', 'aria-selected': 'false', title: 'Funciones de calculo' }, 'Formulas'),
+    h('button', { className: 'ws-data-ribbon-tab', type: 'button', role: 'tab', id: 'ws-data-tab-Vista', 'aria-controls': 'ws-data-ribbon-panel', 'aria-selected': 'false', title: 'Opciones de visualizacion' }, 'Vista'),
     h('button', { className: 'ws-data-ribbon-tab', type: 'button', role: 'tab', id: 'ws-data-tab-Insertar', 'aria-controls': 'ws-data-ribbon-panel', 'aria-selected': 'false', title: 'Crear salidas a partir de esta tabla' }, 'Insertar'),
   );
   toolbar.appendChild(ribbonTabs);
@@ -4234,6 +4328,25 @@ function renderDataTableView(container) {
     h('button', { className: 'ws-btn ws-btn-ghost ws-btn-sm ws-data-command', title: 'Crear un gráfico desde esta tabla', onClick: () => createChartFromTable(appStore.get('currentProject'), table) }, svgIcon('chart'), ' Gráfico'),
     h('button', { className: 'ws-btn ws-btn-ghost ws-btn-sm ws-data-command', title: 'Preparar un informe con resumen, tabla y gráfico', onClick: () => createReportFromTable(appStore.get('currentProject'), table) }, svgIcon('file'), ' Informe'),
     h('button', { className: 'ws-btn ws-btn-secondary ws-btn-sm ws-data-command', onClick: () => exportTableCSV(table) }, svgIcon('download'), ' CSV')
+  );
+  toolbarGroup('Funciones', ['Formulas'],
+    h('button', { className: 'ws-btn ws-btn-ghost ws-btn-sm ws-data-command', title: 'Insertar =SUMA(rango)', onClick: () => { if (selectedCell.row < 0) { toast('Selecciona una celda primero', 'info'); return; } formulaInput.value = '=SUM()'; formulaInput.focus(); } }, svgIcon('formula'), ' SUMA'),
+    h('button', { className: 'ws-btn ws-btn-ghost ws-btn-sm ws-data-command', title: 'Insertar =PROMEDIO(rango)', onClick: () => { if (selectedCell.row < 0) { toast('Selecciona una celda primero', 'info'); return; } formulaInput.value = '=AVERAGE()'; formulaInput.focus(); } }, svgIcon('formula'), ' PROMEDIO'),
+    h('button', { className: 'ws-btn ws-btn-ghost ws-btn-sm ws-data-command', title: 'Insertar =MIN(rango)', onClick: () => { if (selectedCell.row < 0) { toast('Selecciona una celda primero', 'info'); return; } formulaInput.value = '=MIN()'; formulaInput.focus(); } }, svgIcon('formula'), ' MIN'),
+    h('button', { className: 'ws-btn ws-btn-ghost ws-btn-sm ws-data-command', title: 'Insertar =MAX(rango)', onClick: () => { if (selectedCell.row < 0) { toast('Selecciona una celda primero', 'info'); return; } formulaInput.value = '=MAX()'; formulaInput.focus(); } }, svgIcon('formula'), ' MAX'),
+    h('button', { className: 'ws-btn ws-btn-ghost ws-btn-sm ws-data-command', title: 'Insertar =CONTAR(rango)', onClick: () => { if (selectedCell.row < 0) { toast('Selecciona una celda primero', 'info'); return; } formulaInput.value = '=COUNT()'; formulaInput.focus(); } }, svgIcon('formula'), ' CONTAR'),
+    h('button', { className: 'ws-btn ws-btn-ghost ws-btn-sm ws-data-command', title: 'Insertar =CONTARA(rango)', onClick: () => { if (selectedCell.row < 0) { toast('Selecciona una celda primero', 'info'); return; } formulaInput.value = '=COUNTA()'; formulaInput.focus(); } }, svgIcon('formula'), ' CONTARA')
+  );
+  toolbarGroup('Formato', ['Inicio', 'Vista'],
+    h('button', { className: 'ws-btn ws-btn-ghost ws-btn-sm ws-data-command', title: 'Formato numero', onClick: () => toast('Selecciona celdas y escribe una formula con = para calcular', 'info') }, svgIcon('calc'), ' Numero'),
+    h('button', { className: 'ws-btn ws-btn-ghost ws-btn-sm ws-data-command', title: 'Formato porcentaje', onClick: () => { if (selectedCell.row < 0) { toast('Selecciona una celda', 'info'); return; } checkpointTableEdit(table); const v = table.rows[selectedCell.row]?.[selectedCell.col] ?? ''; const n = numericValue(v); table.rows[selectedCell.row][selectedCell.col] = v ? String((n * 100).toFixed(2)) + '%' : ''; commitTableEdit(table); autoSaveTable(table); rerenderTable(); } }, svgIcon('text'), ' %')
+  );
+  toolbarGroup('Vista', ['Vista'],
+    h('button', { className: 'ws-btn ws-btn-ghost ws-btn-sm ws-data-command', title: 'Ir a la primera fila', onClick: () => { if (table.rows.length > 0) setSelection(0, 0); } }, svgIcon('chevronUp'), ' Primera fila'),
+    h('button', { className: 'ws-btn ws-btn-ghost ws-btn-sm ws-data-command', title: 'Ir a la ultima fila', onClick: () => { if (table.rows.length > 0) setSelection(table.rows.length - 1, 0); } }, svgIcon('chevronDown'), ' Ultima fila'),
+    h('button', { className: 'ws-btn ws-btn-ghost ws-btn-sm ws-data-command', title: 'Ir a la primera columna', onClick: () => { if (table.rows.length > 0) setSelection(selection.focusRow, 0); } }, svgIcon('chevronLeftDouble'), ' Primera col.'),
+    h('button', { className: 'ws-btn ws-btn-ghost ws-btn-sm ws-data-command', title: 'Ir a la ultima columna', onClick: () => { if (table.rows.length > 0) setSelection(selection.focusRow, table.headers.length - 1); } }, svgIcon('chevronRightDouble'), ' Ultima col.'),
+    h('button', { className: 'ws-btn ws-btn-ghost ws-btn-sm ws-data-command', title: 'Seleccionar toda la tabla', onClick: () => { selection.anchorRow = 0; selection.anchorCol = 0; selection.focusRow = table.rows.length - 1; selection.focusCol = table.headers.length - 1; selection.hasValue = true; markTableSelection(tableEl, selection); } }, svgIcon('grid'), ' Seleccionar todo')
   );
   ribbonPanel.appendChild(h('span', { className: 'ws-table-capacity' }, `${(table.rows || []).length.toLocaleString('es')} / ${config.maxTableRows.toLocaleString('es')} filas · ${(table.headers || []).length} / ${config.maxTableColumns} columnas`));
   const setRibbonPage = (page) => {
@@ -4326,6 +4439,29 @@ function renderDataTableView(container) {
       return;
     }
     if (meta && ['c', 'x', 'v'].includes(event.key.toLowerCase())) return;
+    if (event.key === 'F2') {
+      event.preventDefault();
+      startCellEdit(table, selection.focusRow, selection.focusCol, tableEl, selection, container, rerenderTable);
+      return;
+    }
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      const nextRow = event.shiftKey ? Math.max(0, selection.focusRow - 1) : Math.min(table.rows.length - 1, selection.focusRow + 1);
+      setSelection(nextRow, selection.focusCol);
+      return;
+    }
+    if (event.key === 'Tab') {
+      event.preventDefault();
+      const nextCol = event.shiftKey ? Math.max(0, selection.focusCol - 1) : Math.min(table.headers.length - 1, selection.focusCol + 1);
+      if (event.shiftKey && nextCol === 0 && selection.focusCol > 0) {
+        setSelection(Math.max(0, selection.focusRow - 1), table.headers.length - 1);
+      } else if (!event.shiftKey && nextCol === selection.focusCol) {
+        setSelection(Math.min(table.rows.length - 1, selection.focusRow + 1), 0);
+      } else {
+        setSelection(selection.focusRow, nextCol);
+      }
+      return;
+    }
     const moves = { ArrowUp: [-1, 0], ArrowDown: [1, 0], ArrowLeft: [0, -1], ArrowRight: [0, 1] };
     if (moves[event.key]) {
       event.preventDefault();
@@ -4341,6 +4477,9 @@ function renderDataTableView(container) {
       commitTableEdit(table);
       autoSaveTable(table);
       rerenderTable();
+    }
+    if (event.key.length === 1 && !meta && !event.altKey) {
+      startCellEdit(table, selection.focusRow, selection.focusCol, tableEl, selection, container, rerenderTable, event.key);
     }
   });
   const thead = h('thead');
@@ -4381,36 +4520,7 @@ function renderDataTableView(container) {
       if (lowConf) td.classList.add('ws-cell-low-confidence');
       td.addEventListener('click', event => setSelection(ri, ci, event.shiftKey));
       td.addEventListener('dblclick', () => {
-        checkpointTableEdit(table);
-        td.classList.add('editing');
-        let draftValue = rawCell;
-        let finished = false;
-        const finishEdit = (save) => {
-          if (finished) return;
-          finished = true;
-          const value = save ? draftValue : rawCell;
-          table.rows[ri][ci] = value;
-          td.classList.remove('editing');
-          td.textContent = String(value).trim().startsWith('=') ? evaluateDataFormula(table, value) : value;
-          if (save) {
-            commitTableEdit(table);
-            autoSaveTable(table);
-          }
-        };
-        const input = h('input', {
-          type: 'text',
-          value: rawCell,
-          style: 'width:100%;height:100%;border:2px solid var(--ws-primary);border-radius:0;padding:5px 10px;font-family:var(--ws-font);font-size:13px;background:var(--ws-surface);color:var(--ws-text);outline:none',
-          onInput: (e) => { draftValue = e.target.value; },
-          onKeydown: (e) => {
-            if (e.key === 'Enter') { e.preventDefault(); finishEdit(true); }
-            if (e.key === 'Escape') { e.preventDefault(); finishEdit(false); }
-          },
-          onblur: () => finishEdit(true)
-        });
-        td.textContent = '';
-        td.appendChild(input);
-        input.focus();
+        startCellEdit(table, ri, ci, tableEl, selection, container, rerenderTable);
       });
       tr.appendChild(td);
     });
@@ -4426,16 +4536,69 @@ function renderDataTableView(container) {
     return dataWorkbookId(item) === workbookId && list.findIndex(candidate => candidate.id === item.id) === index;
   });
   sheetTables.forEach(sheet => {
-    sheetTabs.appendChild(h('button', {
-      className: 'ws-sheet-tab' + (sheet.id === table.id ? ' active' : ''),
-      type: 'button',
-      onClick: () => {
-        appStore.set({ currentDataTable: sheet });
-        container.replaceChildren();
-        renderDataTableView(container);
-      },
-      ariaLabel: 'Abrir ' + (sheet.name || 'Hoja'),
-    }, sheet.name || 'Hoja'));
+    const isActive = sheet.id === table.id;
+    const tabWrap = h('div', { className: 'ws-sheet-tab' + (isActive ? ' active' : ''), role: 'tab', 'aria-selected': isActive ? 'true' : 'false' });
+    const tabLabel = h('span', { className: 'ws-sheet-tab-label', title: 'Doble clic para renombrar' }, sheet.name || 'Hoja');
+    tabLabel.addEventListener('dblclick', () => {
+      const input = h('input', { type: 'text', value: sheet.name || 'Hoja', className: 'ws-sheet-tab-rename-input' });
+      tabLabel.replaceWith(input);
+      input.focus();
+      input.select();
+      const finish = (save) => {
+        const val = input.value.trim();
+        if (save && val && val !== sheet.name) { checkpointTableEdit(table); sheet.name = val; commitTableEdit(table); autoSaveTable(table); }
+        input.replaceWith(tabLabel);
+        tabLabel.textContent = sheet.name || 'Hoja';
+      };
+      input.addEventListener('keydown', (e) => { if (e.key === 'Enter') finish(true); if (e.key === 'Escape') finish(false); });
+      input.addEventListener('blur', () => finish(true));
+    });
+    tabLabel.addEventListener('click', () => {
+      appStore.set({ currentDataTable: sheet });
+      container.replaceChildren();
+      renderDataTableView(container);
+    });
+    tabWrap.appendChild(tabLabel);
+    if (isActive && sheetTables.length > 1) {
+      const closeBtn = h('button', {
+        className: 'ws-sheet-tab-close',
+        type: 'button',
+        title: 'Cerrar hoja',
+        onClick: (e) => {
+          e.stopPropagation();
+          showConfirm({
+            title: 'Cerrar hoja "' + (sheet.name || 'Hoja') + '"',
+            body: 'La hoja se mantendra en el libro. Puedes volver a abrirla desde el navegador de datos.',
+            confirmText: 'Cerrar',
+            onConfirm: () => {
+              const project = appStore.get('currentProject');
+              const tables = appStore.get('dataTables') || [];
+              const sameWorkbook = [table, ...tables].filter(t => dataWorkbookId(t) === workbookId && t.id !== sheet.id);
+              if (sameWorkbook.length > 0) {
+                appStore.set({ currentDataTable: sameWorkbook[0] });
+              } else {
+                appStore.set({ currentDataTable: null });
+              }
+              container.replaceChildren();
+              renderDataTableView(container);
+            }
+          });
+        }
+      }, '\u00d7');
+      tabWrap.appendChild(closeBtn);
+    }
+    tabWrap.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      showContextMenu(e.clientX, e.clientY, [
+        { label: 'Abrir', icon: 'doc', action: () => { appStore.set({ currentDataTable: sheet }); container.replaceChildren(); renderDataTableView(container); } },
+        { label: 'Renombrar', icon: 'edit', action: () => { const val = prompt('Nombre de la hoja:', sheet.name || 'Hoja'); if (val !== null && val.trim()) { checkpointTableEdit(table); sheet.name = val.trim(); commitTableEdit(table); autoSaveTable(table); rerenderTable(); } } },
+        { divider: true },
+        { label: 'Duplicar', icon: 'copy', action: () => duplicateDataSheet(sheet, container) },
+        { divider: true },
+        { label: 'Eliminar', icon: 'trash', danger: true, action: () => deleteDataSheet(sheet, container) },
+      ]);
+    });
+    sheetTabs.appendChild(tabWrap);
   });
   sheetTabs.appendChild(h('button', {
     className: 'ws-sheet-tab add-tab',
@@ -4527,11 +4690,11 @@ function renderQueryView(container, project) {
   const steps = appStore.get('querySteps');
   const el = h('div', { className: 'ws-query-layout', style: 'animation:fadeIn 0.3s ease' });
   const editor = h('div', { className: 'ws-query-editor' });
-  editor.appendChild(h('div', { className: 'ws-module-heading' },
-    h('div', { className: 'ws-module-title' }, 'Toolisto Query'),
-    h('span', { className: 'ws-status-chip ws-status-limited' }, 'FUNCIONAL CON LIMITACIONES')
-  ));
-  editor.appendChild(h('div', { style: 'font-size:13px;color:var(--ws-text-secondary);margin-bottom:20px' }, 'Crea pasos de consulta para transformar y analizar tus datos.'));
+  const headingRow = h('div', { className: 'ws-query-heading-row' });
+  headingRow.appendChild(h('div', { className: 'ws-module-title ws-query-title' }, 'Toolisto Query'));
+  headingRow.appendChild(h('span', { className: 'ws-status-chip ws-status-limited' }, 'FUNCIONAL CON LIMITACIONES'));
+  editor.appendChild(headingRow);
+  editor.appendChild(h('div', { className: 'ws-query-desc' }, 'Crea pasos de consulta para transformar y analizar tus datos.'));
   if (steps.length === 0) {
     editor.appendChild(h('div', { className: 'ws-empty' },
       h('div', { className: 'ws-empty-icon' }, svgIcon('chart', 28)),
