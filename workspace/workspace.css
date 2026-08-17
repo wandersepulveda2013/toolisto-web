@@ -1105,9 +1105,24 @@ html.theme-dark .ws-topbar {
 }
 
 .ws-doc-editor {
-  max-width: 800px;
+  max-width: 100%;
   margin: 0 auto;
   padding: calc(24px * var(--ws-density-scale)) 0;
+}
+
+.ws-doc-editor.ws-doc-focus-mode .ws-doc-toolbar,
+.ws-doc-editor.ws-doc-focus-mode .block-handle,
+.ws-doc-editor.ws-doc-focus-mode .ws-doc-add-block,
+.ws-doc-editor.ws-doc-focus-mode .ws-doc-metrics {
+  opacity: 0;
+  height: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.ws-doc-editor.ws-doc-focus-mode .ws-doc-blocks {
+  max-width: 720px;
+  margin: 0 auto;
 }
 
 .ws-doc-block {

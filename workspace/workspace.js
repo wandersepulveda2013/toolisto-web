@@ -395,6 +395,9 @@ const SVG = {
   highlight: '<path d="m5 15 7-7 4 4-7 7H5z"/><path d="m14 7 2-2 4 4-2 2"/><path d="M3 21h18"/>',
   info: '<circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>',
   imageBlock: '<rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>',
+  eye: '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>',
+  indent: '<line x1="21" y1="6" x2="3" y2="6"/><line x1="15" y1="12" x2="3" y2="12"/><line x1="21" y1="18" x2="3" y2="18"/><polyline points="17 15 21 12 17 9"/>',
+  outdent: '<line x1="21" y1="6" x2="3" y2="6"/><line x1="15" y1="12" x2="3" y2="12"/><line x1="21" y1="18" x2="3" y2="18"/><polyline points="7 15 3 12 7 9"/>',
   empty: '<rect x="3" y="3" width="18" height="18" rx="2"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/>',
   emptyFolder: '<path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/>',
 };
@@ -905,6 +908,8 @@ async function initApp() {
       hideContextMenu();
       $('#ws-sidebar').classList.remove('mobile-open');
       $('#ws-menu-toggle')?.setAttribute('aria-expanded', 'false');
+      const focusEditor = document.querySelector('.ws-doc-editor.ws-doc-focus-mode');
+      if (focusEditor) { focusEditor.classList.remove('ws-doc-focus-mode'); }
     }
   });
 
@@ -3117,7 +3122,8 @@ function renderDocumentToolbar(doc, metrics) {
   const fontSize = h('select', { className: 'ws-doc-format ws-doc-font-size', title: 'Tamaño de texto', ariaLabel: 'Tamaño de texto', onMouseDown: event => { rememberDocSelection(activeDocEditor); event.preventDefault(); }, onChange: event => runDocCommand('fontSize', event.target.value) });
   [['2', '10'], ['3', '12'], ['4', '14'], ['5', '18'], ['6', '24'], ['7', '32']].forEach(([value, label]) => fontSize.appendChild(h('option', { value }, label + ' pt')));
   const textColor = h('input', { className: 'ws-doc-color', type: 'color', value: '#20242b', title: 'Color del texto', ariaLabel: 'Color del texto', onMouseDown: event => { rememberDocSelection(activeDocEditor); event.stopPropagation(); }, onInput: event => runDocCommand('foreColor', event.target.value) });
-  group(format, fontFamily, fontSize, textColor);
+  const highlightColor = h('input', { className: 'ws-doc-color', type: 'color', value: '#F3EBDD', title: 'Color de resaltado', ariaLabel: 'Color de resaltado', onMouseDown: event => { rememberDocSelection(activeDocEditor); event.stopPropagation(); }, onInput: event => runDocCommand('hiliteColor', event.target.value) });
+  group(format, fontFamily, fontSize, textColor, highlightColor);
   group(
     makeDocToolbarButton('Negrita', 'bold', () => runDocCommand('bold'), 'Negrita · Ctrl B'),
     makeDocToolbarButton('Cursiva', 'italic', () => runDocCommand('italic'), 'Cursiva · Ctrl I'),
@@ -3133,6 +3139,16 @@ function renderDocumentToolbar(doc, metrics) {
     makeDocToolbarButton('Lista con viñetas', 'list', () => runDocCommand('insertUnorderedList'), 'Lista con viñetas'),
     makeDocToolbarButton('Lista numerada', 'list', () => runDocCommand('insertOrderedList'), 'Lista numerada')
   );
+  group(
+    makeDocToolbarButton('Aumentar sangría', 'indent', () => runDocCommand('indent'), 'Aumentar sangría'),
+    makeDocToolbarButton('Reducir sangría', 'outdent', () => runDocCommand('outdent'), 'Reducir sangría')
+  );
+  const lineSpacing = h('select', { className: 'ws-doc-format', title: 'Interlineado', ariaLabel: 'Interlineado', onMouseDown: event => { rememberDocSelection(activeDocEditor); event.preventDefault(); }, onChange: event => {
+    const val = parseFloat(event.target.value);
+    if (activeDocEditor) { activeDocEditor.style.lineHeight = val; }
+  } });
+  [['1', '1.0'], ['1.15', '1.15'], ['1.5', '1.5'], ['2', '2.0'], ['2.5', '2.5'], ['3', '3.0']].forEach(([value, label]) => lineSpacing.appendChild(h('option', { value }, label)));
+  group(lineSpacing);
   const hasTabularContent = doc && doc.blocks && doc.blocks.length > 0 && (() => {
     const text = doc.blocks.map(b => b.content || '').join('\n');
     const lines = text.split('\n').filter(Boolean);
@@ -3202,6 +3218,15 @@ function renderDocumentToolbar(doc, metrics) {
       renderView('design');
       toast('Informe creado desde el documento', 'success');
     }, 'Crear informe desde este documento')
+  );
+  ribbonGroup(viewPanel, 'Enfoque',
+    h('button', { className: 'ws-btn ws-btn-ghost ws-btn-sm', title: 'Modo enfoque — oculta toolbar y distracciones', onClick: () => {
+      const editorEl = document.querySelector('.ws-doc-editor');
+      if (editorEl) {
+        editorEl.classList.toggle('ws-doc-focus-mode');
+        toast(editorEl.classList.contains('ws-doc-focus-mode') ? 'Modo enfoque activado — presiona Esc para salir' : 'Modo enfoque desactivado', 'success');
+      }
+    } }, svgIcon('eye'), ' Modo enfoque')
   );
   toolbar.appendChild(tabs);
   toolbar.appendChild(ribbonBody);
