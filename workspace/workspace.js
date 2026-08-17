@@ -6434,6 +6434,8 @@ const DASHBOARD_WIDGET_TYPES = [
   { value: 'kpi', label: 'Indicador KPI' },
   { value: 'bar', label: 'Gráfico de barras' },
   { value: 'line', label: 'Gráfico de línea' },
+  { value: 'pie', label: 'Gráfico de torta' },
+  { value: 'donut', label: 'Gráfico de dona' },
   { value: 'table', label: 'Tabla de detalle' },
   { value: 'insights', label: 'Resumen inteligente' },
 ];
@@ -6549,6 +6551,52 @@ function dashboardSvg(tag, attrs = {}) {
 
 function renderDashboardChart(items, type) {
   if (!items.length) return h('div', { className: 'ws-dashboard-no-data' }, svgIcon('chart', 20), 'Sin datos para visualizar');
+  if (type === 'pie' || type === 'donut') {
+    const total = items.reduce((s, item) => s + item.value, 0) || 1;
+    const cx = 140, cy = 125, r = 90, innerR = type === 'donut' ? 50 : 0;
+    const svg = dashboardSvg('svg', { className: 'ws-dashboard-chart-svg', viewBox: '0 0 560 250', role: 'img', ariaLabel: type === 'pie' ? 'Gráfico de torta' : 'Gráfico de dona' });
+    const colors = ['#FF6542','#5167E8','#4CAF50','#FFC107','#9C27B0','#00BCD4','#FF9800','#E91E63'];
+    let startAngle = -Math.PI / 2;
+    items.forEach((item, index) => {
+      const slice = (item.value / total) * Math.PI * 2;
+      const endAngle = startAngle + slice;
+      const x1 = cx + r * Math.cos(startAngle);
+      const y1 = cy + r * Math.sin(startAngle);
+      const x2 = cx + r * Math.cos(endAngle);
+      const y2 = cy + r * Math.sin(endAngle);
+      const large = slice > Math.PI ? 1 : 0;
+      let d;
+      if (type === 'donut') {
+        const ix1 = cx + innerR * Math.cos(startAngle);
+        const iy1 = cy + innerR * Math.sin(startAngle);
+        const ix2 = cx + innerR * Math.cos(endAngle);
+        const iy2 = cy + innerR * Math.sin(endAngle);
+        d = `M${x1} ${y1} A${r} ${r} 0 ${large} 1 ${x2} ${y2} L${ix2} ${iy2} A${innerR} ${innerR} 0 ${large} 0 ${ix1} ${iy1} Z`;
+      } else {
+        d = `M${cx} ${cy} L${x1} ${y1} A${r} ${r} 0 ${large} 1 ${x2} ${y2} Z`;
+      }
+      svg.appendChild(dashboardSvg('path', { d, fill: colors[index % colors.length], 'data-label': item.label, 'data-value': item.value }));
+      startAngle = endAngle;
+    });
+    if (type === 'donut') {
+      const ct = dashboardSvg('text', { x: cx, y: cy + 5, 'text-anchor': 'middle', className: 'ws-dashboard-chart-tick' });
+      ct.appendChild(document.createTextNode(dashboardFormatNumber(total)));
+      svg.appendChild(ct);
+    }
+    const legend = h('div', { className: 'ws-dashboard-legend', style: 'display:flex;flex-wrap:wrap;gap:8px 16px;padding:12px 0 0;font-size:12px' });
+    items.forEach((item, index) => {
+      const pct = ((item.value / total) * 100).toFixed(1);
+      const dot = h('span', { style: 'display:flex;align-items:center;gap:4px' },
+        h('span', { style: 'width:10px;height:10px;border-radius:2px;background:' + colors[index % colors.length] + ';display:inline-block;flex-shrink:0' }),
+        document.createTextNode(item.label.slice(0, 14) + ' (' + pct + '%)')
+      );
+      legend.appendChild(dot);
+    });
+    const wrapper = h('div', { className: 'ws-dashboard-chart' });
+    wrapper.appendChild(svg);
+    wrapper.appendChild(legend);
+    return wrapper;
+  }
   const svg = dashboardSvg('svg', { className: 'ws-dashboard-chart-svg', viewBox: '0 0 560 250', role: 'img', ariaLabel: type === 'line' ? 'Gráfico de línea' : 'Gráfico de barras' });
   const left = 38;
   const top = 16;
@@ -6629,7 +6677,7 @@ function renderDashboardWidget(widget, source, rows, config, index, commitConfig
       h('span', null, aggregateLabel + ' · ' + label)
     ));
     card.appendChild(h('div', { className: 'ws-dashboard-widget-foot' }, rows.length + ' filas visibles de ' + (source.rows || []).length));
-  } else if (widget.type === 'bar' || widget.type === 'line') {
+  } else if (widget.type === 'bar' || widget.type === 'line' || widget.type === 'pie' || widget.type === 'donut') {
     card.appendChild(renderDashboardChart(dashboardChartItems(rows, widget), widget.type));
     card.appendChild(h('div', { className: 'ws-dashboard-widget-foot' }, (headers[Number(widget.category)] || 'Categoría') + ' · ' + (DASHBOARD_AGGREGATES.find(item => item.value === widget.aggregate)?.label || 'Conteo')));
   } else if (widget.type === 'table') {

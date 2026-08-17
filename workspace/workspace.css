@@ -3134,7 +3134,9 @@ html.theme-dark .ws-status-limited { color: #b7c3ff; background: rgba(120, 135, 
 }
 
 .ws-dashboard-widget-bar,
-.ws-dashboard-widget-line {
+.ws-dashboard-widget-line,
+.ws-dashboard-widget-pie,
+.ws-dashboard-widget-donut {
   grid-column: span 6;
   min-height: 280px;
 }
@@ -6961,6 +6963,8 @@ html.theme-dark .ws-query-workbench {
 
   .ws-dashboard-widget-bar,
   .ws-dashboard-widget-line,
+  .ws-dashboard-widget-pie,
+  .ws-dashboard-widget-donut,
   .ws-dashboard-widget-table {
     grid-column: span 8;
   }
@@ -6987,6 +6991,8 @@ html.theme-dark .ws-query-workbench {
   .ws-dashboard-widget-kpi,
   .ws-dashboard-widget-bar,
   .ws-dashboard-widget-line,
+  .ws-dashboard-widget-pie,
+  .ws-dashboard-widget-donut,
   .ws-dashboard-widget-table,
   .ws-dashboard-widget-insights {
     grid-column: 1 / -1;
