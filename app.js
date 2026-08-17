@@ -493,11 +493,26 @@
 
     ['dragenter', 'dragover'].forEach((name) => els.dropZone?.addEventListener(name, (event) => {
       event.preventDefault();
+      event.stopPropagation();
       els.dropZone.classList.add('dragging');
+      els.dropZone.classList.remove('drag-rejected');
+      if (event.dataTransfer?.types?.includes('Files')) {
+        var files = event.dataTransfer.files;
+        var currentTool = state.tool || state.forcedTool || null;
+        var accepts = currentTool && toolMeta[currentTool] ? toolMeta[currentTool].accepts : null;
+        if (files.length > 0 && accepts && accepts !== 'any' && accepts !== 'none') {
+          var hasInvalid = false;
+          for (var fi = 0; fi < files.length; fi++) {
+            if (!fileMatchesAccept(files[fi], state.inputAccept || '')) { hasInvalid = true; break; }
+          }
+          if (hasInvalid) { els.dropZone.classList.add('drag-rejected'); els.dropZone.classList.remove('dragging'); }
+        }
+      }
     }));
     ['dragleave', 'drop'].forEach((name) => els.dropZone?.addEventListener(name, (event) => {
       event.preventDefault();
       els.dropZone.classList.remove('dragging');
+      els.dropZone.classList.remove('drag-rejected');
     }));
     els.dropZone?.addEventListener('drop', (event) => addFiles([...event.dataTransfer.files]));
 
@@ -2621,7 +2636,7 @@
     } catch (error) {
       state.processError = error;
       state.processPhase = 'failed';
-      const message = error?.message || 'No pudimos procesar el archivo.';
+      const message = friendlyErrorMessage(error, state.tool);
       showProcessFeedback(message);
       showToast(message);
     } finally {
@@ -6281,7 +6296,18 @@
     els.resultStats.innerHTML = (result.stats || []).map(([label,value]) => `<div class="stat"><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong></div>`).join('');
     els.previewArea.innerHTML = '';
     if (els.resultSupport) els.resultSupport.hidden = true;
-    if (result.preview) {
+    if (result.preview && state.files.length && state.files[0] && state.files[0].type && state.files[0].type.startsWith('image/') && window.ToolistoBAV) {
+      var bavWrap = document.createElement('div');
+      bavWrap.className = 'result-bav-wrap';
+      els.previewArea.appendChild(bavWrap);
+      els.previewArea.hidden = false;
+      window.ToolistoBAV.create(bavWrap, {
+        before: state.files[0],
+        after: result.preview,
+        labelBefore: 'Original',
+        labelAfter: 'Resultado'
+      });
+    } else if (result.preview) {
       state.previewUrl = URL.createObjectURL(result.preview);
       const img = document.createElement('img');
       img.src = state.previewUrl;
@@ -6314,6 +6340,30 @@
       els.inspectorRatio.textContent = '—';
     }
     els.inspectorTime.textContent = elapsed > 0 ? (elapsed < 1000 ? elapsed + ' ms' : (elapsed / 1000).toFixed(1) + ' s') : '—';
+    // Enhanced metrics per tool type
+    if (result.stats && result.stats.length > 0) {
+      var extraMetrics = document.getElementById('inspectorExtra');
+      if (!extraMetrics) {
+        extraMetrics = document.createElement('div');
+        extraMetrics.id = 'inspectorExtra';
+        extraMetrics.className = 'inspector-extra';
+        els.resultInspector.appendChild(extraMetrics);
+      }
+      var toolType = state.tool || '';
+      var filteredStats = result.stats.filter(function(s) {
+        var label = (s[0] || '').toLowerCase();
+        if (label === 'tamaño' || label === 'size') return false;
+        return true;
+      }).slice(0, 4);
+      if (filteredStats.length > 0) {
+        extraMetrics.innerHTML = filteredStats.map(function(s) {
+          return '<div class="inspector-row"><span class="inspector-label">' + escapeHtml(s[0]) + '</span><span>' + escapeHtml(String(s[1])) + '</span></div>';
+        }).join('');
+        extraMetrics.hidden = false;
+      } else {
+        extraMetrics.hidden = true;
+      }
+    }
     els.resultInspector.hidden = false;
   }
 
@@ -6509,6 +6559,23 @@
       showToast('Copiar no disponible');
     }
     trackEvent('copy_tech_details', { tool: toolId });
+  }
+
+  function friendlyErrorMessage(error, tool) {
+    var msg = error?.message || String(error) || '';
+    if (msg.includes('password') || msg.includes('contraseña') || msg.includes('encrypted') || msg.includes('Encrypted')) return 'El archivo está protegido con contraseña. No se puede procesar sin desbloquearlo.';
+    if (msg.includes('out of memory') || msg.includes('OOM') || msg.includes('allocation')) return 'El archivo es demasiado grande para procesarlo en el navegador. Intenta con uno más pequeño.';
+    if (msg.includes('not a valid') || msg.includes('corrupt') || msg.includes('Invalid')) return 'El archivo parece estar dañado o no tiene el formato esperado. Verifica que no esté corrupto.';
+    if (msg.includes('decode') || msg.includes('Decode')) return 'No se pudo leer el contenido del archivo. Puede que el formato no sea compatible.';
+    if (msg.includes('timeout') || msg.includes('Timeout')) return 'El procesamiento tardó demasiado. Intenta con un archivo más pequeño.';
+    if (msg.includes('network') || msg.includes('fetch') || msg.includes('Failed to fetch')) return 'Error de conexión. Algunos componentes necesarios no pudieron cargarse.';
+    if (msg.includes('Worker') || msg.includes('worker')) return 'El motor de procesamiento no pudo iniciarse. Recarga la página e intenta de nuevo.';
+    if (msg.includes('Cannot read') || msg.includes('is null') || msg.includes('undefined')) return 'No se pudo acceder al archivo. Intenta seleccionarlo de nuevo.';
+    if (tool === 'compressPdf' || tool === 'scannedPdfToSearchablePdf') return 'No se pudo procesar el PDF. Verifica que no esté protegido y que sea un PDF válido.';
+    if (tool === 'convertAudio' || tool === 'trimAudio') return 'No se pudo procesar el audio. Verifica que el formato sea compatible (MP3, WAV, OGG, AAC, FLAC).';
+    if (tool === 'compressVideo' || tool === 'trimVideo') return 'No se pudo procesar el video. Verifica que el formato sea compatible (MP4, WebM, MOV, AVI).';
+    if (msg) return 'Ocurrió un problema: ' + msg.substring(0, 150);
+    return 'No pudimos procesar el archivo. Verifica el formato e inténtalo de nuevo.';
   }
 
   function showProcessFeedback(message) {

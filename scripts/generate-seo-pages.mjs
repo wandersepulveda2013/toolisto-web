@@ -162,7 +162,7 @@ html.intro-pending, html.intro-pending body { background: #1C1D21; }
 const splashHTML = `<div id="toolisto-intro" aria-hidden="true"><img class="intro-mark" src="./assets/toolisto-mark.svg" alt="" width="80" height="80" /><span class="intro-name">Toolisto</span><span class="intro-accent"></span></div>`;
 
 const splashScript = `<script>(function(){var i=document.getElementById('toolisto-intro');if(!i)return;var h=document.documentElement;var r=false;function c(){if(r)return;r=true;if(i.parentNode)i.remove();h.classList.remove('intro-pending');h.classList.remove('intro-active')}var m=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;if(m){c()}else{i.addEventListener('animationend',function(e){if(e.animationName!=='introMaster')return;i.removeEventListener('animationend',c);c()});setTimeout(c,300)}})()</script>`;
-const pwaHead = `<link rel="manifest" href="./assets/manifest.webmanifest">`;
+const pwaHead = `<link rel="manifest" href="./assets/manifest.webmanifest">\n  <link rel="apple-touch-icon" href="./assets/apple-touch-icon.png">`;
 const pwaScript = `<script src="./js/pwa-register.js"></script>`;
 const ASSET_VERSION = '20260814-apluno';
 const appJsTag = (rel) => `<script src="${rel}app.js?v=${ASSET_VERSION}"></script>`;
@@ -311,6 +311,7 @@ function buildToolPage(tool) {
   ${pwaHead}
   <link rel="stylesheet" href="./styles.css?v=${ASSET_VERSION}">
   <link rel="stylesheet" href="./js/modes/modes.css?v=20260803-modes">
+  <link rel="stylesheet" href="./js/components/components.css?v=20260817">
   ${splashCSS}
   <script type="application/ld+json">${JSON.stringify({
     "@context": "https://schema.org",
@@ -410,6 +411,11 @@ function buildToolPage(tool) {
   <script src="./js/tool-processors.js"></script>
   ${appJsTag('./js/')}
   ${pwaScript}
+  <script src="./js/components/before-after-viewer.js"></script>
+  <script src="./js/components/pdf-page-navigator.js"></script>
+  <script src="./js/components/data-grid.js"></script>
+  <script src="./js/components/live-text-editor.js"></script>
+  <script src="./js/components/generator-preview.js"></script>
   <script src="./js/modes/mode-core.js"></script>
   <script src="./js/modes/calc.js"></script>
   <script src="./js/modes/structure.js"></script>

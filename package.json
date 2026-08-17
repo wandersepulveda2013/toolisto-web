@@ -17,6 +17,10 @@
     "test:workspace": "node tests/workspace/production-validation.mjs",
     "test:apluno": "node tests/apluno-site.mjs",
     "test:release": "node scripts/test-public-release.mjs",
+    "test:e2e": "npx playwright test",
+    "test:e2e:ui": "npx playwright test --ui",
+    "test:167audit": "npx playwright test tests/e2e/167-tool-audit.spec.js",
+    "test:regression": "npx playwright test tests/e2e/regression.spec.js",
     "build:workspace": "node scripts/verify-workspace-sync.mjs",
     "test:workspace:release": "node scripts/test-workspace-release.mjs",
     "start": "node server.js"
@@ -34,9 +38,11 @@
   },
   "homepage": "https://github.com/wandersepulveda2013/toolisto-web#readme",
   "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
     "@ffmpeg/core": "^0.12.9",
     "@ffmpeg/ffmpeg": "^0.12.15",
     "@ffmpeg/util": "^0.12.2",
+    "@playwright/test": "^1.62.1",
     "playwright": "^1.62.0",
     "tesseract.js": "^5.1.1"
   }
