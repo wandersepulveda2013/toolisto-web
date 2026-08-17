@@ -215,6 +215,42 @@ if (existsSync(srcCategories)) {
   fail('src/data/categories.json no existe');
 }
 
+// 11d. Category counts consistency: tools.json → toolisto.html category-count spans
+const srcToolisto = join(root, 'toolisto.html');
+if (existsSync(srcToolisto)) {
+  const srcHtml = readFileSync(srcToolisto, 'utf8');
+  const catCounts = {};
+  for (const tool of enabledTools) {
+    catCounts[tool.category] = (catCounts[tool.category] || 0) + 1;
+  }
+  const totalFromCategories = Object.values(catCounts).reduce((a, b) => a + b, 0);
+  if (totalFromCategories !== enabledTools.length) {
+    fail(`SUM(category.toolCount)=${totalFromCategories} !== enabledTools.length=${enabledTools.length}`);
+  } else {
+    pass(`SUM(category.toolCount) = ${totalFromCategories} = ${enabledTools.length} herramientas habilitadas`);
+  }
+  let mismatchCount = 0;
+  for (const [cat, expected] of Object.entries(catCounts)) {
+    const pattern = new RegExp(`category-card"\\s+href="[^"]*"\\s+data-nav-filter="${cat}"[\\s\\S]*?category-count">(\\d+) herramientas`);
+    const match = srcHtml.match(pattern);
+    if (!match) {
+      fail(`Categoría "${cat}" no encontrada en toolisto.html`);
+      mismatchCount++;
+    } else {
+      const displayed = parseInt(match[1], 10);
+      if (displayed !== expected) {
+        fail(`Categoría "${cat}": toolisto.html muestra ${displayed} pero tools.json tiene ${expected}`);
+        mismatchCount++;
+      }
+    }
+  }
+  if (mismatchCount === 0) {
+    pass(`Contadores de categorías en toolisto.html coinciden con registry (${Object.keys(catCounts).length} categorías)`);
+  }
+} else {
+  info('toolisto.html fuente no encontrado — saltando validación de contadores de categoría');
+}
+
 // 12. Check processor coverage (tool-processors.js + app.js switch-case)
 const processorPath = join(root, 'tool-processors.js');
 const appJsPath = join(root, 'app.js');
