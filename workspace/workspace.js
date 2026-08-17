@@ -3345,6 +3345,90 @@ function renderBlock(block, index, doc, renderBlocks, updateMetrics = () => {}) 
       },
       onKeydown: (e) => {
         if ((e.ctrlKey || e.metaKey) && ['b', 'i', 'u'].includes(e.key.toLowerCase())) return;
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+          e.preventDefault();
+          const url = prompt('URL del enlace:');
+          if (url) document.execCommand('createLink', false, url);
+          return;
+        }
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'f') {
+          e.preventDefault();
+          const term = prompt('Buscar en este documento:');
+          if (term) { const found = window.find(term); if (!found) toast('No se encontro: ' + term, 'info'); }
+          return;
+        }
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'h') {
+          e.preventDefault();
+          const findTerm = prompt('Buscar:');
+          if (!findTerm) return;
+          const replaceTerm = prompt('Reemplazar por:');
+          if (replaceTerm === null) return;
+          let count = 0;
+          const walker = document.createTreeWalker(contentEl, NodeFilter.SHOW_TEXT);
+          while (walker.nextNode()) {
+            const node = walker.currentNode;
+            const idx = node.textContent.indexOf(findTerm);
+            if (idx !== -1) {
+              node.textContent = node.textContent.split(findTerm).join(replaceTerm);
+              count++;
+            }
+          }
+          block.content = contentEl.textContent || '';
+          block.html = sanitizeDocHtml(contentEl.innerHTML);
+          autoSaveDoc(doc);
+          toast(count ? count + ' reemplazos realizados' : 'Sin coincidencias', count ? 'success' : 'info');
+          return;
+        }
+        if (e.key === '/' && block.content === '') {
+          const slashItems = [
+            { label: 'Titulo', type: 'heading1', desc: 'Encabezado grande' },
+            { label: 'Subtitulo', type: 'heading2', desc: 'Encabezado mediano' },
+            { label: 'Parrafo', type: 'paragraph', desc: 'Texto normal' },
+            { label: 'Lista', type: 'list', desc: 'Lista con viñetas' },
+            { label: 'Cita', type: 'callout', desc: 'Bloque destacado' },
+            { label: 'Separador', type: 'divider', desc: 'Linea horizontal' },
+          ];
+          let menuEl = null;
+          const showSlashMenu = () => {
+            hideSlashMenu();
+            const rect = contentEl.getBoundingClientRect();
+            menuEl = h('div', { className: 'ws-slash-menu', style: 'position:fixed;left:' + rect.left + 'px;top:' + (rect.bottom + 4) + 'px' });
+            const filter = h('input', { type: 'text', className: 'ws-slash-menu-filter', placeholder: 'Filtrar...', autofocus: true });
+            menuEl.appendChild(filter);
+            const list = h('div', { className: 'ws-slash-menu-list' });
+            const renderItems = (query) => {
+              list.replaceChildren();
+              const q = (query || '').toLowerCase();
+              slashItems.filter(item => !q || item.label.toLowerCase().includes(q) || item.desc.toLowerCase().includes(q)).forEach(item => {
+                const btn = h('button', { className: 'ws-slash-menu-item', type: 'button' },
+                  h('span', { className: 'ws-slash-menu-item-label' }, item.label),
+                  h('span', { className: 'ws-slash-menu-item-desc' }, item.desc)
+                );
+                btn.addEventListener('click', () => {
+                  block.type = item.type;
+                  if (['heading1', 'heading2'].includes(item.type)) block.content = '';
+                  hideSlashMenu();
+                  renderBlocks();
+                });
+                list.appendChild(btn);
+              });
+            };
+            renderItems('');
+            filter.addEventListener('input', () => renderItems(filter.value));
+            filter.addEventListener('keydown', (e) => {
+              if (e.key === 'Escape') { hideSlashMenu(); return; }
+              const items = list.querySelectorAll('.ws-slash-menu-item');
+              if (e.key === 'ArrowDown' && items.length) { e.preventDefault(); items[0].focus(); }
+            });
+            menuEl.appendChild(list);
+            document.body.appendChild(menuEl);
+            filter.focus();
+          };
+          const hideSlashMenu = () => { if (menuEl) { menuEl.remove(); menuEl = null; } };
+          showSlashMenu();
+          document.addEventListener('click', (e) => { if (menuEl && !menuEl.contains(e.target)) hideSlashMenu(); }, { once: true });
+          return;
+        }
         if (e.key === 'Enter' && !e.shiftKey) {
           e.preventDefault();
           if (doc.blocks.length >= getWorkspaceConfig().maxDocumentBlocks) {
