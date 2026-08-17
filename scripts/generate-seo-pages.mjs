@@ -405,6 +405,7 @@ function buildToolPage(tool) {
   ${pwaScript}
   <script src="./js/components/before-after-viewer.js"></script>
   <script src="./js/components/pdf-page-navigator.js"></script>
+  <script src="./js/components/pdf-result-viewer.js"></script>
   <script src="./js/components/data-grid.js"></script>
   <script src="./js/components/live-text-editor.js"></script>
   <script src="./js/components/generator-preview.js"></script>

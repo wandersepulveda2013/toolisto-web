@@ -1705,18 +1705,35 @@
         ${controlNumber('signPdfWidth', 'Ancho de firma (pt)', 150, 40, 400)}
       `,
       rotatePdf: `
-        ${controlSelect('rotatePdfAngle', 'Ángulo de giro', [['90','90° derecha'],['270','90° izquierda'],['180','180°']])}
-        ${controlSelect('rotatePdfPages', 'Aplicar a', [['all','Todas las páginas'],['first','Solo primera página'],['last','Solo última página']])}
+        <div class="control" style="grid-column:1/-1" id="rotatePdfInfo">
+          <div id="rotatePdfMeta" style="color:var(--muted);font-size:.85rem">Cargando PDF…</div>
+        </div>
+        <div class="control" style="grid-column:1/-1;display:flex;gap:6px;flex-wrap:wrap" id="rotatePdfActions">
+          <button type="button" class="quiet-button" data-rotate="270" style="font-size:.82rem;padding:5px 10px;border:1px solid var(--c-border);border-radius:6px">↺ Girar izquierda</button>
+          <button type="button" class="quiet-button" data-rotate="90" style="font-size:.82rem;padding:5px 10px;border:1px solid var(--c-border);border-radius:6px">↻ Girar derecha</button>
+          <button type="button" class="quiet-button" data-rotate="180" style="font-size:.82rem;padding:5px 10px;border:1px solid var(--c-border);border-radius:6px">↕ Media vuelta</button>
+          <button type="button" class="quiet-button" id="rotatePdfResetBtn" style="font-size:.82rem;padding:5px 10px;border:1px solid var(--c-border);border-radius:6px">Restablecer</button>
+        </div>
+        <div class="control" style="grid-column:1/-1" id="rotatePdfThumbs"></div>
+        <div class="control" style="grid-column:1/-1;color:var(--muted);font-size:.82rem">
+          Selecciona páginas y usa los botones para rotar. La miniatura cambia en tiempo real.
+        </div>
       `,
       deletePagesPdf: `
         <div class="control" style="grid-column:1/-1" id="deletePagesPdfInfo">
           <div id="deletePagesPdfMeta" style="color:var(--muted);font-size:.85rem">Cargando PDF…</div>
         </div>
-        <div class="control" style="grid-column:1/-1">
-          <label for="deletePagesRanges">Páginas a eliminar (rangos separados por coma)</label>
-          <input id="deletePagesRanges" type="text" placeholder="1, 3-5, 8" style="width:100%;padding:8px 10px;border:1px solid var(--c-border);border-radius:8px;background:var(--c-surface);color:var(--c-text);font-size:.9rem" />
-          <div id="deletePagesError" style="color:var(--c-error);font-size:.8rem;margin-top:4px"></div>
+        <div class="control" style="grid-column:1/-1" id="deletePagesPdfThumbs"></div>
+        <div class="control" style="grid-column:1/-1;color:var(--muted);font-size:.82rem" id="deletePagesPdfSummary">
+          Selecciona las páginas a eliminar haciendo clic en ellas.
         </div>
+        <details class="control" style="grid-column:1/-1">
+          <summary style="cursor:pointer;font-size:.82rem;color:var(--c-muted)">Selección avanzada por números</summary>
+          <div style="margin-top:8px">
+            <input id="deletePagesRanges" type="text" placeholder="1, 3-5, 8" style="width:100%;padding:8px 10px;border:1px solid var(--c-border);border-radius:8px;background:var(--c-surface);color:var(--c-text);font-size:.9rem" />
+            <div id="deletePagesError" style="color:var(--c-error);font-size:.8rem;margin-top:4px"></div>
+          </div>
+        </details>
       `,
       reversePagesPdf: `
         <div class="control" style="grid-column:1/-1;color:var(--muted);font-size:.85rem">
@@ -2282,6 +2299,7 @@
     if (hasFiles && tool === 'pdfToImages') initPdfToImages();
     if (hasFiles && tool === 'signPdf') initSignPdf();
     if (hasFiles && tool === 'deletePagesPdf') initDeletePagesPdf();
+    if (hasFiles && tool === 'rotatePdf') initRotatePdf();
     if (hasFiles && tool === 'duplicatePagesPdf') initDuplicatePagesPdf();
     if (hasFiles && tool === 'insertBlankPagesPdf') initInsertBlankPagesPdf();
     if (hasFiles && tool === 'editMetadataPdf') initEditMetadataPdf();
@@ -4307,20 +4325,24 @@
     const file = state.files[0];
     const bytes = await file.arrayBuffer();
     const source = await PDFDocument.load(bytes, { ignoreEncryption: false });
-    const angle = Number(valueOf('rotatePdfAngle', 90));
-    const target = valueOf('rotatePdfPages', 'all');
     const pageCount = source.getPageCount();
-    const indices = target === 'first' ? [0] : target === 'last' ? [pageCount - 1] : Array.from({ length: pageCount }, (_, i) => i);
+    const rotations = state._rotateRotations;
+    const selected = state._rotateSelected;
     const newPdf = await PDFDocument.create();
     const copied = await newPdf.copyPages(source, Array.from({ length: pageCount }, (_, i) => i));
+    let rotatedCount = 0;
     copied.forEach((p, i) => {
-      if (indices.includes(i)) p.setRotation(PDFLib.degrees((p.getRotation().angle + angle) % 360));
+      const pageNum = i + 1;
+      const rot = (rotations && rotations.has(pageNum)) ? rotations.get(pageNum) : 0;
+      if (rot !== 0) {
+        p.setRotation(PDFLib.degrees((p.getRotation().angle + rot) % 360));
+        rotatedCount++;
+      }
       newPdf.addPage(p);
     });
     const outBytes = await newPdf.save();
     const blob = new Blob([outBytes], { type: 'application/pdf' });
-    const label = angle === 180 ? '180°' : angle === 270 ? '90° izquierda' : '90° derecha';
-    return { blob, name: `${file.name.replace(/\.pdf$/i, '')}-girado.pdf`, title: 'PDF girado', message: `${indices.length} página${indices.length !== 1 ? 's' : ''} girada${indices.length !== 1 ? 's' : ''} ${label}.`, stats: [['Ángulo', label], ['Páginas', String(pageCount)], ['Tamaño', formatBytes(blob.size)]] };
+    return { blob, name: `${file.name.replace(/\.pdf$/i, '')}-girado.pdf`, title: 'PDF girado', message: `${rotatedCount} página${rotatedCount !== 1 ? 's' : ''} girada${rotatedCount !== 1 ? 's'}.`, stats: [['Páginas rotadas', String(rotatedCount)], ['Total', String(pageCount)], ['Tamaño', formatBytes(blob.size)]] };
   }
 
   async function processDeletePagesPdf() {
@@ -4330,11 +4352,15 @@
     const bytes = await file.arrayBuffer();
     const source = await PDFDocument.load(bytes, { ignoreEncryption: false });
     const totalPages = source.getPageCount();
-    const rangesText = valueOf('deletePagesRanges', '');
-    const result = parseRanges(rangesText, totalPages);
-    if (result.error) throw new Error(result.error);
-    const deleteSet = new Set();
-    for (const r of result.ranges) for (let i = r.start - 1; i < r.end; i++) deleteSet.add(i);
+    let deleteSet = new Set();
+    if (state._deletePagesSet && state._deletePagesSet.size > 0) {
+      state._deletePagesSet.forEach(p => deleteSet.add(p - 1));
+    } else {
+      const rangesText = valueOf('deletePagesRanges', '');
+      const result = parseRanges(rangesText, totalPages);
+      if (result.error) throw new Error(result.error);
+      for (const r of result.ranges) for (let i = r.start - 1; i < r.end; i++) deleteSet.add(i);
+    }
     if (deleteSet.size === 0) throw new Error('No se indicaron páginas a eliminar.');
     const keepIndices = Array.from({ length: totalPages }, (_, i) => i).filter(i => !deleteSet.has(i));
     if (keepIndices.length === 0) throw new Error('No puedes eliminar todas las páginas.');
@@ -4453,16 +4479,152 @@
     return { blob, name: `${file.name.replace(/\.pdf$/i, '')}-metadatos.pdf`, title: 'Metadatos actualizados', message: `Metadatos actualizados: ${fields.join(', ') || 'sin cambios'}.`, stats: [['Campos', fields.join(', ') || 'Ninguno'], ['Páginas', String(source.getPageCount())], ['Tamaño', formatBytes(blob.size)]] };
   }
 
-  async function initDeletePagesPdf() {
+  async function initRotatePdf() {
     ensurePdfLib();
-    const { PDFDocument } = window.PDFLib;
     const file = state.files[0];
-    if (!file) return;
-    const meta = $('#deletePagesPdfMeta');
+    if (!file || !window.pdfjsLib) return;
+    const meta = $('#rotatePdfMeta');
+    const thumbsEl = $('#rotatePdfThumbs');
+    if (!thumbsEl) return;
     try {
+      window.pdfjsLib.GlobalWorkerOptions.workerSrc = './vendor/pdfjs/pdf.worker.min.js';
       const bytes = await file.arrayBuffer();
-      const doc = await PDFDocument.load(bytes, { ignoreEncryption: false });
-      if (meta) meta.textContent = `${file.name} · ${doc.getPageCount()} página${doc.getPageCount() !== 1 ? 's' : ''} · Indica las páginas a eliminar`;
+      const pdf = await window.pdfjsLib.getDocument({ data: new Uint8Array(bytes) }).promise;
+      const pageCount = pdf.numPages;
+      if (meta) meta.textContent = `${file.name} · ${pageCount} página${pageCount !== 1 ? 's' : ''}`;
+      const rotations = new Map();
+      for (let i = 1; i <= pageCount; i++) rotations.set(i, 0);
+      const selected = new Set();
+      thumbsEl.innerHTML = '';
+      thumbsEl.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:8px;max-height:360px;overflow-y:auto;padding:4px 0';
+      for (let i = 1; i <= pageCount; i++) {
+        const page = await pdf.getPage(i);
+        const vp = page.getViewport({ scale: 0.22 });
+        const c = document.createElement('canvas');
+        c.width = vp.width; c.height = vp.height;
+        await page.render({ canvasContext: c.getContext('2d'), viewport: vp }).promise;
+        const card = document.createElement('div');
+        card.style.cssText = 'position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;padding:4px;border:2px solid var(--c-border);border-radius:8px;cursor:pointer;transition:border-color .15s,box-shadow .15s';
+        card.dataset.page = i;
+        const cb = document.createElement('input');
+        cb.type = 'checkbox'; cb.style.cssText = 'position:absolute;top:4px;right:4px;z-index:1;width:16px;height:16px;accent-color:var(--c-primary)';
+        const rotBadge = document.createElement('span');
+        rotBadge.className = 'pdf-nav-rot-badge';
+        rotBadge.textContent = '0°';
+        rotBadge.style.display = 'none';
+        c.style.cssText = 'width:100%;border-radius:4px;display:block;transition:transform .2s';
+        const num = document.createElement('span');
+        num.style.cssText = 'font-size:.65rem;font-weight:800;color:var(--muted)';
+        num.textContent = i;
+        card.appendChild(cb);
+        card.appendChild(rotBadge);
+        card.appendChild(c);
+        card.appendChild(num);
+        card.addEventListener('click', (e) => {
+          if (e.target === cb) return;
+          cb.checked = !cb.checked;
+          if (cb.checked) selected.add(i); else selected.delete(i);
+          card.style.borderColor = cb.checked ? 'var(--c-primary)' : 'var(--c-border)';
+          card.style.boxShadow = cb.checked ? '0 0 0 1px var(--c-primary)' : '';
+        });
+        cb.addEventListener('change', () => {
+          if (cb.checked) selected.add(i); else selected.delete(i);
+          card.style.borderColor = cb.checked ? 'var(--c-primary)' : 'var(--c-border)';
+          card.style.boxShadow = cb.checked ? '0 0 0 1px var(--c-primary)' : '';
+        });
+        thumbsEl.appendChild(card);
+        card._rotBadge = rotBadge;
+        card._canvas = c;
+        card._pageIdx = i;
+      }
+      state._rotateRotations = rotations;
+      state._rotateSelected = selected;
+      state._rotateCards = Array.from(thumbsEl.children);
+      const actionsEl = $('#rotatePdfActions');
+      if (actionsEl) {
+        actionsEl.addEventListener('click', (e) => {
+          const btn = e.target.closest('[data-rotate]');
+          if (btn) {
+            const angle = Number(btn.dataset.rotate);
+            selected.forEach(idx => {
+              rotations.set(idx, (rotations.get(idx) + angle) % 360);
+            });
+            updateRotateVisuals();
+          }
+        });
+      }
+      const resetBtn = $('#rotatePdfResetBtn');
+      if (resetBtn) resetBtn.addEventListener('click', () => {
+        rotations.forEach((_, k) => rotations.set(k, 0));
+        updateRotateVisuals();
+      });
+      function updateRotateVisuals() {
+        state._rotateCards.forEach(card => {
+          const idx = card._pageIdx;
+          const rot = rotations.get(idx);
+          if (card._canvas) card._canvas.style.transform = `rotate(${rot}deg)`;
+          if (card._rotBadge) {
+            card._rotBadge.style.display = rot !== 0 ? '' : 'none';
+            card._rotBadge.textContent = rot + '°';
+          }
+        });
+      }
+    } catch (err) {
+      if (meta) meta.textContent = err?.message?.includes('password') ? 'PDF protegido.' : 'No se pudo leer el PDF.';
+    }
+  }
+
+  async function initDeletePagesPdf() {
+    const file = state.files[0];
+    if (!file || !window.pdfjsLib) return;
+    const meta = $('#deletePagesPdfMeta');
+    const thumbsEl = $('#deletePagesPdfThumbs');
+    const summaryEl = $('#deletePagesPdfSummary');
+    try {
+      window.pdfjsLib.GlobalWorkerOptions.workerSrc = './vendor/pdfjs/pdf.worker.min.js';
+      const bytes = await file.arrayBuffer();
+      const pdf = await window.pdfjsLib.getDocument({ data: new Uint8Array(bytes) }).promise;
+      const pageCount = pdf.numPages;
+      if (meta) meta.textContent = `${file.name} · ${pageCount} página${pageCount !== 1 ? 's' : ''} —Selecciona las que deseas eliminar`;
+      const toDelete = new Set();
+      if (thumbsEl) {
+        thumbsEl.innerHTML = '';
+        thumbsEl.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:8px;max-height:360px;overflow-y:auto;padding:4px 0';
+        for (let i = 1; i <= pageCount; i++) {
+          const page = await pdf.getPage(i);
+          const vp = page.getViewport({ scale: 0.22 });
+          const c = document.createElement('canvas');
+          c.width = vp.width; c.height = vp.height;
+          await page.render({ canvasContext: c.getContext('2d'), viewport: vp }).promise;
+          const card = document.createElement('div');
+          card.style.cssText = 'position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;padding:4px;border:2px solid var(--c-border);border-radius:8px;cursor:pointer;transition:all .15s';
+          card.dataset.page = i;
+          const trashIcon = document.createElement('span');
+          trashIcon.style.cssText = 'position:absolute;top:4px;right:4px;z-index:1;width:20px;height:20px;display:none;align-items:center;justify-content:center;border-radius:50%;background:var(--c-error);color:#fff;font-size:.7rem;font-weight:700';
+          trashIcon.textContent = '✕';
+          c.style.cssText = 'width:100%;border-radius:4px;display:block;transition:opacity .15s';
+          const num = document.createElement('span');
+          num.style.cssText = 'font-size:.65rem;font-weight:800;color:var(--muted)';
+          num.textContent = i;
+          card.appendChild(trashIcon);
+          card.appendChild(c);
+          card.appendChild(num);
+          card.addEventListener('click', () => {
+            if (toDelete.has(i)) { toDelete.delete(i); card.style.borderColor = 'var(--c-border)'; card.style.opacity = '1'; trashIcon.style.display = 'none'; }
+            else { toDelete.add(i); card.style.borderColor = 'var(--c-error)'; card.style.opacity = '0.6'; trashIcon.style.display = 'flex'; }
+            updateDeleteSummary();
+          });
+          thumbsEl.appendChild(card);
+        }
+      }
+      function updateDeleteSummary() {
+        const count = toDelete.size;
+        const remaining = pageCount - count;
+        if (summaryEl) summaryEl.textContent = count > 0 ? `${count} página${count !== 1 ? 's' : ''} seleccionada${count !== 1 ? 's' : ''} para eliminar —El resultado tendrá ${remaining} página${remaining !== 1 ? 's' : ''}` : 'Selecciona las páginas a eliminar haciendo clic en ellas.';
+        const rangesInput = $('#deletePagesRanges');
+        if (rangesInput && count > 0) rangesInput.value = Array.from(toDelete).sort((a, b) => a - b).join(', ');
+      }
+      state._deletePagesSet = toDelete;
     } catch (err) {
       if (meta) meta.textContent = err?.message?.includes('password') ? 'PDF protegido.' : 'No se pudo leer el PDF.';
     }
@@ -6310,11 +6472,18 @@
       var name = (result.name || '').toLowerCase();
       state.previewUrl = URL.createObjectURL(result.preview);
       if (mime === 'application/pdf' || name.endsWith('.pdf')) {
-        var embed = document.createElement('iframe');
-        embed.src = state.previewUrl;
-        embed.style.cssText = 'width:100%;height:360px;border:none;border-radius:6px';
-        embed.title = 'Vista previa del PDF';
-        els.previewArea.appendChild(embed);
+        if (window.ToolistoPDFViewer) {
+          var viewerWrap = document.createElement('div');
+          viewerWrap.style.cssText = 'height:380px';
+          els.previewArea.appendChild(viewerWrap);
+          window.ToolistoPDFViewer.create(viewerWrap, { blob: result.preview });
+        } else {
+          var embed = document.createElement('iframe');
+          embed.src = state.previewUrl;
+          embed.style.cssText = 'width:100%;height:360px;border:none;border-radius:6px';
+          embed.title = 'Vista previa del PDF';
+          els.previewArea.appendChild(embed);
+        }
         els.previewArea.hidden = false;
       } else if (mime === 'text/plain' || name.endsWith('.txt') || name.endsWith('.csv') || name.endsWith('.json') || name.endsWith('.xml') || name.endsWith('.html') || name.endsWith('.md')) {
         result.preview.text().then(function(txt) {
