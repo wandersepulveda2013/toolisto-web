@@ -1,4 +1,4 @@
-window.ToolProcessors = window.ToolProcessors || {};
+﻿window.ToolProcessors = window.ToolProcessors || {};
 
 (function() {
   'use strict';
@@ -21,6 +21,57 @@ window.ToolProcessors = window.ToolProcessors || {};
       reader.onerror = function() { reject(new Error('Failed to read file as text: ' + file.name)); };
       reader.readAsText(file, 'UTF-8');
     });
+  }
+
+  function _extractTextFromFile(file) {
+    var name = (file.name || '').toLowerCase();
+    var isTxt = /\.txt$/i.test(name) || file.type === 'text/plain';
+    var isHtml = /\.(html?|xhtml)$/i.test(name) || file.type === 'text/html';
+    var isCss = /\.css$/i.test(name) || file.type === 'text/css';
+    var isDocx = /\.(docx?|dotx?)$/i.test(name) || (file.type && file.type.indexOf('word') !== -1);
+    var isPdf = file.type === 'application/pdf';
+    var isRtf = /\.rtf$/i.test(name);
+    var isOdt = /\.odt$/i.test(name);
+    var isEpub = /\.epub$/i.test(name);
+    if (isTxt || isCss) return readFileAsText(file);
+    if (isHtml) {
+      return readFileAsText(file).then(function(html) {
+        var tmp = document.createElement('div');
+        tmp.innerHTML = html;
+        return (tmp.textContent || tmp.innerText || '').trim();
+      });
+    }
+    if (isRtf) {
+      return readFileAsText(file).then(function(rtf) {
+        var t = rtf.replace(/\{\\[^{}]*\}/g, ' ').replace(/\\[a-z]+\d*\s?/gi, ' ').replace(/[{}]/g, '');
+        return t.replace(/\s+/g, ' ').trim();
+      });
+    }
+    if (isDocx && typeof mammoth !== 'undefined') {
+      return readFileAsArrayBuffer(file).then(function(buf) {
+        return mammoth.extractRawText({ arrayBuffer: buf }).then(function(r) { return (r.value || '').trim(); });
+      });
+    }
+    if (isPdf && typeof pdfjsLib !== 'undefined') {
+      return readFileAsArrayBuffer(file).then(function(buf) {
+        return pdfjsLib.getDocument({ data: new Uint8Array(buf) }).promise.then(function(pdf) {
+          var texts = [];
+          var promises = [];
+          for (var i = 1; i <= pdf.numPages; i++) {
+            (function(pageNum) {
+              promises.push(pdf.getPage(pageNum).then(function(page) {
+                return page.getTextContent().then(function(tc) {
+                  var pageText = tc.items.map(function(item) { return item.str; }).join(' ');
+                  texts[pageNum - 1] = pageText;
+                });
+              }));
+            })(i);
+          }
+          return Promise.all(promises).then(function() { return texts.join('\n\n').trim(); });
+        });
+      });
+    }
+    return readFileAsText(file);
   }
 
   function htmlToMarkdown(html) {
@@ -5610,6 +5661,135 @@ window.ToolProcessors = window.ToolProcessors || {};
     return matches ? matches.length : 0;
   }
 
+  var _STOPWORDS_ES = new Set(['de','la','el','en','y','a','los','del','las','un','por','con','una','su','para','es','al','lo','como','mas','o','pero','sus','le','ya','este','ha','si','porque','esta','son','entre','cuando','muy','sin','sobre','ser','tambien','me','hasta','hay','donde','quien','desde','todo','nos','durante','todos','uno','les','ni','contra','otros','ese','eso','ante','ellos','e','esto','mi','antes','algunos','que','unos','yo','otro','otras','otra','el','tanto','esa','estos','mucho','quienes','nada','muchos','cual','poco','ella']);
+  var _STOPWORDS_EN = new Set(['the','be','to','of','and','a','in','that','have','i','it','for','not','on','with','he','as','you','do','at','this','but','his','by','from','they','we','say','her','she','or','an','will','my','one','all','would','there','their','what','so','up','out','if','about','who','get','which','go','me','when','make','can','like','time','no','just','him','know','take','people','into','year','your','good','some','could','them','see','other','than','then','now','look','only','come','its','over','think','also','back','after','use','two','how','our','work','first','well','way','even','new','want','because','any','these','give','day','most','us']);
+
+  function _getWords(text) {
+    return (text.toLowerCase().match(/[\p{L}\p{N}]+(?:[\u2019\u2018''\-][\p{L}\p{N}]+)*/gu) || []);
+  }
+
+  function _wordFrequency(words, excludeStopwords) {
+    var freq = {};
+    words.forEach(function(w) {
+      if (excludeStopwords && (_STOPWORDS_ES.has(w) || _STOPWORDS_EN.has(w))) return;
+      freq[w] = (freq[w] || 0) + 1;
+    });
+    return Object.keys(freq).map(function(k) { return [k, freq[k]]; }).sort(function(a, b) { return b[1] - a[1]; });
+  }
+
+  function _longestWords(words) {
+    var unique = {};
+    words.forEach(function(w) { if (!unique[w] || w.length > unique[w].length) unique[w] = w; });
+    return Object.values(unique).sort(function(a, b) { return b.length - a.length; }).slice(0, 10);
+  }
+
+  function _hapax(words) {
+    var freq = {};
+    words.forEach(function(w) { freq[w] = (freq[w] || 0) + 1; });
+    return Object.keys(freq).filter(function(w) { return freq[w] === 1; }).length;
+  }
+
+  function _countSyllables(word) {
+    word = word.toLowerCase().replace(/[^a-z]/g, '');
+    if (word.length <= 3) return 1;
+    word = word.replace(/(?:[^laeiouy]es|ed|[^laeiouy]e)$/, '');
+    word = word.replace(/^y/, '');
+    var m = word.match(/[aeiouy]+/g);
+    return m ? m.length : 1;
+  }
+
+  function _buildMultiResult(blobs, stats, message) {
+    return {
+      files: blobs.map(function(b) { return { name: b.name, blob: b.blob, size: b.blob.size }; }),
+      message: message || 'Analisis completado.',
+      stats: stats || [],
+      title: message || 'Analisis completado'
+    };
+  }
+
+  function _buildReportHtml(fileName, stats, freq, longest, summary) {
+    var freqRows = freq.slice(0, 20).map(function(pair, i) {
+      return '<tr><td>' + (i + 1) + '</td><td>' + pair[0] + '</td><td>' + pair[1] + '</td><td>' + ((pair[1] / Math.max(1, stats.totalWords) * 100).toFixed(2)) + '%</td></tr>';
+    }).join('\n');
+    var statsHtml = stats.rows.map(function(r) {
+      return '<tr><td>' + r[0] + '</td><td>' + r[1] + '</td><td style="color:#666;font-size:.85em">' + (r[2] || '') + '</td></tr>';
+    }).join('\n');
+    var html = '<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Toolisto Report - ' + fileName + '</title>';
+    html += '<style>@page{margin:1.5cm}body{font-family:Inter,-apple-system,system-ui,sans-serif;color:#17191C;max-width:700px;margin:0 auto;padding:24px;line-height:1.5}';
+    html += '.brand{display:flex;align-items:center;gap:8px;margin-bottom:8px}.brand-mark{width:28px;height:28px;background:#FF6542;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px}';
+    html += '.brand-name{font-size:13px;color:#888;letter-spacing:.5px}h1{font-size:22px;margin:16px 0 4px;font-weight:700}h2{font-size:16px;margin:20px 0 8px;border-bottom:1px solid #e5e5e5;padding-bottom:4px}';
+    html += 'table{width:100%;border-collapse:collapse;margin:8px 0 16px}th,td{border:1px solid #e5e5e5;padding:6px 10px;text-align:left;font-size:13px}th{background:#f5f5f5;font-weight:600}';
+    html += '.summary{background:#f8f8f4;border-radius:8px;padding:14px;margin:12px 0;font-size:14px;border-left:3px solid #FF6542}';
+    html += '.footer{margin-top:24px;padding-top:12px;border-top:1px solid #e5e5e5;font-size:11px;color:#999;text-align:center}@media print{body{padding:0}}</style></head><body>';
+    html += '<div class="brand"><div class="brand-mark">T</div><span class="brand-name">TOOLISTO by Apluno</span></div>';
+    html += '<h1>Reporte de analisis de texto</h1>';
+    html += '<p style="color:#666;font-size:13px">Archivo: ' + fileName + ' | Generado: ' + new Date().toLocaleDateString('es-CL') + ' | Procesamiento local</p>';
+    html += '<div class="summary">' + summary + '</div>';
+    html += '<h2>Metricas principales</h2>';
+    html += '<table><thead><tr><th>Metrica</th><th>Valor</th><th>Nota</th></tr></thead><tbody>' + statsHtml + '</tbody></table>';
+    html += '<h2>Palabras mas frecuentes (Top 20)</h2>';
+    html += '<table><thead><tr><th>#</th><th>Palabra</th><th>Frecuencia</th><th>%</th></tr></thead><tbody>' + freqRows + '</tbody></table>';
+    if (longest.length) html += '<h2>Palabras mas largas</h2><p style="font-size:13px;color:#555">' + longest.join(' | ') + '</p>';
+    html += '<div class="footer">Toolisto by Apluno | apluno.com | Este reporte fue generado localmente en tu navegador. Ningun dato salio de tu dispositivo.</div>';
+    html += '</body></html>';
+    return html;
+  }
+
+  function _analyzeText(text, file) {
+    var words = _countWords(text);
+    var sentences = _countSentences(text);
+    var paragraphs = text.split(/\n{2,}/).filter(function(p) { return p.trim() !== ''; }).length;
+    var lines = text.split('\n').length;
+    var chars = text.length;
+    var charsNoSpaces = text.replace(/\s/g, '').length;
+    var lowerWords = _getWords(text);
+    var uniqueWords = new Set(lowerWords).size;
+    var avgWordLen = words > 0 ? (charsNoSpaces / words) : 0;
+    var readingMinutes = Math.max(1, Math.round(words / 200));
+    var speakingMinutes = Math.max(1, Math.round(words / 130));
+    var lexicalDiversity = words > 0 ? (uniqueWords / words * 100) : 0;
+    var avgWordsPerSentence = sentences > 0 ? (words / sentences) : 0;
+    var avgWordsPerParagraph = paragraphs > 0 ? (words / paragraphs) : 0;
+    var totalSyllables = 0;
+    lowerWords.forEach(function(w) { totalSyllables += _countSyllables(w); });
+    var avgSyllablesPerWord = words > 0 ? (totalSyllables / words) : 0;
+    var freq = _wordFrequency(lowerWords, true);
+    var hapaxCount = _hapax(lowerWords);
+    var longest = _longestWords(lowerWords);
+    var uniquePercent = words > 0 ? (uniqueWords / words * 100) : 0;
+
+    var summary = 'Este documento contiene <strong>' + words.toLocaleString('es-CL') + ' palabras</strong> ';
+    summary += 'y aproximadamente <strong>' + readingMinutes + ' minutos de lectura</strong>. ';
+    summary += 'Se detectaron <strong>' + uniqueWords.toLocaleString('es-CL') + ' palabras unicas</strong> ';
+    summary += '(' + uniquePercent.toFixed(1) + '% del vocabulario total). ';
+    summary += 'La diversidad lexica es del ' + lexicalDiversity.toFixed(1) + '%.';
+
+    var statsData = {
+      totalWords: words,
+      rows: [
+        ['Palabras', words.toLocaleString('es-CL'), 'Total de palabras en el documento'],
+        ['Palabras unicas', uniqueWords.toLocaleString('es-CL'), uniquePercent.toFixed(1) + '% del vocabulario total'],
+        ['Caracteres (con espacios)', chars.toLocaleString('es-CL'), ''],
+        ['Caracteres (sin espacios)', charsNoSpaces.toLocaleString('es-CL'), ''],
+        ['Oraciones / frases', sentences.toLocaleString('es-CL'), ''],
+        ['Parrafos', paragraphs.toLocaleString('es-CL'), ''],
+        ['Lineas', lines.toLocaleString('es-CL'), ''],
+        ['Diversidad lexica', lexicalDiversity.toFixed(1) + '%', 'Indica que porcentaje del vocabulario usado es diferente'],
+        ['Longitud media de palabra', avgWordLen.toFixed(1) + ' caracteres', ''],
+        ['Palabras promedio por oracion', avgWordsPerSentence.toFixed(1), 'Indica la complejidad sintactica'],
+        ['Palabras promedio por parrafo', avgWordsPerParagraph.toFixed(1), ''],
+        ['Silabas promedio por palabra', avgSyllablesPerWord.toFixed(1), ''],
+        ['Tiempo de lectura (aprox.)', readingMinutes + ' min', 'Basado en ~200 palabras/min'],
+        ['Tiempo de voz alta (aprox.)', speakingMinutes + ' min', 'Basado en ~130 palabras/min'],
+        ['Palabras de aparicion unica (hapax)', hapaxCount.toLocaleString('es-CL'), 'Palabras que aparecen solo una vez']
+      ]
+    };
+
+    var statsRows = statsData.rows.map(function(r) { return [r[0], r[1]]; });
+
+    return { words: words, sentences: sentences, paragraphs: paragraphs, lines: lines, chars: chars, charsNoSpaces: charsNoSpaces, uniqueWords: uniqueWords, avgWordLen: avgWordLen, readingMinutes: readingMinutes, speakingMinutes: speakingMinutes, lexicalDiversity: lexicalDiversity, freq: freq, longest: longest, hapaxCount: hapaxCount, summary: summary, statsData: statsData, statsRows: statsRows };
+  }
+
   function _buildStatsResult(blob, name, stats, message) {
     return {
       files: [{ name: name, blob: blob, size: blob.size }],
@@ -5622,84 +5802,85 @@ window.ToolProcessors = window.ToolProcessors || {};
   window.ToolProcessors.textStatistics = async function(files, options, onProgress) {
     if (!files || !files.length) return { files: [], message: 'Selecciona un archivo de texto.' };
     var file = files[0];
-    onProgress(1, 2, 'Leyendo texto...');
-    var text = await readFileAsText(file);
-    onProgress(2, 2, 'Calculando estadísticas...');
-
-    var words = _countWords(text);
-    var sentences = _countSentences(text);
-    var paragraphs = text.split(/\n{2,}/).filter(function(p) { return p.trim() !== ''; }).length;
-    var lines = text.split('\n').length;
-    var chars = text.length;
-    var charsNoSpaces = text.replace(/\s/g, '').length;
-    var uniqueWords = new Set((text.toLowerCase().match(/[\p{L}\p{N}]+(?:['’-][\p{L}\p{N}]+)*/gu) || [])).size;
-    var avgWordLen = words > 0 ? (charsNoSpaces / words) : 0;
-    var readingMinutes = Math.max(1, Math.round(words / 200));
-    var speakingMinutes = Math.max(1, Math.round(words / 130));
-
-    var stats = [
-      ['Palabras', String(words)],
-      ['Caracteres', String(chars)],
-      ['Caracteres sin espacios', String(charsNoSpaces)],
-      ['Frases', String(sentences)],
-      ['Párrafos', String(paragraphs)],
-      ['Líneas', String(lines)],
-      ['Palabras únicas', String(uniqueWords)],
-      ['Longitud media de palabra', avgWordLen.toFixed(1)],
-      ['Tiempo de lectura (aprox.)', readingMinutes + ' min'],
-      ['Tiempo de habla (aprox.)', speakingMinutes + ' min']
-    ];
-
-    var report = [
-      'Estadísticas de texto',
-      '=====================',
+    onProgress(1, 3, 'Extrayendo texto del archivo...');
+    var text = await _extractTextFromFile(file);
+    if (!text || !text.trim()) return { files: [], message: 'No se pudo extraer texto del archivo. Si es un PDF escaneado, intenta con otra herramienta de OCR.' };
+    onProgress(2, 3, 'Calculando estadisticas...');
+    var a = _analyzeText(text, file);
+    onProgress(3, 3, 'Generando reporte...');
+    var baseName = getBaseName(file.name);
+    var txtReport = [
+      '===================================================',
+      '  TOOLISTO - Reporte de analisis de texto',
+      '===================================================',
       '',
-      'Palabras: ' + words,
-      'Caracteres: ' + chars,
-      'Caracteres sin espacios: ' + charsNoSpaces,
-      'Frases: ' + sentences,
-      'Párrafos: ' + paragraphs,
-      'Líneas: ' + lines,
-      'Palabras únicas: ' + uniqueWords,
-      'Longitud media de palabra: ' + avgWordLen.toFixed(1),
-      'Tiempo de lectura (aprox.): ' + readingMinutes + ' min',
-      'Tiempo de habla (aprox.): ' + speakingMinutes + ' min'
-    ];
-
-    var blob = new Blob([report.join('\n')], { type: 'text/plain;charset=utf-8' });
-    return _buildStatsResult(blob, getBaseName(file.name) + '-estadisticas.txt', stats, 'Estadísticas de texto calculadas.');
+      'Archivo: ' + file.name,
+      'Fecha: ' + new Date().toLocaleDateString('es-CL'),
+      'Procesamiento: local',
+      '',
+      '--- Resumen ---',
+      a.summary.replace(/<[^>]*>/g, ''),
+      '',
+      '--- Metricas ---'
+    ].concat(a.statsRows.map(function(r) { return r[0] + ': ' + r[1]; })).concat([
+      '',
+      '--- Top 20 palabras frecuentes (sin stopwords) ---'
+    ]).concat(a.freq.slice(0, 20).map(function(pair, i) { return (i + 1) + '. ' + pair[0] + ' (' + pair[1] + ' - ' + ((pair[1] / Math.max(1, a.words) * 100).toFixed(2)) + '%)'; })).concat([
+      '',
+      '--- Palabras mas largas ---',
+      a.longest.join(', '),
+      '',
+      '===================================================',
+      'Toolisto by Apluno - apluno.com',
+      'Este reporte fue generado localmente.',
+      '==================================================='
+    ]);
+    var txtBlob = new Blob([txtReport.join('\n')], { type: 'text/plain;charset=utf-8' });
+    var htmlReport = _buildReportHtml(file.name, a.statsData, a.freq, a.longest, a.summary);
+    var htmlBlob = new Blob([htmlReport], { type: 'text/html;charset=utf-8' });
+    return _buildMultiResult([
+      { name: baseName + '-reporte.html', blob: htmlBlob },
+      { name: baseName + '-estadisticas.txt', blob: txtBlob }
+    ], a.statsRows, 'Estadisticas de texto calculadas. Se generaron 2 archivos: reporte HTML imprimible y resumen TXT.');
   };
 
   window.ToolProcessors.wordCount = async function(files, options, onProgress) {
     if (!files || !files.length) return { files: [], message: 'Selecciona un archivo de texto.' };
     var file = files[0];
-    onProgress(1, 2, 'Leyendo texto...');
-    var text = await readFileAsText(file);
-    onProgress(2, 2, 'Contando palabras...');
-
-    var words = _countWords(text);
-    var chars = text.length;
-    var uniqueWords = new Set((text.toLowerCase().match(/[\p{L}\p{N}]+(?:['’-][\p{L}\p{N}]+)*/gu) || [])).size;
-
-    var stats = [
-      ['Palabras', String(words)],
-      ['Palabras únicas', String(uniqueWords)],
-      ['Caracteres', String(chars)]
-    ];
-
-    var report = [
-      'Conteo de palabras',
-      '==================',
+    onProgress(1, 3, 'Extrayendo texto del archivo...');
+    var text = await _extractTextFromFile(file);
+    if (!text || !text.trim()) return { files: [], message: 'No se pudo extraer texto del archivo. Si es un PDF escaneado, intenta con otra herramienta de OCR.' };
+    onProgress(2, 3, 'Contando palabras...');
+    var a = _analyzeText(text, file);
+    onProgress(3, 3, 'Generando reporte...');
+    var baseName = getBaseName(file.name);
+    var txtReport = [
+      '===================================================',
+      '  TOOLISTO - Conteo de palabras',
+      '===================================================',
       '',
-      'Palabras: ' + words,
-      'Palabras únicas: ' + uniqueWords,
-      'Caracteres: ' + chars
-    ];
-
-    var blob = new Blob([report.join('\n')], { type: 'text/plain;charset=utf-8' });
-    return _buildStatsResult(blob, getBaseName(file.name) + '-conteo.txt', stats, 'Conteo completado: ' + words + ' palabras.');
+      'Archivo: ' + file.name,
+      'Fecha: ' + new Date().toLocaleDateString('es-CL'),
+      'Procesamiento: local',
+      '',
+      '--- Resumen ---',
+      a.summary.replace(/<[^>]*>/g, ''),
+      '',
+      '--- Metricas ---'
+    ].concat(a.statsRows.map(function(r) { return r[0] + ': ' + r[1]; })).concat([
+      '',
+      '===================================================',
+      'Toolisto by Apluno - apluno.com',
+      '==================================================='
+    ]);
+    var txtBlob = new Blob([txtReport.join('\n')], { type: 'text/plain;charset=utf-8' });
+    var htmlReport = _buildReportHtml(file.name, a.statsData, a.freq, a.longest, a.summary);
+    var htmlBlob = new Blob([htmlReport], { type: 'text/html;charset=utf-8' });
+    return _buildMultiResult([
+      { name: baseName + '-reporte.html', blob: htmlBlob },
+      { name: baseName + '-conteo.txt', blob: txtBlob }
+    ], a.statsRows, 'Conteo completado: ' + a.words.toLocaleString('es-CL') + ' palabras. Se generaron 2 archivos.');
   };
-
   window.ToolProcessors.textDiff = async function(files, options, onProgress) {
     if (!files || files.length < 2) return { files: [], message: 'Selecciona dos archivos de texto para comparar.' };
     var fileA = files[0];

@@ -1245,7 +1245,10 @@
     }
     const textInputTools = ['textStatistics','wordCount','base64Encode','base64Decode','urlEncode','urlDecode'];
     if (textInputTools.includes(tool)) {
-      if (files.length !== 1) return { ok: false, message: 'Selecciona exactamente un archivo de texto.' };
+      if (files.length !== 1) return { ok: false, message: 'Selecciona exactamente un archivo.' };
+      const f = files[0];
+      const isTextLike = isTxtFile(f) || isDocFile(f) || f.type === 'application/pdf' || isHtmlFile(f) || isCssFile(f) || isRtfFile(f) || isOdtFile(f) || isEpubFile(f);
+      if (!isTextLike) return { ok: false, message: 'Selecciona un archivo de texto, DOCX, PDF, HTML, RTF, ODT o EPUB.' };
     }
     if (tool === 'textDiff') {
       if (files.length !== 2) return { ok: false, message: 'Selecciona exactamente dos archivos de texto para comparar.' };
@@ -1413,6 +1416,12 @@
     if (txtFiles.length === 1) tools.push('txtToPdf','txtToEpub','splitTxt','sortLines','removeDuplicates','listToTable');
     if (txtFiles.length > 1) tools.push('mergeTxt');
     if (files.length === 1 && txtFiles.length === 1) tools.push('textStatistics','wordCount','base64Encode','base64Decode','urlEncode','urlDecode');
+    if (files.length === 1 && !txtFiles.length && !images.length && !pdfs.length && !docs.length && !epubFiles.length && !excelFiles.length && !csvs.length && !jsonFiles.length && !xmlFiles.length && !isSpreadsheetFile(files[0]) && !isVideoFile(files[0]) && !isAudioFile(files[0]) && (isHtmlFile(files[0]) || isCssFile(files[0]))) tools.push('textStatistics','wordCount');
+    if (files.length === 1 && docs.length === 1 && images.length === 0 && pdfs.length === 0) tools.push('textStatistics','wordCount');
+    if (files.length === 1 && pdfs.length === 1 && images.length === 0) tools.push('textStatistics','wordCount');
+    if (files.length === 1 && rtfFiles.length === 1) tools.push('textStatistics','wordCount');
+    if (files.length === 1 && isOdtFile(files[0])) tools.push('textStatistics','wordCount');
+    if (files.length === 1 && epubFiles.length === 1) tools.push('textStatistics','wordCount');
     if (files.length === 2 && txtFiles.length === 2) tools.push('textDiff');
     if (files.length === 1 && isHtmlFile(files[0])) tools.push('htmlToMarkdown','htmlToText');
     if (files.length === 1 && isCssFile(files[0])) tools.push('cssMinifier');
