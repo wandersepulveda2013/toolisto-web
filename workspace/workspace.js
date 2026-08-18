@@ -4738,7 +4738,7 @@ function renderDataTableView(container) {
   formulaBar.appendChild(h('span', { className: 'ws-formula-hint' }, 'Enter para guardar'));
   el.appendChild(formulaBar);
   const gridContainer = h('div', { className: 'ws-grid-container' });
-  const tableEl = h('table', { className: 'ws-grid-table', tabIndex: '0', ariaLabel: 'Tabla editable. Usa Ctrl C y Ctrl V para copiar y pegar.' });
+  const tableEl = h('table', { className: 'ws-grid-table', tabIndex: '0', role: 'grid', ariaLabel: 'Tabla editable. Usa Ctrl C y Ctrl V para copiar y pegar.' });
   const setSelection = (row, col, extend = false) => {
     if (!extend || !selection.hasValue) {
       selection.anchorRow = row;
@@ -4851,10 +4851,10 @@ function renderDataTableView(container) {
   headerRow.appendChild(h('th', { className: 'row-number' }, '#'));
   (table.headers || []).forEach((hdr, ci) => {
     const filterIcon = h('span', { className: 'ws-col-filter-btn', title: 'Filtrar columna' }, '\u25BD');
-    const th = h('th', null,
-      h('span', { className: 'ws-data-type-badge' }, table.columnTypes?.[ci] || queryColumnType(table.rows || [], ci)),
+    const th = h('th', { role: 'columnheader' },
+      h('span', { className: 'ws-data-type-badge', 'aria-hidden': 'true' }, table.columnTypes?.[ci] || queryColumnType(table.rows || [], ci)),
       h('span', { className: 'ws-col-header-text' }, hdr),
-      h('span', { className: 'sort-indicator' }),
+      h('span', { className: 'sort-indicator', 'aria-hidden': 'true' }),
       filterIcon
     );
     th.addEventListener('dblclick', () => {
@@ -4883,6 +4883,9 @@ function renderDataTableView(container) {
       });
       commitTableEdit(table);
       autoSaveTable(table);
+      headerRow.querySelectorAll('th[role="columnheader"]').forEach((h, i) => {
+        h.setAttribute('aria-sort', i === ci ? (descending ? 'descending' : 'ascending') : 'none');
+      });
       rerenderTable();
     });
     filterIcon.addEventListener('click', (e) => {
@@ -7541,15 +7544,28 @@ function renderPalette(container) {
     className: 'ws-palette-input',
     type: 'text',
     placeholder: 'Buscar herramientas, vistas, acciones...',
+    'aria-label': 'Buscar herramientas, vistas, acciones',
+    'aria-controls': 'ws-palette-results',
+    'aria-expanded': 'true',
+    'aria-autocomplete': 'list',
     onInput: (e) => filterPalette(e.target.value, resultsEl)
   });
   palette.appendChild(input);
-  const resultsEl = h('div', { className: 'ws-palette-results' });
+  const resultsEl = h('div', { className: 'ws-palette-results', id: 'ws-palette-results', role: 'listbox' });
   palette.appendChild(resultsEl);
   overlay.appendChild(palette);
   container.appendChild(overlay);
   setTimeout(() => input.focus(), 0);
   filterPalette('', resultsEl);
+  let activeIdx = -1;
+  palette.addEventListener('keydown', (e) => {
+    const items = resultsEl.querySelectorAll('[role="option"]');
+    if (!items.length) return;
+    if (e.key === 'ArrowDown') { e.preventDefault(); activeIdx = Math.min(activeIdx + 1, items.length - 1); items.forEach((el, i) => el.setAttribute('aria-selected', i === activeIdx)); items[activeIdx]?.scrollIntoView({ block: 'nearest' }); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); activeIdx = Math.max(activeIdx - 1, 0); items.forEach((el, i) => el.setAttribute('aria-selected', i === activeIdx)); items[activeIdx]?.scrollIntoView({ block: 'nearest' }); }
+    else if (e.key === 'Enter' && activeIdx >= 0) { e.preventDefault(); items[activeIdx]?.click(); }
+    else if (e.key === 'Escape') { appStore.set({ paletteOpen: false }); }
+  });
 }
 
 function filterPalette(query, container) {
@@ -7577,18 +7593,22 @@ function filterPalette(query, container) {
     ...TOOLS_DATA.map(t => ({ label: t.name, icon: 'tool', type: 'tool', tool: t, action: () => openTool(t) })),
   ];
   const filtered = q ? allItems.filter(i => i.label.toLowerCase().includes(q)) : allItems.slice(0, 12);
-  filtered.forEach(item => {
-    container.appendChild(h('div', {
+  filtered.forEach((item, idx) => {
+    const el = h('button', {
       className: 'ws-palette-item',
+      role: 'option',
+      id: 'ws-palette-option-' + idx,
+      'aria-selected': 'false',
       onClick: () => { item.action(); appStore.set({ paletteOpen: false }); }
     },
-      h('div', { className: 'item-icon' }, svgIcon(item.icon, 16)),
+      h('div', { className: 'item-icon', 'aria-hidden': 'true' }, svgIcon(item.icon, 16)),
       h('div', { className: 'item-label' }, item.label),
       item.type === 'tool' ? h('span', { className: 'item-shortcut' }, 'Herramienta') : null
-    ));
+    );
+    container.appendChild(el);
   });
   if (filtered.length === 0) {
-    container.appendChild(h('div', { style: 'padding:16px;text-align:center;color:var(--ws-text-tertiary);font-size:13px' }, 'Sin resultados'));
+    container.appendChild(h('div', { style: 'padding:16px;text-align:center;color:var(--ws-text-tertiary);font-size:13px', role: 'option' }, 'Sin resultados'));
   }
 }
 
@@ -7624,15 +7644,18 @@ function _flushToastQueue() {
   }, entry.duration);
 }
 
+let _modalRestoreFocus = null;
 function showModal(opts) {
   const root = $('#ws-modal-root');
+  _modalRestoreFocus = document.activeElement;
   root.replaceChildren();
   const overlay = h('div', { className: 'ws-modal-overlay', onClick: (e) => {
     if (e.target === overlay) closeModal();
   }});
-  const modal = h('div', { className: 'ws-modal' + (opts.size ? ' size-' + opts.size : '') });
+  const titleId = 'ws-modal-title-' + Date.now();
+  const modal = h('div', { className: 'ws-modal' + (opts.size ? ' size-' + opts.size : ''), role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': titleId });
   const header = h('div', { className: 'ws-modal-header' },
-    h('div', { className: 'ws-modal-title' }, opts.title || ''),
+    h('div', { className: 'ws-modal-title', id: titleId }, opts.title || ''),
     h('button', { className: 'ws-modal-close', onClick: async () => { if (opts.onClose) await opts.onClose(); closeModal(); }, ariaLabel: 'Cerrar diálogo' }, svgIcon('close', 18))
   );
   modal.appendChild(header);
@@ -7661,6 +7684,19 @@ function showModal(opts) {
   }
   overlay.appendChild(modal);
   root.appendChild(overlay);
+  modal.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') { closeModal(); return; }
+    if (e.key !== 'Tab') return;
+    const focusable = modal.querySelectorAll('button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])');
+    if (!focusable.length) return;
+    const first = focusable[0], last = focusable[focusable.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  });
+  setTimeout(() => {
+    const focusable = modal.querySelector('button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])');
+    if (focusable) focusable.focus();
+  }, 0);
 }
 
 function showConfirm({ title, message, confirmText = 'Confirmar', onConfirm, announce = false }) {
@@ -7676,23 +7712,38 @@ function showConfirm({ title, message, confirmText = 'Confirmar', onConfirm, ann
 function closeModal() {
   const root = $('#ws-modal-root');
   root.replaceChildren();
+  if (_modalRestoreFocus && _modalRestoreFocus.isConnected) { _modalRestoreFocus.focus(); }
+  _modalRestoreFocus = null;
 }
 
 function showContextMenu(x, y, items) {
   hideContextMenu();
   const root = $('#ws-context-root');
-  const menu = h('div', { className: 'ws-context-menu', style: 'left:' + x + 'px;top:' + y + 'px' });
+  const menu = h('div', { className: 'ws-context-menu', role: 'menu', style: 'left:' + x + 'px;top:' + y + 'px' });
+  const buttons = [];
   items.forEach(item => {
     if (item.divider) {
-      menu.appendChild(h('div', { className: 'ws-context-menu-divider' }));
+      menu.appendChild(h('div', { className: 'ws-context-menu-divider', role: 'separator' }));
       return;
     }
-    menu.appendChild(h('div', {
+    const btn = h('button', {
       className: 'ws-context-menu-item' + (item.danger ? ' danger' : ''),
+      role: 'menuitem',
       onClick: () => { item.action(); hideContextMenu(); }
-    }, item.icon ? h('span', null, svgIcon(item.icon, 14)) : null, item.label));
+    }, item.icon ? h('span', { 'aria-hidden': 'true' }, svgIcon(item.icon, 14)) : null, item.label);
+    buttons.push(btn);
+    menu.appendChild(btn);
   });
   root.appendChild(menu);
+  if (buttons.length) buttons[0].focus();
+  menu.addEventListener('keydown', (e) => {
+    const idx = buttons.indexOf(document.activeElement);
+    if (e.key === 'ArrowDown') { e.preventDefault(); const next = (idx + 1) % buttons.length; buttons[next].focus(); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); const prev = (idx - 1 + buttons.length) % buttons.length; buttons[prev].focus(); }
+    else if (e.key === 'Escape') { hideContextMenu(); }
+    else if (e.key === 'Home') { e.preventDefault(); buttons[0]?.focus(); }
+    else if (e.key === 'End') { e.preventDefault(); buttons[buttons.length - 1]?.focus(); }
+  });
   setTimeout(() => {
     document.addEventListener('click', hideContextMenu, { once: true });
   }, 0);

@@ -42,26 +42,28 @@
       '<span class="pdf-nav-view-group">' +
         vb('compact', size === 'compact') + vb('medium', size === 'medium') + vb('large', size === 'large') +
       '</span><span class="pdf-nav-sep"></span>' +
-      '<button class="quiet-button pdf-nav-sel-all" type="button">Todas</button>' +
-      '<button class="quiet-button pdf-nav-desel" type="button">Ninguna</button>' +
+      '<button class="quiet-button pdf-nav-sel-all" type="button" aria-label="Seleccionar todas">Todas</button>' +
+      '<button class="quiet-button pdf-nav-desel" type="button" aria-label="Deseleccionar todas">Ninguna</button>' +
       (allowRotation ? '<span class="pdf-nav-sep"></span>' +
-        '<button class="quiet-button pdf-nav-rot-l" type="button" title="Rotar izquierda">\u21BA</button>' +
-        '<button class="quiet-button pdf-nav-rot-r" type="button" title="Rotar derecha">\u21BB</button>' : '') +
-      (allowDelete ? '<button class="quiet-button pdf-nav-del" type="button" title="Eliminar">\u2715</button>' : '') +
+        '<button class="quiet-button pdf-nav-rot-l" type="button" title="Rotar izquierda" aria-label="Rotar izquierda">\u21BA</button>' +
+        '<button class="quiet-button pdf-nav-rot-r" type="button" title="Rotar derecha" aria-label="Rotar derecha">\u21BB</button>' : '') +
+      (allowDelete ? '<button class="quiet-button pdf-nav-del" type="button" title="Eliminar" aria-label="Eliminar página seleccionada">\u2715</button>' : '') +
       '<span class="pdf-nav-sep"></span>' +
-      '<button class="quiet-button pdf-nav-undo" type="button" disabled title="Deshacer">\u21B6</button>' +
-      '<button class="quiet-button pdf-nav-redo" type="button" disabled title="Rehacer">\u21B7</button>' +
+      '<button class="quiet-button pdf-nav-undo" type="button" disabled title="Deshacer" aria-label="Deshacer">\u21B6</button>' +
+      '<button class="quiet-button pdf-nav-redo" type="button" disabled title="Rehacer" aria-label="Rehacer">\u21B7</button>' +
       (reorderable ? '<span class="pdf-nav-sep"></span>' +
-        '<button class="quiet-button pdf-nav-mv-s" type="button" disabled title="Inicio">\u21E4</button>' +
-        '<button class="quiet-button pdf-nav-mv-b" type="button" disabled title="Antes">\u25C2</button>' +
-        '<button class="quiet-button pdf-nav-mv-a" type="button" disabled title="Despues">\u25B8</button>' +
-        '<button class="quiet-button pdf-nav-mv-e" type="button" disabled title="Final">\u21E5</button>' : '') +
-      '<span class="pdf-nav-counter" role="status"></span>';
+        '<button class="quiet-button pdf-nav-mv-s" type="button" disabled title="Inicio" aria-label="Mover al inicio">\u21E4</button>' +
+        '<button class="quiet-button pdf-nav-mv-b" type="button" disabled title="Antes" aria-label="Mover antes">\u25C2</button>' +
+        '<button class="quiet-button pdf-nav-mv-a" type="button" disabled title="Despues" aria-label="Mover después">\u25B8</button>' +
+        '<button class="quiet-button pdf-nav-mv-e" type="button" disabled title="Final" aria-label="Mover al final">\u21E5</button>' : '') +
+      '<span class="pdf-nav-counter" role="status" aria-live="polite"></span>';
     container.appendChild(tb);
 
     var split = el('div', 'pdf-nav-split');
     var left = el('div', 'pdf-nav-left');
     var grid = el('div', 'pdf-nav-grid');
+    grid.setAttribute('role', 'group');
+    grid.setAttribute('aria-label', 'Miniaturas de páginas');
     left.appendChild(grid);
 
     var right = el('div', 'pdf-nav-right');
@@ -74,18 +76,18 @@
     var vPlaceholder = el('div', 'pdf-nav-viewer-placeholder', 'Pasa el cursor sobre una miniatura para ver la pagina en grande');
     var vTb = el('div', 'pdf-nav-viewer-toolbar');
     vTb.innerHTML =
-      '<button class="pdf-nav-viewer-btn" data-v="prev" title="Anterior">\u25C0</button>' +
-      '<button class="pdf-nav-viewer-btn" data-v="next" title="Siguiente">\u25B6</button>' +
+      '<button class="pdf-nav-viewer-btn" data-v="prev" title="Anterior" aria-label="Página anterior">\u25C0</button>' +
+      '<button class="pdf-nav-viewer-btn" data-v="next" title="Siguiente" aria-label="Página siguiente">\u25B6</button>' +
       '<span class="pdf-nav-viewer-sep"></span>' +
-      '<button class="pdf-nav-viewer-btn" data-v="zo" title="Zoom -">\u2212</button>' +
-      '<span class="pdf-nav-viewer-zoom-label">100%</span>' +
-      '<button class="pdf-nav-viewer-btn" data-v="zi" title="Zoom +">+</button>' +
+      '<button class="pdf-nav-viewer-btn" data-v="zo" title="Zoom -" aria-label="Reducir zoom">\u2212</button>' +
+      '<span class="pdf-nav-viewer-zoom-label" aria-live="polite">100%</span>' +
+      '<button class="pdf-nav-viewer-btn" data-v="zi" title="Zoom +" aria-label="Aumentar zoom">+</button>' +
       '<span class="pdf-nav-viewer-sep"></span>' +
-      '<button class="pdf-nav-viewer-btn" data-v="fw" title="Ajustar ancho">\u2194</button>' +
-      '<button class="pdf-nav-viewer-btn" data-v="fp" title="Ajustar pagina">\u2B0D</button>' +
-      '<button class="pdf-nav-viewer-btn" data-v="r1" title="100%">1:1</button>' +
+      '<button class="pdf-nav-viewer-btn" data-v="fw" title="Ajustar ancho" aria-label="Ajustar al ancho">\u2194</button>' +
+      '<button class="pdf-nav-viewer-btn" data-v="fp" title="Ajustar pagina" aria-label="Ajustar a página">\u2B0D</button>' +
+      '<button class="pdf-nav-viewer-btn" data-v="r1" title="100%" aria-label="Zoom 100%">1:1</button>' +
       '<span class="pdf-nav-viewer-sep"></span>' +
-      '<button class="pdf-nav-viewer-btn" data-v="fs" title="Pantalla completa">\u26F6</button>';
+      '<button class="pdf-nav-viewer-btn" data-v="fs" title="Pantalla completa" aria-label="Pantalla completa">\u26F6</button>';
     right.appendChild(vHdr);
     right.appendChild(vWrap);
     right.appendChild(vPlaceholder);

@@ -1194,6 +1194,11 @@ html.theme-dark .ws-topbar {
   min-height: calc(24px * var(--ws-density-scale));
   padding: calc(2px * var(--ws-density-scale)) 0;
 }
+.ws-doc-block [contenteditable]:focus-visible {
+  outline: 2px solid var(--ws-primary);
+  outline-offset: -2px;
+  border-radius: 2px;
+}
 
 .ws-doc-block [contenteditable]:empty::before {
   content: attr(data-placeholder);
@@ -1452,6 +1457,10 @@ html.theme-dark .ws-topbar {
 .ws-formula-bar input:focus {
   border-color: var(--ws-primary);
 }
+.ws-formula-bar input:focus-visible {
+  outline: 2px solid var(--ws-primary);
+  outline-offset: -2px;
+}
 
 .ws-formula-hint {
   color: var(--ws-text-tertiary);
@@ -1575,8 +1584,10 @@ html.theme-dark .ws-topbar {
   color: var(--ws-text);
   outline: none;
 }
-
-.row-number {
+.ws-grid-table td.editing input:focus-visible {
+  outline: 2px solid var(--ws-primary);
+  outline-offset: -2px;
+}
   position: sticky;
   left: 0;
   background: var(--ws-surface);
@@ -2654,8 +2665,10 @@ html.theme-dark .ws-status-limited { color: #b7c3ff; background: rgba(120, 135, 
   color: var(--ws-text);
   outline: none;
 }
-
-.ws-palette-input::placeholder {
+.ws-palette-input:focus-visible {
+  outline: 2px solid var(--ws-primary);
+  outline-offset: -2px;
+}
   color: var(--ws-text-tertiary);
 }
 
@@ -6937,13 +6950,18 @@ html.theme-dark .ws-query-workbench {
 }
 
 .ws-doc-tool:hover,
-.ws-doc-format:hover,
-.ws-doc-tool:focus-visible,
-.ws-doc-format:focus-visible {
+.ws-doc-format:hover {
   border-color: var(--ws-border);
   background: var(--ws-primary-light);
   color: var(--ws-text);
-  outline: none;
+}
+.ws-doc-tool:focus-visible,
+.ws-doc-format:focus-visible {
+  border-color: var(--ws-primary);
+  background: var(--ws-primary-light);
+  color: var(--ws-text);
+  outline: 2px solid var(--ws-primary);
+  outline-offset: 2px;
 }
 
 .ws-doc-metrics {
