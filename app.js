@@ -1636,10 +1636,7 @@
         <div id="socialCanvasWrap" style="grid-column:1/-1;position:relative;display:none;margin-top:8px"></div>
       `,
       splitPdf: `
-        <div class="control" style="grid-column:1/-1" id="splitPdfInfo">
-          <div id="splitPdfMeta" style="color:var(--muted);font-size:.85rem">Cargando PDF…</div>
-        </div>
-        <div class="control" style="grid-column:1/-1;display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:6px;max-height:260px;overflow-y:auto;padding:4px 0" id="splitPdfThumbs"></div>
+        <div class="control" style="grid-column:1/-1" id="splitPdfNavContainer"></div>
         ${controlSelect('splitMode', 'Modo de extracción', [['ranges','Por rangos (ej: 1-3, 5, 8-10)'],['selected','Páginas seleccionadas']])}
         <div class="control" style="grid-column:1/-1" id="splitRangesControl">
           <label for="splitRanges">Rangos de páginas</label>
@@ -1649,13 +1646,7 @@
         ${controlSelect('splitOutput', 'Salida', [['single','Un solo PDF con las páginas seleccionadas'],['multi','Un PDF por cada página (ZIP)']])}
       `,
       reorderPdf: `
-        <div class="control" style="grid-column:1/-1" id="reorderPdfInfo">
-          <div id="reorderPdfMeta" style="color:var(--muted);font-size:.85rem">Cargando PDF…</div>
-        </div>
-        <div class="control" style="grid-column:1/-1" id="reorderPdfThumbs" style="display:flex;flex-wrap:wrap;gap:6px;max-height:300px;overflow-y:auto;padding:4px 0"></div>
-        <div class="control" style="grid-column:1/-1;color:var(--muted);font-size:.82rem">
-          Arrastra las páginas para cambiar el orden. La salida será un PDF con todas las páginas en el nuevo orden.
-        </div>
+        <div class="control" style="grid-column:1/-1" id="reorderPdfNavContainer"></div>
       `,
       pdfToImages: `
         <div class="control" style="grid-column:1/-1" id="pdfToImagesInfo">
@@ -1741,28 +1732,10 @@
         ${controlNumber('signPdfWidth', 'Ancho de firma (pt)', 150, 40, 400)}
       `,
       rotatePdf: `
-        <div class="control" style="grid-column:1/-1" id="rotatePdfInfo">
-          <div id="rotatePdfMeta" style="color:var(--muted);font-size:.85rem">Cargando PDF…</div>
-        </div>
-        <div class="control" style="grid-column:1/-1;display:flex;gap:6px;flex-wrap:wrap" id="rotatePdfActions">
-          <button type="button" class="quiet-button" data-rotate="270" style="font-size:.82rem;padding:5px 10px;border:1px solid var(--c-border);border-radius:6px">↺ Girar izquierda</button>
-          <button type="button" class="quiet-button" data-rotate="90" style="font-size:.82rem;padding:5px 10px;border:1px solid var(--c-border);border-radius:6px">↻ Girar derecha</button>
-          <button type="button" class="quiet-button" data-rotate="180" style="font-size:.82rem;padding:5px 10px;border:1px solid var(--c-border);border-radius:6px">↕ Media vuelta</button>
-          <button type="button" class="quiet-button" id="rotatePdfResetBtn" style="font-size:.82rem;padding:5px 10px;border:1px solid var(--c-border);border-radius:6px">Restablecer</button>
-        </div>
-        <div class="control" style="grid-column:1/-1" id="rotatePdfThumbs"></div>
-        <div class="control" style="grid-column:1/-1;color:var(--muted);font-size:.82rem">
-          Selecciona páginas y usa los botones para rotar. La miniatura cambia en tiempo real.
-        </div>
+        <div class="control" style="grid-column:1/-1" id="rotatePdfNavContainer"></div>
       `,
       deletePagesPdf: `
-        <div class="control" style="grid-column:1/-1" id="deletePagesPdfInfo">
-          <div id="deletePagesPdfMeta" style="color:var(--muted);font-size:.85rem">Cargando PDF…</div>
-        </div>
-        <div class="control" style="grid-column:1/-1" id="deletePagesPdfThumbs"></div>
-        <div class="control" style="grid-column:1/-1;color:var(--muted);font-size:.82rem" id="deletePagesPdfSummary">
-          Selecciona las páginas a eliminar haciendo clic en ellas.
-        </div>
+        <div class="control" style="grid-column:1/-1" id="deletePdfNavContainer"></div>
         <details class="control" style="grid-column:1/-1">
           <summary style="cursor:pointer;font-size:.82rem;color:var(--c-muted)">Selección avanzada por números</summary>
           <div style="margin-top:8px">
@@ -2322,6 +2295,13 @@
 
     els.advancedControls.innerHTML = htmlByTool[tool] || '';
     els.advancedPanel.open = Boolean(htmlByTool[tool]);
+    if (pdfNavTools.indexOf(tool) === -1) {
+      if (_pdfNav) { _pdfNav.destroy(); _pdfNav = null; }
+      if (_splitNav) { _splitNav.destroy(); _splitNav = null; }
+      if (_rotateNav) { _rotateNav.destroy(); _rotateNav = null; }
+      if (_deleteNav) { _deleteNav.destroy(); _deleteNav = null; }
+      removePdfNavBreakout();
+    }
     const preset = $('#cropPreset');
     if (preset) preset.addEventListener('change', syncCropPreset);
     if (tool === 'crop') initCropPreview();
@@ -2603,13 +2583,13 @@
     'mergePdf', 'imagesPdf', 'splitPdf', 'reorderPdf', 'pdfToImages', 'signPdf',
     'compressPdf', 'comparePdfs', 'scannedPdfToSearchablePdf',
     'extractTextFromScannedPdf', 'detectOcrNeeded', 'pdfTablesToExcel', 'censorPdf',
-    'verifyPdfCensor', 'pdfPageCounter'
+    'verifyPdfCensor', 'pdfPageCounter', 'rotatePdf', 'deletePagesPdf'
   ]);
   // Estos inicializadores inspeccionan el PDF seleccionado. No deben ejecutarse
   // al abrir una página porque PDFLib se carga bajo demanda.
   const PDF_INITIALIZER_TOOLS = new Set([
     'splitPdf', 'reorderPdf', 'pdfToImages', 'signPdf', 'deletePagesPdf',
-    'duplicatePagesPdf', 'insertBlankPagesPdf', 'editMetadataPdf',
+    'rotatePdf', 'duplicatePagesPdf', 'insertBlankPagesPdf', 'editMetadataPdf',
     'compressPdf', 'interleavePdf', 'cropPdf', 'resizePdfPages', 'nUpPdf',
     'splitDoublePdf', 'bookletPdf', 'watermarkPdf', 'addPageNumbersPdf',
     'addHeaderFooterPdf'
@@ -4214,87 +4194,37 @@
     };
   }
 
-  const _sp = { pdfDoc:null, pageCount:0, selectedPages:new Set(), parsedRanges:[], cancelled:false };
+  let _splitNav = null;
 
   function initSplitPdf() {
     ensurePdfLib();
     const file = state.files[0];
-    if (!file) return;
+    if (!file || !window.ToolistoPDFNav) return;
+    const container = ensurePdfNavBreakout();
+    if (!container) return;
+    if (_splitNav) _splitNav.destroy();
+    _splitNav = window.ToolistoPDFNav.create(container, {
+      file: file,
+      size: 'medium',
+      reorderable: false,
+      allowRotation: false,
+      allowDelete: false,
+      onSelect: function (sel) {},
+      onReorder: function () {},
+      onRemove: function () {},
+    });
     const modeSel = $('#splitMode');
     const rangesControl = $('#splitRangesControl');
-    const rangesInput = $('#splitRanges');
-    const outputSel = $('#splitOutput');
     if (modeSel) modeSel.addEventListener('change', () => {
       if (rangesControl) rangesControl.style.display = modeSel.value === 'ranges' ? '' : 'none';
-    });
-    if (rangesInput) rangesInput.addEventListener('input', () => {
-      const result = parseRanges(rangesInput.value, _sp.pageCount);
-      const errEl = $('#splitRangesError');
-      if (result.error) { if (errEl) errEl.textContent = result.error; _sp.parsedRanges = []; }
-      else { if (errEl) errEl.textContent = ''; _sp.parsedRanges = result.ranges; }
-      updateSplitThumbnails();
-    });
-    loadSplitPdf(file);
-  }
-
-  async function loadSplitPdf(file) {
-    ensurePdfLib();
-    const { PDFDocument } = window.PDFLib;
-    const meta = $('#splitPdfMeta');
-    const thumbs = $('#splitPdfThumbs');
-    try {
-      const bytes = await file.arrayBuffer();
-      const doc = await PDFDocument.load(bytes, { ignoreEncryption: false });
-      _sp.pdfDoc = doc; _sp.pageCount = doc.getPageCount();
-      _sp.selectedPages = new Set(Array.from({ length: _sp.pageCount }, (_, i) => i));
-      if (meta) meta.textContent = `${file.name} · ${_sp.pageCount} página${_sp.pageCount !== 1 ? 's' : ''}`;
-      if (!thumbs) return;
-      thumbs.innerHTML = '';
-      if (window.pdfjsLib) {
-        window.pdfjsLib.GlobalWorkerOptions.workerSrc = './vendor/pdfjs/pdf.worker.min.js';
-        const pdf = await window.pdfjsLib.getDocument({ data: new Uint8Array(bytes) }).promise;
-        for (let i = 1; i <= _sp.pageCount; i++) {
-          const page = await pdf.getPage(i);
-          const vp = page.getViewport({ scale: 0.22 });
-          const c = document.createElement('canvas');
-          c.width = vp.width; c.height = vp.height;
-          await page.render({ canvasContext: c.getContext('2d'), viewport: vp }).promise;
-          const wrap = document.createElement('label');
-          wrap.style.cssText = 'position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;border:2px solid var(--c-border);border-radius:6px;padding:3px;transition:border-color .15s';
-          wrap.dataset.page = i;
-          const cb = document.createElement('input');
-          cb.type = 'checkbox'; cb.checked = true; cb.value = i;
-          cb.style.cssText = 'position:absolute;top:4px;right:4px;z-index:1';
-          const num = document.createElement('span');
-          num.textContent = i; num.style.cssText = 'font-size:.7rem;font-weight:700;color:var(--muted)';
-          c.style.cssText = 'width:100%;border-radius:4px;display:block';
-          cb.addEventListener('change', () => {
-            if (cb.checked) _sp.selectedPages.add(i - 1); else _sp.selectedPages.delete(i - 1);
-            wrap.style.borderColor = cb.checked ? 'var(--c-primary)' : 'var(--c-border)';
-          });
-          wrap.appendChild(cb); wrap.appendChild(c); wrap.appendChild(num);
-          thumbs.appendChild(wrap);
-        }
-      }
-    } catch (err) {
-      if (meta) meta.textContent = err?.message?.includes('password') || err?.message?.includes('Encrypted') ? 'PDF protegido con contraseña.' : 'No se pudo leer el PDF.';
-    }
-  }
-
-  function updateSplitThumbnails() {
-    const pages = $('#splitMode')?.value === 'ranges' ? getPagesFromRanges() : [..._sp.selectedPages];
-    document.querySelectorAll('#splitPdfThumbs label').forEach(el => {
-      const idx = parseInt(el.dataset.page, 10);
-      const active = pages.includes(idx - 1);
-      el.style.borderColor = active ? 'var(--c-primary)' : 'var(--c-border)';
-      const cb = el.querySelector('input[type="checkbox"]');
-      if (cb) cb.checked = active;
     });
   }
 
   function getPagesFromRanges() {
+    const rangesInput = $('#splitRanges');
+    const result = parseRanges(rangesInput ? rangesInput.value : '', _splitNav ? _splitNav.getPageCount() : 0);
     const pages = [];
-    for (const r of _sp.parsedRanges) for (let i = r.start; i <= r.end; i++) pages.push(i - 1);
+    for (const r of result.ranges) for (let i = r.start; i <= r.end; i++) pages.push(i - 1);
     return [...new Set(pages)];
   }
 
@@ -4331,7 +4261,7 @@
     const source = await PDFDocument.load(bytes, { ignoreEncryption: false });
     const totalPages = source.getPageCount();
     const mode = $('#splitMode')?.value || 'ranges';
-    const pagesToExtract = mode === 'ranges' ? getPagesFromRanges() : [..._sp.selectedPages];
+    const pagesToExtract = mode === 'ranges' ? getPagesFromRanges() : (_splitNav ? _splitNav.getSelected() : []);
     if (!pagesToExtract.length) throw new Error('No se seleccionó ninguna página.');
     const outputMode = $('#splitOutput')?.value || 'single';
 
@@ -4358,102 +4288,44 @@
     return { blob, name: `${file.name.replace(/\.pdf$/i, '')}-seleccion.pdf`, title: 'PDF dividido', message: `${pagesToExtract.length} página${pagesToExtract.length !== 1 ? 's' : ''} extraída${pagesToExtract.length !== 1 ? 's' : ''}.`, stats: [['Páginas', pagesToExtract.map(i => i + 1).join(', ')], ['Total', `${pagesToExtract.length} de ${totalPages}`], ['Tamaño', formatBytes(blob.size)]] };
   }
 
-  const _rp = { pdfDoc:null, pageCount:0, pages:[], dragIdx:null };
+  let _pdfNav = null;
+
+  const pdfNavTools = ['reorderPdf', 'splitPdf', 'rotatePdf', 'deletePagesPdf'];
+
+  function ensurePdfNavBreakout() {
+    let z = $('#pdfNavBreakout');
+    if (z) return z;
+    const hero = $('.hero-tool');
+    if (!hero || !hero.parentNode) return null;
+    z = document.createElement('section');
+    z.id = 'pdfNavBreakout';
+    z.className = 'pdf-nav-breakout';
+    hero.parentNode.insertBefore(z, hero.nextSibling);
+    return z;
+  }
+
+  function removePdfNavBreakout() {
+    const z = $('#pdfNavBreakout');
+    if (z) z.remove();
+  }
 
   function initReorderPdf() {
     ensurePdfLib();
     const file = state.files[0];
-    if (!file) return;
-    loadReorderPdf(file);
-  }
-
-  async function loadReorderPdf(file) {
-    ensurePdfLib();
-    const { PDFDocument } = window.PDFLib;
-    const meta = $('#reorderPdfMeta');
-    const thumbs = $('#reorderPdfThumbs');
-    try {
-      const bytes = await file.arrayBuffer();
-      const doc = await PDFDocument.load(bytes, { ignoreEncryption: false });
-      _rp.pdfDoc = doc; _rp.pageCount = doc.getPageCount();
-      _rp.pages = Array.from({ length: _rp.pageCount }, (_, i) => i);
-      if (meta) meta.textContent = `${file.name} · ${_rp.pageCount} página${_rp.pageCount !== 1 ? 's' : ''} · Arrastra para reordenar`;
-      if (!thumbs) return;
-      thumbs.innerHTML = '';
-      thumbs.style.cssText = 'display:flex;flex-wrap:wrap;gap:6px;max-height:300px;overflow-y:auto;padding:4px 0';
-      if (window.pdfjsLib) {
-        window.pdfjsLib.GlobalWorkerOptions.workerSrc = './vendor/pdfjs/pdf.worker.min.js';
-        const pdf = await window.pdfjsLib.getDocument({ data: new Uint8Array(bytes) }).promise;
-        for (let i = 0; i < _rp.pageCount; i++) {
-          const page = await pdf.getPage(i + 1);
-          const vp = page.getViewport({ scale: 0.2 });
-          const c = document.createElement('canvas');
-          c.width = vp.width; c.height = vp.height;
-          await page.render({ canvasContext: c.getContext('2d'), viewport: vp }).promise;
-          const card = document.createElement('div');
-          card.draggable = true; card.dataset.idx = i;
-          card.style.cssText = 'position:relative;cursor:grab;border:2px solid var(--c-border);border-radius:6px;padding:3px;transition:border-color .15s;display:flex;flex-direction:column;align-items:center;gap:3px';
-          const num = document.createElement('span');
-          num.textContent = i + 1; num.style.cssText = 'font-size:.7rem;font-weight:700;color:var(--muted)';
-          c.style.cssText = 'width:100%;border-radius:4px;display:block';
-          card.appendChild(num); card.appendChild(c);
-          card.addEventListener('dragstart', (e) => { _rp.dragIdx = i; card.style.opacity = '0.5'; e.dataTransfer.effectAllowed = 'move'; });
-          card.addEventListener('dragend', () => { _rp.dragIdx = null; card.style.opacity = '1'; });
-          card.addEventListener('dragover', (e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; card.style.borderColor = 'var(--c-primary)'; });
-          card.addEventListener('dragleave', () => { card.style.borderColor = 'var(--c-border)'; });
-          card.addEventListener('drop', (e) => {
-            e.preventDefault(); card.style.borderColor = 'var(--c-border)';
-            if (_rp.dragIdx === null || _rp.dragIdx === i) return;
-            const moved = _rp.pages.splice(_rp.dragIdx, 1)[0];
-            _rp.pages.splice(i, 0, moved);
-            renderReorderThumbs();
-          });
-          thumbs.appendChild(card);
-        }
-      }
-    } catch (err) {
-      if (meta) meta.textContent = err?.message?.includes('password') ? 'PDF protegido.' : 'No se pudo leer el PDF.';
-    }
-  }
-
-  function renderReorderThumbs() {
-    const thumbs = $('#reorderPdfThumbs');
-    if (!thumbs || !window.pdfjsLib) return;
-    const pdfData = state.files[0];
-    if (!pdfData) return;
-    pdfData.arrayBuffer().then(bytes => {
-      window.pdfjsLib.GlobalWorkerOptions.workerSrc = './vendor/pdfjs/pdf.worker.min.js';
-      return window.pdfjsLib.getDocument({ data: new Uint8Array(bytes) }).promise;
-    }).then(async pdf => {
-      thumbs.innerHTML = '';
-      for (let vi = 0; vi < _rp.pages.length; vi++) {
-        const origIdx = _rp.pages[vi];
-        const page = await pdf.getPage(origIdx + 1);
-        const vp = page.getViewport({ scale: 0.2 });
-        const c = document.createElement('canvas');
-        c.width = vp.width; c.height = vp.height;
-        await page.render({ canvasContext: c.getContext('2d'), viewport: vp }).promise;
-        const card = document.createElement('div');
-        card.draggable = true; card.dataset.idx = vi;
-        card.style.cssText = 'position:relative;cursor:grab;border:2px solid var(--c-border);border-radius:6px;padding:3px;transition:border-color .15s;display:flex;flex-direction:column;align-items:center;gap:3px';
-        const num = document.createElement('span');
-        num.textContent = `${vi + 1} (pág ${origIdx + 1})`; num.style.cssText = 'font-size:.65rem;font-weight:700;color:var(--muted)';
-        c.style.cssText = 'width:100%;border-radius:4px;display:block';
-        card.appendChild(num); card.appendChild(c);
-        card.addEventListener('dragstart', (e) => { _rp.dragIdx = vi; card.style.opacity = '0.5'; e.dataTransfer.effectAllowed = 'move'; });
-        card.addEventListener('dragend', () => { _rp.dragIdx = null; card.style.opacity = '1'; });
-        card.addEventListener('dragover', (e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; card.style.borderColor = 'var(--c-primary)'; });
-        card.addEventListener('dragleave', () => { card.style.borderColor = 'var(--c-border)'; });
-        card.addEventListener('drop', (e) => {
-          e.preventDefault(); card.style.borderColor = 'var(--c-border)';
-          if (_rp.dragIdx === null || _rp.dragIdx === vi) return;
-          const moved = _rp.pages.splice(_rp.dragIdx, 1)[0];
-          _rp.pages.splice(vi, 0, moved);
-          renderReorderThumbs();
-        });
-        thumbs.appendChild(card);
-      }
-    }).catch(() => {});
+    if (!file || !window.ToolistoPDFNav) return;
+    const container = ensurePdfNavBreakout();
+    if (!container) return;
+    if (_pdfNav) _pdfNav.destroy();
+    _pdfNav = window.ToolistoPDFNav.create(container, {
+      file: file,
+      size: 'medium',
+      reorderable: true,
+      allowRotation: false,
+      allowDelete: false,
+      onSelect: function (sel) {},
+      onReorder: function (order) {},
+      onRemove: function () {},
+    });
   }
 
   async function processReorderPdf() {
@@ -4462,12 +4334,13 @@
     const file = state.files[0];
     const bytes = await file.arrayBuffer();
     const source = await PDFDocument.load(bytes, { ignoreEncryption: false });
+    const order = _pdfNav ? _pdfNav.getPageOrder() : Array.from({ length: source.getPageCount() }, (_, i) => i);
     const newPdf = await PDFDocument.create();
-    const copied = await newPdf.copyPages(source, _rp.pages);
+    const copied = await newPdf.copyPages(source, order);
     copied.forEach(p => newPdf.addPage(p));
     const outBytes = await newPdf.save();
     const blob = new Blob([outBytes], { type: 'application/pdf' });
-    return { blob, name: `${file.name.replace(/\.pdf$/i, '')}-ordenado.pdf`, title: 'PDF reorganizado', message: `${_rp.pages.length} páginas reordenadas.`, stats: [['Páginas', String(_rp.pages.length)], ['Tamaño', formatBytes(blob.size)]] };
+    return { blob, name: `${file.name.replace(/\.pdf$/i, '')}-ordenado.pdf`, title: 'PDF reorganizado', message: `${order.length} páginas reordenadas.`, stats: [['Páginas', String(order.length)], ['Tamaño', formatBytes(blob.size)]] };
   }
 
   async function processRotatePdf() {
@@ -4477,14 +4350,12 @@
     const bytes = await file.arrayBuffer();
     const source = await PDFDocument.load(bytes, { ignoreEncryption: false });
     const pageCount = source.getPageCount();
-    const rotations = state._rotateRotations;
-    const selected = state._rotateSelected;
+    const rotationMap = _rotateNav ? _rotateNav.getRotationMap() : null;
     const newPdf = await PDFDocument.create();
     const copied = await newPdf.copyPages(source, Array.from({ length: pageCount }, (_, i) => i));
     let rotatedCount = 0;
     copied.forEach((p, i) => {
-      const pageNum = i + 1;
-      const rot = (rotations && rotations.has(pageNum)) ? rotations.get(pageNum) : 0;
+      const rot = (rotationMap && rotationMap.has(i)) ? rotationMap.get(i) : 0;
       if (rot !== 0) {
         p.setRotation(PDFLib.degrees((p.getRotation().angle + rot) % 360));
         rotatedCount++;
@@ -4637,161 +4508,46 @@
     return { blob, name: `${file.name.replace(/\.pdf$/i, '')}-metadatos.pdf`, title: 'Metadatos actualizados', message: `Metadatos actualizados: ${fields.join(', ') || 'sin cambios'}.`, stats: [['Campos', fields.join(', ') || 'Ninguno'], ['Páginas', String(source.getPageCount())], ['Tamaño', formatBytes(blob.size)]] };
   }
 
+  let _rotateNav = null;
+
   async function initRotatePdf() {
     ensurePdfLib();
     const file = state.files[0];
-    if (!file || !window.pdfjsLib) return;
-    const meta = $('#rotatePdfMeta');
-    const thumbsEl = $('#rotatePdfThumbs');
-    if (!thumbsEl) return;
-    try {
-      window.pdfjsLib.GlobalWorkerOptions.workerSrc = './vendor/pdfjs/pdf.worker.min.js';
-      const bytes = await file.arrayBuffer();
-      const pdf = await window.pdfjsLib.getDocument({ data: new Uint8Array(bytes) }).promise;
-      const pageCount = pdf.numPages;
-      if (meta) meta.textContent = `${file.name} · ${pageCount} página${pageCount !== 1 ? 's' : ''}`;
-      const rotations = new Map();
-      for (let i = 1; i <= pageCount; i++) rotations.set(i, 0);
-      const selected = new Set();
-      thumbsEl.innerHTML = '';
-      thumbsEl.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:8px;max-height:360px;overflow-y:auto;padding:4px 0';
-      for (let i = 1; i <= pageCount; i++) {
-        const page = await pdf.getPage(i);
-        const vp = page.getViewport({ scale: 0.22 });
-        const c = document.createElement('canvas');
-        c.width = vp.width; c.height = vp.height;
-        await page.render({ canvasContext: c.getContext('2d'), viewport: vp }).promise;
-        const card = document.createElement('div');
-        card.style.cssText = 'position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;padding:4px;border:2px solid var(--c-border);border-radius:8px;cursor:pointer;transition:border-color .15s,box-shadow .15s';
-        card.dataset.page = i;
-        const cb = document.createElement('input');
-        cb.type = 'checkbox'; cb.style.cssText = 'position:absolute;top:4px;right:4px;z-index:1;width:16px;height:16px;accent-color:var(--c-primary)';
-        const rotBadge = document.createElement('span');
-        rotBadge.className = 'pdf-nav-rot-badge';
-        rotBadge.textContent = '0°';
-        rotBadge.style.display = 'none';
-        c.style.cssText = 'width:100%;border-radius:4px;display:block;transition:transform .2s';
-        const num = document.createElement('span');
-        num.style.cssText = 'font-size:.65rem;font-weight:800;color:var(--muted)';
-        num.textContent = i;
-        card.appendChild(cb);
-        card.appendChild(rotBadge);
-        card.appendChild(c);
-        card.appendChild(num);
-        card.addEventListener('click', (e) => {
-          if (e.target === cb) return;
-          cb.checked = !cb.checked;
-          if (cb.checked) selected.add(i); else selected.delete(i);
-          card.style.borderColor = cb.checked ? 'var(--c-primary)' : 'var(--c-border)';
-          card.style.boxShadow = cb.checked ? '0 0 0 1px var(--c-primary)' : '';
-        });
-        cb.addEventListener('change', () => {
-          if (cb.checked) selected.add(i); else selected.delete(i);
-          card.style.borderColor = cb.checked ? 'var(--c-primary)' : 'var(--c-border)';
-          card.style.boxShadow = cb.checked ? '0 0 0 1px var(--c-primary)' : '';
-        });
-        thumbsEl.appendChild(card);
-        card._rotBadge = rotBadge;
-        card._canvas = c;
-        card._pageIdx = i;
-      }
-      state._rotateRotations = rotations;
-      state._rotateSelected = selected;
-      state._rotateCards = Array.from(thumbsEl.children);
-      const actionsEl = $('#rotatePdfActions');
-      if (actionsEl) {
-        actionsEl.addEventListener('click', (e) => {
-          const btn = e.target.closest('[data-rotate]');
-          if (btn) {
-            const angle = Number(btn.dataset.rotate);
-            selected.forEach(idx => {
-              rotations.set(idx, (rotations.get(idx) + angle) % 360);
-            });
-            updateRotateVisuals();
-          }
-        });
-      }
-      const resetBtn = $('#rotatePdfResetBtn');
-      if (resetBtn) resetBtn.addEventListener('click', () => {
-        rotations.forEach((_, k) => rotations.set(k, 0));
-        updateRotateVisuals();
-      });
-      function updateRotateVisuals() {
-        state._rotateCards.forEach(card => {
-          const idx = card._pageIdx;
-          const rot = rotations.get(idx);
-          if (card._canvas) card._canvas.style.transform = `rotate(${rot}deg)`;
-          if (card._rotBadge) {
-            card._rotBadge.style.display = rot !== 0 ? '' : 'none';
-            card._rotBadge.textContent = rot + '°';
-          }
-        });
-      }
-    } catch (err) {
-      if (meta) meta.textContent = err?.message?.includes('password') ? 'PDF protegido.' : 'No se pudo leer el PDF.';
-    }
+    if (!file || !window.ToolistoPDFNav) return;
+    const container = ensurePdfNavBreakout();
+    if (!container) return;
+    if (_rotateNav) _rotateNav.destroy();
+    _rotateNav = window.ToolistoPDFNav.create(container, {
+      file: file,
+      size: 'medium',
+      reorderable: false,
+      allowRotation: true,
+      allowDelete: false,
+      onSelect: function (sel) {},
+      onReorder: function () {},
+      onRemove: function () {},
+    });
   }
+
+  let _deleteNav = null;
 
   async function initDeletePagesPdf() {
     const file = state.files[0];
-    if (!file || !window.pdfjsLib) return;
-    const meta = $('#deletePagesPdfMeta');
-    const thumbsEl = $('#deletePagesPdfThumbs');
-    const summaryEl = $('#deletePagesPdfSummary');
-    try {
-      window.pdfjsLib.GlobalWorkerOptions.workerSrc = './vendor/pdfjs/pdf.worker.min.js';
-      const bytes = await file.arrayBuffer();
-      const pdf = await window.pdfjsLib.getDocument({ data: new Uint8Array(bytes) }).promise;
-      const pageCount = pdf.numPages;
-      if (meta) meta.textContent = `${file.name} · ${pageCount} página${pageCount !== 1 ? 's' : ''} —Selecciona las que deseas eliminar`;
-      const toDelete = new Set();
-      if (thumbsEl) {
-        thumbsEl.innerHTML = '';
-        thumbsEl.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:8px;max-height:360px;overflow-y:auto;padding:4px 0';
-        for (let i = 1; i <= pageCount; i++) {
-          const page = await pdf.getPage(i);
-          const vp = page.getViewport({ scale: 0.22 });
-          const c = document.createElement('canvas');
-          c.width = vp.width; c.height = vp.height;
-          await page.render({ canvasContext: c.getContext('2d'), viewport: vp }).promise;
-          const card = document.createElement('div');
-          card.style.cssText = 'position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;padding:4px;border:2px solid var(--c-border);border-radius:8px;cursor:pointer;transition:all .15s';
-          card.dataset.page = i;
-          const trashIcon = document.createElement('span');
-          trashIcon.style.cssText = 'position:absolute;top:4px;right:4px;z-index:1;width:20px;height:20px;display:none;align-items:center;justify-content:center;border-radius:50%;background:var(--c-error);color:#fff;font-size:.7rem;font-weight:700';
-          trashIcon.textContent = '✕';
-          c.style.cssText = 'width:100%;border-radius:4px;display:block;transition:opacity .15s';
-          const num = document.createElement('span');
-          num.style.cssText = 'font-size:.65rem;font-weight:800;color:var(--muted)';
-          num.textContent = i;
-          card.appendChild(trashIcon);
-          card.appendChild(c);
-          card.appendChild(num);
-          card.addEventListener('click', () => {
-            if (toDelete.has(i)) { toDelete.delete(i); card.style.borderColor = 'var(--c-border)'; card.style.opacity = '1'; trashIcon.style.display = 'none'; }
-            else { toDelete.add(i); card.style.borderColor = 'var(--c-error)'; card.style.opacity = '0.6'; trashIcon.style.display = 'flex'; }
-            updateDeleteSummary();
-          });
-          thumbsEl.appendChild(card);
-        }
-      }
-      function updateDeleteSummary() {
-        const count = toDelete.size;
-        const remaining = pageCount - count;
-        if (summaryEl) summaryEl.textContent = count > 0 ? `${count} página${count !== 1 ? 's' : ''} seleccionada${count !== 1 ? 's' : ''} para eliminar —El resultado tendrá ${remaining} página${remaining !== 1 ? 's' : ''}` : 'Selecciona las páginas a eliminar haciendo clic en ellas.';
-        const rangesInput = $('#deletePagesRanges');
-        if (rangesInput && count > 0) rangesInput.value = Array.from(toDelete).sort((a, b) => a - b).join(', ');
-      }
-      state._deletePagesSet = toDelete;
-    } catch (err) {
-      if (meta) meta.textContent = err?.message?.includes('password') ? 'PDF protegido.' : 'No se pudo leer el PDF.';
-    }
-    const rangesInput = $('#deletePagesRanges');
-    if (rangesInput) rangesInput.addEventListener('input', () => {
-      const errEl = $('#deletePagesError');
-      if (!rangesInput.value.trim()) { if (errEl) errEl.textContent = ''; return; }
-      const result = parseRanges(rangesInput.value, 999);
-      if (result.error) { if (errEl) errEl.textContent = result.error; } else { if (errEl) errEl.textContent = ''; }
+    if (!file || !window.ToolistoPDFNav) return;
+    const container = ensurePdfNavBreakout();
+    if (!container) return;
+    if (_deleteNav) _deleteNav.destroy();
+    _deleteNav = window.ToolistoPDFNav.create(container, {
+      file: file,
+      size: 'medium',
+      reorderable: false,
+      allowRotation: false,
+      allowDelete: true,
+      onSelect: function (sel) {},
+      onReorder: function () {},
+      onRemove: function (removed) {
+        state._deletePagesSet = new Set(removed.map(function (i) { return i + 1; }));
+      },
     });
   }
 

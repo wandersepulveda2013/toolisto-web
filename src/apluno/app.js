@@ -203,6 +203,41 @@
         input.value = '';
         run('');
         input.blur();
+      } else if (event.key === 'ArrowDown') {
+        var firstLink = list.querySelector('a.apluno-launcher-result');
+        if (firstLink) {
+          event.preventDefault();
+          firstLink.focus();
+        }
+      }
+    });
+
+    list.addEventListener('keydown', function (event) {
+      var links = Array.from(list.querySelectorAll('a.apluno-launcher-result'));
+      var currIdx = links.indexOf(document.activeElement);
+      if (currIdx === -1) return;
+      if (event.key === 'ArrowDown' || event.key === 'ArrowRight') {
+        event.preventDefault();
+        var nextIdx = (currIdx + 1) % links.length;
+        links[nextIdx].focus();
+      } else if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') {
+        event.preventDefault();
+        if (currIdx === 0) {
+          input.focus();
+        } else {
+          links[currIdx - 1].focus();
+        }
+      } else if (event.key === 'Escape') {
+        event.preventDefault();
+        input.focus();
+      }
+    });
+
+    document.addEventListener('keydown', function (event) {
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault();
+        input.focus();
+        input.select();
       }
     });
     if (clearBtn) {

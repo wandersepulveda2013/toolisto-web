@@ -1,49 +1,23 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="apluno-title apluno-desc">
-  <title id="apluno-title">APLUNO</title>
-  <desc id="apluno-desc">Letra A estilizada: cuerpo azul-cian, pierna derecha grafito, anillo orbital multicolor.</desc>
-
-  <!-- Cuerpo principal A (azul eléctrico → cian) -->
-  <path fill="#2563EB" d="
-    M256 60
-    L100 420
-    H152
-    L188 340
-    H324
-    L360 420
-    H412
-    Z
-    M196 300
-    L256 160
-    L316 300
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">Toolisto Favicon</title>
+  <desc id="desc">Letra T blanca geométrica sobre cuadrado carbón con detalles azules.</desc>
+  <rect x="16" y="16" width="480" height="480" rx="112" fill="#1C1D21"/>
+  <path fill="#F7F5EF" d="
+    M120 104
+    H338
+    L370 136
+    H392
+    V192
+    H300
+    V396
+    L256 440
+    L212 396
+    V192
+    H120
+    Q104 192 104 176
+    V120
+    Q104 104 120 104
     Z"/>
-
-  <!-- Pierna derecha (grafito oscuro) -->
-  <path fill="#3A3B3F" d="
-    M324 300
-    L360 420
-    H412
-    L372 294
-    Z"/>
-
-  <!-- Travesaño (cian) -->
-  <path fill="#06B6D4" d="
-    M196 300
-    L316 300
-    L316 330
-    L196 330
-    Z"/>
-
-  <!-- Anillo orbital fino (cian → violeta → coral) -->
-  <ellipse cx="360" cy="120" rx="100" ry="30" fill="none" stroke="url(#orbitalGrad)" stroke-width="6" transform="rotate(-20 360 120)" opacity="0.9"/>
-
-  <!-- Esfera coral/naranja -->
-  <circle cx="440" cy="80" r="22" fill="#F97316"/>
-
-  <defs>
-    <linearGradient id="orbitalGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#06B6D4"/>
-      <stop offset="50%" stop-color="#8B5CF6"/>
-      <stop offset="100%" stop-color="#F97316"/>
-    </linearGradient>
-  </defs>
+  <path fill="#2563EB" d="M340 104 H392 V145 H370 Z"/>
+  <path fill="#2563EB" d="M212 340 V396 H268 Z"/>
 </svg>
