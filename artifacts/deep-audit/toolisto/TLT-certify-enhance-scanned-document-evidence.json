@@ -16,9 +16,9 @@
       "pass": true
     },
     {
-      "detail": "{\"w\":109,\"h\":59}",
+      "detail": "null",
       "name": "recorte automático produce una salida real más pequeña",
-      "pass": true
+      "pass": null
     },
     {
       "detail": "Documento escaneado optimizado correctamente.",
@@ -26,22 +26,20 @@
       "pass": true
     },
     {
-      "detail": "{\"w\":200,\"h\":100}",
-      "name": "desactivar recorte conserva dimensiones de origen",
-      "pass": true
-    },
-    {
-      "detail": "",
-      "name": "sin errores de consola",
-      "pass": true
+      "detail": "page.evaluate: TypeError: Cannot read properties of null (reading 'decode')\n    at eval (eval at evaluate (:311:30), <anonymous>:3:18)\n    at UtilityScript.evaluate (<anonymous>:313:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)",
+      "name": "ejecución completa sin excepción",
+      "pass": false
     }
   ],
-  "failed": 0,
-  "failures": [],
-  "passed": 7,
+  "failed": 2,
+  "failures": [
+    "recorte automático produce una salida real más pequeña",
+    "ejecución completa sin excepción"
+  ],
+  "passed": 4,
   "suite": "gate-e2e-enhance-scanned-document",
   "tools": [
     "enhanceScannedDocument"
   ],
-  "total": 7
+  "total": 6
 }

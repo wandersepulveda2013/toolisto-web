@@ -1588,6 +1588,7 @@ html.theme-dark .ws-topbar {
   outline: 2px solid var(--ws-primary);
   outline-offset: -2px;
 }
+.row-number {
   position: sticky;
   left: 0;
   background: var(--ws-surface);
@@ -2669,6 +2670,7 @@ html.theme-dark .ws-status-limited { color: #b7c3ff; background: rgba(120, 135, 
   outline: 2px solid var(--ws-primary);
   outline-offset: -2px;
 }
+.ws-palette-input::placeholder {
   color: var(--ws-text-tertiary);
 }
 

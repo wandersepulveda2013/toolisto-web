@@ -161,7 +161,11 @@
       "pass": true
     },
     {
-      "name": "photoLocationExtractor: JSON con gps.lat/lng (fix parseExif→PhotoLocation)",
+      "name": "photoLocationExtractor: HTML report rendered",
+      "pass": true
+    },
+    {
+      "name": "photoLocationExtractor: cámara info present",
       "pass": true
     },
     {
@@ -169,19 +173,15 @@
       "pass": true
     },
     {
-      "name": "photoLocationExtractor: longitud 70° W",
+      "name": "photoLocationExtractor: longitud info present",
       "pass": true
     },
     {
-      "name": "photoLocationExtractor: url_mapa presente",
+      "name": "photoLocationExtractor: OSM map link",
       "pass": true
     },
     {
-      "name": "photoLocationExtractor: cámara del EXIF",
-      "pass": true
-    },
-    {
-      "name": "photoLocationExtractor: fecha_hora",
+      "name": "photoLocationExtractor: privacy warning",
       "pass": true
     },
     {

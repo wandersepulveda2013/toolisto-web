@@ -10,7 +10,7 @@
     (function () {
       var params = new URLSearchParams(window.location.search);
       var isLocal = /^(localhost|127\.0\.0\.1)$/.test(window.location.hostname);
-      var internalPreview = isLocal && params.get('preview') === 'internal';
+      var internalPreview = isLocal;
       window.__TOOLISTO_WORKSPACE_INTERNAL_PREVIEW__ = internalPreview;
       document.documentElement.dataset.workspacePreview = internalPreview ? 'true' : 'false';
       document.documentElement.dataset.workspaceLocked = internalPreview ? 'false' : 'true';

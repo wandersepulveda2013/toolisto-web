@@ -17,9 +17,9 @@
       "pass": true
     },
     {
-      "detail": "47 PASS / 0 FAIL",
+      "detail": "7 PASS / 1 FAIL",
       "name": "TLT-certify-av-evidence.json: resultado aprobado",
-      "pass": true
+      "pass": false
     },
     {
       "detail": "24 PASS / 0 FAIL",
@@ -42,9 +42,9 @@
       "pass": true
     },
     {
-      "detail": "7 PASS / 0 FAIL",
+      "detail": "4 PASS / 2 FAIL",
       "name": "TLT-certify-enhance-scanned-document-evidence.json: resultado aprobado",
-      "pass": true
+      "pass": false
     },
     {
       "detail": "70 PASS / 0 FAIL",
@@ -72,9 +72,9 @@
       "pass": true
     },
     {
-      "detail": "21 PASS / 0 FAIL",
+      "detail": "13 PASS / 4 FAIL",
       "name": "TLT-certify-image-interactive-evidence.json: resultado aprobado",
-      "pass": true
+      "pass": false
     },
     {
       "detail": "34 PASS / 0 FAIL",
@@ -112,9 +112,9 @@
       "pass": true
     },
     {
-      "detail": "56 PASS / 0 FAIL",
+      "detail": "53 PASS / 3 FAIL",
       "name": "TLT-certify-text-family-evidence.json: resultado aprobado",
-      "pass": true
+      "pass": false
     },
     {
       "detail": "67 PASS / 0 FAIL",
@@ -127,18 +127,46 @@
       "pass": true
     },
     {
-      "detail": "167/167",
+      "detail": "removeObjects, signature, workflow, txtToPdf, mergeTxt, splitTxt, sortLines, removeDuplicates, convertAudio, trimAudio, mergeAudio, compressVideo, trimVideo, mergeVideos, videoToGif, extractAudioFromVideo, removeAudioFromVideo, textStatistics, wordCount, textDiff, htmlToMarkdown, htmlToText, cssMinifier, base64Encode, base64Decode, urlEncode, urlDecode",
       "name": "Cada evidencia asignada a una herramienta habilitada aprobó",
-      "pass": true
+      "pass": false
     }
   ],
   "coveredTools": 167,
   "enabledTools": 167,
   "evidenceFiles": 22,
-  "failed": 0,
-  "passed": 26,
+  "failed": 5,
+  "passed": 21,
   "suite": "production-tool-coverage",
   "total": 26,
-  "uncertified": [],
+  "uncertified": [
+    "removeObjects",
+    "signature",
+    "workflow",
+    "txtToPdf",
+    "mergeTxt",
+    "splitTxt",
+    "sortLines",
+    "removeDuplicates",
+    "convertAudio",
+    "trimAudio",
+    "mergeAudio",
+    "compressVideo",
+    "trimVideo",
+    "mergeVideos",
+    "videoToGif",
+    "extractAudioFromVideo",
+    "removeAudioFromVideo",
+    "textStatistics",
+    "wordCount",
+    "textDiff",
+    "htmlToMarkdown",
+    "htmlToText",
+    "cssMinifier",
+    "base64Encode",
+    "base64Decode",
+    "urlEncode",
+    "urlDecode"
+  ],
   "uncovered": []
 }

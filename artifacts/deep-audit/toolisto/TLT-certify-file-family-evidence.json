@@ -37,7 +37,7 @@
       "pass": true
     },
     {
-      "name": "fileSplit nombra los fragmentos partNNN.txt",
+      "name": "fileSplit nombra los fragmentos partNNN (sin extensión falsa)",
       "pass": true
     },
     {
@@ -77,7 +77,7 @@
       "pass": true
     },
     {
-      "name": "fileJoin recompone el nombre original \"mixto.txt\"",
+      "name": "fileJoin recompone nombre razonable (\"mixto.txt\")",
       "pass": true
     },
     {

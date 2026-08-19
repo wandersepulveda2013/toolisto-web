@@ -2735,7 +2735,13 @@ function showExtractionModeChooser(project, capture, rawText, words, confidence,
 async function finalizeExtraction(project, capture, rawText, words, confidence, mode, start) {
   const statusEl = h('div', { style: 'padding:12px;text-align:center;color:var(--ws-text-secondary)' }, 'Procesando texto...');
   showModal({ title: 'Generando documento...', body: [statusEl], footer: null });
+  let _extractionTimeout = null;
   try {
+    _extractionTimeout = setTimeout(() => {
+      closeModal();
+      toast('La operación tardo demasiado. Intenta de nuevo.', 'error');
+      showManualTextEntry(project, capture, start);
+    }, 45000);
     const scannerMeta = capture.scannerMetadata || {};
     let processedText;
     let blockType = 'paragraph';
@@ -2760,11 +2766,11 @@ async function finalizeExtraction(project, capture, rawText, words, confidence, 
     if (mode === 'faithful' && words && words.length) doc.ocrWords = words;
     if (words && words.length) doc.ocrWords = words;
     addRelation(doc, capture.id, 'source-capture');
+    statusEl.textContent = 'Guardando en almacenamiento local...';
     await saveDoc(project.id, doc);
-    const text = rawText;
-    const ocrSourceLabel = scannerMeta.ocrSource || 'corrected';
-    await updateScanOcrState(capture, { status: 'completed', confidence, text, words });
-    await registerExecution(project.id, 'ocr-extract', 'Extracción de texto (OCR)', {
+    await updateScanOcrState(capture, { status: 'completed', confidence, text: rawText, words });
+    statusEl.textContent = 'Registrando ejecucion...';
+    await registerExecution(project.id, 'ocr-extract', 'Extraccion de texto (OCR)', {
       inputAssetIds: [capture.id],
       sourceAssetId: capture.id,
       parameters: {
@@ -2773,7 +2779,7 @@ async function finalizeExtraction(project, capture, rawText, words, confidence, 
         confidence: Math.round(confidence),
         charCount: rawText.length,
         lineCount: rawText.split(/\r?\n/).length,
-        ocrSource: ocrSourceLabel,
+        ocrSource: scannerMeta.ocrSource || 'corrected',
         extractionMode: mode,
         autoDetectionFallback: scannerMeta.autoDetectionFallback || false,
         cornersModified: scannerMeta.cornersModified || false,
@@ -2786,14 +2792,17 @@ async function finalizeExtraction(project, capture, rawText, words, confidence, 
       startedAt: start,
       status: 'completed',
     });
+    statusEl.textContent = 'Actualizando proyecto...';
     await refreshProjectCounts(project.id);
     appStore.set({ currentDoc: doc, currentView: 'doc-editor' });
     const modeLabels = { clean: 'Texto limpio', faithful: 'Fiel al original', raw: 'Solo texto' };
     toast('Documento creado (' + modeLabels[mode] + ', ' + Math.round(confidence) + '% confianza)', 'success');
   } catch (e) {
-    closeModal();
     toast('Error al crear documento: ' + e.message, 'error');
     showManualTextEntry(project, capture, start);
+  } finally {
+    if (_extractionTimeout) clearTimeout(_extractionTimeout);
+    closeModal();
   }
 }
 
