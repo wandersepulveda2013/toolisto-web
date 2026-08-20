@@ -918,6 +918,11 @@
   }
 
   function addFiles(incoming) {
+    if (state.processing) {
+      showToast('Espera a que termine el procesamiento actual.');
+      if (els.fileInput) els.fileInput.value = '';
+      return;
+    }
     if (state.toolDisabled) {
       showToast('Esta herramienta está temporalmente en revisión.');
       if (els.fileInput) els.fileInput.value = '';
@@ -2713,6 +2718,7 @@
 
     try {
       await ensureToolDependencies(state.tool);
+      clearPreviousOutput();
       let result;
       if (window.ToolProcessors && window.ToolProcessors[state.tool]) {
         result = await window.ToolProcessors[state.tool](state.files, options, (cur, total, msg) => {
@@ -6493,6 +6499,8 @@
   }
 
   function presentSummaryResult(result) {
+    if (state.previewUrl) URL.revokeObjectURL(state.previewUrl);
+    state.previewUrl = '';
     state.outputFiles = [];
     state.outputBlob = null;
     if (els.downloadButton) els.downloadButton.style.display = 'none';
@@ -6765,6 +6773,10 @@
   }
 
   function resetAll() {
+    if (state.processing) {
+      showToast('No se puede reiniciar durante el procesamiento.');
+      return;
+    }
     els.resultDialog.close();
     clearPreviousOutput();
     state.files = [];
