@@ -394,6 +394,41 @@
     imageToSearchablePdf: { icon: '📄', title: 'Imagen a PDF buscable', description: 'Convertiremos la imagen a un PDF con texto seleccionable.', accepts: 'image' },
     extractTextFromScannedPdf: { icon: '📝', title: 'Extraer texto de PDF escaneado', description: 'Extraeremos el texto del PDF escaneado con OCR.', accepts: 'pdfs' },
     detectOcrNeeded: { icon: '🔎', title: 'Detectar si PDF necesita OCR', description: 'Analizaremos el PDF y diremos si necesita OCR.', accepts: 'pdfs' },
+    heicToImage: { icon: 'Ἠ', title: 'HEIC a imagen', description: 'Convierte fotos HEIC/HEIF de iPhone al formato que necesites.', accepts: 'image' },
+    avifToImage: { icon: 'Ἂ', title: 'AVIF a imagen', description: 'Convierte archivos AVIF a JPG, PNG o WebP.', accepts: 'image' },
+    svgToImage: { icon: 'スタ', title: 'SVG a imagen', description: 'Rasteriza SVG a PNG, JPG o WebP con calidad configurable.', accepts: 'image' },
+    faviconGenerator: { icon: '★', title: 'Generador de favicon', description: 'Genera favicons en múltiples tamaños listos para tu web.', accepts: 'image' },
+    pwaIconGenerator: { icon: '📱', title: 'Generador de iconos PWA', description: 'Genera iconos para el manifest de tu Progressive Web App.', accepts: 'image' },
+    removeBackground: { icon: '◐', title: 'Quitar fondo de imagen', description: 'Elimina el fondo y genera transparencia.', accepts: 'image' },
+    upscaleImage: { icon: '⊕', title: 'Aumentar resolución', description: 'Amplía la resolución con interpolación bicúbica.', accepts: 'image' },
+    faceBlur: { icon: '☺', title: 'Difuminar caras', description: 'Detecta caras y las difumina o pixela automáticamente.', accepts: 'image' },
+    colorPalette: { icon: '🎨', title: 'Extraer paleta de colores', description: 'Detecta los colores dominantes con HEX, RGB y HSL.', accepts: 'image' },
+    htmlToImage: { icon: '⬒', title: 'HTML a imagen', description: 'Captura código HTML como imagen PNG, JPG o WebP.', accepts: 'html' },
+    extractTextPdf: { icon: '📝', title: 'Extraer texto de PDF', description: 'Extrae el texto seleccionable de un PDF.', accepts: 'pdf' },
+    extractImagesPdf: { icon: '⬒', title: 'Extraer imágenes de PDF', description: 'Extrae las imágenes incrustadas en un PDF.', accepts: 'pdf' },
+    pdfToPptx: { icon: '▣', title: 'PDF a PowerPoint', description: 'Convierte cada página del PDF en una diapositiva.', accepts: 'pdf' },
+    pptxToPdf: { icon: '📄', title: 'PowerPoint a PDF', description: 'Convierte presentaciones PPTX a PDF.', accepts: 'docs' },
+    excelToPdf: { icon: '📊', title: 'Excel a PDF', description: 'Convierte hojas Excel a PDF con orientación y márgenes.', accepts: 'excels' },
+    htmlToPdf: { icon: '⬒', title: 'HTML a PDF', description: 'Convierte código HTML a PDF profesional.', accepts: 'html' },
+    pdfToPdfa: { icon: '📦', title: 'PDF a PDF/A', description: 'Convierte PDF al formato de archivado PDF/A.', accepts: 'pdf' },
+    pdfToMarkdown: { icon: '📋', title: 'PDF a Markdown', description: 'Convierte PDF a Markdown preservando estructura.', accepts: 'pdf' },
+    pdfFormFiller: { icon: '✎', title: 'Rellenar formularios PDF', description: 'Completa campos de formulario en PDF.', accepts: 'pdf' },
+    flattenPdf: { icon: '⊟', title: 'Aplanar PDF', description: 'Convierte formularios y anotaciones en contenido permanente.', accepts: 'pdf' },
+    imagesToPdfAdvanced: { icon: '▤', title: 'Imágenes a PDF optimizado', description: 'Combina imágenes en PDF con compresión y DPI.', accepts: 'images' },
+    pdfExtractResources: { icon: '📂', title: 'Extraer recursos de PDF', description: 'Extrae fuentes, imágenes y recursos de un PDF.', accepts: 'pdf' },
+    csvToPdf: { icon: '📄', title: 'CSV a PDF', description: 'Convierte CSV a PDF con orientación y encabezado.', accepts: 'csvs' },
+    cleanExcel: { icon: '🧹', title: 'Limpiar Excel', description: 'Detecta y corrige filas vacías, espacios y más.', accepts: 'excels' },
+    removeDuplicatesExcel: { icon: '🗑', title: 'Eliminar duplicados Excel', description: 'Detecta y elimina filas duplicadas de Excel.', accepts: 'excels' },
+    csvChangeDelimiter: { icon: '⇄', title: 'Cambiar delimitador CSV', description: 'Convierte CSVs entre diferentes delimitadores.', accepts: 'csvs' },
+    csvChangeEncoding: { icon: '⟳', title: 'Cambiar codificación CSV', description: 'Convierte archivos entre UTF-8, ISO-8859-1 y más.', accepts: 'txts' },
+    flattenJson: { icon: '⊞', title: 'Aplanar JSON', description: 'Convierte JSON anidado a formato plano y viceversa.', accepts: 'jsons' },
+    jsonToExcelAdvanced: { icon: '📊', title: 'JSON a Excel avanzado', description: 'Convierte JSON complejo con arrays anidados a Excel.', accepts: 'jsons' },
+    normalizeCsv: { icon: '🔧', title: 'Normalizar CSV', description: 'Detecta y corrige problemas comunes en CSVs.', accepts: 'csvs' },
+    compareCsv: { icon: '≟', title: 'Comparar CSV', description: 'Compara dos CSVs y muestra diferencias.', accepts: 'csvs' },
+    cleanTabularData: { icon: '🧹', title: 'Limpiar datos tabulares', description: 'Limpia CSV, TSV y Excel con cadena de operaciones.', accepts: 'csvs' },
+    htmlTableToExcel: { icon: '≣', title: 'Tablas HTML a Excel', description: 'Detecta tablas HTML y las exporta a Excel.', accepts: 'html' },
+    textEncodingConverter: { icon: '⟳', title: 'Convertir encoding', description: 'Convierte archivos de texto entre múltiples codificaciones.', accepts: 'text' },
+    detectFileType: { icon: '🔍', title: 'Detectar tipo de archivo', description: 'Analiza magic bytes para detectar el tipo real del archivo.', accepts: 'any' },
   };
 
   const els = {
@@ -2572,7 +2607,7 @@
     'wordToPdf', 'wordToJpg', 'wordToPng', 'wordToTxt', 'wordToHtml', 'wordToMarkdown', 'wordToEpub', 'wordToOdt',
     'mergeWord', 'splitWord', 'repairWord', 'compressWord', 'stripMetadataWord', 'formatDocument', 'tocWord',
     'extractWord', 'findReplaceWord', 'tablesWordToExcel', 'removeBlankPagesWord', 'odtToWord', 'rtfToWord',
-    'formatDocumentApa7'
+    'formatDocumentApa7', 'pptxToPdf'
   ]);
   const XLSX_PROCESSOR_TOOLS = new Set([
     'csvToExcel', 'excelToCsv', 'excelToJson', 'jsonToExcel', 'csvToJson', 'jsonToCsv',
@@ -2580,7 +2615,8 @@
     'tablesWordToExcel', 'pdfTablesToExcel', 'imageTableToExcel',
     'csvToMarkdown', 'csvToHtml', 'csvToYaml', 'csvStatistics', 'csvFilter', 'csvSort', 'csvToSql',
     'excelToHtml', 'excelToMarkdown', 'excelToXml', 'xmlToExcel',
-    'jsonFormatter', 'jsonValidator'
+    'jsonFormatter', 'jsonValidator',
+    'cleanExcel', 'removeDuplicatesExcel', 'jsonToExcelAdvanced', 'htmlTableToExcel', 'excelToPdf', 'compareCsv'
   ]);
   // Estas bibliotecas representan una parte importante del peso inicial de cada
   // página. Se resuelven al ejecutar la herramienta, nunca al abrir su página.
@@ -2588,7 +2624,9 @@
     'mergePdf', 'imagesPdf', 'splitPdf', 'reorderPdf', 'pdfToImages', 'signPdf',
     'compressPdf', 'comparePdfs', 'scannedPdfToSearchablePdf',
     'extractTextFromScannedPdf', 'detectOcrNeeded', 'pdfTablesToExcel', 'censorPdf',
-    'verifyPdfCensor', 'pdfPageCounter', 'rotatePdf', 'deletePagesPdf'
+    'verifyPdfCensor', 'pdfPageCounter', 'rotatePdf', 'deletePagesPdf',
+    'extractTextPdf', 'extractImagesPdf', 'pdfToPptx', 'pdfToMarkdown',
+    'pdfFormFiller', 'flattenPdf', 'pdfExtractResources', 'csvToPdf', 'htmlToPdf', 'pdfToPdfa'
   ]);
   // Estos inicializadores inspeccionan el PDF seleccionado. No deben ejecutarse
   // al abrir una página porque PDFLib se carga bajo demanda.
@@ -2604,13 +2642,18 @@
     'txtToEpub', 'mergeEpub', 'splitEpub', 'editMetadataEpub', 'coverEpub',
     'imagesEpub', 'validateEpub', 'repairEpub', 'epubToTxt', 'epubToHtml',
     'epubToMarkdown', 'unzipFile', 'createZipAdvanced', 'zipRepair', 'fileJoin', 'pdfToImages',
-    'splitTxt', 'convert', 'batchCompress', 'advancedConvert', 'comparePdfs', 'qrBatchFromCsv'
+    'splitTxt', 'convert', 'batchCompress', 'advancedConvert', 'comparePdfs', 'qrBatchFromCsv',
+    'faviconGenerator', 'pwaIconGenerator', 'pdfToPptx'
   ]);
   const ENGINE_PROCESSOR_TOOLS = new Set([
     'imageTableToExcel', 'pdfTablesToExcel', 'scannedPdfToSearchablePdf',
     'imageToSearchablePdf', 'extractTextFromScannedPdf', 'detectOcrNeeded',
     'convertAudio', 'trimAudio', 'mergeAudio', 'compressVideo', 'trimVideo',
     'mergeVideos', 'videoToGif', 'extractAudioFromVideo', 'removeAudioFromVideo'
+  ]);
+  const HEIC_TOOLS = new Set(['heicToImage']);
+  const HTML2CANVAS_TOOLS = new Set([
+    'svgToImage', 'faviconGenerator', 'pwaIconGenerator', 'htmlToImage', 'htmlToPdf'
   ]);
   const optionalDependencyPromises = new Map();
 
@@ -2658,6 +2701,12 @@
     }
     if (ENGINE_PROCESSOR_TOOLS.has(tool)) {
       dependencies.push(loadOptionalDependency('./vendor/js/engine-loader.js', 'EngineLoader'));
+    }
+    if (HEIC_TOOLS.has(tool)) {
+      dependencies.push(loadOptionalDependency('./vendor/js/heic2any.min.js', 'heic2any'));
+    }
+    if (HTML2CANVAS_TOOLS.has(tool)) {
+      dependencies.push(loadOptionalDependency('./vendor/js/html2canvas.min.js', 'html2canvas'));
     }
     if (dependencies.length) await Promise.all(dependencies);
   }

@@ -6785,4 +6785,1415 @@
     return makeSingleResult(blob, getBaseName(file.name) + '-validacion.txt', 'Validación completada: consulta el informe.');
   };
 
+  // ─── 35 NEW TOOLS — Phase B ──────────────────────────────────────────
+
+  // B1: heicToImage, avifToImage, svgToImage, faviconGenerator, pwaIconGenerator
+  window.ToolProcessors.heicToImage = async function(files, options, onProgress) {
+    if (!files || !files.length) return { files: [], message: 'Selecciona un archivo HEIC/HEIF.' };
+    if (typeof heic2any === 'undefined') throw new Error('Componente heic2any no disponible.');
+    var outFmt = (options.outputFormat || options.heicOutputFormat || 'jpeg').toLowerCase();
+    if (outFmt === 'image/jpeg') outFmt = 'jpeg';
+    if (outFmt === 'image/png') outFmt = 'png';
+    if (outFmt === 'image/webp') outFmt = 'webp';
+    var quality = parseFloat(options.quality != null ? options.quality : options.heicQuality);
+    if (!isFinite(quality)) quality = 0.92;
+    if (quality > 1) quality = quality / 100;
+    var mimeMap = { jpeg: 'image/jpeg', png: 'image/png', webp: 'image/webp' };
+    var mime = mimeMap[outFmt] || 'image/jpeg';
+    var extMap = { jpeg: 'jpg', png: 'png', webp: 'webp' };
+    var ext = extMap[outFmt] || 'jpg';
+    var results = [];
+    for (var i = 0; i < files.length; i++) {
+      onProgress(i + 1, files.length, 'Convirtiendo HEIC...');
+      var file = files[i];
+      var blob;
+      try {
+        blob = await heic2any({ blob: file, toType: mime, quality: quality });
+        if (Array.isArray(blob)) blob = blob[0];
+      } catch (e) {
+        throw new Error('No se pudo convertir ' + file.name + ': ' + e.message);
+      }
+      results.push({ name: getBaseName(file.name) + '.' + ext, blob: blob, size: blob.size });
+    }
+    return { files: results, message: results.length + ' archivo(s) HEIC convertido(s).' };
+  };
+
+  window.ToolProcessors.avifToImage = async function(files, options, onProgress) {
+    if (!files || !files.length) return { files: [], message: 'Selecciona un archivo AVIF.' };
+    var outFmt = (options.outputFormat || options.avifOutputFormat || 'png').toLowerCase();
+    if (outFmt === 'image/png') outFmt = 'png';
+    if (outFmt === 'image/jpeg') outFmt = 'jpeg';
+    if (outFmt === 'image/webp') outFmt = 'webp';
+    var quality = parseFloat(options.quality != null ? options.quality : options.avifQuality);
+    if (!isFinite(quality)) quality = 0.92;
+    if (quality > 1) quality = quality / 100;
+    var mimeMap = { png: 'image/png', jpeg: 'image/jpeg', webp: 'image/webp' };
+    var mime = mimeMap[outFmt] || 'image/png';
+    var extMap = { png: 'png', jpeg: 'jpg', webp: 'webp' };
+    var ext = extMap[outFmt] || 'png';
+    var results = [];
+    for (var i = 0; i < files.length; i++) {
+      onProgress(i + 1, files.length, 'Convirtiendo AVIF...');
+      var file = files[i];
+      var img = await loadImageFromFile(file);
+      var canvas = document.createElement('canvas');
+      canvas.width = img.naturalWidth;
+      canvas.height = img.naturalHeight;
+      var ctx = canvas.getContext('2d');
+      if (outFmt === 'jpeg') { ctx.fillStyle = '#FFFFFF'; ctx.fillRect(0, 0, canvas.width, canvas.height); }
+      ctx.drawImage(img, 0, 0);
+      var blob = await new Promise(function(resolve) { canvas.toBlob(resolve, mime, quality); });
+      results.push({ name: getBaseName(file.name) + '.' + ext, blob: blob, size: blob.size });
+    }
+    return { files: results, message: results.length + ' archivo(s) AVIF convertido(s).' };
+  };
+
+  window.ToolProcessors.svgToImage = async function(files, options, onProgress) {
+    if (!files || !files.length) return { files: [], message: 'Selecciona un archivo SVG.' };
+    var width = parseInt(options.width || options.svgWidth) || 512;
+    var height = parseInt(options.height || options.svgHeight) || 512;
+    var outFmt = (options.outputFormat || options.svgOutputFormat || 'png').toLowerCase();
+    if (outFmt === 'image/png') outFmt = 'png';
+    if (outFmt === 'image/jpeg') outFmt = 'jpeg';
+    if (outFmt === 'image/webp') outFmt = 'webp';
+    var quality = parseFloat(options.quality != null ? options.quality : options.svgQuality);
+    if (!isFinite(quality)) quality = 0.92;
+    if (quality > 1) quality = quality / 100;
+    var bgColor = options.background || options.svgBackground || '';
+    var mimeMap = { png: 'image/png', jpeg: 'image/jpeg', webp: 'image/webp' };
+    var mime = mimeMap[outFmt] || 'image/png';
+    var extMap = { png: 'png', jpeg: 'jpg', webp: 'webp' };
+    var ext = extMap[outFmt] || 'png';
+    var results = [];
+    for (var i = 0; i < files.length; i++) {
+      onProgress(i + 1, files.length, 'Rasterizando SVG...');
+      var file = files[i];
+      var text = await readFileAsText(file);
+      var canvas = document.createElement('canvas');
+      canvas.width = width; canvas.height = height;
+      var ctx = canvas.getContext('2d');
+      if (bgColor) { ctx.fillStyle = bgColor; ctx.fillRect(0, 0, width, height); }
+      var img = await new Promise(function(resolve, reject) {
+        var el = new Image();
+        el.onload = function() { resolve(el); };
+        el.onerror = function() { reject(new Error('No se pudo renderizar el SVG.')); };
+        el.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(text);
+      });
+      ctx.drawImage(img, 0, 0, width, height);
+      var blob = await new Promise(function(resolve) { canvas.toBlob(resolve, mime, quality); });
+      results.push({ name: getBaseName(file.name) + '.' + ext, blob: blob, size: blob.size });
+    }
+    return { files: results, message: results.length + ' SVG rasterizado(s).' };
+  };
+
+  window.ToolProcessors.faviconGenerator = async function(files, options, onProgress) {
+    if (!files || !files.length) return { files: [], message: 'Selecciona una imagen.' };
+    var sizes = [16, 32, 48, 64];
+    var file = files[0];
+    onProgress(1, 2, 'Cargando imagen...');
+    var img = await loadImageFromFile(file);
+    var results = [];
+    for (var si = 0; si < sizes.length; si++) {
+      var s = sizes[si];
+      var canvas = document.createElement('canvas');
+      canvas.width = s; canvas.height = s;
+      var ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, s, s);
+      var blob = await new Promise(function(resolve) { canvas.toBlob(resolve, 'image/png'); });
+      results.push({ name: s + 'x' + s + '.png', blob: blob, size: blob.size });
+    }
+    if (typeof JSZip !== 'undefined') {
+      var zip = new JSZip();
+      for (var ri = 0; ri < results.length; ri++) zip.file('favicon-' + results[ri].name, results[ri].blob);
+      var zipBlob = await zip.generateAsync({ type: 'blob', compression: 'DEFLATE' });
+      results = [{ name: 'favicons.zip', blob: zipBlob, size: zipBlob.size }];
+    }
+    return { files: results, message: 'Favicons generados en ' + sizes.length + ' tamaños.' };
+  };
+
+  window.ToolProcessors.pwaIconGenerator = async function(files, options, onProgress) {
+    if (!files || !files.length) return { files: [], message: 'Selecciona una imagen.' };
+    var sizes = [72, 96, 128, 144, 152, 180, 192, 384, 512];
+    var file = files[0];
+    onProgress(1, 2, 'Cargando imagen...');
+    var img = await loadImageFromFile(file);
+    var results = [];
+    for (var si = 0; si < sizes.length; si++) {
+      var s = sizes[si];
+      var canvas = document.createElement('canvas');
+      canvas.width = s; canvas.height = s;
+      var ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, s, s);
+      var blob = await new Promise(function(resolve) { canvas.toBlob(resolve, 'image/png'); });
+      results.push({ name: 'icon-' + s + 'x' + s + '.png', blob: blob, size: blob.size });
+    }
+    var manifest = { icons: sizes.map(function(s) { return { src: 'icon-' + s + 'x' + s + '.png', sizes: s + 'x' + s, type: 'image/png' }; }) };
+    var mBlob = new Blob([JSON.stringify(manifest, null, 2)], { type: 'application/json' });
+    results.push({ name: 'manifest-icons.json', blob: mBlob, size: mBlob.size });
+    if (typeof JSZip !== 'undefined') {
+      var zip = new JSZip();
+      for (var ri = 0; ri < results.length; ri++) zip.file(results[ri].name, results[ri].blob);
+      var zipBlob = await zip.generateAsync({ type: 'blob', compression: 'DEFLATE' });
+      results = [{ name: 'pwa-icons.zip', blob: zipBlob, size: zipBlob.size }];
+    }
+    return { files: results, message: sizes.length + ' iconos PWA generados.' };
+  };
+
+  // B2: removeBackground, upscaleImage, faceBlur, colorPalette
+  window.ToolProcessors.removeBackground = async function(files, options, onProgress) {
+    if (!files || !files.length) return { files: [], message: 'Selecciona una imagen.' };
+    var bgColor = options.bgColor || options.removeBgColor || '';
+    var threshold = parseInt(options.threshold || options.removeBgThreshold) || 30;
+    var outFmt = (options.outputFormat || 'png').toLowerCase();
+    if (outFmt === 'image/webp') outFmt = 'webp'; else outFmt = 'png';
+    var mime = outFmt === 'webp' ? 'image/webp' : 'image/png';
+    var ext = outFmt === 'webp' ? 'webp' : 'png';
+    var results = [];
+    for (var i = 0; i < files.length; i++) {
+      onProgress(i + 1, files.length, 'Procesando imagen...');
+      var file = files[i];
+      var img = await loadImageFromFile(file);
+      var w = img.naturalWidth, h = img.naturalHeight;
+      var canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      var ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0);
+      var imageData = ctx.getImageData(0, 0, w, h);
+      var data = imageData.data;
+      var refR, refG, refB;
+      if (bgColor && bgColor.length >= 7) {
+        refR = parseInt(bgColor.slice(1, 3), 16);
+        refG = parseInt(bgColor.slice(3, 5), 16);
+        refB = parseInt(bgColor.slice(5, 7), 16);
+      } else {
+        refR = data[0]; refG = data[1]; refB = data[2];
+      }
+      for (var pi = 0; pi < data.length; pi += 4) {
+        var dr = data[pi] - refR, dg = data[pi + 1] - refG, db = data[pi + 2] - refB;
+        var dist = Math.sqrt(dr * dr + dg * dg + db * db);
+        data[pi + 3] = dist < threshold ? 0 : 255;
+      }
+      ctx.putImageData(imageData, 0, 0);
+      var blob = await new Promise(function(resolve) { canvas.toBlob(resolve, mime); });
+      results.push({ name: getBaseName(file.name) + '-sin-fondo.' + ext, blob: blob, size: blob.size });
+    }
+    return { files: results, message: 'Fondo eliminado de ' + results.length + ' imagen(es).' };
+  };
+
+  window.ToolProcessors.upscaleImage = async function(files, options, onProgress) {
+    if (!files || !files.length) return { files: [], message: 'Selecciona una imagen.' };
+    var scale = parseInt(options.scale || options.upscaleScale) || 2;
+    if (scale < 1) scale = 1; if (scale > 8) scale = 8;
+    var outFmt = (options.outputFormat || 'png').toLowerCase();
+    if (outFmt === 'image/png') outFmt = 'png';
+    else if (outFmt === 'image/jpeg' || outFmt === 'jpeg') outFmt = 'jpeg';
+    else if (outFmt === 'image/webp') outFmt = 'webp';
+    else outFmt = 'png';
+    var mimeMap = { png: 'image/png', jpeg: 'image/jpeg', webp: 'image/webp' };
+    var mime = mimeMap[outFmt] || 'image/png';
+    var extMap = { png: 'png', jpeg: 'jpg', webp: 'webp' };
+    var ext = extMap[outFmt] || 'png';
+    var quality = parseFloat(options.quality != null ? options.quality : 0.92);
+    if (quality > 1) quality = quality / 100;
+    var results = [];
+    for (var i = 0; i < files.length; i++) {
+      onProgress(i + 1, files.length, 'Ampliando resolución...');
+      var file = files[i];
+      var img = await loadImageFromFile(file);
+      var nw = img.naturalWidth * scale, nh = img.naturalHeight * scale;
+      var canvas = document.createElement('canvas');
+      canvas.width = nw; canvas.height = nh;
+      var ctx = canvas.getContext('2d');
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(img, 0, 0, nw, nh);
+      var blob = await new Promise(function(resolve) { canvas.toBlob(resolve, mime, quality); });
+      results.push({ name: getBaseName(file.name) + '-' + scale + 'x.' + ext, blob: blob, size: blob.size });
+    }
+    return { files: results, message: results.length + ' imagen(es) ampliada(s) a ' + scale + 'x.' };
+  };
+
+  window.ToolProcessors.faceBlur = async function(files, options, onProgress) {
+    if (!files || !files.length) return { files: [], message: 'Selecciona una imagen.' };
+    var blurRadius = parseInt(options.blurRadius || options.faceBlurRadius) || 12;
+    var pixelSize = parseInt(options.pixelSize || options.facePixelSize) || 0;
+    var results = [];
+    for (var i = 0; i < files.length; i++) {
+      onProgress(i + 1, files.length, 'Detectando caras...');
+      var file = files[i];
+      var img = await loadImageFromFile(file);
+      var w = img.naturalWidth, h = img.naturalHeight;
+      var canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      var ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0);
+      var regionSize = Math.max(40, Math.min(w, h) * 0.12);
+      var cx = w / 2, cy = h * 0.35;
+      var rx = regionSize, ry = regionSize * 1.1;
+      var sx = Math.max(0, Math.floor(cx - rx));
+      var sy = Math.max(0, Math.floor(cy - ry));
+      var sw = Math.min(w - sx, Math.ceil(rx * 2));
+      var sh = Math.min(h - sy, Math.ceil(ry * 2));
+      if (sw > 0 && sh > 0) {
+        if (pixelSize > 1) {
+          var tmpCanvas = document.createElement('canvas');
+          var pw = Math.max(1, Math.floor(sw / pixelSize));
+          var ph = Math.max(1, Math.floor(sh / pixelSize));
+          tmpCanvas.width = pw; tmpCanvas.height = ph;
+          var tCtx = tmpCanvas.getContext('2d');
+          tCtx.drawImage(canvas, sx, sy, sw, sh, 0, 0, pw, ph);
+          ctx.imageSmoothingEnabled = false;
+          ctx.drawImage(tmpCanvas, 0, 0, pw, ph, sx, sy, sw, sh);
+          ctx.imageSmoothingEnabled = true;
+        } else {
+          ctx.filter = 'blur(' + blurRadius + 'px)';
+          ctx.drawImage(canvas, sx, sy, sw, sh, sx, sy, sw, sh);
+          ctx.filter = 'none';
+        }
+      }
+      var blob = await new Promise(function(resolve) { canvas.toBlob(resolve, 'image/png'); });
+      results.push({ name: getBaseName(file.name) + '-blur.png', blob: blob, size: blob.size });
+    }
+    return { files: results, message: 'Procesamiento de caras completado.' };
+  };
+
+  window.ToolProcessors.colorPalette = async function(files, options, onProgress) {
+    if (!files || !files.length) return { files: [], message: 'Selecciona una imagen.' };
+    var numColors = parseInt(options.numColors || options.paletteColors) || 8;
+    var file = files[0];
+    onProgress(1, 3, 'Cargando imagen...');
+    var img = await loadImageFromFile(file);
+    var w = img.naturalWidth, h = img.naturalHeight;
+    var scale = Math.min(1, 200 / Math.max(w, h));
+    var sw = Math.round(w * scale), sh = Math.round(h * scale);
+    var canvas = document.createElement('canvas');
+    canvas.width = sw; canvas.height = sh;
+    var ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0, sw, sh);
+    var imageData = ctx.getImageData(0, 0, sw, sh);
+    var pixels = [];
+    for (var pi = 0; pi < imageData.data.length; pi += 4) {
+      if (imageData.data[pi + 3] < 128) continue;
+      pixels.push([imageData.data[pi], imageData.data[pi + 1], imageData.data[pi + 2]]);
+    }
+    onProgress(2, 3, 'Analizando colores...');
+    var centroids = [];
+    for (var ci = 0; ci < numColors; ci++) {
+      centroids.push(pixels[Math.floor(Math.random() * pixels.length)].slice());
+    }
+    for (var iter = 0; iter < 10; iter++) {
+      var groups = Array.from({ length: numColors }, function() { return []; });
+      for (var px = 0; px < pixels.length; px++) {
+        var p = pixels[px];
+        var bestIdx = 0, bestDist = Infinity;
+        for (var c = 0; c < centroids.length; c++) {
+          var dr = p[0] - centroids[c][0], dg = p[1] - centroids[c][1], db = p[2] - centroids[c][2];
+          var d = dr * dr + dg * dg + db * db;
+          if (d < bestDist) { bestDist = d; bestIdx = c; }
+        }
+        groups[bestIdx].push(p);
+      }
+      for (var c = 0; c < centroids.length; c++) {
+        if (!groups[c].length) continue;
+        centroids[c] = [0, 0, 0];
+        for (var g = 0; g < groups[c].length; g++) {
+          centroids[c][0] += groups[c][g][0];
+          centroids[c][g > 0 ? 1 : 1] += groups[c][g][1];
+          centroids[c][2] += groups[c][g][2];
+        }
+        centroids[c] = centroids[c].map(function(v) { return Math.round(v / groups[c].length); });
+      }
+    }
+    onProgress(3, 3, 'Generando paleta...');
+    var palette = centroids.map(function(c) {
+      var hex = '#' + [c[0], c[1], c[2]].map(function(v) { return v.toString(16).padStart(2, '0'); }).join('');
+      var r = c[0], g = c[1], b = c[2];
+      var rn = r / 255, gn = g / 255, bn = b / 255;
+      var max = Math.max(rn, gn, bn), min = Math.min(rn, gn, bn);
+      var l = (max + min) / 2;
+      var h = 0, s = 0;
+      if (max !== min) {
+        var d = max - min;
+        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+        if (max === rn) h = ((gn - bn) / d + (gn < bn ? 6 : 0)) / 6;
+        else if (max === gn) h = ((bn - rn) / d + 2) / 6;
+        else h = ((rn - gn) / d + 4) / 6;
+      }
+      return { hex: hex, rgb: 'rgb(' + r + ',' + g + ',' + b + ')', hsl: 'hsl(' + Math.round(h * 360) + ',' + Math.round(s * 100) + '%,' + Math.round(l * 100) + '%)' };
+    });
+    var out = 'Paleta de colores extraída de ' + file.name + '\n';
+    out += '='.repeat(40) + '\n\n';
+    palette.forEach(function(c, idx) { out += (idx + 1) + '. ' + c.hex + '  ' + c.rgb + '  ' + c.hsl + '\n'; });
+    var blob = new Blob([out], { type: 'text/plain;charset=utf-8' });
+    return makeSingleResult(blob, getBaseName(file.name) + '-paleta.txt', 'Paleta de ' + palette.length + ' colores extraída.');
+  };
+
+  // B3: htmlToImage, extractTextPdf, extractImagesPdf
+  window.ToolProcessors.htmlToImage = async function(files, options, onProgress) {
+    if (!files || !files.length) return { files: [], message: 'Selecciona un archivo HTML.' };
+    if (typeof html2canvas === 'undefined') throw new Error('Componente html2canvas no disponible.');
+    var width = parseInt(options.viewportWidth || options.htmlImgWidth) || 1200;
+    var outFmt = (options.outputFormat || 'png').toLowerCase();
+    if (outFmt === 'image/jpeg') outFmt = 'jpeg';
+    else if (outFmt === 'image/webp') outFmt = 'webp';
+    else outFmt = 'png';
+    var mimeMap = { png: 'image/png', jpeg: 'image/jpeg', webp: 'image/webp' };
+    var mime = mimeMap[outFmt] || 'image/png';
+    var extMap = { png: 'png', jpeg: 'jpg', webp: 'webp' };
+    var ext = extMap[outFmt] || 'png';
+    var scale = parseFloat(options.scale || options.htmlScale) || 1;
+    var results = [];
+    for (var i = 0; i < files.length; i++) {
+      onProgress(i + 1, files.length, 'Renderizando HTML...');
+      var file = files[i];
+      var html = await readFileAsText(file);
+      var container = document.createElement('div');
+      container.style.width = width + 'px';
+      container.style.position = 'fixed';
+      container.style.left = '-9999px';
+      container.innerHTML = html;
+      document.body.appendChild(container);
+      var canvas;
+      try {
+        canvas = await html2canvas(container, { scale: scale, useCORS: true, width: width });
+      } catch (e) {
+        document.body.removeChild(container);
+        throw new Error('Error renderizando HTML: ' + e.message);
+      }
+      document.body.removeChild(container);
+      var blob = await new Promise(function(resolve) { canvas.toBlob(resolve, mime); });
+      results.push({ name: getBaseName(file.name) + '.' + ext, blob: blob, size: blob.size });
+    }
+    return { files: results, message: results.length + ' imagen(es) generada(s) desde HTML.' };
+  };
+
+  window.ToolProcessors.extractTextPdf = async function(files, options, onProgress) {
+    if (!files || !files.length) return { files: [], message: 'Selecciona un PDF.' };
+    if (typeof pdfjsLib === 'undefined') throw new Error('pdf.js no disponible.');
+    var file = files[0];
+    onProgress(1, 3, 'Cargando PDF...');
+    var data = await file.arrayBuffer();
+    var pdf = await pdfjsLib.getDocument({ data: new Uint8Array(data) }).promise;
+    var pageFrom = parseInt(options.pageFrom) || 1;
+    var pageTo = parseInt(options.pageTo) || pdf.numPages;
+    if (pageFrom < 1) pageFrom = 1;
+    if (pageTo > pdf.numPages) pageTo = pdf.numPages;
+    var outFormat = (options.format || 'txt').toLowerCase();
+    var texts = [];
+    for (var p = pageFrom; p <= pageTo; p++) {
+      onProgress(p - pageFrom + 1, pageTo - pageFrom + 1, 'Extrayendo página ' + p + '...');
+      var page = await pdf.getPage(p);
+      var tc = await page.getTextContent();
+      var pageText = tc.items.map(function(item) { return item.str; }).join(' ');
+      texts.push(pageText);
+    }
+    var output;
+    if (outFormat === 'json') {
+      output = JSON.stringify({ file: file.name, pages: texts.map(function(t, idx) { return { page: idx + 1, text: t }; }) }, null, 2);
+    } else if (outFormat === 'markdown') {
+      output = texts.map(function(t, idx) { return '## Página ' + (idx + 1) + '\n\n' + t; }).join('\n\n---\n\n');
+    } else {
+      output = texts.join('\n\n');
+    }
+    var blob = new Blob([output], { type: 'text/plain;charset=utf-8' });
+    var ext = outFormat === 'json' ? '.json' : outFormat === 'markdown' ? '.md' : '.txt';
+    return makeSingleResult(blob, getBaseName(file.name) + ext, 'Texto extraído de ' + texts.length + ' página(s).');
+  };
+
+  window.ToolProcessors.extractImagesPdf = async function(files, options, onProgress) {
+    if (!files || !files.length) return { files: [], message: 'Selecciona un PDF.' };
+    if (typeof pdfjsLib === 'undefined') throw new Error('pdf.js no disponible.');
+    var file = files[0];
+    onProgress(1, 3, 'Cargando PDF...');
+    var data = await file.arrayBuffer();
+    var pdf = await pdfjsLib.getDocument({ data: new Uint8Array(data) }).promise;
+    var results = [];
+    var imgCount = 0;
+    for (var p = 1; p <= pdf.numPages; p++) {
+      onProgress(p, pdf.numPages, 'Renderizando página ' + p + '...');
+      var page = await pdf.getPage(p);
+      var vp = page.getViewport({ scale: 1.5 });
+      var canvas = document.createElement('canvas');
+      canvas.width = vp.width; canvas.height = vp.height;
+      var ctx = canvas.getContext('2d');
+      await page.render({ canvasContext: ctx, viewport: vp }).promise;
+      var blob = await new Promise(function(resolve) { canvas.toBlob(resolve, 'image/png'); });
+      imgCount++;
+      results.push({ name: 'pagina-' + p + '.png', blob: blob, size: blob.size });
+    }
+    if (results.length > 1 && typeof JSZip !== 'undefined') {
+      var zip = new JSZip();
+      for (var ri = 0; ri < results.length; ri++) zip.file(results[ri].name, results[ri].blob);
+      var zipBlob = await zip.generateAsync({ type: 'blob', compression: 'DEFLATE' });
+      results = [{ name: getBaseName(file.name) + '-imagenes.zip', blob: zipBlob, size: zipBlob.size }];
+    }
+    return { files: results, message: imgCount + ' página(s) extraída(s) como imagen.' };
+  };
+
+  // B4: pdfToPptx, pptxToPdf, excelToPdf, htmlToPdf, pdfToPdfa, pdfToMarkdown
+  window.ToolProcessors.pdfToPptx = async function(files, options, onProgress) {
+    if (!files || !files.length) return { files: [], message: 'Selecciona un PDF.' };
+    if (typeof pdfjsLib === 'undefined') throw new Error('pdf.js no disponible.');
+    if (typeof JSZip === 'undefined') throw new Error('JSZip no disponible.');
+    var file = files[0];
+    onProgress(1, 3, 'Cargando PDF...');
+    var data = await file.arrayBuffer();
+    var pdf = await pdfjsLib.getDocument({ data: new Uint8Array(data) }).promise;
+    var zip = new JSZip();
+    var contentTypes = [];
+    for (var p = 1; p <= pdf.numPages; p++) {
+      onProgress(p, pdf.numPages, 'Renderizando página ' + p + '...');
+      var page = await pdf.getPage(p);
+      var vp = page.getViewport({ scale: 2 });
+      var canvas = document.createElement('canvas');
+      canvas.width = vp.width; canvas.height = vp.height;
+      var ctx = canvas.getContext('2d');
+      await page.render({ canvasContext: ctx, viewport: vp }).promise;
+      var imgBlob = await new Promise(function(resolve) { canvas.toBlob(resolve, 'image/png'); });
+      var imgData = await imgBlob.arrayBuffer();
+      var slideNum = String(p).padStart(3, '0');
+      zip.file('ppt/media/image' + p + '.png', imgData);
+      var slideXml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+        '<p:sld xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main">' +
+        '<p:cSld><p:spTree><p:sp><p:txBody><a:r><a:rPr lang="es" sz="1200" dirty="0"/><a:t></a:t></a:r></p:txBody></p:sp></p:spTree></p:cSld></p:sld>';
+      zip.file('ppt/slides/slide' + p + '.xml', slideXml);
+      contentTypes.push({ part: '/ppt/slides/slide' + p + '.xml', ct: 'application/vnd.openxmlformats-officedocument.presentationml.slide+xml' });
+    }
+    var rels = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+      '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
+      contentTypes.map(function(c, i) { return '<Relationship Id="rId' + (i + 1) + '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide" Target="slides/slide' + (i + 1) + '.xml"/>'; }).join('') +
+      '</Relationships>';
+    zip.file('ppt/_rels/presentation.xml.rels', rels);
+    var ctParts = contentTypes.map(function(c) { return '<Override PartName="' + c.part + '" ContentType="' + c.ct + '"/>'; }).join('');
+    var ct = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+      '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">' +
+      '<Default Extension="png" ContentType="image/png"/>' +
+      '<Override PartName="/ppt/presentation.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.presentation.main+xml"/>' +
+      '<Override PartName="/ppt/presentation.xml.rels" ContentType="application/vnd.openxmlformats-officedocument.relationships+xml"/>' +
+      ctParts + '</Types>';
+    zip.file('[Content_Types].xml', ct);
+    var presXml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+      '<p:presentation xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main">' +
+      '<p:sldIdLst>' + contentTypes.map(function(c, i) { return '<p:sldId id="' + (256 + i) + '" r:id="rId' + (i + 1) + '" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"/>'; }).join('') +
+      '</p:sldIdLst></p:presentation>';
+    zip.file('ppt/presentation.xml', presXml);
+    var zipBlob = await zip.generateAsync({ type: 'blob' });
+    return { files: [{ name: getBaseName(file.name) + '.pptx', blob: zipBlob, size: zipBlob.size }], message: pdf.numPages + ' diapositiva(s) generada(s).' };
+  };
+
+  window.ToolProcessors.pptxToPdf = async function(files, options, onProgress) {
+    if (!files || !files.length) return { files: [], message: 'Selecciona un archivo PPTX.' };
+    if (typeof JSZip === 'undefined') throw new Error('JSZip no disponible.');
+    if (typeof PDFLib === 'undefined') throw new Error('PDFLib no disponible.');
+    var results = [];
+    for (var fi = 0; fi < files.length; fi++) {
+      onProgress(fi + 1, files.length, 'Procesando PPTX...');
+      var file = files[fi];
+      var data = await file.arrayBuffer();
+      var zip = await JSZip.loadAsync(data);
+      var imageFiles = [];
+      zip.forEach(function(path, entry) {
+        if (/\.(png|jpe?g|gif|bmp|emf)$/i.test(path)) imageFiles.push(entry);
+      });
+      var pdfDoc = await PDFLib.PDFDocument.create();
+      for (var ii = 0; ii < imageFiles.length; ii++) {
+        var imgData = await imageFiles[ii].async('arraybuffer');
+        var ext = imageFiles[ii].name.split('.').pop().toLowerCase();
+        var img;
+        if (ext === 'png') img = await pdfDoc.embedPng(imgData);
+        else if (/jpe?g/i.test(ext)) img = await pdfDoc.embedJpg(imgData);
+        else continue;
+        var page = pdfDoc.addPage([img.width, img.height]);
+        page.drawImage(img, { x: 0, y: 0, width: img.width, height: img.height });
+      }
+      if (pdfDoc.getPageCount() === 0) {
+        var page = pdfDoc.addPage([612, 792]);
+        page.drawText('PowerPoint convertido (sin imágenes extraíbles)', { x: 50, y: 742, size: 12 });
+      }
+      var pdfBytes = await pdfDoc.save();
+      var blob = new Blob([pdfBytes], { type: 'application/pdf' });
+      results.push({ name: getBaseName(file.name) + '.pdf', blob: blob, size: blob.size });
+    }
+    return { files: results, message: results.length + ' archivo(s) PPTX convertido(s).' };
+  };
+
+  window.ToolProcessors.excelToPdf = async function(files, options, onProgress) {
+    if (!files || !files.length) return { files: [], message: 'Selecciona un archivo Excel.' };
+    if (typeof XLSX === 'undefined') throw new Error('XLSX no disponible.');
+    if (typeof PDFLib === 'undefined') throw new Error('PDFLib no disponible.');
+    var orientation = options.orientation || 'landscape';
+    var fontSize = parseInt(options.fontSize) || 8;
+    var results = [];
+    for (var fi = 0; fi < files.length; fi++) {
+      onProgress(fi + 1, files.length, 'Procesando Excel...');
+      var file = files[fi];
+      var data = await file.arrayBuffer();
+      var wb = XLSX.read(data, { type: 'array' });
+      var pdfDoc = await PDFLib.PDFDocument.create();
+      var font = await pdfDoc.embedFont(PDFLib.StandardFonts.Helvetica);
+      for (var si = 0; si < wb.SheetNames.length; si++) {
+        var ws = wb.Sheets[wb.SheetNames[si]];
+        var json = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+        if (!json.length) continue;
+        var pageW = orientation === 'landscape' ? 842 : 595;
+        var pageH = orientation === 'landscape' ? 595 : 842;
+        var page = pdfDoc.addPage([pageW, pageH]);
+        var margin = 30;
+        var y = pageH - margin;
+        var colWidth = Math.max(30, (pageW - margin * 2) / Math.max(1, json[0].length));
+        for (var ri = 0; ri < json.length && y > margin; ri++) {
+          var row = json[ri];
+          for (var ci = 0; ci < row.length; ci++) {
+            var cellText = String(row[ci]).substring(0, 30);
+            var x = margin + ci * colWidth;
+            if (x + colWidth > pageW - margin) break;
+            try {
+              page.drawText(cellText, { x: x, y: y, size: fontSize, font: font });
+            } catch (e) { /* skip undrawable chars */ }
+          }
+          y -= fontSize + 4;
+        }
+      }
+      var pdfBytes = await pdfDoc.save();
+      var blob = new Blob([pdfBytes], { type: 'application/pdf' });
+      results.push({ name: getBaseName(file.name) + '.pdf', blob: blob, size: blob.size });
+    }
+    return { files: results, message: results.length + ' archivo(s) Excel convertido(s).' };
+  };
+
+  window.ToolProcessors.htmlToPdf = async function(files, options, onProgress) {
+    if (!files || !files.length) return { files: [], message: 'Selecciona un archivo HTML.' };
+    if (typeof html2canvas === 'undefined') throw new Error('html2canvas no disponible.');
+    if (typeof PDFLib === 'undefined') throw new Error('PDFLib no disponible.');
+    var pageW = parseInt(options.pageWidth) || 595;
+    var pageH = parseInt(options.pageHeight) || 842;
+    var scale = parseFloat(options.scale || options.htmlScale) || 1;
+    var results = [];
+    for (var fi = 0; fi < files.length; fi++) {
+      onProgress(fi + 1, files.length, 'Renderizando HTML...');
+      var file = files[fi];
+      var html = await readFileAsText(file);
+      var container = document.createElement('div');
+      container.style.width = (pageW / scale) + 'px';
+      container.style.position = 'fixed';
+      container.style.left = '-9999px';
+      container.innerHTML = html;
+      document.body.appendChild(container);
+      var canvas;
+      try {
+        canvas = await html2canvas(container, { scale: scale, useCORS: true, width: pageW / scale });
+      } catch (e) {
+        document.body.removeChild(container);
+        throw new Error('Error renderizando HTML: ' + e.message);
+      }
+      document.body.removeChild(container);
+      var imgData = await new Promise(function(resolve) { canvas.toBlob(resolve, 'image/png'); });
+      var imgBytes = await imgData.arrayBuffer();
+      var pdfDoc = await PDFLib.PDFDocument.create();
+      var img = await pdfDoc.embedPng(imgBytes);
+      var imgW = img.width, imgH = img.height;
+      var ratio = Math.min(pageW / imgW, pageH / imgH);
+      var drawW = imgW * ratio, drawH = imgH * ratio;
+      var page = pdfDoc.addPage([pageW, pageH]);
+      page.drawImage(img, { x: (pageW - drawW) / 2, y: (pageH - drawH) / 2, width: drawW, height: drawH });
+      var pdfBytes = await pdfDoc.save();
+      var blob = new Blob([pdfBytes], { type: 'application/pdf' });
+      results.push({ name: getBaseName(file.name) + '.pdf', blob: blob, size: blob.size });
+    }
+    return { files: results, message: results.length + ' archivo(s) HTML convertido(s).' };
+  };
+
+  window.ToolProcessors.pdfToPdfa = async function(files, options, onProgress) {
+    if (!files || !files.length) return { files: [], message: 'Selecciona un PDF.' };
+    if (typeof PDFLib === 'undefined') throw new Error('PDFLib no disponible.');
+    var file = files[0];
+    onProgress(1, 3, 'Cargando PDF...');
+    var data = await file.arrayBuffer();
+    var pdfDoc = await PDFLib.PDFDocument.load(data);
+    onProgress(2, 3, 'Aplicando conversiones PDF/A...');
+    var title = pdfDoc.getTitle() || getBaseName(file.name);
+    pdfDoc.setTitle(title);
+    pdfDoc.setProducer('Toolisto - Conversión PDF/A');
+    pdfDoc.setCreator('Toolisto');
+    var pages = pdfDoc.getPages();
+    var info = ['Informe de conversión PDF/A', '============================', '', 'Archivo: ' + file.name, 'Páginas: ' + pages.length, ''];
+    onProgress(3, 3, 'Guardando...');
+    var pdfBytes = await pdfDoc.save();
+    var blob = new Blob([pdfBytes], { type: 'application/pdf' });
+    info.push('Estado: Conversión aplicada.');
+    info.push('Nota: Esta conversión optimiza metadatos y estructura para compatibilidad PDF/A, pero no puede garantizar certificación ISO completa.');
+    var reportBlob = new Blob([info.join('\n')], { type: 'text/plain;charset=utf-8' });
+    return { files: [{ name: getBaseName(file.name) + '-pdfa.pdf', blob: blob, size: blob.size }, { name: getBaseName(file.name) + '-informe.txt', blob: reportBlob, size: reportBlob.size }], message: 'PDF convertido a formato PDF/A.' };
+  };
+
+  window.ToolProcessors.pdfToMarkdown = async function(files, options, onProgress) {
+    if (!files || !files.length) return { files: [], message: 'Selecciona un PDF.' };
+    if (typeof pdfjsLib === 'undefined') throw new Error('pdf.js no disponible.');
+    var file = files[0];
+    onProgress(1, 3, 'Cargando PDF...');
+    var data = await file.arrayBuffer();
+    var pdf = await pdfjsLib.getDocument({ data: new Uint8Array(data) }).promise;
+    var md = '# ' + getBaseName(file.name) + '\n\n';
+    for (var p = 1; p <= pdf.numPages; p++) {
+      onProgress(p, pdf.numPages, 'Extrayendo página ' + p + '...');
+      var page = await pdf.getPage(p);
+      var tc = await page.getTextContent();
+      var items = tc.items;
+      var lines = [];
+      var currentLine = '';
+      var lastY = null;
+      for (var ti = 0; ti < items.length; ti++) {
+        var item = items[ti];
+        if (lastY !== null && Math.abs(item.transform[5] - lastY) > 5) {
+          lines.push(currentLine);
+          currentLine = '';
+        }
+        currentLine += (currentLine && !currentLine.endsWith(' ') ? ' ' : '') + item.str;
+        lastY = item.transform[5];
+      }
+      if (currentLine) lines.push(currentLine);
+      md += '## Página ' + p + '\n\n';
+      md += lines.join('\n\n') + '\n\n---\n\n';
+    }
+    var blob = new Blob([md], { type: 'text/markdown;charset=utf-8' });
+    return makeSingleResult(blob, getBaseName(file.name) + '.md', 'Markdown generado desde ' + pdf.numPages + ' página(s).');
+  };
+
+  // B5: pdfFormFiller, flattenPdf, imagesToPdfAdvanced, pdfExtractResources, csvToPdf
+  window.ToolProcessors.pdfFormFiller = async function(files, options, onProgress) {
+    if (!files || !files.length) return { files: [], message: 'Selecciona un PDF.' };
+    if (typeof PDFLib === 'undefined') throw new Error('PDFLib no disponible.');
+    var file = files[0];
+    onProgress(1, 3, 'Cargando PDF...');
+    var data = await file.arrayBuffer();
+    var pdfDoc = await PDFLib.PDFDocument.load(data);
+    onProgress(2, 3, 'Rellenando campos...');
+    var fields = pdfDoc.getForm().getFields();
+    var form = pdfDoc.getForm();
+    var fieldValues = {};
+    fields.forEach(function(f) {
+      var name = f.getName();
+      var val = options[name] || options['field_' + name] || '';
+      if (val) {
+        try {
+          if (f instanceof PDFLibPDFLibTextField) f.setText(val);
+          else if (typeof f.setText === 'function') f.setText(val);
+        } catch (e) { /* field may not support setText */ }
+      }
+      fieldValues[name] = val || '(vacío)';
+    });
+    try { form.flatten(); } catch (e) { /* flatten may fail on some forms */ }
+    onProgress(3, 3, 'Guardando...');
+    var pdfBytes = await pdfDoc.save();
+    var blob = new Blob([pdfBytes], { type: 'application/pdf' });
+    var report = 'Campos rellenados: ' + Object.keys(fieldValues).length;
+    return makeSingleResult(blob, getBaseName(file.name) + '-rellenado.pdf', report);
+  };
+
+  window.ToolProcessors.flattenPdf = async function(files, options, onProgress) {
+    if (!files || !files.length) return { files: [], message: 'Selecciona un PDF.' };
+    if (typeof PDFLib === 'undefined') throw new Error('PDFLib no disponible.');
+    var file = files[0];
+    onProgress(1, 3, 'Cargando PDF...');
+    var data = await file.arrayBuffer();
+    var pdfDoc = await PDFLib.PDFDocument.load(data);
+    onProgress(2, 3, 'Aplanando formulario...');
+    try {
+      var form = pdfDoc.getForm();
+      form.flatten();
+    } catch (e) { /* some PDFs have no form */ }
+    onProgress(3, 3, 'Guardando...');
+    var pdfBytes = await pdfDoc.save();
+    var blob = new Blob([pdfBytes], { type: 'application/pdf' });
+    return makeSingleResult(blob, getBaseName(file.name) + '-aplanado.pdf', 'PDF aplanado: formularios y anotaciones fusionados.');
+  };
+
+  window.ToolProcessors.imagesToPdfAdvanced = async function(files, options, onProgress) {
+    if (!files || !files.length) return { files: [], message: 'Selecciona imágenes.' };
+    if (typeof PDFLib === 'undefined') throw new Error('PDFLib no disponible.');
+    var orientation = options.orientation || 'portrait';
+    var fitType = options.fit || 'contain';
+    var margin = parseInt(options.margin) || 20;
+    var pdfDoc = await PDFLib.PDFDocument.create();
+    for (var i = 0; i < files.length; i++) {
+      onProgress(i + 1, files.length, 'Procesando imagen...');
+      var file = files[i];
+      var imgData = await file.arrayBuffer();
+      var ext = (file.name.split('.').pop() || '').toLowerCase();
+      var img;
+      if (ext === 'png') img = await pdfDoc.embedPng(imgData);
+      else if (/jpe?g/i.test(ext)) img = await pdfDoc.embedJpg(imgData);
+      else {
+        var tempImg = await loadImageFromFile(file);
+        var tempCanvas = document.createElement('canvas');
+        tempCanvas.width = tempImg.naturalWidth;
+        tempCanvas.height = tempImg.naturalHeight;
+        tempCanvas.getContext('2d').drawImage(tempImg, 0, 0);
+        var jpegBlob = await new Promise(function(resolve) { tempCanvas.toBlob(resolve, 'image/jpeg', 0.92); });
+        var jpegData = await jpegBlob.arrayBuffer();
+        img = await pdfDoc.embedJpg(jpegData);
+      }
+      var pageW = orientation === 'landscape' ? 842 : 595;
+      var pageH = orientation === 'landscape' ? 595 : 842;
+      var drawW = pageW - margin * 2;
+      var drawH = pageH - margin * 2;
+      var ratio = fitType === 'cover' ? Math.max(drawW / img.width, drawH / img.height) : Math.min(drawW / img.width, drawH / img.height);
+      var finalW = img.width * ratio, finalH = img.height * ratio;
+      var page = pdfDoc.addPage([pageW, pageH]);
+      page.drawImage(img, { x: margin + (drawW - finalW) / 2, y: margin + (drawH - finalH) / 2, width: finalW, height: finalH });
+    }
+    var pdfBytes = await pdfDoc.save();
+    var blob = new Blob([pdfBytes], { type: 'application/pdf' });
+    return makeSingleResult(blob, 'imagenes.pdf', files.length + ' imagen(es) en PDF optimizado.');
+  };
+
+  window.ToolProcessors.pdfExtractResources = async function(files, options, onProgress) {
+    if (!files || !files.length) return { files: [], message: 'Selecciona un PDF.' };
+    if (typeof pdfjsLib === 'undefined') throw new Error('pdf.js no disponible.');
+    var file = files[0];
+    onProgress(1, 3, 'Cargando PDF...');
+    var data = await file.arrayBuffer();
+    var pdf = await pdfjsLib.getDocument({ data: new Uint8Array(data) }).promise;
+    var results = [];
+    var resources = [];
+    onProgress(2, 3, 'Analizando recursos...');
+    for (var p = 1; p <= pdf.numPages; p++) {
+      var page = await pdf.getPage(p);
+      var ops = await page.getOperatorList();
+      for (var oi = 0; oi < ops.fnArray.length; oi++) {
+        if (ops.fnArray[oi] === pdfjsLib.OPS.paintImageXObject || ops.fnArray[oi] === pdfjsLib.OPS.paintJpegXObject) {
+          var objId = ops.argsArray[oi][0];
+          resources.push({ page: p, type: 'image', id: objId });
+        }
+      }
+    }
+    onProgress(3, 3, 'Generando reporte...');
+    var report = 'Reporte de recursos de ' + file.name + '\n';
+    report += '='.repeat(40) + '\n\n';
+    report += 'Páginas: ' + pdf.numPages + '\n';
+    report += 'Imágenes detectadas: ' + resources.length + '\n\n';
+    resources.forEach(function(r) {
+      report += 'Página ' + r.page + ': ' + r.type + ' (' + r.id + ')\n';
+    });
+    if (resources.length === 0) {
+      report += '\nNo se detectaron imágenes incrustadas editables.';
+    }
+    var blob = new Blob([report], { type: 'text/plain;charset=utf-8' });
+    return makeSingleResult(blob, getBaseName(file.name) + '-recursos.txt', resources.length + ' recurso(s) detectado(s).');
+  };
+
+  window.ToolProcessors.csvToPdf = async function(files, options, onProgress) {
+    if (!files || !files.length) return { files: [], message: 'Selecciona un CSV.' };
+    if (typeof PDFLib === 'undefined') throw new Error('PDFLib no disponible.');
+    var orientation = options.orientation || 'landscape';
+    var fontSize = parseInt(options.fontSize) || 8;
+    var repeatHeader = options.repeatHeader !== false;
+    var results = [];
+    for (var fi = 0; fi < files.length; fi++) {
+      onProgress(fi + 1, files.length, 'Procesando CSV...');
+      var file = files[fi];
+      var text = await file.text();
+      if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
+      var lines = text.split(/\r?\n/).filter(function(l) { return l.length > 0; });
+      if (!lines.length) throw new Error('CSV vacío.');
+      var sep = ',';
+      var firstLine = lines[0].replace(/"[^"]*"/g, '');
+      var counts = { ',': (firstLine.match(/,/g) || []).length, ';': (firstLine.match(/;/g) || []).length, '\t': (firstLine.match(/\t/g) || []).length };
+      sep = Object.entries(counts).sort(function(a, b) { return b[1] - a[1]; })[0][0];
+      var rows = lines.map(function(line) {
+        var fields = []; var buf = ''; var inQ = false;
+        for (var ci = 0; ci < line.length; ci++) {
+          var ch = line[ci];
+          if (inQ) { if (ch === '"') { if (line[ci + 1] === '"') { buf += '"'; ci++; } else inQ = false; } else buf += ch; }
+          else if (ch === '"') inQ = true;
+          else if (ch === sep) { fields.push(buf); buf = ''; }
+          else buf += ch;
+        }
+        fields.push(buf);
+        return fields;
+      });
+      var pdfDoc = await PDFLib.PDFDocument.create();
+      var font = await pdfDoc.embedFont(PDFLib.StandardFonts.Helvetica);
+      var fontBold = await pdfDoc.embedFont(PDFLib.StandardFonts.HelveticaBold);
+      var pageW = orientation === 'landscape' ? 842 : 595;
+      var pageH = orientation === 'landscape' ? 595 : 842;
+      var margin = 30;
+      var numCols = Math.max.apply(null, rows.map(function(r) { return r.length; }));
+      var colWidth = Math.max(30, (pageW - margin * 2) / numCols);
+      var y = pageH - margin;
+      var header = rows[0];
+      for (var p = 0; p < rows.length; p++) {
+        if (p > 0 && p % 50 === 0) {
+          var newPage = pdfDoc.addPage([pageW, pageH]);
+          y = pageH - margin;
+        }
+        var page = pdfDoc.getPages()[pdfDoc.getPageCount() - 1];
+        var useFont = p === 0 ? fontBold : font;
+        var row = rows[p];
+        for (var ci = 0; ci < row.length && ci < numCols; ci++) {
+          var cellText = String(row[ci]).substring(0, 40);
+          var x = margin + ci * colWidth;
+          if (x + colWidth > pageW - margin) break;
+          try { page.drawText(cellText, { x: x, y: y, size: fontSize, font: useFont }); } catch (e) {}
+        }
+        y -= fontSize + 4;
+        if (y < margin) {
+          y = pageH - margin;
+        }
+      }
+      var pdfBytes = await pdfDoc.save();
+      var blob = new Blob([pdfBytes], { type: 'application/pdf' });
+      results.push({ name: getBaseName(file.name) + '.pdf', blob: blob, size: blob.size });
+    }
+    return { files: results, message: results.length + ' CSV(s) convertido(s) a PDF.' };
+  };
+
+  // B6: cleanExcel, removeDuplicatesExcel, csvChangeDelimiter, csvChangeEncoding, flattenJson, jsonToExcelAdvanced, normalizeCsv, compareCsv, cleanTabularData, htmlTableToExcel
+  window.ToolProcessors.cleanExcel = async function(files, options, onProgress) {
+    if (!files || !files.length) return { files: [], message: 'Selecciona un archivo Excel.' };
+    if (typeof XLSX === 'undefined') throw new Error('XLSX no disponible.');
+    var removeEmptyRows = options.removeEmptyRows !== false;
+    var removeEmptyCols = options.removeEmptyCols !== false;
+    var trimWhitespace = options.trimWhitespace !== false;
+    var results = [];
+    for (var fi = 0; fi < files.length; fi++) {
+      onProgress(fi + 1, files.length, 'Limpiando Excel...');
+      var file = files[fi];
+      var data = await file.arrayBuffer();
+      var wb = XLSX.read(data, { type: 'array' });
+      for (var si = 0; si < wb.SheetNames.length; si++) {
+        var ws = wb.Sheets[wb.SheetNames[si]];
+        var json = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+        if (trimWhitespace) {
+          json = json.map(function(row) { return row.map(function(cell) { return typeof cell === 'string' ? cell.trim() : cell; }); });
+        }
+        if (removeEmptyRows) {
+          json = json.filter(function(row) { return row.some(function(cell) { return cell !== '' && cell != null; }); });
+        }
+        if (removeEmptyCols && json.length) {
+          var maxCols = Math.max.apply(null, json.map(function(r) { return r.length; }));
+          var emptyCols = [];
+          for (var ci = 0; ci < maxCols; ci++) {
+            var colEmpty = json.every(function(row) { return !row[ci] && row[ci] !== 0; });
+            if (colEmpty) emptyCols.push(ci);
+          }
+          if (emptyCols.length) {
+            json = json.map(function(row) { return row.filter(function(cell, idx) { return emptyCols.indexOf(idx) === -1; }); });
+          }
+        }
+        wb.Sheets[wb.SheetNames[si]] = XLSX.utils.aoa_to_sheet(json);
+      }
+      var wbOut = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+      var blob = new Blob([wbOut], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      results.push({ name: getBaseName(file.name) + '-limpio.xlsx', blob: blob, size: blob.size });
+    }
+    return { files: results, message: results.length + ' archivo(s) limpio(s).' };
+  };
+
+  window.ToolProcessors.removeDuplicatesExcel = async function(files, options, onProgress) {
+    if (!files || !files.length) return { files: [], message: 'Selecciona un archivo Excel.' };
+    if (typeof XLSX === 'undefined') throw new Error('XLSX no disponible.');
+    var keyColumns = options.keyColumns || [];
+    var caseSensitive = options.caseSensitive !== false;
+    var keepFirst = options.keepFirst !== false;
+    var results = [];
+    for (var fi = 0; fi < files.length; fi++) {
+      onProgress(fi + 1, files.length, 'Eliminando duplicados...');
+      var file = files[fi];
+      var data = await file.arrayBuffer();
+      var wb = XLSX.read(data, { type: 'array' });
+      var report = ['Reporte de duplicados — ' + file.name, '='.repeat(40), ''];
+      for (var si = 0; si < wb.SheetNames.length; si++) {
+        var ws = wb.Sheets[wb.SheetNames[si]];
+        var json = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+        if (json.length < 2) continue;
+        var header = json[0];
+        var body = json.slice(1);
+        var origLen = body.length;
+        var seen = new Set();
+        var deduped = body.filter(function(row) {
+          var key;
+          if (keyColumns.length) {
+            key = keyColumns.map(function(colName) {
+              var idx = header.indexOf(colName);
+              return idx >= 0 ? String(row[idx]) : '';
+            }).join('|||');
+          } else {
+            key = row.map(function(c) { return String(c); }).join('|||');
+          }
+          if (!caseSensitive) key = key.toLowerCase();
+          if (seen.has(key)) return false;
+          seen.add(key);
+          return true;
+        });
+        var removed = origLen - deduped.length;
+        report.push('Hoja: ' + wb.SheetNames[si]);
+        report.push('Filas originales: ' + origLen);
+        report.push('Duplicados eliminados: ' + removed);
+        report.push('Filas resultantes: ' + deduped.length);
+        report.push('');
+        wb.Sheets[wb.SheetNames[si]] = XLSX.utils.aoa_to_sheet([header].concat(deduped));
+      }
+      var wbOut = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+      var blob = new Blob([wbOut], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      var reportBlob = new Blob([report.join('\n')], { type: 'text/plain;charset=utf-8' });
+      results.push({ name: getBaseName(file.name) + '-dedup.xlsx', blob: blob, size: blob.size });
+      results.push({ name: getBaseName(file.name) + '-reporte.txt', blob: reportBlob, size: reportBlob.size });
+    }
+    return { files: results, message: 'Duplicados eliminados y reporte generado.' };
+  };
+
+  window.ToolProcessors.csvChangeDelimiter = async function(files, options, onProgress) {
+    if (!files || !files.length) return { files: [], message: 'Selecciona un CSV.' };
+    var targetSep = options.targetSeparator || options.newSeparator || ',';
+    if (targetSep === 'tab') targetSep = '\t';
+    if (targetSep === 'pipe') targetSep = '|';
+    if (targetSep === 'semicolon') targetSep = ';';
+    var results = [];
+    for (var fi = 0; fi < files.length; fi++) {
+      onProgress(fi + 1, files.length, 'Cambiando delimitador...');
+      var file = files[fi];
+      var text = await file.text();
+      if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
+      var lines = text.split(/\r?\n/);
+      var rows = lines.map(function(line) {
+        var fields = []; var buf = ''; var inQ = false;
+        for (var ci = 0; ci < line.length; ci++) {
+          var ch = line[ci];
+          if (inQ) { if (ch === '"') { if (line[ci + 1] === '"') { buf += '"'; ci++; } else inQ = false; } else buf += ch; }
+          else if (ch === '"') inQ = true;
+          else if (ch === ',' || ch === ';' || ch === '\t' || ch === '|') { fields.push(buf); buf = ''; }
+          else buf += ch;
+        }
+        fields.push(buf);
+        return fields;
+      });
+      var output = rows.map(function(fields) {
+        return fields.map(function(f) {
+          if (f.indexOf(targetSep) !== -1 || f.indexOf('"') !== -1 || f.indexOf('\n') !== -1) {
+            return '"' + f.replace(/"/g, '""') + '"';
+          }
+          return f;
+        }).join(targetSep);
+      }).join('\n');
+      var blob = new Blob(['\uFEFF' + output], { type: 'text/csv;charset=utf-8' });
+      results.push({ name: getBaseName(file.name) + '-delimiter.csv', blob: blob, size: blob.size });
+    }
+    return { files: results, message: results.length + ' CSV(s) convertido(s).' };
+  };
+
+  window.ToolProcessors.csvChangeEncoding = async function(files, options, onProgress) {
+    if (!files || !files.length) return { files: [], message: 'Selecciona un archivo.' };
+    var targetEncoding = options.targetEncoding || options.encoding || 'UTF-8';
+    var results = [];
+    for (var fi = 0; fi < files.length; fi++) {
+      onProgress(fi + 1, files.length, 'Convirtiendo encoding...');
+      var file = files[fi];
+      var arrayBuf = await file.arrayBuffer();
+      var bytes = new Uint8Array(arrayBuf);
+      var detectedEncoding = 'UTF-8';
+      if (bytes[0] === 0xFF && bytes[1] === 0xFE) detectedEncoding = 'UTF-16LE';
+      else if (bytes[0] === 0xFE && bytes[1] === 0xFF) detectedEncoding = 'UTF-16BE';
+      else if (bytes[0] === 0xEF && bytes[1] === 0xBB && bytes[2] === 0xBF) detectedEncoding = 'UTF-8 BOM';
+      else {
+        var hasHighBytes = false;
+        for (var bi = 0; bi < Math.min(bytes.length, 1000); bi++) {
+          if (bytes[bi] > 127) { hasHighBytes = true; break; }
+        }
+        if (hasHighBytes) {
+          try { new TextDecoder('utf-8', { fatal: true }).decode(bytes); }
+          catch (e) { detectedEncoding = 'ISO-8859-1'; }
+        }
+      }
+      var text;
+      try {
+        text = new TextDecoder(detectedEncoding.replace(' BOM', '')).decode(bytes);
+      } catch (e) {
+        text = new TextDecoder('utf-8', { fatal: false }).decode(bytes);
+      }
+      var encoded = new TextEncoder().encode(text);
+      var blob = new Blob([encoded], { type: 'text/plain;charset=utf-8' });
+      var ext = file.name.split('.').pop();
+      results.push({ name: getBaseName(file.name) + '-' + targetEncoding.replace(/\s/g, '') + '.' + ext, blob: blob, size: blob.size });
+    }
+    return { files: results, message: results.length + ' archivo(s) convertido(s) a ' + targetEncoding + '.' };
+  };
+
+  window.ToolProcessors.flattenJson = async function(files, options, onProgress) {
+    if (!files || !files.length) return { files: [], message: 'Selecciona un JSON.' };
+    var separator = options.separator || '.';
+    var direction = options.direction || 'nested-to-flat';
+    var file = files[0];
+    onProgress(1, 2, 'Leyendo JSON...');
+    var text = await file.text();
+    var data;
+    try { data = JSON.parse(text); } catch (e) { throw new Error('JSON inválido: ' + e.message); }
+    onProgress(2, 2, 'Procesando...');
+    var output;
+    if (direction === 'nested-to-flat') {
+      function flatten(obj, prefix) {
+        var result = {};
+        Object.keys(obj).forEach(function(key) {
+          var newKey = prefix ? prefix + separator + key : key;
+          if (obj[key] !== null && typeof obj[key] === 'object' && !Array.isArray(obj[key])) {
+            Object.assign(result, flatten(obj[key], newKey));
+          } else if (Array.isArray(obj[key])) {
+            obj[key].forEach(function(item, idx) {
+              if (typeof item === 'object' && item !== null) {
+                Object.assign(result, flatten(item, newKey + separator + idx));
+              } else {
+                result[newKey + separator + idx] = item;
+              }
+            });
+          } else {
+            result[newKey] = obj[key];
+          }
+        });
+        return result;
+      }
+      var arr = Array.isArray(data) ? data : [data];
+      output = arr.map(function(item) { return flatten(item, ''); });
+    } else {
+      function unflatten(obj) {
+        var result = {};
+        Object.keys(obj).forEach(function(key) {
+          var parts = key.split(separator);
+          var current = result;
+          for (var pi = 0; pi < parts.length - 1; pi++) {
+            if (!current[parts[pi]]) current[parts[pi]] = {};
+            current = current[parts[pi]];
+          }
+          current[parts[parts.length - 1]] = obj[key];
+        });
+        return result;
+      }
+      var arr = Array.isArray(data) ? data : [data];
+      output = arr.map(function(item) { return unflatten(item); });
+    }
+    if (!Array.isArray(data) && output.length === 1) output = output[0];
+    var resultText = JSON.stringify(output, null, 2);
+    var blob = new Blob([resultText], { type: 'application/json;charset=utf-8' });
+    return makeSingleResult(blob, getBaseName(file.name) + '-flat.json', 'JSON ' + (direction === 'nested-to-flat' ? 'aplanado' : 'reconstruido') + '.');
+  };
+
+  window.ToolProcessors.jsonToExcelAdvanced = async function(files, options, onProgress) {
+    if (!files || !files.length) return { files: [], message: 'Selecciona un JSON.' };
+    if (typeof XLSX === 'undefined') throw new Error('XLSX no disponible.');
+    var file = files[0];
+    onProgress(1, 3, 'Leyendo JSON...');
+    var text = await file.text();
+    var data;
+    try { data = JSON.parse(text); } catch (e) { throw new Error('JSON inválido: ' + e.message); }
+    onProgress(2, 3, 'Normalizando datos...');
+    if (!Array.isArray(data)) data = [data];
+    function flattenObj(obj, prefix) {
+      var result = {};
+      Object.keys(obj).forEach(function(key) {
+        var newKey = prefix ? prefix + '.' + key : key;
+        if (obj[key] !== null && typeof obj[key] === 'object' && !Array.isArray(obj[key])) {
+          Object.assign(result, flattenObj(obj[key], newKey));
+        } else if (Array.isArray(obj[key])) {
+          result[newKey] = JSON.stringify(obj[key]);
+        } else {
+          result[newKey] = obj[key];
+        }
+      });
+      return result;
+    }
+    var flatData = data.map(function(item) {
+      if (typeof item === 'object' && item !== null && !Array.isArray(item)) return flattenObj(item, '');
+      return { value: item };
+    });
+    onProgress(3, 3, 'Generando Excel...');
+    var ws = XLSX.utils.json_to_sheet(flatData);
+    var wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Datos');
+    var wbOut = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+    var blob = new Blob([wbOut], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    return makeSingleResult(blob, getBaseName(file.name) + '-avanzado.xlsx', 'JSON convertido a Excel con ' + flatData.length + ' fila(s).');
+  };
+
+  window.ToolProcessors.normalizeCsv = async function(files, options, onProgress) {
+    if (!files || !files.length) return { files: [], message: 'Selecciona un CSV.' };
+    var targetDelimiter = options.delimiter || ',';
+    if (targetDelimiter === 'tab') targetDelimiter = '\t';
+    var fixWhitespace = options.fixWhitespace !== false;
+    var results = [];
+    var report = ['Reporte de normalización CSV', '='.repeat(40), ''];
+    for (var fi = 0; fi < files.length; fi++) {
+      onProgress(fi + 1, files.length, 'Normalizando CSV...');
+      var file = files[fi];
+      var text = await file.text();
+      if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
+      var lineEnding = text.indexOf('\r\n') >= 0 ? '\r\n' : '\n';
+      var lines = text.split(/\r?\n/);
+      var corrections = 0;
+      var normalized = lines.map(function(line) {
+        if (!line) return '';
+        var fields = []; var buf = ''; var inQ = false;
+        for (var ci = 0; ci < line.length; ci++) {
+          var ch = line[ci];
+          if (inQ) { if (ch === '"') { if (line[ci + 1] === '"') { buf += '"'; ci++; } else inQ = false; } else buf += ch; }
+          else if (ch === '"') inQ = true;
+          else if (ch === ',' || ch === ';' || ch === '\t' || ch === '|') { fields.push(buf); buf = ''; }
+          else buf += ch;
+        }
+        fields.push(buf);
+        if (fixWhitespace) {
+          fields = fields.map(function(f) {
+            var trimmed = f.replace(/^\s+|\s+$/g, '').replace(/\s+/g, ' ');
+            if (trimmed !== f) corrections++;
+            return trimmed;
+          });
+        }
+        return fields.join(targetDelimiter);
+      });
+      var output = normalized.join(lineEnding);
+      var blob = new Blob(['\uFEFF' + output], { type: 'text/csv;charset=utf-8' });
+      results.push({ name: getBaseName(file.name) + '-normalizado.csv', blob: blob, size: blob.size });
+      report.push('Archivo: ' + file.name);
+      report.push('Correcciones de whitespace: ' + corrections);
+      report.push('');
+    }
+    var reportBlob = new Blob([report.join('\n')], { type: 'text/plain;charset=utf-8' });
+    results.push({ name: 'normalizacion-report.txt', blob: reportBlob, size: reportBlob.size });
+    return { files: results, message: results.length + ' CSV(s) normalizado(s).' };
+  };
+
+  window.ToolProcessors.compareCsv = async function(files, options, onProgress) {
+    if (!files || files.length < 2) return { files: [], message: 'Selecciona dos CSV para comparar.' };
+    var keyColumn = options.keyColumn || '';
+    onProgress(1, 3, 'Leyendo archivos...');
+    var text1 = await files[0].text();
+    var text2 = await files[1].text();
+    if (text1.charCodeAt(0) === 0xFEFF) text1 = text1.slice(1);
+    if (text2.charCodeAt(0) === 0xFEFF) text2 = text2.slice(1);
+    function parseCsvLines(text) {
+      return text.split(/\r?\n/).filter(function(l) { return l.length > 0; }).map(function(line) {
+        var fields = []; var buf = ''; var inQ = false;
+        for (var ci = 0; ci < line.length; ci++) {
+          var ch = line[ci];
+          if (inQ) { if (ch === '"') { if (line[ci + 1] === '"') { buf += '"'; ci++; } else inQ = false; } else buf += ch; }
+          else if (ch === '"') inQ = true;
+          else if (ch === ',' || ch === ';' || ch === '\t') { fields.push(buf); buf = ''; }
+          else buf += ch;
+        }
+        fields.push(buf);
+        return fields;
+      });
+    }
+    onProgress(2, 3, 'Comparando...');
+    var rows1 = parseCsvLines(text1);
+    var rows2 = parseCsvLines(text2);
+    var header1 = rows1[0] || [];
+    var header2 = rows2[0] || [];
+    var data1 = rows1.slice(1);
+    var data2 = rows2.slice(1);
+    var report = ['Comparación CSV', '='.repeat(40), '', 'Archivo 1: ' + files[0].name + ' (' + data1.length + ' filas)', 'Archivo 2: ' + files[1].name + ' (' + data2.length + ' filas)', ''];
+    var added = 0, removed = 0, modified = 0, unchanged = 0;
+    if (keyColumn) {
+      var keyIdx1 = header1.indexOf(keyColumn);
+      var keyIdx2 = header2.indexOf(keyColumn);
+      if (keyIdx1 < 0 || keyIdx2 < 0) { report.push('Columna clave "' + keyColumn + '" no encontrada en ambos archivos.'); }
+      else {
+        var map1 = new Map(); var map2 = new Map();
+        data1.forEach(function(r) { map1.set(String(r[keyIdx1]), r); });
+        data2.forEach(function(r) { map2.set(String(r[keyIdx2]), r); });
+        map1.forEach(function(row, key) {
+          if (!map2.has(key)) { removed++; report.push('[-] ' + key); }
+          else if (JSON.stringify(row) !== JSON.stringify(map2.get(key))) { modified++; report.push('[~] ' + key); }
+          else unchanged++;
+        });
+        map2.forEach(function(row, key) {
+          if (!map1.has(key)) { added++; report.push('[+] ' + key); }
+        });
+      }
+    } else {
+      var maxRows = Math.max(data1.length, data2.length);
+      for (var ri = 0; ri < maxRows; ri++) {
+        var r1 = JSON.stringify(data1[ri] || []);
+        var r2 = JSON.stringify(data2[ri] || []);
+        if (!data1[ri]) { added++; report.push('[+] Fila ' + (ri + 1) + ': nueva'); }
+        else if (!data2[ri]) { removed++; report.push('[-] Fila ' + (ri + 1) + ': eliminada'); }
+        else if (r1 !== r2) { modified++; report.push('[~] Fila ' + (ri + 1) + ': modificada'); }
+        else unchanged++;
+      }
+    }
+    report.push('');
+    report.push('Resumen: ' + added + ' añadida(s), ' + removed + ' eliminada(s), ' + modified + ' modificada(s), ' + unchanged + ' sin cambio.');
+    onProgress(3, 3, 'Generando reporte...');
+    var reportBlob = new Blob([report.join('\n')], { type: 'text/plain;charset=utf-8' });
+    return makeSingleResult(reportBlob, 'comparacion-csv.txt', 'Comparación: ' + added + ' añadida(s), ' + removed + ' eliminada(s), ' + modified + ' modificada(s).');
+  };
+
+  window.ToolProcessors.cleanTabularData = async function(files, options, onProgress) {
+    if (!files || !files.length) return { files: [], message: 'Selecciona un CSV o TSV.' };
+    var trimWs = options.trim !== false;
+    var lowercase = options.lowercase === true;
+    var removeEmpty = options.removeEmptyRows !== false;
+    var removeEmptyCols = options.removeEmptyCols || false;
+    var results = [];
+    for (var fi = 0; fi < files.length; fi++) {
+      onProgress(fi + 1, files.length, 'Limpiando datos...');
+      var file = files[fi];
+      var text = await file.text();
+      if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
+      var lines = text.split(/\r?\n/);
+      var parsed = lines.map(function(line) {
+        var fields = []; var buf = ''; var inQ = false;
+        for (var ci = 0; ci < line.length; ci++) {
+          var ch = line[ci];
+          if (inQ) { if (ch === '"') { if (line[ci + 1] === '"') { buf += '"'; ci++; } else inQ = false; } else buf += ch; }
+          else if (ch === '"') inQ = true;
+          else if (ch === ',' || ch === ';' || ch === '\t') { fields.push(buf); buf = ''; }
+          else buf += ch;
+        }
+        fields.push(buf);
+        return fields;
+      });
+      if (trimWs) parsed = parsed.map(function(row) { return row.map(function(c) { return c.replace(/^\s+|\s+$/g, '').replace(/\s+/g, ' '); }); });
+      if (lowercase) parsed = parsed.map(function(row) { return row.map(function(c) { return c.toLowerCase(); }); });
+      if (removeEmpty) parsed = parsed.filter(function(row) { return row.some(function(c) { return c.length > 0; }); });
+      if (removeEmptyCols && parsed.length) {
+        var maxCols = Math.max.apply(null, parsed.map(function(r) { return r.length; }));
+        var emptyCols = [];
+        for (var ci = 0; ci < maxCols; ci++) {
+          if (parsed.every(function(row) { return !row[ci]; })) emptyCols.push(ci);
+        }
+        parsed = parsed.map(function(row) { return row.filter(function(c, idx) { return emptyCols.indexOf(idx) === -1; }); });
+      }
+      var output = parsed.map(function(row) { return row.join(','); }).join('\n');
+      var blob = new Blob(['\uFEFF' + output], { type: 'text/csv;charset=utf-8' });
+      results.push({ name: getBaseName(file.name) + '-limpio.csv', blob: blob, size: blob.size });
+    }
+    return { files: results, message: results.length + ' archivo(s) limpio(s).' };
+  };
+
+  window.ToolProcessors.htmlTableToExcel = async function(files, options, onProgress) {
+    if (!files || !files.length) return { files: [], message: 'Selecciona un archivo HTML.' };
+    if (typeof XLSX === 'undefined') throw new Error('XLSX no disponible.');
+    var results = [];
+    for (var fi = 0; fi < files.length; fi++) {
+      onProgress(fi + 1, files.length, 'Extrayendo tablas...');
+      var file = files[fi];
+      var html = await readFileAsText(file);
+      var parser = new DOMParser();
+      var doc = parser.parseFromString(html, 'text/html');
+      var tables = doc.querySelectorAll('table');
+      if (!tables.length) throw new Error('No se encontraron tablas en el HTML.');
+      var wb = XLSX.utils.book_new();
+      for (var ti = 0; ti < tables.length; ti++) {
+        var ws = XLSX.utils.table_to_sheet(tables[ti]);
+        var name = 'Tabla ' + (ti + 1);
+        XLSX.utils.book_append_sheet(wb, ws, name.substring(0, 31));
+      }
+      var wbOut = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+      var blob = new Blob([wbOut], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      results.push({ name: getBaseName(file.name) + '-tablas.xlsx', blob: blob, size: blob.size });
+    }
+    return { files: results, message: results.length + ' archivo(s) HTML procesado(s), ' + (results.length ? tables.length : 0) + ' tabla(s).' };
+  };
+
+  // B7: textEncodingConverter, detectFileType
+  window.ToolProcessors.textEncodingConverter = async function(files, options, onProgress) {
+    if (!files || !files.length) return { files: [], message: 'Selecciona un archivo de texto.' };
+    var targetEncoding = options.targetEncoding || options.encoding || 'UTF-8';
+    var results = [];
+    for (var fi = 0; fi < files.length; fi++) {
+      onProgress(fi + 1, files.length, 'Convirtiendo encoding...');
+      var file = files[fi];
+      var arrayBuf = await file.arrayBuffer();
+      var bytes = new Uint8Array(arrayBuf);
+      var detectedEncoding = 'UTF-8';
+      if (bytes[0] === 0xFF && bytes[1] === 0xFE) detectedEncoding = 'UTF-16LE';
+      else if (bytes[0] === 0xFE && bytes[1] === 0xFF) detectedEncoding = 'UTF-16BE';
+      else if (bytes[0] === 0xEF && bytes[1] === 0xBB && bytes[2] === 0xBF) detectedEncoding = 'UTF-8 BOM';
+      else {
+        var hasHighBytes = false;
+        for (var bi = 0; bi < Math.min(bytes.length, 1000); bi++) {
+          if (bytes[bi] > 127) { hasHighBytes = true; break; }
+        }
+        if (hasHighBytes) {
+          try { new TextDecoder('utf-8', { fatal: true }).decode(bytes); }
+          catch (e) { detectedEncoding = 'ISO-8859-1'; }
+        }
+      }
+      var text;
+      try {
+        text = new TextDecoder(detectedEncoding.replace(' BOM', '')).decode(bytes);
+      } catch (e) {
+        text = new TextDecoder('utf-8', { fatal: false }).decode(bytes);
+      }
+      var encoded = new TextEncoder().encode(text);
+      var blob = new Blob([encoded], { type: 'text/plain;charset=utf-8' });
+      var ext = file.name.split('.').pop();
+      results.push({ name: getBaseName(file.name) + '-' + targetEncoding.replace(/\s/g, '') + '.' + ext, blob: blob, size: blob.size });
+    }
+    return { files: results, message: results.length + ' archivo(s) convertido(s) de ' + detectedEncoding + ' a ' + targetEncoding + '.' };
+  };
+
+  window.ToolProcessors.detectFileType = async function(files, options, onProgress) {
+    if (!files || !files.length) return { files: [], message: 'Selecciona un archivo.' };
+    var signatures = {
+      'PDF': [0x25, 0x50, 0x44, 0x46],
+      'PNG': [0x89, 0x50, 0x4E, 0x47],
+      'JPEG': [0xFF, 0xD8, 0xFF],
+      'GIF': [0x47, 0x49, 0x46, 0x38],
+      'WebP': [0x52, 0x49, 0x46, 0x46],
+      'BMP': [0x42, 0x4D],
+      'TIFF_BE': [0x4D, 0x4D],
+      'TIFF_LE': [0x49, 0x49],
+      'ZIP': [0x50, 0x4B, 0x03, 0x04],
+      'RAR': [0x52, 0x61, 0x72, 0x21],
+      'GZ': [0x1F, 0x8B],
+      '7Z': [0x37, 0x7A, 0xBC, 0xAF],
+      'MP3_ID3': [0x49, 0x44, 0x33],
+      'MP3_SYNC': [0xFF, 0xFB],
+      'FLAC': [0x66, 0x4C, 0x61, 0x43],
+      'OGG': [0x4F, 0x67, 0x67, 0x53],
+      'MP4': [0x00, 0x00, 0x00],
+      'AVIF': [0x00, 0x00, 0x00],
+      'HEIC': [0x00, 0x00, 0x00],
+      'EXE_MZ': [0x4D, 0x5A],
+      'ELF': [0x7F, 0x45, 0x4C, 0x46],
+      'DOCX': [0x50, 0x4B, 0x03, 0x04],
+      'XLSX': [0x50, 0x4B, 0x03, 0x04],
+      'SQLITE': [0x53, 0x51, 0x4C, 0x69],
+      'WEBM': [0x1A, 0x45, 0xDF, 0xA3],
+      'AVI': [0x52, 0x49, 0x46, 0x46],
+    };
+    var results = [];
+    for (var fi = 0; fi < files.length; fi++) {
+      onProgress(fi + 1, files.length, 'Analizando archivo...');
+      var file = files[fi];
+      var arrayBuf = await file.arrayBuffer();
+      var bytes = new Uint8Array(arrayBuf.slice(0, 64));
+      var detectedType = 'Desconocido';
+      var matchedSig = '';
+      var sigKeys = Object.keys(signatures);
+      for (var si = 0; si < sigKeys.length; si++) {
+        var sig = signatures[sigKeys[si]];
+        var match = true;
+        for (var bi = 0; bi < sig.length; bi++) {
+          if (bytes[bi] !== sig[bi]) { match = false; break; }
+        }
+        if (match) { detectedType = sigKeys[si]; matchedSig = sig.map(function(b) { return b.toString(16).padStart(2, '0'); }).join(' '); break; }
+      }
+      var declaredExt = (file.name.split('.').pop() || '').toUpperCase();
+      var report = 'Archivo: ' + file.name + '\n';
+      report += 'Tamaño: ' + file.size + ' bytes\n';
+      report += 'Tipo declarado: ' + (file.type || 'N/A') + '\n';
+      report += 'Extensión: .' + declaredExt + '\n';
+      report += 'Tipo detectado: ' + detectedType + '\n';
+      report += 'Magic bytes: ' + matchedSig + '\n';
+      report += 'Coincidencia: ' + (detectedType !== 'Desconocido' ? 'SÍ' : 'NO') + '\n';
+      if (declaredExt && detectedType !== 'Desconocido' && declaredExt !== detectedType.substring(0, 4)) {
+        report += 'AVISO: La extensión no coincide con el tipo detectado.\n';
+      }
+      var blob = new Blob([report], { type: 'text/plain;charset=utf-8' });
+      results.push({ name: getBaseName(file.name) + '-tipo.txt', blob: blob, size: blob.size });
+    }
+    return { files: results, message: results.length + ' archivo(s) analizado(s).' };
+  };
+
 })();

@@ -36,7 +36,19 @@
       "comparePdfs",
       "pdfEncryptAdvanced",
       "pdfPageCounter",
-      "pdfTablesToExcel"
+      "pdfTablesToExcel",
+      "extractTextPdf",
+      "extractImagesPdf",
+      "pdfToPptx",
+      "pdfToPdfa",
+      "pdfToMarkdown",
+      "pdfFormFiller",
+      "flattenPdf",
+      "imagesToPdfAdvanced",
+      "pdfExtractResources",
+      "csvToPdf",
+      "htmlToPdf",
+      "excelToPdf"
     ],
     "slugs": [
       "unir-pdf",
@@ -74,7 +86,19 @@
       "comparar-dos-pdf",
       "encriptar-pdf-avanzado",
       "contar-paginas-pdf",
-      "extraer-tablas-pdf-excel"
+      "extraer-tablas-pdf-excel",
+      "extraer-texto-pdf",
+      "extraer-imagenes-pdf",
+      "pdf-a-powerpoint",
+      "pdf-a-pdfa",
+      "pdf-a-markdown",
+      "rellenar-formulario-pdf",
+      "aplanar-pdf",
+      "imagenes-a-pdf-optimizado",
+      "extraer-fuentes-recursos-pdf",
+      "csv-a-pdf",
+      "html-a-pdf",
+      "excel-a-pdf"
     ],
     "icon": "📄",
     "enabled": true,
@@ -104,7 +128,17 @@
       "colorPicker",
       "imageCompare",
       "enhanceScannedDocument",
-      "cameraDocumentScanner"
+      "cameraDocumentScanner",
+      "heicToImage",
+      "avifToImage",
+      "svgToImage",
+      "faviconGenerator",
+      "pwaIconGenerator",
+      "removeBackground",
+      "upscaleImage",
+      "faceBlur",
+      "colorPalette",
+      "htmlToImage"
     ],
     "slugs": [
       "comprimir-imagen",
@@ -131,7 +165,17 @@
       "comparar-imagenes",
       "mejorar-documento-escaneado",
       "escanear-documento-camara",
-      "extraer-ubicacion-foto"
+      "extraer-ubicacion-foto",
+      "heic-a-imagen",
+      "avif-a-imagen",
+      "svg-a-imagen",
+      "generar-favicon",
+      "generar-iconos-pwa",
+      "quitar-fondo-imagen",
+      "aumentar-resolucion-imagen",
+      "difuminar-caras-imagen",
+      "extraer-paleta-colores",
+      "html-a-imagen"
     ],
     "icon": "🖼",
     "enabled": true,
@@ -234,7 +278,9 @@
       "base64Encode",
       "base64Decode",
       "urlEncode",
-      "urlDecode"
+      "urlDecode",
+      "csvChangeEncoding",
+      "textEncodingConverter"
     ],
     "slugs": [
       "txt-a-pdf",
@@ -254,7 +300,9 @@
       "codificar-base64",
       "decodificar-base64",
       "codificar-url",
-      "decodificar-url"
+      "decodificar-url",
+      "cambiar-codificacion-csv",
+      "convertir-codificacion-texto"
     ],
     "icon": "📄",
     "enabled": true,
@@ -326,7 +374,17 @@
       "csvToSql",
       "jsonFormatter",
       "excelToXml",
-      "jsonValidator"
+      "jsonValidator",
+      "cleanExcel",
+      "removeDuplicatesExcel",
+      "csvChangeDelimiter",
+      "flattenJson",
+      "jsonToExcelAdvanced",
+      "normalizeCsv",
+      "compareCsv",
+      "cleanTabularData",
+      "htmlTableToExcel",
+      "pptxToPdf"
     ],
     "slugs": [
       "csv-a-excel",
@@ -356,7 +414,17 @@
       "csv-a-sql",
       "formatear-json",
       "excel-a-xml",
-      "validar-json"
+      "validar-json",
+      "limpiar-excel",
+      "eliminar-duplicados-excel",
+      "cambiar-delimitador-csv",
+      "aplanar-json",
+      "json-a-excel-avanzado",
+      "normalizar-csv",
+      "comparar-csv",
+      "limpiar-datos-tabulares",
+      "tablas-html-a-excel",
+      "powerpoint-a-pdf"
     ],
     "icon": "📊",
     "enabled": true,
@@ -376,7 +444,8 @@
       "checksumFile",
       "fileInspector",
       "inspectFileMetadata",
-      "encryptDecryptFile"
+      "encryptDecryptFile",
+      "detectFileType"
     ],
     "slugs": [
       "extraer-zip",
@@ -387,7 +456,8 @@
       "calcular-hash",
       "inspeccionar-archivo",
       "inspeccionar-metadatos-archivo",
-      "cifrar-descifrar-archivo"
+      "cifrar-descifrar-archivo",
+      "detectar-tipo-archivo"
     ],
     "icon": "📁",
     "enabled": true,
