@@ -212,7 +212,7 @@ async function run() {
     await upload(page, [PNG_FILE('retrato.png')]);
     await runTool(page);
     msg = await page.$eval('#resultMessage', (el) => el.textContent);
-    ok(msg.includes('caras') || msg.includes('Procesamiento') || msg.includes('completado'), `faceBlur message: "${msg}"`);
+    ok(msg.includes('difuminada') || msg.includes('caras') || msg.includes('región') || msg.includes('Procesamiento'), `faceBlur message: "${msg}"`);
     buf = await downloadResult(page);
     ok(buf && buf.length > 0, 'faceBlur genera archivo', buf ? buf.length + ' bytes' : 'null');
     if (buf) {
@@ -291,7 +291,7 @@ async function run() {
     failed: failures,
     checks,
     failures: failureReasons,
-    limitation: 'faceBlur usa heurística de posición central (no ML real). removeBackground usa distancia euclidiana por color (no ML real). upscaleImage es interpolación bicúbica (no super-resolution IA).',
+    limitation: 'faceBlur usa FaceDetector API cuando disponible, heurística posicional como fallback. removeBackground usa distancia euclidiana por color con feathering. upscaleImage es interpolación bicúbica con unsharp mask (no super-resolution IA).',
   };
   const evidencePath = join(root, 'artifacts', 'deep-audit', 'toolisto', 'TLT-certify-advanced-image-tools.json');
   mkdirSync(dirname(evidencePath), { recursive: true });

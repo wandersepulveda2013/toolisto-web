@@ -45,7 +45,7 @@
       "pass": true
     },
     {
-      "name": "faceBlur message: \"Procesamiento de caras completado.\"",
+      "name": "faceBlur message: \"1 región(es) difuminada(s) (Heurística posicional).\"",
       "pass": true
     },
     {
@@ -103,7 +103,7 @@
   ],
   "failed": 0,
   "failures": [],
-  "limitation": "faceBlur usa heurística de posición central (no ML real). removeBackground usa distancia euclidiana por color (no ML real). upscaleImage es interpolación bicúbica (no super-resolution IA).",
+  "limitation": "faceBlur usa FaceDetector API cuando disponible, heurística posicional como fallback. removeBackground usa distancia euclidiana por color con feathering. upscaleImage es interpolación bicúbica con unsharp mask (no super-resolution IA).",
   "passed": 25,
   "suite": "gate-e2e-advanced-image-tools",
   "tools": [

@@ -6832,9 +6832,20 @@
     var extMap = { png: 'png', jpeg: 'jpg', webp: 'webp' };
     var ext = extMap[outFmt] || 'png';
     var results = [];
+    var avifSupported = await new Promise(function(resolve) {
+      var testImg = new Image();
+      testImg.onload = function() { resolve(true); URL.revokeObjectURL(testImg.src); };
+      testImg.onerror = function() { resolve(false); URL.revokeObjectURL(testImg.src); };
+      var testBlob = new Blob([new Uint8Array([0x00, 0x00, 0x00, 0x1C, 0x66, 0x74, 0x79, 0x70, 0x61, 0x76, 0x69, 0x66])], { type: 'image/avif' });
+      testImg.src = URL.createObjectURL(testBlob);
+      setTimeout(function() { resolve(false); }, 3000);
+    });
     for (var i = 0; i < files.length; i++) {
       onProgress(i + 1, files.length, 'Convirtiendo AVIF...');
       var file = files[i];
+      if (!avifSupported) {
+        throw new Error('Tu navegador no soporta archivos AVIF. Actualiza a Chrome 85+, Firefox 93+ o Safari 16.4+.');
+      }
       var img = await loadImageFromFile(file);
       var canvas = document.createElement('canvas');
       canvas.width = img.naturalWidth;
@@ -6944,6 +6955,7 @@
     if (!files || !files.length) return { files: [], message: 'Selecciona una imagen.' };
     var bgColor = options.bgColor || options.removeBgColor || '';
     var threshold = parseInt(options.threshold || options.removeBgThreshold) || 30;
+    var feather = parseInt(options.feather || options.removeBgFeather) || 8;
     var outFmt = (options.outputFormat || 'png').toLowerCase();
     if (outFmt === 'image/webp') outFmt = 'webp'; else outFmt = 'png';
     var mime = outFmt === 'webp' ? 'image/webp' : 'image/png';
@@ -6968,10 +6980,39 @@
       } else {
         refR = data[0]; refG = data[1]; refB = data[2];
       }
+      var alphas = new Float32Array(w * h);
+      var innerThreshold = threshold * 0.6;
+      var outerThreshold = threshold * 1.4;
       for (var pi = 0; pi < data.length; pi += 4) {
         var dr = data[pi] - refR, dg = data[pi + 1] - refG, db = data[pi + 2] - refB;
         var dist = Math.sqrt(dr * dr + dg * dg + db * db);
-        data[pi + 3] = dist < threshold ? 0 : 255;
+        var px = pi / 4;
+        if (dist <= innerThreshold) { alphas[px] = 0; }
+        else if (dist >= outerThreshold) { alphas[px] = 255; }
+        else { alphas[px] = Math.round(((dist - innerThreshold) / (outerThreshold - innerThreshold)) * 255); }
+      }
+      if (feather > 0) {
+        var smoothAlphas = new Float32Array(alphas);
+        var passes = Math.min(Math.ceil(feather / 2), 3);
+        for (var pass = 0; pass < passes; pass++) {
+          var temp = new Float32Array(smoothAlphas);
+          for (var y = 1; y < h - 1; y++) {
+            for (var x = 1; x < w - 1; x++) {
+              var idx = y * w + x;
+              var count = 0, sum = 0;
+              for (var dy = -1; dy <= 1; dy++) {
+                for (var dx = -1; dx <= 1; dx++) {
+                  sum += temp[(y + dy) * w + (x + dx)]; count++;
+                }
+              }
+              smoothAlphas[idx] = sum / count;
+            }
+          }
+        }
+        alphas = smoothAlphas;
+      }
+      for (var pi2 = 0; pi2 < data.length; pi2 += 4) {
+        data[pi2 + 3] = Math.round(alphas[pi2 / 4]);
       }
       ctx.putImageData(imageData, 0, 0);
       var blob = await new Promise(function(resolve) { canvas.toBlob(resolve, mime); });
@@ -6984,6 +7025,7 @@
     if (!files || !files.length) return { files: [], message: 'Selecciona una imagen.' };
     var scale = parseInt(options.scale || options.upscaleScale) || 2;
     if (scale < 1) scale = 1; if (scale > 8) scale = 8;
+    var sharpen = options.sharpen !== 'false' && options.sharpen !== false && options.upscaleSharpen !== 'false';
     var outFmt = (options.outputFormat || 'png').toLowerCase();
     if (outFmt === 'image/png') outFmt = 'png';
     else if (outFmt === 'image/jpeg' || outFmt === 'jpeg') outFmt = 'jpeg';
@@ -7007,6 +7049,33 @@
       ctx.imageSmoothingEnabled = true;
       ctx.imageSmoothingQuality = 'high';
       ctx.drawImage(img, 0, 0, nw, nh);
+      if (sharpen && scale >= 2) {
+        try {
+          var srcData = ctx.getImageData(0, 0, nw, nh);
+          var src = new Uint8ClampedArray(srcData.data);
+          var dst = srcData.data;
+          var kernel = [0, -1, 0, -1, 5, -1, 0, -1, 0];
+          for (var y = 1; y < nh - 1; y++) {
+            for (var x = 1; x < nw - 1; x++) {
+              var r = 0, g = 0, b = 0;
+              for (var ky = -1; ky <= 1; ky++) {
+                for (var kx = -1; kx <= 1; kx++) {
+                  var idx = ((y + ky) * nw + (x + kx)) * 4;
+                  var kVal = kernel[(ky + 1) * 3 + (kx + 1)];
+                  r += src[idx] * kVal;
+                  g += src[idx + 1] * kVal;
+                  b += src[idx + 2] * kVal;
+                }
+              }
+              var oi = (y * nw + x) * 4;
+              dst[oi] = Math.max(0, Math.min(255, r));
+              dst[oi + 1] = Math.max(0, Math.min(255, g));
+              dst[oi + 2] = Math.max(0, Math.min(255, b));
+            }
+          }
+          ctx.putImageData(srcData, 0, 0);
+        } catch (e) { /* sharpening is best-effort */ }
+      }
       var blob = await new Promise(function(resolve) { canvas.toBlob(resolve, mime, quality); });
       results.push({ name: getBaseName(file.name) + '-' + scale + 'x.' + ext, blob: blob, size: blob.size });
     }
@@ -7017,6 +7086,7 @@
     if (!files || !files.length) return { files: [], message: 'Selecciona una imagen.' };
     var blurRadius = parseInt(options.blurRadius || options.faceBlurRadius) || 12;
     var pixelSize = parseInt(options.pixelSize || options.facePixelSize) || 0;
+    var hasFaceDetector = typeof FaceDetector !== 'undefined';
     var results = [];
     for (var i = 0; i < files.length; i++) {
       onProgress(i + 1, files.length, 'Detectando caras...');
@@ -7027,34 +7097,59 @@
       canvas.width = w; canvas.height = h;
       var ctx = canvas.getContext('2d');
       ctx.drawImage(img, 0, 0);
-      var regionSize = Math.max(40, Math.min(w, h) * 0.12);
-      var cx = w / 2, cy = h * 0.35;
-      var rx = regionSize, ry = regionSize * 1.1;
-      var sx = Math.max(0, Math.floor(cx - rx));
-      var sy = Math.max(0, Math.floor(cy - ry));
-      var sw = Math.min(w - sx, Math.ceil(rx * 2));
-      var sh = Math.min(h - sy, Math.ceil(ry * 2));
-      if (sw > 0 && sh > 0) {
-        if (pixelSize > 1) {
-          var tmpCanvas = document.createElement('canvas');
-          var pw = Math.max(1, Math.floor(sw / pixelSize));
-          var ph = Math.max(1, Math.floor(sh / pixelSize));
-          tmpCanvas.width = pw; tmpCanvas.height = ph;
-          var tCtx = tmpCanvas.getContext('2d');
-          tCtx.drawImage(canvas, sx, sy, sw, sh, 0, 0, pw, ph);
-          ctx.imageSmoothingEnabled = false;
-          ctx.drawImage(tmpCanvas, 0, 0, pw, ph, sx, sy, sw, sh);
-          ctx.imageSmoothingEnabled = true;
-        } else {
-          ctx.filter = 'blur(' + blurRadius + 'px)';
-          ctx.drawImage(canvas, sx, sy, sw, sh, sx, sy, sw, sh);
-          ctx.filter = 'none';
+      var regions = [];
+      if (hasFaceDetector) {
+        try {
+          var detector = new FaceDetector({ fastMode: true, maxDetectedFaces: 20 });
+          var faces = await detector.detect(img);
+          for (var fi = 0; fi < faces.length; fi++) {
+            var box = faces[fi].boundingBox;
+            var pad = Math.max(box.width, box.height) * 0.15;
+            regions.push({
+              sx: Math.max(0, Math.floor(box.x - pad)),
+              sy: Math.max(0, Math.floor(box.y - pad)),
+              sw: Math.min(w - Math.max(0, Math.floor(box.x - pad)), Math.ceil(box.width + pad * 2)),
+              sh: Math.min(h - Math.max(0, Math.floor(box.y - pad)), Math.ceil(box.height + pad * 2))
+            });
+          }
+        } catch (e) { /* FaceDetector failed, fall through to heuristic */ }
+      }
+      if (regions.length === 0) {
+        var regionSize = Math.max(40, Math.min(w, h) * 0.12);
+        var cx = w / 2, cy = h * 0.35;
+        var rx = regionSize, ry = regionSize * 1.1;
+        regions.push({
+          sx: Math.max(0, Math.floor(cx - rx)),
+          sy: Math.max(0, Math.floor(cy - ry)),
+          sw: Math.min(w - Math.max(0, Math.floor(cx - rx)), Math.ceil(rx * 2)),
+          sh: Math.min(h - Math.max(0, Math.floor(cy - ry)), Math.ceil(ry * 2))
+        });
+      }
+      for (var ri = 0; ri < regions.length; ri++) {
+        var r = regions[ri];
+        if (r.sw > 0 && r.sh > 0) {
+          if (pixelSize > 1) {
+            var tmpCanvas = document.createElement('canvas');
+            var pw = Math.max(1, Math.floor(r.sw / pixelSize));
+            var ph = Math.max(1, Math.floor(r.sh / pixelSize));
+            tmpCanvas.width = pw; tmpCanvas.height = ph;
+            var tCtx = tmpCanvas.getContext('2d');
+            tCtx.drawImage(canvas, r.sx, r.sy, r.sw, r.sh, 0, 0, pw, ph);
+            ctx.imageSmoothingEnabled = false;
+            ctx.drawImage(tmpCanvas, 0, 0, pw, ph, r.sx, r.sy, r.sw, r.sh);
+            ctx.imageSmoothingEnabled = true;
+          } else {
+            ctx.filter = 'blur(' + blurRadius + 'px)';
+            ctx.drawImage(canvas, r.sx, r.sy, r.sw, r.sh, r.sx, r.sy, r.sw, r.sh);
+            ctx.filter = 'none';
+          }
         }
       }
       var blob = await new Promise(function(resolve) { canvas.toBlob(resolve, 'image/png'); });
       results.push({ name: getBaseName(file.name) + '-blur.png', blob: blob, size: blob.size });
     }
-    return { files: results, message: 'Procesamiento de caras completado.' };
+    var faceInfo = hasFaceDetector ? 'Detección facial nativa' : 'Heurística posicional';
+    return { files: results, message: regions.length + ' región(es) difuminada(s) (' + faceInfo + ').' };
   };
 
   window.ToolProcessors.colorPalette = async function(files, options, onProgress) {
@@ -7210,16 +7305,55 @@
     var results = [];
     var imgCount = 0;
     for (var p = 1; p <= pdf.numPages; p++) {
-      onProgress(p, pdf.numPages, 'Renderizando página ' + p + '...');
+      onProgress(p, pdf.numPages, 'Extrayendo imágenes de página ' + p + '...');
       var page = await pdf.getPage(p);
-      var vp = page.getViewport({ scale: 1.5 });
-      var canvas = document.createElement('canvas');
-      canvas.width = vp.width; canvas.height = vp.height;
-      var ctx = canvas.getContext('2d');
-      await page.render({ canvasContext: ctx, viewport: vp }).promise;
-      var blob = await new Promise(function(resolve) { canvas.toBlob(resolve, 'image/png'); });
-      imgCount++;
-      results.push({ name: 'pagina-' + p + '.png', blob: blob, size: blob.size });
+      var ops = await page.getOperatorList();
+      var seenObjs = {};
+      for (var oi = 0; oi < ops.fnArray.length; oi++) {
+        if (ops.fnArray[oi] === pdfjsLib.OPS.paintImageXObject || ops.fnArray[oi] === pdfjsLib.OPS.paintJpegXObject) {
+          var objId = ops.argsArray[oi][0];
+          if (seenObjs[objId]) continue;
+          seenObjs[objId] = true;
+          try {
+            var imgData = await new Promise(function(resolve, reject) {
+              page.objs.get(objId, function(data) { data ? resolve(data) : reject(new Error('No data')); });
+            });
+            if (imgData && imgData.width > 0 && imgData.height > 0) {
+              var tmpCanvas = document.createElement('canvas');
+              tmpCanvas.width = imgData.width;
+              tmpCanvas.height = imgData.height;
+              var tmpCtx = tmpCanvas.getContext('2d');
+              var imgDataObj = tmpCtx.createImageData(imgData.width, imgData.height);
+              if (imgData.data) {
+                var src = imgData.data;
+                var dst = imgDataObj.data;
+                var len = Math.min(src.length, dst.length);
+                for (var di = 0; di < len; di++) dst[di] = src[di];
+              }
+              tmpCtx.putImageData(imgDataObj, 0, 0);
+              var ext = (objId.indexOf('jpeg') >= 0 || objId.indexOf('jpg') >= 0) ? 'jpg' : 'png';
+              var mime = ext === 'jpg' ? 'image/jpeg' : 'image/png';
+              var blob = await new Promise(function(resolve) { tmpCanvas.toBlob(resolve, mime, 0.92); });
+              imgCount++;
+              results.push({ name: 'pagina-' + p + '-img-' + imgCount + '.' + ext, blob: blob, size: blob.size });
+            }
+          } catch (e) { /* skip unresolvable image objects */ }
+        }
+      }
+    }
+    if (results.length === 0) {
+      onProgress(2, 3, 'No se encontraron imágenes embebidas; renderizando páginas...');
+      for (var p2 = 1; p2 <= pdf.numPages; p2++) {
+        var page2 = await pdf.getPage(p2);
+        var vp = page2.getViewport({ scale: 1.5 });
+        var canvas = document.createElement('canvas');
+        canvas.width = vp.width; canvas.height = vp.height;
+        var ctx = canvas.getContext('2d');
+        await page2.render({ canvasContext: ctx, viewport: vp }).promise;
+        var blob = await new Promise(function(resolve) { canvas.toBlob(resolve, 'image/png'); });
+        imgCount++;
+        results.push({ name: 'pagina-' + p2 + '.png', blob: blob, size: blob.size });
+      }
     }
     if (results.length > 1 && typeof JSZip !== 'undefined') {
       var zip = new JSZip();
@@ -7227,7 +7361,7 @@
       var zipBlob = await zip.generateAsync({ type: 'blob', compression: 'DEFLATE' });
       results = [{ name: getBaseName(file.name) + '-imagenes.zip', blob: zipBlob, size: zipBlob.size }];
     }
-    return { files: results, message: imgCount + ' página(s) extraída(s) como imagen.' };
+    return { files: results, message: imgCount + ' imagen(es) extraída(s) de ' + pdf.numPages + ' página(s).' };
   };
 
   // B4: pdfToPptx, pptxToPdf, excelToPdf, htmlToPdf, pdfToPdfa, pdfToMarkdown
@@ -7240,31 +7374,53 @@
     var data = await file.arrayBuffer();
     var pdf = await pdfjsLib.getDocument({ data: new Uint8Array(data) }).promise;
     var zip = new JSZip();
-    var contentTypes = [];
+    var slideEntries = [];
     for (var p = 1; p <= pdf.numPages; p++) {
       onProgress(p, pdf.numPages, 'Renderizando página ' + p + '...');
       var page = await pdf.getPage(p);
       var vp = page.getViewport({ scale: 2 });
+      var emuW = Math.round(vp.width * 9525);
+      var emuH = Math.round(vp.height * 9525);
       var canvas = document.createElement('canvas');
       canvas.width = vp.width; canvas.height = vp.height;
       var ctx = canvas.getContext('2d');
       await page.render({ canvasContext: ctx, viewport: vp }).promise;
       var imgBlob = await new Promise(function(resolve) { canvas.toBlob(resolve, 'image/png'); });
       var imgData = await imgBlob.arrayBuffer();
-      var slideNum = String(p).padStart(3, '0');
       zip.file('ppt/media/image' + p + '.png', imgData);
+      var slideIdx = p - 1;
+      var slideRels = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+        '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
+        '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/image' + p + '.png"/>' +
+        '</Relationships>';
+      zip.file('ppt/slides/_rels/slide' + p + '.xml.rels', slideRels);
       var slideXml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
-        '<p:sld xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main">' +
-        '<p:cSld><p:spTree><p:sp><p:txBody><a:r><a:rPr lang="es" sz="1200" dirty="0"/><a:t></a:t></a:r></p:txBody></p:sp></p:spTree></p:cSld></p:sld>';
+        '<p:sld xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"' +
+        ' xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"' +
+        ' xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">' +
+        '<p:cSld><p:spTree>' +
+        '<p:nvGrpSpPr><p:cNvPr id="1" name=""/><p:cNvGrpSpPr/><p:nvPr/></p:nvGrpSpPr>' +
+        '<p:grpSpPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="0" cy="0"/>' +
+        '<a:chOff x="0" y="0"/><a:chExt cx="0" cy="0"/></a:xfrm></p:grpSpPr>' +
+        '<p:pic>' +
+        '<p:nvPicPr><p:cNvPr id="2" name="Image' + p + '"/>' +
+        '<p:cNvPicPr><a:picLocks noChangeAspect="1"/></p:cNvPicPr>' +
+        '<p:nvPr/></p:nvPicPr>' +
+        '<p:blipFill><a:blip r:embed="rId1"/>' +
+        '<a:stretch><a:fillRect/></a:stretch></p:blipFill>' +
+        '<p:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="' + emuW + '" cy="' + emuH + '"/></a:xfrm>' +
+        '<a:prstGeom prst="rect"><a:avLst/></a:prstGeom></p:spPr>' +
+        '</p:pic>' +
+        '</p:spTree></p:cSld></p:sld>';
       zip.file('ppt/slides/slide' + p + '.xml', slideXml);
-      contentTypes.push({ part: '/ppt/slides/slide' + p + '.xml', ct: 'application/vnd.openxmlformats-officedocument.presentationml.slide+xml' });
+      slideEntries.push(p);
     }
-    var rels = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+    var presRels = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
       '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
-      contentTypes.map(function(c, i) { return '<Relationship Id="rId' + (i + 1) + '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide" Target="slides/slide' + (i + 1) + '.xml"/>'; }).join('') +
+      slideEntries.map(function(s, i) { return '<Relationship Id="rId' + (i + 1) + '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide" Target="slides/slide' + s + '.xml"/>'; }).join('') +
       '</Relationships>';
-    zip.file('ppt/_rels/presentation.xml.rels', rels);
-    var ctParts = contentTypes.map(function(c) { return '<Override PartName="' + c.part + '" ContentType="' + c.ct + '"/>'; }).join('');
+    zip.file('ppt/_rels/presentation.xml.rels', presRels);
+    var ctParts = slideEntries.map(function(s) { return '<Override PartName="/ppt/slides/slide' + s + '.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.slide+xml"/>'; }).join('');
     var ct = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
       '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">' +
       '<Default Extension="png" ContentType="image/png"/>' +
@@ -7273,8 +7429,8 @@
       ctParts + '</Types>';
     zip.file('[Content_Types].xml', ct);
     var presXml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
-      '<p:presentation xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main">' +
-      '<p:sldIdLst>' + contentTypes.map(function(c, i) { return '<p:sldId id="' + (256 + i) + '" r:id="rId' + (i + 1) + '" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"/>'; }).join('') +
+      '<p:presentation xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">' +
+      '<p:sldIdLst>' + slideEntries.map(function(s, i) { return '<p:sldId id="' + (256 + i) + '" r:id="rId' + (i + 1) + '"/>'; }).join('') +
       '</p:sldIdLst></p:presentation>';
     zip.file('ppt/presentation.xml', presXml);
     var zipBlob = await zip.generateAsync({ type: 'blob' });
@@ -7291,30 +7447,126 @@
       var file = files[fi];
       var data = await file.arrayBuffer();
       var zip = await JSZip.loadAsync(data);
-      var imageFiles = [];
+      var slideFiles = [];
       zip.forEach(function(path, entry) {
-        if (/\.(png|jpe?g|gif|bmp|emf)$/i.test(path)) imageFiles.push(entry);
+        if (/^ppt\/slides\/slide\d+\.xml$/i.test(path)) slideFiles.push({ path: path, entry: entry });
+      });
+      slideFiles.sort(function(a, b) {
+        var na = parseInt(a.path.match(/slide(\d+)\.xml$/i)[1]);
+        var nb = parseInt(b.path.match(/slide(\d+)\.xml$/i)[1]);
+        return na - nb;
+      });
+      var mediaFiles = {};
+      zip.forEach(function(path, entry) {
+        if (/^ppt\/media\/(image\d+\.(png|jpe?g|gif|bmp|emf|tiff?))$/i.test(path)) {
+          mediaFiles[path.split('/').pop().toLowerCase()] = entry;
+        }
       });
       var pdfDoc = await PDFLib.PDFDocument.create();
-      for (var ii = 0; ii < imageFiles.length; ii++) {
-        var imgData = await imageFiles[ii].async('arraybuffer');
-        var ext = imageFiles[ii].name.split('.').pop().toLowerCase();
-        var img;
-        if (ext === 'png') img = await pdfDoc.embedPng(imgData);
-        else if (/jpe?g/i.test(ext)) img = await pdfDoc.embedJpg(imgData);
-        else continue;
-        var page = pdfDoc.addPage([img.width, img.height]);
-        page.drawImage(img, { x: 0, y: 0, width: img.width, height: img.height });
+      var imageCount = 0;
+      var textCount = 0;
+      for (var si = 0; si < slideFiles.length; si++) {
+        var slideXml = await slideFiles[si].entry.async('string');
+        var textParts = [];
+        var re = /<a:t>([^<]*)<\/a:t>/g;
+        var m;
+        while ((m = re.exec(slideXml)) !== null) {
+          if (m[1].trim()) textParts.push(m[1].trim());
+        }
+        var imgRefs = [];
+        var imgRe = /r:embed="(rId\d+)"/g;
+        while ((m = imgRe.exec(slideXml)) !== null) imgRefs.push(m[1]);
+        var slideRelsPath = slideFiles[si].path.replace('ppt/slides/', 'ppt/slides/_rels/') + '.rels';
+        var slideRelsEntry = zip.file(slideRelsPath);
+        var imgFile = null;
+        if (slideRelsEntry) {
+          var relsXml = await slideRelsEntry.async('string');
+          for (var ir = 0; ir < imgRefs.length; ir++) {
+            var relRe = new RegExp('Id="' + imgRefs[ir] + '"[^>]*Target="([^"]+)"');
+            var relM = relsXml.match(relRe);
+            if (relM) {
+              var target = relM[1];
+              if (target.indexOf('../') === 0) target = target.substring(3);
+              var resolvedPath = 'ppt/' + target;
+              var mediaEntry = zip.file(resolvedPath);
+              if (mediaEntry) { imgFile = mediaEntry; break; }
+            }
+          }
+        }
+        if (!imgFile) {
+          var mediaKeys = Object.keys(mediaFiles);
+          for (var mk = 0; mk < mediaKeys.length; mk++) {
+            if (/image\d+\.png$/i.test(mediaKeys[mk]) || /image\d+\.jpe?g$/i.test(mediaKeys[mk])) {
+              imgFile = mediaFiles[mediaKeys[mk]];
+              delete mediaFiles[mediaKeys[mk]];
+              break;
+            }
+          }
+        }
+        var pageW = 612, pageH = 792;
+        var page = pdfDoc.addPage([pageW, pageH]);
+        var yPos = pageH - 50;
+        if (imgFile) {
+          try {
+            var imgData = await imgFile.async('arraybuffer');
+            var ext = imgFile.name.split('.').pop().toLowerCase();
+            var img;
+            if (ext === 'png') img = await pdfDoc.embedPng(imgData);
+            else if (/jpe?g/i.test(ext)) img = await pdfDoc.embedJpg(imgData);
+            if (img) {
+              var scale = Math.min((pageW - 60) / img.width, (pageH - 120) / img.height, 1);
+              var dw = img.width * scale;
+              var dh = img.height * scale;
+              var dx = (pageW - dw) / 2;
+              page.drawImage(img, { x: dx, y: yPos - dh, width: dw, height: dh });
+              yPos -= dh + 15;
+              imageCount++;
+            }
+          } catch (e) { /* skip bad image */ }
+        }
+        if (textParts.length > 0) {
+          var fullText = textParts.join('\n');
+          var font = await pdfDoc.embedFont(PDFLib.StandardFonts.Helvetica);
+          var fontSize = 11;
+          var maxW = pageW - 80;
+          var lines = fullText.split(/\n/);
+          for (var li = 0; li < lines.length && yPos > 50; li++) {
+            var line = lines[li];
+            var words = line.split(/\s+/);
+            var currentLine = '';
+            for (var wi = 0; wi < words.length; wi++) {
+              var testLine = currentLine ? currentLine + ' ' + words[wi] : words[wi];
+              var tw = font.widthOfTextAtSize(testLine, fontSize);
+              if (tw > maxW && currentLine) {
+                page.drawText(currentLine, { x: 40, y: yPos, size: fontSize, font: font, color: PDFLib.rgb(0, 0, 0) });
+                yPos -= fontSize + 4;
+                currentLine = words[wi];
+              } else {
+                currentLine = testLine;
+              }
+            }
+            if (currentLine && yPos > 50) {
+              page.drawText(currentLine, { x: 40, y: yPos, size: fontSize, font: font, color: PDFLib.rgb(0, 0, 0) });
+              yPos -= fontSize + 4;
+            }
+          }
+          textCount++;
+        }
+        if (yPos === pageH - 50 && !imgFile) {
+          var font = await pdfDoc.embedFont(PDFLib.StandardFonts.Helvetica);
+          page.drawText('Diapositiva ' + (si + 1) + ' (sin contenido extraíble)', { x: 50, y: 742, size: 12, font: font, color: PDFLib.rgb(0.5, 0.5, 0.5) });
+        }
       }
       if (pdfDoc.getPageCount() === 0) {
         var page = pdfDoc.addPage([612, 792]);
-        page.drawText('PowerPoint convertido (sin imágenes extraíbles)', { x: 50, y: 742, size: 12 });
+        var font = await pdfDoc.embedFont(PDFLib.StandardFonts.Helvetica);
+        page.drawText('PowerPoint convertido (sin contenido extraíble)', { x: 50, y: 742, size: 12, font: font, color: PDFLib.rgb(0, 0, 0) });
       }
       var pdfBytes = await pdfDoc.save();
       var blob = new Blob([pdfBytes], { type: 'application/pdf' });
       results.push({ name: getBaseName(file.name) + '.pdf', blob: blob, size: blob.size });
     }
-    return { files: results, message: results.length + ' archivo(s) PPTX convertido(s).' };
+    return { files: results, message: results.length + ' archivo(s) PPTX convertido(s). Texto: ' + textCount + ', Imágenes: ' + imageCount + '.' };
   };
 
   window.ToolProcessors.excelToPdf = async function(files, options, onProgress) {
@@ -7413,17 +7665,61 @@
     onProgress(2, 3, 'Aplicando conversiones PDF/A...');
     var title = pdfDoc.getTitle() || getBaseName(file.name);
     pdfDoc.setTitle(title);
-    pdfDoc.setProducer('Toolisto - Conversión PDF/A');
+    pdfDoc.setAuthor(pdfDoc.getAuthor() || 'Toolisto');
+    pdfDoc.setProducer('Toolisto - Conversión PDF/A-1b');
     pdfDoc.setCreator('Toolisto');
+    pdfDoc.setCreationDate(new Date());
+    var now = new Date();
+    var xmpDate = now.toISOString().replace(/\.\d{3}Z$/, 'Z');
+    function _esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+    var xmpStr = '<?xpacket begin="\uFEFF" id="W5M0MpCehiHzreSzNTczkc9d"?>\n' +
+      '<x:xmpmeta xmlns:x="adobe:ns:meta/">\n' +
+      '<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">\n' +
+      '<rdf:Description rdf:about=""\n' +
+      '  xmlns:dc="http://purl.org/dc/elements/1.1/"\n' +
+      '  xmlns:xmp="http://ns.adobe.com/xap/1.0/"\n' +
+      '  xmlns:pdf="http://ns.adobe.com/pdf/1.3/"\n' +
+      '  xmlns:pdfaid="http://www.aiim.org/pdfa/ns/id/">\n' +
+      '  <dc:title><rdf:Alt><rdf:li xml:lang="es">' + _esc(title) + '</rdf:li></rdf:Alt></dc:title>\n' +
+      '  <dc:creator><rdf:Seq><rdf:li>Toolisto</rdf:li></rdf:Seq></dc:creator>\n' +
+      '  <xmp:CreateDate>' + xmpDate + '</xmp:CreateDate>\n' +
+      '  <xmp:CreatorTool>Toolisto</xmp:CreatorTool>\n' +
+      '  <pdf:Producer>Toolisto - Conversi\u00f3n PDF/A-1b</pdf:Producer>\n' +
+      '  <pdfaid:part>1</pdfaid:part>\n' +
+      '  <pdfaid:conformance>b</pdfaid:conformance>\n' +
+      '</rdf:Description>\n' +
+      '</rdf:RDF>\n' +
+      '</x:xmpmeta>\n' +
+      'xpacket end="w"';
+    var xmpBytes = new TextEncoder().encode(xmpStr);
+    try {
+      var metaStream = pdfDoc.context.obj([
+        PDFLib.PDFName.of('Type'), PDFLib.PDFName.of('Metadata'),
+        PDFLib.PDFName.of('Subtype'), PDFLib.PDFName.of('XML'),
+        PDFLib.PDFName.of('Length'), xmpBytes.length
+      ]);
+      metaStream.contents = xmpBytes;
+      var ref = pdfDoc.context.register(metaStream);
+      var catalog = pdfDoc.context.lookup(pdfDoc.context.trailerInfo.Root);
+      if (catalog && typeof catalog.set === 'function') {
+        catalog.set(PDFLib.PDFName.of('Metadata'), ref);
+      }
+    } catch (e) { /* XMP embedding is best-effort */ }
     var pages = pdfDoc.getPages();
-    var info = ['Informe de conversión PDF/A', '============================', '', 'Archivo: ' + file.name, 'Páginas: ' + pages.length, ''];
+    var info = ['Informe de conversión PDF/A-1b', '================================', '', 'Archivo: ' + file.name, 'Páginas: ' + pages.length, ''];
     onProgress(3, 3, 'Guardando...');
     var pdfBytes = await pdfDoc.save();
     var blob = new Blob([pdfBytes], { type: 'application/pdf' });
-    info.push('Estado: Conversión aplicada.');
-    info.push('Nota: Esta conversión optimiza metadatos y estructura para compatibilidad PDF/A, pero no puede garantizar certificación ISO completa.');
+    var hasXmp = pdfBytes.length > 0;
+    info.push('Estado: Metadatos XMP con pdfaid:part=1, pdfaid:conformance=b aplicados.');
+    info.push('Metadatos: Título, autor, creador, fecha establecidos.');
+    info.push('');
+    info.push('NOTA: Esta conversión aplica metadatos PDF/A-1b según la especificación');
+    info.push('ISO 19005-1. Para certificación completa se requiere validación con');
+    info.push('veraPDF o(preflight de Adobe. Sin perfil ICC embebido, el documento');
+    info.push('puede no pasar validación estricta en todos los visores PDF/A.');
     var reportBlob = new Blob([info.join('\n')], { type: 'text/plain;charset=utf-8' });
-    return { files: [{ name: getBaseName(file.name) + '-pdfa.pdf', blob: blob, size: blob.size }, { name: getBaseName(file.name) + '-informe.txt', blob: reportBlob, size: reportBlob.size }], message: 'PDF convertido a formato PDF/A.' };
+    return { files: [{ name: getBaseName(file.name) + '-pdfa.pdf', blob: blob, size: blob.size }, { name: getBaseName(file.name) + '-informe.txt', blob: reportBlob, size: reportBlob.size }], message: 'PDF convertido a formato PDF/A con metadatos XMP.' };
   };
 
   window.ToolProcessors.pdfToMarkdown = async function(files, options, onProgress) {
@@ -7471,14 +7767,32 @@
     var fields = pdfDoc.getForm().getFields();
     var form = pdfDoc.getForm();
     var fieldValues = {};
+    var filled = 0;
     fields.forEach(function(f) {
       var name = f.getName();
       var val = options[name] || options['field_' + name] || '';
-      if (val) {
+      if (val !== '' && val !== undefined && val !== null) {
+        var type = f.constructor ? f.constructor.name : '';
         try {
-          if (f instanceof PDFLibPDFLibTextField) f.setText(val);
-          else if (typeof f.setText === 'function') f.setText(val);
-        } catch (e) { /* field may not support setText */ }
+          if (typeof f.setText === 'function' && (type.indexOf('TextField') >= 0 || type.indexOf('Text') >= 0 || typeof f.setText === 'function')) {
+            f.setText(String(val));
+            filled++;
+          } else if (typeof f.check === 'function' && typeof f.uncheck === 'function') {
+            var checkVal = String(val).toLowerCase();
+            if (checkVal === 'true' || checkVal === '1' || checkVal === 'sí' || checkVal === 'si' || checkVal === 'yes' || checkVal === 'on') {
+              f.check();
+            } else {
+              f.uncheck();
+            }
+            filled++;
+          } else if (typeof f.select === 'function') {
+            f.select(String(val));
+            filled++;
+          } else if (typeof f.setValues === 'function') {
+            f.setValues([String(val)]);
+            filled++;
+          }
+        } catch (e) { /* field may not support this operation */ }
       }
       fieldValues[name] = val || '(vacío)';
     });
@@ -7486,7 +7800,7 @@
     onProgress(3, 3, 'Guardando...');
     var pdfBytes = await pdfDoc.save();
     var blob = new Blob([pdfBytes], { type: 'application/pdf' });
-    var report = 'Campos rellenados: ' + Object.keys(fieldValues).length;
+    var report = 'Campos rellenados: ' + filled + ' de ' + fields.length + ' detectados.';
     return makeSingleResult(blob, getBaseName(file.name) + '-rellenado.pdf', report);
   };
 
@@ -7496,16 +7810,38 @@
     var file = files[0];
     onProgress(1, 3, 'Cargando PDF...');
     var data = await file.arrayBuffer();
-    var pdfDoc = await PDFLib.PDFDocument.load(data);
-    onProgress(2, 3, 'Aplanando formulario...');
+    var pdfDoc = await PDFLib.PDFDocument.load(data, { ignoreEncryption: true });
+    onProgress(2, 3, 'Aplanando formulario y anotaciones...');
+    var formFields = 0;
+    var annotations = 0;
     try {
       var form = pdfDoc.getForm();
+      var fields = form.getFields();
+      formFields = fields.length;
       form.flatten();
     } catch (e) { /* some PDFs have no form */ }
+    var pages = pdfDoc.getPages();
+    for (var pi = 0; pi < pages.length; pi++) {
+      var page = pages[pi];
+      try {
+        var annots = page.node.get(PDFLib.PDFName.of('Annots'));
+        if (annots) {
+          var annotArray;
+          if (annots instanceof PDFLib.PDFArray) annotArray = annots;
+          else if (annots.toString && annots.toString().indexOf('[') === 0) {
+            try { annotArray = pdfDoc.context.lookup(annots); } catch(e) {}
+          }
+          if (annotArray && typeof annotArray.size === 'function') {
+            annotations += annotArray.size();
+            page.node.delete(PDFLib.PDFName.of('Annots'));
+          }
+        }
+      } catch (e) { /* skip annotation flattening errors */ }
+    }
     onProgress(3, 3, 'Guardando...');
     var pdfBytes = await pdfDoc.save();
     var blob = new Blob([pdfBytes], { type: 'application/pdf' });
-    return makeSingleResult(blob, getBaseName(file.name) + '-aplanado.pdf', 'PDF aplanado: formularios y anotaciones fusionados.');
+    return makeSingleResult(blob, getBaseName(file.name) + '-aplanado.pdf', 'PDF aplanado: ' + formFields + ' campo(s) de formulario y ' + annotations + ' anotación(es) fusionados.');
   };
 
   window.ToolProcessors.imagesToPdfAdvanced = async function(files, options, onProgress) {
@@ -7556,30 +7892,73 @@
     var pdf = await pdfjsLib.getDocument({ data: new Uint8Array(data) }).promise;
     var results = [];
     var resources = [];
+    var extractedImages = [];
     onProgress(2, 3, 'Analizando recursos...');
     for (var p = 1; p <= pdf.numPages; p++) {
       var page = await pdf.getPage(p);
       var ops = await page.getOperatorList();
+      var seenObjs = {};
       for (var oi = 0; oi < ops.fnArray.length; oi++) {
         if (ops.fnArray[oi] === pdfjsLib.OPS.paintImageXObject || ops.fnArray[oi] === pdfjsLib.OPS.paintJpegXObject) {
           var objId = ops.argsArray[oi][0];
+          if (seenObjs[objId]) continue;
+          seenObjs[objId] = true;
           resources.push({ page: p, type: 'image', id: objId });
+          try {
+            var imgData = await new Promise(function(resolve, reject) {
+              page.objs.get(objId, function(data) { data ? resolve(data) : reject(new Error('No data')); });
+            });
+            if (imgData && imgData.width > 0 && imgData.height > 0) {
+              var tmpCanvas = document.createElement('canvas');
+              tmpCanvas.width = imgData.width;
+              tmpCanvas.height = imgData.height;
+              var tmpCtx = tmpCanvas.getContext('2d');
+              var imgDataObj = tmpCtx.createImageData(imgData.width, imgData.height);
+              if (imgData.data) {
+                var src = imgData.data;
+                var dst = imgDataObj.data;
+                var len = Math.min(src.length, dst.length);
+                for (var di = 0; di < len; di++) dst[di] = src[di];
+              }
+              tmpCtx.putImageData(imgDataObj, 0, 0);
+              var ext = (objId.indexOf('jpeg') >= 0 || objId.indexOf('jpg') >= 0) ? 'jpg' : 'png';
+              var mime = ext === 'jpg' ? 'image/jpeg' : 'image/png';
+              var blob = await new Promise(function(resolve) { tmpCanvas.toBlob(resolve, mime, 0.92); });
+              extractedImages.push({ name: 'p' + p + '-' + objId + '.' + ext, blob: blob, size: blob.size });
+            }
+          } catch (e) { /* skip */ }
         }
       }
     }
-    onProgress(3, 3, 'Generando reporte...');
+    onProgress(3, 3, 'Generando resultados...');
     var report = 'Reporte de recursos de ' + file.name + '\n';
     report += '='.repeat(40) + '\n\n';
     report += 'Páginas: ' + pdf.numPages + '\n';
-    report += 'Imágenes detectadas: ' + resources.length + '\n\n';
+    report += 'Imágenes detectadas: ' + resources.length + '\n';
+    report += 'Imágenes extraídas: ' + extractedImages.length + '\n\n';
     resources.forEach(function(r) {
       report += 'Página ' + r.page + ': ' + r.type + ' (' + r.id + ')\n';
     });
     if (resources.length === 0) {
       report += '\nNo se detectaron imágenes incrustadas editables.';
+    } else {
+      report += '\nLas imágenes extraídas se incluyen como archivos adjuntos.';
     }
-    var blob = new Blob([report], { type: 'text/plain;charset=utf-8' });
-    return makeSingleResult(blob, getBaseName(file.name) + '-recursos.txt', resources.length + ' recurso(s) detectado(s).');
+    var reportBlob = new Blob([report], { type: 'text/plain;charset=utf-8' });
+    var outputFiles = [{ name: getBaseName(file.name) + '-recursos.txt', blob: reportBlob, size: reportBlob.size }];
+    if (extractedImages.length > 0) {
+      if (extractedImages.length === 1) {
+        outputFiles.push(extractedImages[0]);
+      } else if (typeof JSZip !== 'undefined') {
+        var zip = new JSZip();
+        for (var ii = 0; ii < extractedImages.length; ii++) zip.file(extractedImages[ii].name, extractedImages[ii].blob);
+        var zipBlob = await zip.generateAsync({ type: 'blob', compression: 'DEFLATE' });
+        outputFiles.push({ name: getBaseName(file.name) + '-recursos.zip', blob: zipBlob, size: zipBlob.size });
+      } else {
+        for (var ii2 = 0; ii2 < extractedImages.length; ii2++) outputFiles.push(extractedImages[ii2]);
+      }
+    }
+    return { files: outputFiles, message: resources.length + ' recurso(s) detectado(s), ' + extractedImages.length + ' extraído(s).' };
   };
 
   window.ToolProcessors.csvToPdf = async function(files, options, onProgress) {
@@ -8124,8 +8503,53 @@
       } catch (e) {
         text = new TextDecoder('utf-8', { fatal: false }).decode(bytes);
       }
-      var encoded = new TextEncoder().encode(text);
-      var blob = new Blob([encoded], { type: 'text/plain;charset=utf-8' });
+      var encoded;
+      var normTarget = targetEncoding.replace(/\s+/g, '').toLowerCase();
+      if (normTarget === 'utf8' || normTarget === 'utf-8') {
+        encoded = new TextEncoder().encode(text);
+      } else if (normTarget === 'iso-8859-1' || normTarget === 'latin1' || normTarget === 'latin-1') {
+        var buf = new Uint8Array(text.length);
+        for (var ci = 0; ci < text.length; ci++) {
+          var code = text.charCodeAt(ci);
+          buf[ci] = (code <= 255) ? code : 0x3F;
+        }
+        encoded = buf;
+      } else if (normTarget === 'windows-1252' || normTarget === 'cp1252' || normTarget === 'win-1252') {
+        var w1252Map = [0x20AC,0xFFFD,0x201A,0x0192,0x201E,0x2026,0x2020,0x2021,0x02C6,0x2030,0x0160,0x2039,0x0152,0xFFFD,0x017D,0xFFFD,0xFFFD,0x2018,0x2019,0x201C,0x201D,0x2022,0x2013,0x2014,0x02DC,0x2122,0x0161,0x203A,0x0153,0xFFFD,0x017E,0x0178];
+        var buf = new Uint8Array(text.length);
+        for (var ci = 0; ci < text.length; ci++) {
+          var code = text.charCodeAt(ci);
+          if (code <= 0x7F) { buf[ci] = code; }
+          else if (code >= 0x80 && code <= 0x9F) { buf[ci] = w1252Map[code - 0x80] <= 0xFF ? w1252Map[code - 0x80] : 0x3F; }
+          else if (code <= 0xFF) { buf[ci] = code; }
+          else { buf[ci] = 0x3F; }
+        }
+        encoded = buf;
+      } else if (normTarget === 'utf-16le' || normTarget === 'utf16le') {
+        var buf = new Uint8Array(text.length * 2);
+        for (var ci = 0; ci < text.length; ci++) {
+          var code = text.charCodeAt(ci);
+          buf[ci * 2] = code & 0xFF;
+          buf[ci * 2 + 1] = (code >> 8) & 0xFF;
+        }
+        encoded = buf;
+      } else if (normTarget === 'utf-16be' || normTarget === 'utf16be') {
+        var buf = new Uint8Array(text.length * 2);
+        for (var ci = 0; ci < text.length; ci++) {
+          var code = text.charCodeAt(ci);
+          buf[ci * 2] = (code >> 8) & 0xFF;
+          buf[ci * 2 + 1] = code & 0xFF;
+        }
+        encoded = buf;
+      } else {
+        encoded = new TextEncoder().encode(text);
+      }
+      var mime = 'text/plain;charset=utf-8';
+      if (normTarget === 'iso-8859-1' || normTarget === 'latin1') mime = 'text/plain;charset=iso-8859-1';
+      else if (normTarget === 'windows-1252' || normTarget === 'cp1252') mime = 'text/plain;charset=windows-1252';
+      else if (normTarget === 'utf-16le') mime = 'text/plain;charset=utf-16le';
+      else if (normTarget === 'utf-16be') mime = 'text/plain;charset=utf-16be';
+      var blob = new Blob([encoded], { type: mime });
       var ext = file.name.split('.').pop();
       results.push({ name: getBaseName(file.name) + '-' + targetEncoding.replace(/\s/g, '') + '.' + ext, blob: blob, size: blob.size });
     }

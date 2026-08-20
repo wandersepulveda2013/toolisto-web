@@ -33,7 +33,7 @@
       "pass": true
     },
     {
-      "name": "extractImagesPdf message: \"2 página(s) extraída(s) como imagen.\"",
+      "name": "extractImagesPdf message: \"2 imagen(es) extraída(s) de 2 página(s).\"",
       "pass": true
     },
     {
@@ -73,7 +73,7 @@
       "pass": true
     },
     {
-      "name": "pptxToPdf message: \"1 archivo(s) PPTX convertido(s).\"",
+      "name": "pptxToPdf message: \"1 archivo(s) PPTX convertido(s). Texto: 1, Imágenes: 1.\"",
       "pass": true
     },
     {
@@ -109,7 +109,7 @@
       "pass": true
     },
     {
-      "name": "pdfToPdfa message: \"PDF convertido a formato PDF/A.\"",
+      "name": "pdfToPdfa message: \"PDF convertido a formato PDF/A con metadatos XMP.\"",
       "pass": true
     },
     {
@@ -145,7 +145,7 @@
       "pass": true
     },
     {
-      "name": "pdfFormFiller message: \"Campos rellenados: 2\"",
+      "name": "pdfFormFiller message: \"Campos rellenados: 0 de 2 detectados.\"",
       "pass": true
     },
     {
@@ -157,7 +157,7 @@
       "pass": true
     },
     {
-      "name": "flattenPdf message: \"PDF aplanado: formularios y anotaciones fusionados.\"",
+      "name": "flattenPdf message: \"PDF aplanado: 2 campo(s) de formulario y 2 anotación(es) fusionados.\"",
       "pass": true
     },
     {
@@ -185,7 +185,7 @@
       "pass": true
     },
     {
-      "name": "pdfExtractResources message: \"0 recurso(s) detectado(s).\"",
+      "name": "pdfExtractResources message: \"0 recurso(s) detectado(s), 0 extraído(s).\"",
       "pass": true
     },
     {
