@@ -828,8 +828,9 @@ async function _flushAndSaveSession() {
     const doc = appStore.get('currentDoc');
     const table = appStore.get('currentDataTable');
     const project = appStore.get('currentProject');
-    if (project && doc && appStore.get('isDirty')) { await saveDoc(project.id, doc); _appHistory.push(_captureWorkspaceState(), { action: 'doc-edit' }); }
-    if (project && table && appStore.get('isDirty')) { await saveData(project.id, table); await syncDerivedCharts(project, table); _appHistory.push(_captureWorkspaceState(), { action: 'table-edit' }); }
+    const dirty = appStore.get('isDirty');
+    if (project && doc && dirty) { await saveDoc(project.id, doc); _appHistory.push(_captureWorkspaceState(), { action: 'doc-edit' }); }
+    if (project && table && dirty) { await saveData(project.id, table); await syncDerivedCharts(project, table); _appHistory.push(_captureWorkspaceState(), { action: 'table-edit' }); }
     if (project) {
       const workflowData = workflowUI ? workflowUI.getWorkflowSnapshot() : null;
       await saveWorkspaceSession({
@@ -1594,37 +1595,42 @@ function renderIntakeView(container) {
 
 async function saveImageCapture(project, dataUrl, type, name) {
   const start = Date.now();
-  const capture = {
-    id: generateId(),
-    projectId: project.id,
-    type,
-    dataUrl,
-    timestamp: Date.now(),
-    name,
-  };
-  await saveCapture(project.id, capture);
-  const asset = createImageAsset(name || 'Captura', project.id, null);
-  asset.originalDataUrl = dataUrl;
-  asset.dataUrl = dataUrl;
-  asset.type = 'image-asset';
-  asset.metadata = { captureType: type, captureId: capture.id };
-  addRelation(capture, asset.id, 'asset');
-  addRelation(asset, capture.id, 'source-capture');
-  await saveAsset(project.id, asset);
-  pushHistory(asset, 'imported', `Imagen importada desde ${type}`);
-  await saveAsset(project.id, asset);
-  await registerExecution(project.id, 'image-import', 'Importar imagen', {
-    inputAssetIds: [asset.id],
-    parameters: { type, name },
-    resultType: 'image-asset',
-    resultAssetId: asset.id,
-    startedAt: start,
-    status: 'completed',
-  });
-  await refreshProjectCounts(project.id);
-  appStore.set({ captures: [capture, ...appStore.get('captures')], lastSaved: Date.now() });
-  toast('Captura guardada en el proyecto', 'success');
-  return { capture, asset };
+  try {
+    const capture = {
+      id: generateId(),
+      projectId: project.id,
+      type,
+      dataUrl,
+      timestamp: Date.now(),
+      name,
+    };
+    await saveCapture(project.id, capture);
+    const asset = createImageAsset(name || 'Captura', project.id, null);
+    asset.originalDataUrl = dataUrl;
+    asset.dataUrl = dataUrl;
+    asset.type = 'image-asset';
+    asset.metadata = { captureType: type, captureId: capture.id };
+    addRelation(capture, asset.id, 'asset');
+    addRelation(asset, capture.id, 'source-capture');
+    await saveAsset(project.id, asset);
+    pushHistory(asset, 'imported', `Imagen importada desde ${type}`);
+    await registerExecution(project.id, 'image-import', 'Importar imagen', {
+      inputAssetIds: [asset.id],
+      parameters: { type, name },
+      resultType: 'image-asset',
+      resultAssetId: asset.id,
+      startedAt: start,
+      status: 'completed',
+    });
+    await refreshProjectCounts(project.id);
+    appStore.set({ captures: [capture, ...appStore.get('captures')], lastSaved: Date.now() });
+    toast('Captura guardada en el proyecto', 'success');
+    return { capture, asset };
+  } catch (error) {
+    reportError(error, 'save-image-capture', { type, name });
+    toast('Error al guardar la captura', 'error');
+    return null;
+  }
 }
 
 async function captureFromFile(project, mode) {
@@ -2132,7 +2138,9 @@ function rebuildTableRow(tokens, headerCount) {
   return cells;
 }
 
+let _convertingDocToTable = false;
 function convertDocToTable(doc) {
+  if (_convertingDocToTable) { toast('Conversión en curso, espera', 'info'); return; }
   const project = appStore.get('currentProject');
   if (!project || !doc) { toast('Proyecto o documento no disponible', 'warning'); return; }
   const lines = (doc.blocks || []).map(b => b.content || '').filter(Boolean);
@@ -2165,6 +2173,7 @@ function convertDocToTable(doc) {
   table.reviewedAt = requiresDataReview(table) ? null : Date.now();
   addRelation(table, doc.id, 'source-document');
   addRelation(doc, table.id, 'derived-table');
+  _convertingDocToTable = true;
   saveData(project.id, table).then(() => {
     registerExecution(project.id, 'text-to-table', 'Texto a tabla', {
       inputAssetIds: [doc.id],
@@ -2178,7 +2187,8 @@ function convertDocToTable(doc) {
     refreshProjectCounts(project.id);
     appStore.set({ currentDataTable: table, currentView: 'data-table' });
     toast('Documento convertido a tabla', 'success');
-  }).catch(() => { toast('Error al guardar la tabla', 'error'); });
+  }).catch(() => { toast('Error al guardar la tabla', 'error'); })
+    .finally(() => { _convertingDocToTable = false; });
 }
 
 function tableChartData(table, maxSeries = 30) {
