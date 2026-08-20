@@ -7668,7 +7668,7 @@ function showModal(opts) {
   const modal = h('div', { className: 'ws-modal' + (opts.size ? ' size-' + opts.size : ''), role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': titleId });
   const header = h('div', { className: 'ws-modal-header' },
     h('div', { className: 'ws-modal-title', id: titleId }, opts.title || ''),
-    h('button', { className: 'ws-modal-close', onClick: async () => { if (opts.onClose) await opts.onClose(); closeModal(); }, ariaLabel: 'Cerrar diálogo' }, svgIcon('close', 18))
+    h('button', { className: 'ws-modal-close', onClick: async () => { try { if (opts.onClose) await opts.onClose(); } finally { closeModal(); } }, ariaLabel: 'Cerrar diálogo' }, svgIcon('close', 18))
   );
   modal.appendChild(header);
   const body = h('div', { className: 'ws-modal-body' });
@@ -7685,10 +7685,9 @@ function showModal(opts) {
     else footer.appendChild(opts.footer);
     modal.appendChild(footer);
   } else if (opts.confirmText) {
-    const cancelBtn = h('button', { className: 'ws-btn ws-btn-ghost', onClick: async () => { if (opts.onCancel) await opts.onCancel(); closeModal(); } }, opts.cancelText || 'Cancelar');
+    const cancelBtn = h('button', { className: 'ws-btn ws-btn-ghost', onClick: async () => { try { if (opts.onCancel) await opts.onCancel(); } finally { closeModal(); } } }, opts.cancelText || 'Cancelar');
     const confirmBtn = h('button', { className: 'ws-btn ' + (opts.confirmClass || 'ws-btn-primary') + ' ws-btn-confirm', onClick: async () => {
-      if (opts.onConfirm) await opts.onConfirm();
-      closeModal();
+      try { if (opts.onConfirm) await opts.onConfirm(); } finally { closeModal(); }
     }}, opts.confirmText);
     footer.appendChild(cancelBtn);
     footer.appendChild(confirmBtn);

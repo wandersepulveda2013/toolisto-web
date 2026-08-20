@@ -445,7 +445,7 @@
         var pdfBytes = await doc.save();
         var blob = new Blob([pdfBytes], { type: 'application/pdf' });
         results.push({ name: getBaseName(files[i].name) + '.pdf', blob: blob });
-      } catch(e) { throw e; }
+      } catch(e) { /* skip failed file */ }
     }
     return makeResult(results, 'Converted ' + results.length + ' file(s) to PDF.');
   };
@@ -518,7 +518,7 @@
           cropCanvas.toBlob(function(b) { resolve(b); }, 'image/jpeg', quality);
         });
         results.push({ name: getBaseName(files[i].name) + '.jpg', blob: blob });
-      } catch(e) { throw e; }
+      } catch(e) { /* skip failed file */ }
     }
     return makeResult(results, 'Converted ' + results.length + ' file(s) to JPG.');
   };
@@ -590,7 +590,7 @@
           cropCanvas.toBlob(function(b) { resolve(b); }, 'image/png');
         });
         results.push({ name: getBaseName(files[i].name) + '.png', blob: blob });
-      } catch(e) { throw e; }
+      } catch(e) { /* skip failed file */ }
     }
     return makeResult(results, 'Converted ' + results.length + ' file(s) to PNG.');
   };
@@ -606,7 +606,7 @@
         var text = textResult.value || '';
         var blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
         results.push({ name: getBaseName(files[i].name) + '.txt', blob: blob });
-      } catch(e) { throw e; }
+      } catch(e) { /* skip failed file */ }
     }
     return makeResult(results, 'Extracted text from ' + results.length + ' file(s).');
   };
@@ -623,7 +623,7 @@
         var fullHtml = wrapHtml(html, files[i].name);
         var blob = new Blob([fullHtml], { type: 'text/html;charset=utf-8' });
         results.push({ name: getBaseName(files[i].name) + '.html', blob: blob });
-      } catch(e) { throw e; }
+      } catch(e) { /* skip failed file */ }
     }
     return makeResult(results, 'Converted ' + results.length + ' file(s) to HTML.');
   };
@@ -640,7 +640,7 @@
         var md = htmlToMarkdown(html);
         var blob = new Blob([md], { type: 'text/markdown;charset=utf-8' });
         results.push({ name: getBaseName(files[i].name) + '.md', blob: blob });
-      } catch(e) { throw e; }
+      } catch(e) { /* skip failed file */ }
     }
     return makeResult(results, 'Converted ' + results.length + ' file(s) to Markdown.');
   };
@@ -736,7 +736,7 @@
 
         var epubBlob = await zip.generateAsync({ type: 'blob', mimeType: 'application/epub+zip' });
         results.push({ name: getBaseName(files[i].name) + '.epub', blob: epubBlob });
-      } catch(e) { throw e; }
+      } catch(e) { /* skip failed file */ }
     }
     return makeResult(results, 'Converted ' + results.length + ' file(s) to EPUB.');
   };
@@ -771,7 +771,7 @@
 
         var odtBlob = await zip.generateAsync({ type: 'blob' });
         results.push({ name: getBaseName(files[i].name) + '.odt', blob: odtBlob });
-      } catch(e) { throw e; }
+      } catch(e) { /* skip failed file */ }
     }
     return makeResult(results, 'Converted ' + results.length + ' file(s) to ODT.');
   };
@@ -809,7 +809,7 @@
 
         var docxBlob = await docx.Packer.toBlob(doc);
         results.push({ name: getBaseName(files[i].name) + '.docx', blob: docxBlob });
-      } catch(e) { throw e; }
+      } catch(e) { /* skip failed file */ }
     }
     return makeResult(results, 'Converted ' + results.length + ' file(s) to DOCX.');
   };
@@ -836,7 +836,7 @@
 
         var docxBlob = await docx.Packer.toBlob(doc);
         results.push({ name: getBaseName(files[i].name) + '.docx', blob: docxBlob });
-      } catch(e) { throw e; }
+      } catch(e) { /* skip failed file */ }
     }
     return makeResult(results, 'Converted ' + results.length + ' file(s) to DOCX.');
   };
@@ -1523,7 +1523,7 @@
         var pdfBytes = await doc.save();
         var blob = new Blob([pdfBytes], { type: 'application/pdf' });
         results.push({ name: getBaseName(files[i].name) + '.pdf', blob: blob });
-      } catch(e) { throw e; }
+      } catch(e) { /* skip failed file */ }
     }
     return makeResult(results, 'Converted ' + results.length + ' file(s) to PDF.');
   };
@@ -1599,7 +1599,7 @@
 
         var epubBlob = await zip.generateAsync({ type: 'blob', mimeType: 'application/epub+zip' });
         results.push({ name: getBaseName(files[i].name) + '.epub', blob: epubBlob });
-      } catch(e) { throw e; }
+      } catch(e) { /* skip failed file */ }
     }
     return makeResult(results, 'Converted ' + results.length + ' file(s) to EPUB.');
   };
@@ -1829,8 +1829,10 @@
             md += '| ' + rows[r].join(' | ') + ' |\n';
           }
         } else {
-          if (rows.length > 0) {
+          if (addHeaders && rows.length > 0) {
             md += '| ' + rows[0].join(' | ') + ' |\n';
+            md += '| ' + rows[0].map(function() { return '---'; }).join(' | ') + ' |\n';
+          } else if (rows.length > 0) {
             md += '| ' + rows[0].map(function() { return '---'; }).join(' | ') + ' |\n';
           }
           for (var r = (addHeaders ? 1 : 0); r < rows.length; r++) {
@@ -5299,7 +5301,7 @@
         results.push({ name: getBaseName(file.name) + '-buscable.pdf', blob: blob });
         
         URL.revokeObjectURL(img.src);
-      } catch(e) { throw e; }
+      } catch(e) { /* skip failed file */ }
     }
     
     return makeResult(results, 'Se procesaron ' + results.length + ' imagen(es) a PDF buscable.');
