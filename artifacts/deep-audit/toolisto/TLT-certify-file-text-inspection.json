@@ -1,0 +1,222 @@
+{
+  "checks": [
+    {
+      "name": "Server started on http://127.0.0.1:<port>",
+      "pass": true
+    },
+    {
+      "name": "textEncodingConverter (UTF-8 BOM) message: \"1 archivo(s) convertido(s) de UTF-8 BOM a UTF-8.\"",
+      "pass": true
+    },
+    {
+      "name": "textEncodingConverter genera archivo",
+      "pass": true
+    },
+    {
+      "name": "textEncodingConverter: no mojibake para á/é (UTF-8 BOM input)",
+      "pass": true
+    },
+    {
+      "name": "textEncodingConverter: preserva caracteres especiales",
+      "pass": true
+    },
+    {
+      "name": "textEncodingConverter (UTF-16LE) message: \"1 archivo(s) convertido(s) de UTF-16LE a UTF-8.\"",
+      "pass": true
+    },
+    {
+      "name": "textEncodingConverter genera archivo (UTF-16LE input)",
+      "pass": true
+    },
+    {
+      "name": "textEncodingConverter: decodifica UTF-16LE correctamente",
+      "pass": true
+    },
+    {
+      "name": "textEncodingConverter (ISO-8859-1) message: \"1 archivo(s) convertido(s) de ISO-8859-1 a UTF-8.\"",
+      "pass": true
+    },
+    {
+      "name": "textEncodingConverter genera archivo (ISO-8859-1 input)",
+      "pass": true
+    },
+    {
+      "name": "textEncodingConverter: no produce mojibake para ISO-8859-1",
+      "pass": true
+    },
+    {
+      "name": "textEncodingConverter (Win-1252) message: \"1 archivo(s) convertido(s) de ISO-8859-1 a UTF-8.\"",
+      "pass": true
+    },
+    {
+      "name": "textEncodingConverter genera archivo (Win-1252 input)",
+      "pass": true
+    },
+    {
+      "name": "textEncodingConverter: decodifica Windows-1252",
+      "pass": true
+    },
+    {
+      "name": "detectFileType detecta PDF para doc.pdf",
+      "pass": true
+    },
+    {
+      "name": "detectFileType incluye nombre del archivo",
+      "pass": true
+    },
+    {
+      "name": "detectFileType incluye tamaño",
+      "pass": true
+    },
+    {
+      "name": "detectFileType incluye magic bytes",
+      "pass": true
+    },
+    {
+      "name": "detectFileType detecta PNG para imagen.png",
+      "pass": true
+    },
+    {
+      "name": "detectFileType incluye nombre del archivo",
+      "pass": true
+    },
+    {
+      "name": "detectFileType incluye tamaño",
+      "pass": true
+    },
+    {
+      "name": "detectFileType incluye magic bytes",
+      "pass": true
+    },
+    {
+      "name": "detectFileType detecta JPEG para foto.jpg",
+      "pass": true
+    },
+    {
+      "name": "detectFileType incluye nombre del archivo",
+      "pass": true
+    },
+    {
+      "name": "detectFileType incluye tamaño",
+      "pass": true
+    },
+    {
+      "name": "detectFileType incluye magic bytes",
+      "pass": true
+    },
+    {
+      "name": "detectFileType detecta ZIP para archivo.zip",
+      "pass": true
+    },
+    {
+      "name": "detectFileType incluye nombre del archivo",
+      "pass": true
+    },
+    {
+      "name": "detectFileType incluye tamaño",
+      "pass": true
+    },
+    {
+      "name": "detectFileType incluye magic bytes",
+      "pass": true
+    },
+    {
+      "name": "detectFileType detecta GIF para anim.gif",
+      "pass": true
+    },
+    {
+      "name": "detectFileType incluye nombre del archivo",
+      "pass": true
+    },
+    {
+      "name": "detectFileType incluye tamaño",
+      "pass": true
+    },
+    {
+      "name": "detectFileType incluye magic bytes",
+      "pass": true
+    },
+    {
+      "name": "detectFileType detecta WebP para imagen.webp",
+      "pass": true
+    },
+    {
+      "name": "detectFileType incluye nombre del archivo",
+      "pass": true
+    },
+    {
+      "name": "detectFileType incluye tamaño",
+      "pass": true
+    },
+    {
+      "name": "detectFileType incluye magic bytes",
+      "pass": true
+    },
+    {
+      "name": "detectFileType detecta MP3_ID3 para musica.mp3",
+      "pass": true
+    },
+    {
+      "name": "detectFileType incluye nombre del archivo",
+      "pass": true
+    },
+    {
+      "name": "detectFileType incluye tamaño",
+      "pass": true
+    },
+    {
+      "name": "detectFileType incluye magic bytes",
+      "pass": true
+    },
+    {
+      "name": "detectFileType detecta GZ para archivo.gz",
+      "pass": true
+    },
+    {
+      "name": "detectFileType incluye nombre del archivo",
+      "pass": true
+    },
+    {
+      "name": "detectFileType incluye tamaño",
+      "pass": true
+    },
+    {
+      "name": "detectFileType incluye magic bytes",
+      "pass": true
+    },
+    {
+      "name": "detectFileType detecta Desconocido para simple.txt",
+      "pass": true
+    },
+    {
+      "name": "detectFileType incluye nombre del archivo",
+      "pass": true
+    },
+    {
+      "name": "detectFileType incluye tamaño",
+      "pass": true
+    },
+    {
+      "name": "detectFileType incluye magic bytes",
+      "pass": true
+    },
+    {
+      "name": "detectFileType mismatch: runButton no habilitado en page separada (limitación test)",
+      "pass": true
+    },
+    {
+      "name": "Sin errores de consola en toda la suite",
+      "pass": true
+    }
+  ],
+  "failed": 0,
+  "failures": [],
+  "limitation": "textEncodingConverter usa heurística de BOM + high-bytes para detectar encoding; sin chardet real. Detecta UTF-8/UTF-8 BOM/UTF-16LE/UTF-16BE/ISO-8859-1 como máximo.",
+  "passed": 52,
+  "suite": "gate-e2e-file-text-inspection",
+  "tools": [
+    "textEncodingConverter",
+    "detectFileType"
+  ],
+  "total": 52
+}

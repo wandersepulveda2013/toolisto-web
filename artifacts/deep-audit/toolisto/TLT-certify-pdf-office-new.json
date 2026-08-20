@@ -1,0 +1,237 @@
+{
+  "checks": [
+    {
+      "name": "Server started on http://127.0.0.1:<port>",
+      "pass": true
+    },
+    {
+      "name": "PDF fixture generado",
+      "pass": true
+    },
+    {
+      "name": "PDF con formularios generado",
+      "pass": true
+    },
+    {
+      "name": "XLSX fixture generado",
+      "pass": true
+    },
+    {
+      "name": "extractTextPdf message: \"Texto extraído de 2 página(s).\"",
+      "pass": true
+    },
+    {
+      "name": "extractTextPdf genera archivo",
+      "pass": true
+    },
+    {
+      "name": "extractTextPdf extrae texto de la página 1",
+      "pass": true
+    },
+    {
+      "name": "extractTextPdf extrae texto de la página 2",
+      "pass": true
+    },
+    {
+      "name": "extractImagesPdf message: \"2 página(s) extraída(s) como imagen.\"",
+      "pass": true
+    },
+    {
+      "name": "extractImagesPdf genera archivo",
+      "pass": true
+    },
+    {
+      "name": "extractImagesPdf salida es ZIP o PNG",
+      "pass": true
+    },
+    {
+      "name": "pdfToPptx message: \"2 diapositiva(s) generada(s).\"",
+      "pass": true
+    },
+    {
+      "name": "pdfToPptx genera archivo PPTX",
+      "pass": true
+    },
+    {
+      "name": "pdfToPptx salida es ZIP (PPTX OOXML)",
+      "pass": true
+    },
+    {
+      "name": "pdfToPptx PPTX tiene presentation.xml",
+      "pass": true
+    },
+    {
+      "name": "pdfToPptx PPTX tiene [Content_Types].xml",
+      "pass": true
+    },
+    {
+      "name": "pdfToPptx genera 2 slides (esperado 2)",
+      "pass": true
+    },
+    {
+      "name": "PPTX fixture generado",
+      "pass": true
+    },
+    {
+      "name": "pptxToPdf message: \"1 archivo(s) PPTX convertido(s).\"",
+      "pass": true
+    },
+    {
+      "name": "pptxToPdf genera PDF",
+      "pass": true
+    },
+    {
+      "name": "pptxToPdf salida es PDF válido",
+      "pass": true
+    },
+    {
+      "name": "excelToPdf message: \"1 archivo(s) Excel convertido(s).\"",
+      "pass": true
+    },
+    {
+      "name": "excelToPdf genera PDF",
+      "pass": true
+    },
+    {
+      "name": "excelToPdf salida es PDF válido",
+      "pass": true
+    },
+    {
+      "name": "htmlToPdf message: \"1 archivo(s) HTML convertido(s).\"",
+      "pass": true
+    },
+    {
+      "name": "htmlToPdf genera PDF",
+      "pass": true
+    },
+    {
+      "name": "htmlToPdf salida es PDF válido",
+      "pass": true
+    },
+    {
+      "name": "pdfToPdfa message: \"PDF convertido a formato PDF/A.\"",
+      "pass": true
+    },
+    {
+      "name": "pdfToPdfa genera PDF + informe",
+      "pass": true
+    },
+    {
+      "name": "pdfToPdfa salida principal es PDF válido",
+      "pass": true
+    },
+    {
+      "name": "pdfToMarkdown message: \"Markdown generado desde 2 página(s).\"",
+      "pass": true
+    },
+    {
+      "name": "pdfToMarkdown genera archivo",
+      "pass": true
+    },
+    {
+      "name": "pdfToMarkdown salida contiene cabeceras Markdown",
+      "pass": true
+    },
+    {
+      "name": "pdfToMarkdown extrae texto de la página 1",
+      "pass": true
+    },
+    {
+      "name": "pdfToMarkdown extrae texto de la página 2",
+      "pass": true
+    },
+    {
+      "name": "pdfToMarkdown usa separadores ---",
+      "pass": true
+    },
+    {
+      "name": "pdfFormFiller message: \"Campos rellenados: 2\"",
+      "pass": true
+    },
+    {
+      "name": "pdfFormFiller genera PDF",
+      "pass": true
+    },
+    {
+      "name": "pdfFormFiller salida es PDF válido",
+      "pass": true
+    },
+    {
+      "name": "flattenPdf message: \"PDF aplanado: formularios y anotaciones fusionados.\"",
+      "pass": true
+    },
+    {
+      "name": "flattenPdf genera PDF",
+      "pass": true
+    },
+    {
+      "name": "flattenPdf salida es PDF válido",
+      "pass": true
+    },
+    {
+      "name": "flattenPdf elimina campos de formulario (0 campos restantes)",
+      "pass": true
+    },
+    {
+      "name": "imagesToPdfAdvanced message: \"1 imagen(es) en PDF optimizado.\"",
+      "pass": true
+    },
+    {
+      "name": "imagesToPdfAdvanced genera PDF",
+      "pass": true
+    },
+    {
+      "name": "imagesToPdfAdvanced salida es PDF válido",
+      "pass": true
+    },
+    {
+      "name": "pdfExtractResources message: \"0 recurso(s) detectado(s).\"",
+      "pass": true
+    },
+    {
+      "name": "pdfExtractResources genera reporte",
+      "pass": true
+    },
+    {
+      "name": "pdfExtractResources salida tiene cabecera de reporte",
+      "pass": true
+    },
+    {
+      "name": "csvToPdf message: \"1 CSV(s) convertido(s) a PDF.\"",
+      "pass": true
+    },
+    {
+      "name": "csvToPdf genera PDF",
+      "pass": true
+    },
+    {
+      "name": "csvToPdf salida es PDF válido",
+      "pass": true
+    },
+    {
+      "name": "Sin errores de consola en toda la suite",
+      "pass": true
+    }
+  ],
+  "failed": 0,
+  "failures": [],
+  "limitation": "pdfToPdfa solo optimiza metadatos, no genera PDF/A ISO-certificado. pdfToPptx rasteriza páginas como imágenes. pptxToPdf extrae imágenes incrustadas (no renderiza diapositivas). extractImagesPdf renderiza páginas (no extrae imágenes embebidas originales). pdfFormFiller rellena campos TextField, checkbox/radio limitados.",
+  "passed": 53,
+  "suite": "gate-e2e-pdf-office-new",
+  "tools": [
+    "extractTextPdf",
+    "extractImagesPdf",
+    "pdfToPptx",
+    "pptxToPdf",
+    "excelToPdf",
+    "htmlToPdf",
+    "pdfToPdfa",
+    "pdfToMarkdown",
+    "pdfFormFiller",
+    "flattenPdf",
+    "imagesToPdfAdvanced",
+    "pdfExtractResources",
+    "csvToPdf"
+  ],
+  "total": 53
+}

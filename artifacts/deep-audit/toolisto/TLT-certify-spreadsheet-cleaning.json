@@ -1,0 +1,186 @@
+{
+  "checks": [
+    {
+      "name": "Server started on http://127.0.0.1:<port>",
+      "pass": true
+    },
+    {
+      "name": "XLSX fixture con duplicados y vacíos",
+      "pass": true
+    },
+    {
+      "name": "cleanExcel message: \"1 archivo(s) limpio(s).\"",
+      "pass": true
+    },
+    {
+      "name": "cleanExcel genera archivo",
+      "pass": true
+    },
+    {
+      "name": "cleanExcel reduce filas vacías (6 filas)",
+      "pass": true
+    },
+    {
+      "name": "cleanExcel elimina filas completamente vacías",
+      "pass": true
+    },
+    {
+      "name": "removeDuplicatesExcel message: \"Duplicados eliminados y reporte generado.\"",
+      "pass": true
+    },
+    {
+      "name": "removeDuplicatesExcel genera archivo",
+      "pass": true
+    },
+    {
+      "name": "removeDuplicatesExcel salida es ZIP/XLSX",
+      "pass": true
+    },
+    {
+      "name": "removeDuplicatesExcel reduce a 4 filas (header + 3 únicas)",
+      "pass": true
+    },
+    {
+      "name": "csvChangeDelimiter message: \"1 CSV(s) convertido(s).\"",
+      "pass": true
+    },
+    {
+      "name": "csvChangeDelimiter genera archivo",
+      "pass": true
+    },
+    {
+      "name": "csvChangeDelimiter salida tiene delimitador",
+      "pass": true
+    },
+    {
+      "name": "csvChangeDelimiter conserva datos",
+      "pass": true
+    },
+    {
+      "name": "csvChangeEncoding message: \"1 archivo(s) convertido(s) a UTF-8.\"",
+      "pass": true
+    },
+    {
+      "name": "csvChangeEncoding genera archivo",
+      "pass": true
+    },
+    {
+      "name": "csvChangeEncoding no produce mojibake para á/é",
+      "pass": true
+    },
+    {
+      "name": "flattenJson message: \"JSON aplanado.\"",
+      "pass": true
+    },
+    {
+      "name": "flattenJson genera archivo",
+      "pass": true
+    },
+    {
+      "name": "flattenJson salida es array",
+      "pass": true
+    },
+    {
+      "name": "flattenJson aplana objetos anidados",
+      "pass": true
+    },
+    {
+      "name": "jsonToExcelAdvanced message: \"JSON convertido a Excel con 2 fila(s).\"",
+      "pass": true
+    },
+    {
+      "name": "jsonToExcelAdvanced genera XLSX",
+      "pass": true
+    },
+    {
+      "name": "jsonToExcelAdvanced salida es ZIP/XLSX",
+      "pass": true
+    },
+    {
+      "name": "jsonToExcelAdvanced produce 3 filas",
+      "pass": true
+    },
+    {
+      "name": "normalizeCsv message: \"2 CSV(s) normalizado(s).\"",
+      "pass": true
+    },
+    {
+      "name": "normalizeCsv genera archivo",
+      "pass": true
+    },
+    {
+      "name": "normalizeCsv conserva datos",
+      "pass": true
+    },
+    {
+      "name": "compareCsv message: \"Comparación: 0 añadida(s), 0 eliminada(s), 3 modificada(s).\"",
+      "pass": true
+    },
+    {
+      "name": "compareCsv genera reporte",
+      "pass": true
+    },
+    {
+      "name": "compareCsv reporte tiene cabecera",
+      "pass": true
+    },
+    {
+      "name": "compareCsv reporte marca diferencias",
+      "pass": true
+    },
+    {
+      "name": "compareCsv reporte menciona filas del análisis",
+      "pass": true
+    },
+    {
+      "name": "cleanTabularData message: \"1 archivo(s) limpio(s).\"",
+      "pass": true
+    },
+    {
+      "name": "cleanTabularData genera archivo",
+      "pass": true
+    },
+    {
+      "name": "cleanTabularData conserva datos",
+      "pass": true
+    },
+    {
+      "name": "htmlTableToExcel message: \"1 archivo(s) HTML procesado(s), 2 tabla(s).\"",
+      "pass": true
+    },
+    {
+      "name": "htmlTableToExcel genera XLSX",
+      "pass": true
+    },
+    {
+      "name": "htmlTableToExcel salida es ZIP/XLSX",
+      "pass": true
+    },
+    {
+      "name": "htmlTableToExcel extrae 2 tablas como hojas",
+      "pass": true
+    },
+    {
+      "name": "Sin errores de consola en toda la suite",
+      "pass": true
+    }
+  ],
+  "failed": 0,
+  "failures": [],
+  "limitation": "csvChangeEncoding no puede re-encodificar desde编码unknown sin dependencia chardet; usa heurística de BOM + high bytes. flattenJson no soporta unflatten bidireccional completo.",
+  "passed": 41,
+  "suite": "gate-e2e-spreadsheet-cleaning",
+  "tools": [
+    "cleanExcel",
+    "removeDuplicatesExcel",
+    "csvChangeDelimiter",
+    "csvChangeEncoding",
+    "flattenJson",
+    "jsonToExcelAdvanced",
+    "normalizeCsv",
+    "compareCsv",
+    "cleanTabularData",
+    "htmlTableToExcel"
+  ],
+  "total": 41
+}

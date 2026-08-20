@@ -1,0 +1,101 @@
+{
+  "checks": [
+    {
+      "name": "Server started on http://127.0.0.1:<port>",
+      "pass": true
+    },
+    {
+      "name": "fixtures generados",
+      "pass": true
+    },
+    {
+      "name": "heicToImage procesa JPEG: error controlado \"Ocurrió un problema: No se pudo convertir foto.jpg: ERR_USER Image is already br\" (sin HEIC real)",
+      "pass": true
+    },
+    {
+      "name": "heicToImage reutilización produce resultado",
+      "pass": true
+    },
+    {
+      "name": "avifToImage message: \"1 archivo(s) AVIF convertido(s).\"",
+      "pass": true
+    },
+    {
+      "name": "avifToImage genera archivo de descarga",
+      "pass": true
+    },
+    {
+      "name": "avifToImage salida es imagen válida",
+      "pass": true
+    },
+    {
+      "name": "svgToImage message: \"1 SVG rasterizado(s).\"",
+      "pass": true
+    },
+    {
+      "name": "svgToImage genera archivo de descarga",
+      "pass": true
+    },
+    {
+      "name": "svgToImage salida es PNG válido",
+      "pass": true
+    },
+    {
+      "name": "svgToImage produce imagen 512x512 por defecto",
+      "pass": true
+    },
+    {
+      "name": "svgToImage reutilización produce resultado",
+      "pass": true
+    },
+    {
+      "name": "faviconGenerator message: \"Favicons generados en 4 tamaños.\"",
+      "pass": true
+    },
+    {
+      "name": "faviconGenerator genera archivo de descarga",
+      "pass": true
+    },
+    {
+      "name": "faviconGenerator salida es ZIP o PNG",
+      "pass": true
+    },
+    {
+      "name": "pwaIconGenerator message: \"9 iconos PWA generados.\"",
+      "pass": true
+    },
+    {
+      "name": "pwaIconGenerator genera archivo de descarga",
+      "pass": true
+    },
+    {
+      "name": "pwaIconGenerator salida es ZIP",
+      "pass": true
+    },
+    {
+      "name": "pwaIconGenerator ZIP tiene 10 entradas (esperado >=9 iconos + manifest)",
+      "pass": true
+    },
+    {
+      "name": "pwaIconGenerator ZIP incluye manifest-icons.json",
+      "pass": true
+    },
+    {
+      "name": "Sin errores de consola en toda la suite",
+      "pass": true
+    }
+  ],
+  "failed": 0,
+  "failures": [],
+  "limitation": "HEIC y AVIF reales no generables en Node sin dependencias externas. Se usa JPEG para probar el pipeline del procesador. avifToImage con JPEG puede fallar si canvas no soporta el formato de entrada.",
+  "passed": 21,
+  "suite": "gate-e2e-modern-image-formats",
+  "tools": [
+    "heicToImage",
+    "avifToImage",
+    "svgToImage",
+    "faviconGenerator",
+    "pwaIconGenerator"
+  ],
+  "total": 21
+}
