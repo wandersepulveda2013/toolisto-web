@@ -53,6 +53,7 @@ const tests = [
   { name: 'PDF Office New', cmd: 'node tests/gate-e2e-pdf-office-new.mjs' },
   { name: 'Spreadsheet Cleaning', cmd: 'node tests/gate-e2e-spreadsheet-cleaning.mjs' },
   { name: 'File Text Inspection', cmd: 'node tests/gate-e2e-file-text-inspection.mjs' },
+  { name: 'Capability Integrity Audit', cmd: 'node tests/gate-capability-integrity.mjs' },
   { name: 'Production Tool Coverage', cmd: 'node tests/production-tool-coverage.mjs' },
   { name: 'APLUNO Launcher', cmd: 'node tests/apluno-launcher.mjs' },
   { name: 'AdSense Integration', cmd: 'node tests/adsense-integration.mjs' },

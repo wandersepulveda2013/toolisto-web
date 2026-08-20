@@ -45,7 +45,7 @@
       "pass": true
     },
     {
-      "name": "faceBlur message: \"1 región(es) difuminada(s) (Heurística posicional).\"",
+      "name": "faceBlur message: \"Tu navegador no soporta detección facial. Actualiza a Chrome 87+, Edge 87+ o Safari 15.4+. Imagen copiada sin cambios.\"",
       "pass": true
     },
     {

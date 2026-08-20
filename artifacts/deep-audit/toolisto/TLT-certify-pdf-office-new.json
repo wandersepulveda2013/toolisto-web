@@ -109,7 +109,7 @@
       "pass": true
     },
     {
-      "name": "pdfToPdfa message: \"PDF convertido a formato PDF/A con metadatos XMP.\"",
+      "name": "pdfToPdfa message: \"Metadatos PDF/A-1b aplicados al PDF (ver informe para limitaciones).\"",
       "pass": true
     },
     {
@@ -157,7 +157,7 @@
       "pass": true
     },
     {
-      "name": "flattenPdf message: \"PDF aplanado: 2 campo(s) de formulario y 2 anotación(es) fusionados.\"",
+      "name": "flattenPdf message: \"PDF aplanado: 2 campo(s) de formulario y 0 anotación(es) eliminados. Los campos de formulario se fusionaron visualmente. Las anotaciones se eliminaron del PDF.\"",
       "pass": true
     },
     {

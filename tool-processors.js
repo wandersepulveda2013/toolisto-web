@@ -7086,8 +7086,10 @@
     if (!files || !files.length) return { files: [], message: 'Selecciona una imagen.' };
     var blurRadius = parseInt(options.blurRadius || options.faceBlurRadius) || 12;
     var pixelSize = parseInt(options.pixelSize || options.facePixelSize) || 0;
-    var hasFaceDetector = typeof FaceDetector !== 'undefined';
+    var hasFaceDetector = false;
+    try { hasFaceDetector = typeof FaceDetector === 'function'; } catch (e) { hasFaceDetector = false; }
     var results = [];
+    var totalFaces = 0;
     for (var i = 0; i < files.length; i++) {
       onProgress(i + 1, files.length, 'Detectando caras...');
       var file = files[i];
@@ -7103,7 +7105,10 @@
           var detector = new FaceDetector({ fastMode: true, maxDetectedFaces: 20 });
           var faces = await detector.detect(img);
           for (var fi = 0; fi < faces.length; fi++) {
-            var box = faces[fi].boundingBox;
+            var face = faces[fi];
+            if (face.score !== undefined && face.score < 0.5) continue;
+            var box = face.boundingBox;
+            if (box.width < 10 || box.height < 10) continue;
             var pad = Math.max(box.width, box.height) * 0.15;
             regions.push({
               sx: Math.max(0, Math.floor(box.x - pad)),
@@ -7112,18 +7117,7 @@
               sh: Math.min(h - Math.max(0, Math.floor(box.y - pad)), Math.ceil(box.height + pad * 2))
             });
           }
-        } catch (e) { /* FaceDetector failed, fall through to heuristic */ }
-      }
-      if (regions.length === 0) {
-        var regionSize = Math.max(40, Math.min(w, h) * 0.12);
-        var cx = w / 2, cy = h * 0.35;
-        var rx = regionSize, ry = regionSize * 1.1;
-        regions.push({
-          sx: Math.max(0, Math.floor(cx - rx)),
-          sy: Math.max(0, Math.floor(cy - ry)),
-          sw: Math.min(w - Math.max(0, Math.floor(cx - rx)), Math.ceil(rx * 2)),
-          sh: Math.min(h - Math.max(0, Math.floor(cy - ry)), Math.ceil(ry * 2))
-        });
+        } catch (e) { regions = []; }
       }
       for (var ri = 0; ri < regions.length; ri++) {
         var r = regions[ri];
@@ -7145,11 +7139,14 @@
           }
         }
       }
+      totalFaces += regions.length;
       var blob = await new Promise(function(resolve) { canvas.toBlob(resolve, 'image/png'); });
       results.push({ name: getBaseName(file.name) + '-blur.png', blob: blob, size: blob.size });
     }
-    var faceInfo = hasFaceDetector ? 'Detección facial nativa' : 'Heurística posicional';
-    return { files: results, message: regions.length + ' región(es) difuminada(s) (' + faceInfo + ').' };
+    if (!hasFaceDetector) {
+      return { files: results, message: 'Tu navegador no soporta detección facial. Actualiza a Chrome 87+, Edge 87+ o Safari 15.4+. Imagen copiada sin cambios.' };
+    }
+    return { files: results, message: totalFaces + ' cara(s) detectada(s) y difuminada(s).' };
   };
 
   window.ToolProcessors.colorPalette = async function(files, options, onProgress) {
@@ -7693,12 +7690,11 @@
       'xpacket end="w"';
     var xmpBytes = new TextEncoder().encode(xmpStr);
     try {
-      var metaStream = pdfDoc.context.obj([
-        PDFLib.PDFName.of('Type'), PDFLib.PDFName.of('Metadata'),
-        PDFLib.PDFName.of('Subtype'), PDFLib.PDFName.of('XML'),
-        PDFLib.PDFName.of('Length'), xmpBytes.length
-      ]);
-      metaStream.contents = xmpBytes;
+      var metaDict = pdfDoc.context.obj({});
+      metaDict.set(PDFLib.PDFName.of('Type'), PDFLib.PDFName.of('Metadata'));
+      metaDict.set(PDFLib.PDFName.of('Subtype'), PDFLib.PDFName.of('XML'));
+      metaDict.set(PDFLib.PDFName.of('Length'), xmpBytes.length);
+      var metaStream = PDFLib.PDFRawStream.of(metaDict, xmpBytes);
       var ref = pdfDoc.context.register(metaStream);
       var catalog = pdfDoc.context.lookup(pdfDoc.context.trailerInfo.Root);
       if (catalog && typeof catalog.set === 'function') {
@@ -7714,12 +7710,18 @@
     info.push('Estado: Metadatos XMP con pdfaid:part=1, pdfaid:conformance=b aplicados.');
     info.push('Metadatos: Título, autor, creador, fecha establecidos.');
     info.push('');
-    info.push('NOTA: Esta conversión aplica metadatos PDF/A-1b según la especificación');
-    info.push('ISO 19005-1. Para certificación completa se requiere validación con');
-    info.push('veraPDF o(preflight de Adobe. Sin perfil ICC embebido, el documento');
-    info.push('puede no pasar validación estricta en todos los visores PDF/A.');
+    info.push('NOTA: Esta conversión aplica ÚNICAMENTE metadatos PDF/A-1b (ISO 19005-1).');
+    info.push('NO se embebe perfil ICC, NO se validan fuentes, NO se convierten');
+    info.push('colores a CMYK. El documento NO cumple PDF/A-1b completo y puede');
+    info.push('no pasar validación con veraPDF o prefli de Adobe Acrobat.');
+    info.push('');
+    info.push('Limitaciones conocidas:');
+    info.push('- Sin perfil ICC embebido (requerido para PDF/A-1b).');
+    info.push('- Fuentes no embebidas o en formatos no permitidos (Type 1, TrueType).');
+    info.push('- Colores en espacio RGB sin conversión a CMYK/perfil.');
+    info.push('- Transparencia no eliminada (prohibida en PDF/A-1b).');
     var reportBlob = new Blob([info.join('\n')], { type: 'text/plain;charset=utf-8' });
-    return { files: [{ name: getBaseName(file.name) + '-pdfa.pdf', blob: blob, size: blob.size }, { name: getBaseName(file.name) + '-informe.txt', blob: reportBlob, size: reportBlob.size }], message: 'PDF convertido a formato PDF/A con metadatos XMP.' };
+    return { files: [{ name: getBaseName(file.name) + '-pdfa.pdf', blob: blob, size: blob.size }, { name: getBaseName(file.name) + '-informe.txt', blob: reportBlob, size: reportBlob.size }], message: 'Metadatos PDF/A-1b aplicados al PDF (ver informe para limitaciones).' };
   };
 
   window.ToolProcessors.pdfToMarkdown = async function(files, options, onProgress) {
@@ -7824,24 +7826,67 @@
     for (var pi = 0; pi < pages.length; pi++) {
       var page = pages[pi];
       try {
-        var annots = page.node.get(PDFLib.PDFName.of('Annots'));
-        if (annots) {
-          var annotArray;
-          if (annots instanceof PDFLib.PDFArray) annotArray = annots;
-          else if (annots.toString && annots.toString().indexOf('[') === 0) {
-            try { annotArray = pdfDoc.context.lookup(annots); } catch(e) {}
-          }
-          if (annotArray && typeof annotArray.size === 'function') {
-            annotations += annotArray.size();
-            page.node.delete(PDFLib.PDFName.of('Annots'));
-          }
+        var annotsRaw = page.node.get(PDFLib.PDFName.of('Annots'));
+        if (!annotsRaw) continue;
+        var annotArray = null;
+        if (typeof annotsRaw.size === 'function') {
+          annotArray = annotsRaw;
+        } else {
+          try { annotArray = pdfDoc.context.lookup(annotsRaw); } catch (e) { annotArray = null; }
         }
-      } catch (e) { /* skip annotation flattening errors */ }
+        if (!annotArray || typeof annotArray.size !== 'function') continue;
+        var count = annotArray.size();
+        for (var ai = count - 1; ai >= 0; ai--) {
+          try {
+            var annotRef = annotArray.get(ai);
+            var annotDict = pdfDoc.context.lookup(annotRef);
+            if (!annotDict || typeof annotDict.get !== 'function') continue;
+            var ap = annotDict.get(PDFLib.PDFName.of('AP'));
+            if (ap) {
+              var n = pdfDoc.context.lookup(ap.get(PDFLib.PDFName.of('N')));
+              if (n && typeof n.contents === 'object' && n.contents) {
+                var streamDict = pdfDoc.context.obj({});
+                streamDict.set(PDFLib.PDFName.of('Type'), PDFLib.PDFName.of('XObject'));
+                streamDict.set(PDFLib.PDFName.of('Subtype'), PDFLib.PDFName.of('Form'));
+                var bbox = annotDict.get(PDFLib.PDFName.of('Rect'));
+                if (bbox) streamDict.set(PDFLib.PDFName.of('BBox'), bbox);
+                var newStream = pdfDoc.context.obj([]);
+                newStream.dict = streamDict;
+                newStream.contents = n.contents;
+                var pageMediaBox = page.getMediaBox();
+                var pageW = pageMediaBox.width;
+                var pageH = pageMediaBox.height;
+                var savedPage = pdfDoc.context.obj([
+                  PDFLib.PDFName.of('q'),
+                  PDFLib.PDFName.of('1 0 0 1 0 ' + pageH + ' cm'),
+                ]);
+                savedPage.contents = n.contents;
+                try {
+                  var resObj = n.get ? n.get(PDFLib.PDFName.of('Resources')) : null;
+                  if (resObj) {
+                    var pageRes = page.node.get(PDFLib.PDFName.of('Resources'));
+                    if (!pageRes) {
+                      page.node.set(PDFLib.PDFName.of('Resources'), resObj);
+                    }
+                  }
+                } catch (e) { /* resource copy is best-effort */ }
+              }
+            }
+            annotArray.remove(ai);
+            annotations++;
+          } catch (e) { /* skip individual annotation */ }
+        }
+        if (annotArray.size() === 0) {
+          page.node.delete(PDFLib.PDFName.of('Annots'));
+        }
+      } catch (e) { /* skip page annotation errors */ }
     }
     onProgress(3, 3, 'Guardando...');
     var pdfBytes = await pdfDoc.save();
     var blob = new Blob([pdfBytes], { type: 'application/pdf' });
-    return makeSingleResult(blob, getBaseName(file.name) + '-aplanado.pdf', 'PDF aplanado: ' + formFields + ' campo(s) de formulario y ' + annotations + ' anotación(es) fusionados.');
+    var msg = 'PDF aplanado: ' + formFields + ' campo(s) de formulario y ' + annotations + ' anotación(es) eliminados.';
+    msg += ' Los campos de formulario se fusionaron visualmente. Las anotaciones se eliminaron del PDF.';
+    return makeSingleResult(blob, getBaseName(file.name) + '-aplanado.pdf', msg);
   };
 
   window.ToolProcessors.imagesToPdfAdvanced = async function(files, options, onProgress) {
@@ -7935,15 +7980,21 @@
     report += '='.repeat(40) + '\n\n';
     report += 'Páginas: ' + pdf.numPages + '\n';
     report += 'Imágenes detectadas: ' + resources.length + '\n';
-    report += 'Imágenes extraídas: ' + extractedImages.length + '\n\n';
-    resources.forEach(function(r) {
-      report += 'Página ' + r.page + ': ' + r.type + ' (' + r.id + ')\n';
-    });
+    report += 'Imágenes extraídas: ' + extractedImages.length + '\n';
+    report += 'Fuentes: No extraíbles (pdf.js no expone fuentes incrustadas)\n';
+    report += 'Archivos adjuntos: No extraíbles (requiere parsing de objetos PDF)\n\n';
+    report += '=== Imágenes detectadas ===\n';
     if (resources.length === 0) {
-      report += '\nNo se detectaron imágenes incrustadas editables.';
+      report += 'No se detectaron imágenes incrustadas editables.\n';
     } else {
-      report += '\nLas imágenes extraídas se incluyen como archivos adjuntos.';
+      resources.forEach(function(r) {
+        report += '  Página ' + r.page + ': imagen (' + r.id + ')\n';
+      });
     }
+    report += '\n=== Limitaciones ===\n';
+    report += 'Solo extrae imágenes incrustadas vía operador PaintImageXObject.\n';
+    report += 'No extrae fuentes, archivos adjuntos ni metadatos del PDF.\n';
+    report += 'Imágenes renderizadas como parte del contenido de la página no se detectan.\n';
     var reportBlob = new Blob([report], { type: 'text/plain;charset=utf-8' });
     var outputFiles = [{ name: getBaseName(file.name) + '-recursos.txt', blob: reportBlob, size: reportBlob.size }];
     if (extractedImages.length > 0) {

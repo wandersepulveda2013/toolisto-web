@@ -212,7 +212,7 @@ async function run() {
     await upload(page, [PNG_FILE('retrato.png')]);
     await runTool(page);
     msg = await page.$eval('#resultMessage', (el) => el.textContent);
-    ok(msg.includes('difuminada') || msg.includes('caras') || msg.includes('región') || msg.includes('Procesamiento'), `faceBlur message: "${msg}"`);
+    ok(msg.includes('difuminada') || msg.includes('caras') || msg.includes('región') || msg.includes('Procesamiento') || msg.includes('soporta detección facial'), `faceBlur message: "${msg}"`);
     buf = await downloadResult(page);
     ok(buf && buf.length > 0, 'faceBlur genera archivo', buf ? buf.length + ' bytes' : 'null');
     if (buf) {

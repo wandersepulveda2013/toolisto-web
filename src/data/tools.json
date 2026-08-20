@@ -11230,7 +11230,7 @@
       {"q":"¿Puedo elegir un fondo de color?","a":"Sí, puedes dejar transparente, blanco o cualquier color personalizado."}
     ],
     "instructions": ["Selecciona una imagen con un sujeto claro.","La herramienta detecta el sujeto automáticamente.","Elige el fondo: transparente, blanco o color.","Descarga el resultado."],
-    "limitations": ["La detección usa un modelo liviano, puede fallar con fondos complejos.","Imágenes muy pequeñas o borrosas pueden dar resultados imprecisos."],
+    "limitations": ["Usa un algoritmo de distancia de color, no inteligencia artificial. Funciona mejor con fondos uniformes.","Imágenes muy pequeñas o borrosas pueden dar resultados imprecisos.","El color de referencia se toma del píxel superior izquierdo o se configura manualmente."],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-08-20",
     "keywords": ["quitar fondo","fondo transparente","remove background","png","transparencia"]
@@ -11284,11 +11284,11 @@
     "relatedSlugs": ["censurar-imagen","quitar-fondo-imagen","borrar-objetos-de-imagen"],
     "enabledInSitemap": true,
     "faq": [
-      {"q":"¿Qué tan precisa es la detección?","a":"Usa un detector basado en características faciales. Funciona bien con caras frontales y semiprofiladas."},
+      {"q":"¿Qué tan precisa es la detección?","a":"Usa el detector facial nativo del navegador (FaceDetector API). Funciona bien con caras frontales y semiprofiladas."},
       {"q":"¿Puedo ajustar la intensidad?","a":"Sí, puedes regular el nivel de desenfoque o pixelado de cada cara detectada."}
     ],
-    "instructions": ["Selecciona una imagen con personas.","La herramienta detecta las caras automáticamente.","Ajusta la intensidad del difuminado.","Descarga el resultado."],
-    "limitations": ["La detección es automática, no permite selección manual.","Funciona mejor con caras frontales bien iluminadas."],
+    "instructions": ["Selecciona una imagen con personas.","La herramienta detecta las caras con el detector facial nativo.","Ajusta la intensidad del difuminado.","Descarga el resultado."],
+    "limitations": ["Requiere Chrome 87+, Edge 87+ o Safari 15.4+ para detección facial nativa.","La detección es automática, no permite selección manual.","Funciona mejor con caras frontales bien iluminadas."],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-08-20",
     "keywords": ["difuminar","caras","blur","pixelar","privacidad","rostron"]
@@ -11535,7 +11535,7 @@
     "title": "Convertir PDF a PDF/A online gratis | Toolisto",
     "description": "Convierte un PDF al formato PDF/A para archivado a largo plazo.",
     "h1": "PDF a PDF/A",
-    "summary": "Transforma PDFs al formato de archivado PDF/A con verificación estructural.",
+    "summary": "Aplica metadatos PDF/A-1b (ISO 19005-1) a un PDF existente.",
     "inputFormats": ["PDF"],
     "outputFormats": ["PDF"],
     "accepts": "pdf",
@@ -11546,10 +11546,10 @@
     "enabledInSitemap": true,
     "faq": [
       {"q":"¿Qué es PDF/A?","a":"Es un formato ISO diseñado para el archivado digital a largo plazo, garantizando reproducción fiel."},
-      {"q":"¿Garantiza cumplimiento total?","a":"Realiza las conversiones técnicas viables pero no puede garantizar certificación ISO completa."}
+      {"q":"¿Garantiza cumplimiento total?","a":"No. Solo aplica metadatos XMP con identificación PDF/A-1b. No embebe perfil ICC, no valida fuentes, no convierte colores. Se requiere validación con veraPDF."}
     ],
-    "instructions": ["Selecciona un PDF.","La herramienta aplica las conversiones para compatibilidad PDF/A.","Descarga el resultado y revisa el informe."],
-    "limitations": ["No puede certificar cumplimiento PDF/A-1b completo.","Las fuentes no embebidas pueden causar problemas de reproducción."],
+    "instructions": ["Selecciona un PDF.","La herramienta aplica metadatos PDF/A-1b al documento.","Descarga el resultado y revisa el informe de limitaciones."],
+    "limitations": ["Solo aplica metadatos XMP, NO embebe perfil ICC ni valida fuentes.","No puede certificar cumplimiento PDF/A-1b completo.","Se requiere validación externa con veraPDF o prefli de Adobe Acrobat."],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-08-20",
     "keywords": ["pdf","pdfa","archivado","iso","preservacion","conversion"]
@@ -11620,9 +11620,9 @@
     "category": "pdf",
     "name": "Aplanar PDF",
     "title": "Aplanar PDF online gratis | Toolisto",
-    "description": "Convierte formularios, anotaciones y capas en contenido permanente no editable.",
+    "description": "Fusiona campos de formulario en el contenido permanente del PDF y elimina anotaciones interactivas.",
     "h1": "Aplanar PDF",
-    "summary": "Fija todo el contenido del PDF como parte permanente de la página.",
+    "summary": "Fusiona campos de formulario y elimina anotaciones interactivas del PDF.",
     "inputFormats": ["PDF"],
     "outputFormats": ["PDF"],
     "accepts": "pdf",
@@ -11632,11 +11632,11 @@
     "relatedSlugs": ["rellenar-formulario-pdf","firmar-pdf","comprimir-pdf"],
     "enabledInSitemap": true,
     "faq": [
-      {"q":"¿Qué se aplana?","a":"Campos de formulario, anotaciones, marcadores y capas visibles se fusionan en el contenido de la página."},
+      {"q":"¿Qué se aplana?","a":"Los campos de formulario se fusionan visualmente en el contenido de la página. Las anotaciones se eliminan del PDF."},
       {"q":"¿Se puede deshacer?","a":"No, una vez aplanado el contenido es permanente. Guarda una copia original."}
     ],
-    "instructions": ["Selecciona un PDF.","La herramienta aplana todo el contenido interactivo.","Descarga el PDF aplanado."],
-    "limitations": ["No revierte campos protegidos por contraseña.","El resultado final no tiene campos editables."],
+    "instructions": ["Selecciona un PDF.","La herramienta fusiona campos de formulario y elimina anotaciones.","Descarga el PDF aplanado."],
+    "limitations": ["No revierte campos protegidos por contraseña.","El resultado final no tiene campos editables.","Las anotaciones se eliminan, no se fusionan visualmente en la página."],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-08-20",
     "keywords": ["pdf","aplanar","formularios","anotaciones","permanente"]
@@ -11676,11 +11676,11 @@
     "indexable": true,
     "slug": "extraer-fuentes-recursos-pdf",
     "category": "pdf",
-    "name": "Extraer fuentes y recursos de PDF",
-    "title": "Extraer fuentes y recursos de PDF online gratis | Toolisto",
-    "description": "Extrae fuentes incrustadas, imágenes y recursos de un PDF.",
-    "h1": "Extraer fuentes y recursos de PDF",
-    "summary": "Obtén un inventario completo de fuentes, imágenes y archivos adjuntos del PDF.",
+    "name": "Extraer imágenes incrustadas de PDF",
+    "title": "Extraer imágenes incrustadas de PDF online gratis | Toolisto",
+    "description": "Extrae imágenes incrustadas de un PDF en su formato original.",
+    "h1": "Extraer imágenes incrustadas de PDF",
+    "summary": "Extrae imágenes incrustadas de un PDF sin renderizar la página completa.",
     "inputFormats": ["PDF"],
     "outputFormats": ["ZIP"],
     "accepts": "pdf",
@@ -11690,14 +11690,14 @@
     "relatedSlugs": ["extraer-imagenes-pdf","extraer-texto-pdf","contar-paginas-pdf"],
     "enabledInSitemap": true,
     "faq": [
-      {"q":"¿Qué fuentes puedo extraer?","a":"Fuentes TrueType y OpenType incrustadas en el PDF."},
-      {"q":"¿Informa si no puede extraer algo?","a":"Sí, si un recurso no es extraíble legalmente lo indica sin simular resultado."}
+      {"q":"¿Qué tipo de imágenes extrae?","a":"Imágenes incrustadas vía el operador PaintImageXObject del PDF (logos, fotos, gráficos embebidos)."},
+      {"q":"¿Extrae también fuentes o adjuntos?","a":"No, solo imágenes. No extrae fuentes, archivos adjuntos ni metadatos del PDF."}
     ],
-    "instructions": ["Selecciona un PDF.","Revisa el inventario de recursos detectados.","Descarga los recursos extraíbles en ZIP."],
-    "limitations": ["Algunas fuentes están subconjuntadas y solo contienen los glifos usados.","No extrae fuentes protegidas por licencia embebida."],
+    "instructions": ["Selecciona un PDF.","Revisa el inventario de imágenes detectadas.","Descarga las imágenes extraídas en ZIP."],
+    "limitations": ["Solo extrae imágenes incrustadas, no fuentes ni archivos adjuntos.","Imágenes renderizadas como parte del contenido de la página no se detectan.","El informe detalla las limitaciones de cada recurso."],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-08-20",
-    "keywords": ["pdf","fuentes","recursos","extraer","fuentes incrustadas"]
+    "keywords": ["pdf","imagenes","recursos","extraer","imagenes incrustadas"]
   },
   {
     "id": "cleanExcel",
