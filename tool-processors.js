@@ -2822,12 +2822,23 @@
 
     var sep = separator;
     if (sep === 'auto') {
-      var firstLine = text.split('\n')[0];
-      var counts = { ',': (firstLine.match(/,/g) || []).length, ';': (firstLine.match(/;/g) || []).length, '\t': (firstLine.match(/\t/g) || []).length };
+      var lines = text.split('\n').slice(0, 5);
+      var counts = { ',': 0, ';': 0, '\t': 0 };
+      lines.forEach(function(line) {
+        var unquoted = line.replace(/"[^"]*"/g, '');
+        counts[','] += (unquoted.match(/,/g) || []).length;
+        counts[';'] += (unquoted.match(/;/g) || []).length;
+        counts['\t'] += (unquoted.match(/\t/g) || []).length;
+      });
       sep = Object.entries(counts).sort(function(a, b) { return b[1] - a[1]; })[0][1] > 0 ? Object.entries(counts).sort(function(a, b) { return b[1] - a[1]; })[0][0] : ',';
     }
 
-    var wb = XLSX.read(text, { type: 'string', raw: true, FS: sep });
+    var wb;
+    try {
+      wb = XLSX.read(text, { type: 'string', raw: true, FS: sep });
+    } catch (e) {
+      throw new Error('No se pudo leer el CSV: ' + e.message);
+    }
     var wbOut = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
     var blob = new Blob([wbOut], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
     var name = file.name.replace(/\.[^.]+$/, '.xlsx');
@@ -2867,7 +2878,12 @@
     var file = files[0];
     onProgress(1, 1, 'Procesando JSON...');
     var text = await file.text();
-    var data = JSON.parse(text);
+    var data;
+    try {
+      data = JSON.parse(text);
+    } catch (e) {
+      throw new Error('JSON inválido: ' + e.message);
+    }
     if (!Array.isArray(data)) data = [data];
     var ws = XLSX.utils.json_to_sheet(data);
     var wb = XLSX.utils.book_new();
@@ -2886,8 +2902,14 @@
     var separator = options.separator || 'auto';
     var sep = separator;
     if (sep === 'auto') {
-      var firstLine = text.split('\n')[0];
-      var counts = { ',': (firstLine.match(/,/g) || []).length, ';': (firstLine.match(/;/g) || []).length, '\t': (firstLine.match(/\t/g) || []).length };
+      var lines = text.split('\n').slice(0, 5);
+      var counts = { ',': 0, ';': 0, '\t': 0 };
+      lines.forEach(function(line) {
+        var unquoted = line.replace(/"[^"]*"/g, '');
+        counts[','] += (unquoted.match(/,/g) || []).length;
+        counts[';'] += (unquoted.match(/;/g) || []).length;
+        counts['\t'] += (unquoted.match(/\t/g) || []).length;
+      });
       sep = Object.entries(counts).sort(function(a, b) { return b[1] - a[1]; })[0][1] > 0 ? Object.entries(counts).sort(function(a, b) { return b[1] - a[1]; })[0][0] : ',';
     }
     var wb = XLSX.read(text, { type: 'string', raw: true, FS: sep });
@@ -2903,7 +2925,12 @@
     var file = files[0];
     onProgress(1, 1, 'Procesando JSON...');
     var text = await file.text();
-    var data = JSON.parse(text);
+    var data;
+    try {
+      data = JSON.parse(text);
+    } catch (e) {
+      throw new Error('JSON inválido: ' + e.message);
+    }
     if (!Array.isArray(data)) data = [data];
     var separator = options.separator || ',';
     var ws = XLSX.utils.json_to_sheet(data);
@@ -3023,6 +3050,7 @@
       wb.SheetNames.forEach(function(sheetName) {
         var ws = wb.Sheets[sheetName];
         var rows = XLSX.utils.sheet_to_json(ws, { defval: null, header: 1 });
+        if (i > 0 && rows.length > 0) rows = rows.slice(1);
         allRows.push.apply(allRows, rows);
       });
     }
@@ -3102,7 +3130,9 @@
         var v1 = row1[c] !== undefined ? String(row1[c]) : '';
         var v2 = row2[c] !== undefined ? String(row2[c]) : '';
         if (v1 !== v2) {
-          var colLetter = String.fromCharCode(65 + c % 26);
+          var colLetter = '';
+          var ci = c;
+          do { colLetter = String.fromCharCode(65 + ci % 26) + colLetter; ci = Math.floor(ci / 26) - 1; } while (ci >= 0);
           diffRows.push([r + 1, colLetter, v1 || '(vacío)', v2 || '(vacío)', v1 === '' ? 'Añadido' : v2 === '' ? 'Eliminado' : 'Modificado']);
           diffCount++;
         }
@@ -3139,7 +3169,12 @@
     var file = files[0];
     onProgress(1, 1, 'Convirtiendo XLS a XLSX...');
     var data = await file.arrayBuffer();
-    var wb = XLSX.read(data, { type: 'array' });
+    var wb;
+    try {
+      wb = XLSX.read(data, { type: 'array' });
+    } catch (e) {
+      throw new Error('No se pudo leer el archivo XLS: ' + e.message);
+    }
     var wbOut = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
     var blob = new Blob([wbOut], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
     var name = file.name.replace(/\.xls$/i, '.xlsx');
@@ -3150,7 +3185,12 @@
     var file = files[0];
     onProgress(1, 1, 'Convirtiendo XLSX a ODS...');
     var data = await file.arrayBuffer();
-    var wb = XLSX.read(data, { type: 'array' });
+    var wb;
+    try {
+      wb = XLSX.read(data, { type: 'array' });
+    } catch (e) {
+      throw new Error('No se pudo leer el archivo XLSX: ' + e.message);
+    }
     var wbOut = XLSX.write(wb, { bookType: 'ods', type: 'array' });
     var blob = new Blob([wbOut], { type: 'application/vnd.oasis.opendocument.spreadsheet' });
     var name = file.name.replace(/\.[^.]+$/, '.ods');
@@ -3161,7 +3201,12 @@
     var file = files[0];
     onProgress(1, 1, 'Convirtiendo ODS a XLSX...');
     var data = await file.arrayBuffer();
-    var wb = XLSX.read(data, { type: 'array' });
+    var wb;
+    try {
+      wb = XLSX.read(data, { type: 'array' });
+    } catch (e) {
+      throw new Error('No se pudo leer el archivo ODS: ' + e.message);
+    }
     var wbOut = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
     var blob = new Blob([wbOut], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
     var name = file.name.replace(/\.[^.]+$/, '.xlsx');
@@ -6478,6 +6523,8 @@
 
   function _filterCsvRows(rows, colIndex, operator, target, caseSensitive) {
     var cmp;
+    if (operator === 'isEmpty') return rows.filter(function(row) { var v = row[colIndex]; return v === '' || v === null || v === undefined; });
+    if (operator === 'isNotEmpty') return rows.filter(function(row) { var v = row[colIndex]; return v !== '' && v !== null && v !== undefined; });
     if (operator === '=' || operator === '!=') {
       var eq = function(v, t) {
         if (v !== '' && t !== '' && !isNaN(Number(v)) && !isNaN(Number(t))) return Number(v) === Number(t);
@@ -6657,7 +6704,19 @@
     if (indent === 0) {
       output = JSON.stringify(data);
     } else {
-      output = JSON.stringify(data, options.sortKeys ? Object.keys(data).sort() : null, indent);
+      var replacer = options.sortKeys ? (function() {
+        var seen = new WeakSet();
+        return function(key, val) {
+          if (typeof val === 'object' && val !== null && !Array.isArray(val) && !seen.has(val)) {
+            seen.add(val);
+            var sorted = {};
+            Object.keys(val).sort().forEach(function(k) { sorted[k] = val[k]; });
+            return sorted;
+          }
+          return val;
+        };
+      })() : null;
+      output = JSON.stringify(data, replacer, indent);
     }
     var blob = new Blob([output], { type: 'application/json;charset=utf-8' });
     return makeSingleResult(blob, getBaseName(file.name) + '-formateado.json', 'JSON ' + (indent === 0 ? 'compactado' : 'formateado') + ' correctamente.');
