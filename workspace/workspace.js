@@ -1931,7 +1931,7 @@ function renderCaptureView(container, project) {
       container.replaceChildren();
       renderCaptureView(container, project);
     }
-  });
+  }).catch(() => {});
 }
 
 function formatCaptureDeletionWarning(preview) {
@@ -2178,7 +2178,7 @@ function convertDocToTable(doc) {
     refreshProjectCounts(project.id);
     appStore.set({ currentDataTable: table, currentView: 'data-table' });
     toast('Documento convertido a tabla', 'success');
-  });
+  }).catch(() => { toast('Error al guardar la tabla', 'error'); });
 }
 
 function tableChartData(table, maxSeries = 30) {
@@ -2966,7 +2966,7 @@ function renderDocumentsView(container, project) {
       container.replaceChildren();
       renderDocumentsView(container, project);
     }
-  });
+  }).catch(() => {});
 }
 
 const BLOCK_TYPES = [
@@ -4077,7 +4077,7 @@ function renderDataView(container, project) {
       container.replaceChildren();
       renderDataView(container, project);
     }
-  });
+  }).catch(() => {});
 }
 
 async function renderModelView(container, project) {
@@ -6697,6 +6697,9 @@ function renderQueryStudioView(container, project) {
     if (!saved && model) queryPersistState(project.id, restored.sheets, model).catch(e => reportError(e, 'persist', {}));
     container.replaceChildren();
     renderQueryStudio(container, project, tables, model, restored.sheets);
+  }).catch(() => {
+    container.replaceChildren();
+    container.appendChild(h('div', { className: 'ws-query-error' }, 'Error al cargar las fuentes de datos.'));
   });
 }
 
@@ -7047,7 +7050,7 @@ function renderDashboardBuilder(container, project, tables, initialConfig) {
           container.replaceChildren();
           renderDashboardBuilder(container, project, tables, fresh);
           toast('Dashboard restablecido', 'success');
-        });
+        }).catch(() => { toast('Error al restablecer el dashboard', 'error'); });
       } }, svgIcon('rotate', 15), ' Restablecer')
     )
   );

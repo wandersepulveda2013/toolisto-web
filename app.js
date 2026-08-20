@@ -4001,9 +4001,9 @@
       const copyHex = $('#colorPickerCopyHex');
       const copyRgb = $('#colorPickerCopyRgb');
       const copyHsl = $('#colorPickerCopyHsl');
-      if (copyHex) copyHex.addEventListener('click', () => { if (_cp.lastColor) navigator.clipboard.writeText(_cp.lastColor.hex.toUpperCase()).then(() => showToast('HEX copiado')); });
-      if (copyRgb) copyRgb.addEventListener('click', () => { if (_cp.lastColor) navigator.clipboard.writeText(_cp.lastColor.rgb).then(() => showToast('RGB copiado')); });
-      if (copyHsl) copyHsl.addEventListener('click', () => { if (_cp.lastColor) navigator.clipboard.writeText(_cp.lastColor.hsl).then(() => showToast('HSL copiado')); });
+      if (copyHex) copyHex.addEventListener('click', () => { if (_cp.lastColor) navigator.clipboard.writeText(_cp.lastColor.hex.toUpperCase()).then(() => showToast('HEX copiado')).catch(() => {}); });
+      if (copyRgb) copyRgb.addEventListener('click', () => { if (_cp.lastColor) navigator.clipboard.writeText(_cp.lastColor.rgb).then(() => showToast('RGB copiado')).catch(() => {}); });
+      if (copyHsl) copyHsl.addEventListener('click', () => { if (_cp.lastColor) navigator.clipboard.writeText(_cp.lastColor.hsl).then(() => showToast('HSL copiado')).catch(() => {}); });
     }).catch(() => { /* el procesador mostrará el error */ });
   }
 
@@ -6384,6 +6384,7 @@
     } else if (result.preview) {
       var mime = result.preview.type || '';
       var name = (result.name || '').toLowerCase();
+      if (state.previewUrl) URL.revokeObjectURL(state.previewUrl);
       state.previewUrl = URL.createObjectURL(result.preview);
       if (mime === 'application/pdf' || name.endsWith('.pdf')) {
         if (window.ToolistoPDFViewer) {
@@ -6405,6 +6406,12 @@
           pre.style.cssText = 'max-height:320px;overflow:auto;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:6px;font-size:.85rem;line-height:1.5;font-family:monospace;white-space:pre-wrap;word-break:break-word';
           pre.textContent = txt.length > 8000 ? txt.slice(0, 8000) + '\n\n[Truncado — ' + formatBytes(result.preview.size) + ']' : txt;
           els.previewArea.appendChild(pre);
+          els.previewArea.hidden = false;
+        }).catch(function() {
+          var p = document.createElement('p');
+          p.style.cssText = 'padding:12px;color:var(--muted)';
+          p.textContent = 'No se pudo generar la vista previa del texto.';
+          els.previewArea.appendChild(p);
           els.previewArea.hidden = false;
         });
         els.previewArea.hidden = false;
@@ -6566,7 +6573,7 @@
     lines.push('', '--- Metadatos ---');
     r.metadata.metadataEntries.forEach(([f, v, c]) => lines.push(`[${c}] ${f}: ${v ?? ''}`));
     if (r.metadata.sensitive.length) { lines.push('', '--- Sensible ---'); r.metadata.sensitive.forEach(([f, v, risk]) => lines.push(`[${risk.toUpperCase()}] ${f}: ${v}`)); }
-    navigator.clipboard.writeText(lines.join('\n')).then(() => showToast('Copiado al portapapeles'));
+    navigator.clipboard.writeText(lines.join('\n')).then(() => showToast('Copiado al portapapeles')).catch(() => showToast('No se pudo copiar al portapapeles'));
   };
 
   window._metaDownloadJSON = function() {
