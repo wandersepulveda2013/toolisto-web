@@ -1671,6 +1671,356 @@
       "pass": true
     },
     {
+      "detail": "200",
+      "name": "heic-a-imagen: carga HTTP",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "heic-a-imagen: sin error de consola",
+      "pass": true
+    },
+    {
+      "detail": "200",
+      "name": "avif-a-imagen: carga HTTP",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "avif-a-imagen: sin error de consola",
+      "pass": true
+    },
+    {
+      "detail": "200",
+      "name": "svg-a-imagen: carga HTTP",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "svg-a-imagen: sin error de consola",
+      "pass": true
+    },
+    {
+      "detail": "200",
+      "name": "generar-favicon: carga HTTP",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "generar-favicon: sin error de consola",
+      "pass": true
+    },
+    {
+      "detail": "200",
+      "name": "generar-iconos-pwa: carga HTTP",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "generar-iconos-pwa: sin error de consola",
+      "pass": true
+    },
+    {
+      "detail": "200",
+      "name": "quitar-fondo-imagen: carga HTTP",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "quitar-fondo-imagen: sin error de consola",
+      "pass": true
+    },
+    {
+      "detail": "200",
+      "name": "aumentar-resolucion-imagen: carga HTTP",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "aumentar-resolucion-imagen: sin error de consola",
+      "pass": true
+    },
+    {
+      "detail": "200",
+      "name": "difuminar-caras-imagen: carga HTTP",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "difuminar-caras-imagen: sin error de consola",
+      "pass": true
+    },
+    {
+      "detail": "200",
+      "name": "extraer-paleta-colores: carga HTTP",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "extraer-paleta-colores: sin error de consola",
+      "pass": true
+    },
+    {
+      "detail": "200",
+      "name": "html-a-imagen: carga HTTP",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "html-a-imagen: sin error de consola",
+      "pass": true
+    },
+    {
+      "detail": "200",
+      "name": "extraer-texto-pdf: carga HTTP",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "extraer-texto-pdf: sin error de consola",
+      "pass": true
+    },
+    {
+      "detail": "200",
+      "name": "extraer-imagenes-pdf: carga HTTP",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "extraer-imagenes-pdf: sin error de consola",
+      "pass": true
+    },
+    {
+      "detail": "200",
+      "name": "pdf-a-powerpoint: carga HTTP",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "pdf-a-powerpoint: sin error de consola",
+      "pass": true
+    },
+    {
+      "detail": "200",
+      "name": "powerpoint-a-pdf: carga HTTP",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "powerpoint-a-pdf: sin error de consola",
+      "pass": true
+    },
+    {
+      "detail": "200",
+      "name": "excel-a-pdf: carga HTTP",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "excel-a-pdf: sin error de consola",
+      "pass": true
+    },
+    {
+      "detail": "200",
+      "name": "html-a-pdf: carga HTTP",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "html-a-pdf: sin error de consola",
+      "pass": true
+    },
+    {
+      "detail": "200",
+      "name": "pdf-a-pdfa: carga HTTP",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "pdf-a-pdfa: sin error de consola",
+      "pass": true
+    },
+    {
+      "detail": "200",
+      "name": "pdf-a-markdown: carga HTTP",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "pdf-a-markdown: sin error de consola",
+      "pass": true
+    },
+    {
+      "detail": "200",
+      "name": "rellenar-formulario-pdf: carga HTTP",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "rellenar-formulario-pdf: sin error de consola",
+      "pass": true
+    },
+    {
+      "detail": "200",
+      "name": "aplanar-pdf: carga HTTP",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "aplanar-pdf: sin error de consola",
+      "pass": true
+    },
+    {
+      "detail": "200",
+      "name": "imagenes-a-pdf-optimizado: carga HTTP",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "imagenes-a-pdf-optimizado: sin error de consola",
+      "pass": true
+    },
+    {
+      "detail": "200",
+      "name": "extraer-fuentes-recursos-pdf: carga HTTP",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "extraer-fuentes-recursos-pdf: sin error de consola",
+      "pass": true
+    },
+    {
+      "detail": "200",
+      "name": "limpiar-excel: carga HTTP",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "limpiar-excel: sin error de consola",
+      "pass": true
+    },
+    {
+      "detail": "200",
+      "name": "eliminar-duplicados-excel: carga HTTP",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "eliminar-duplicados-excel: sin error de consola",
+      "pass": true
+    },
+    {
+      "detail": "200",
+      "name": "cambiar-delimitador-csv: carga HTTP",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "cambiar-delimitador-csv: sin error de consola",
+      "pass": true
+    },
+    {
+      "detail": "200",
+      "name": "cambiar-codificacion-csv: carga HTTP",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "cambiar-codificacion-csv: sin error de consola",
+      "pass": true
+    },
+    {
+      "detail": "200",
+      "name": "aplanar-json: carga HTTP",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "aplanar-json: sin error de consola",
+      "pass": true
+    },
+    {
+      "detail": "200",
+      "name": "json-a-excel-avanzado: carga HTTP",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "json-a-excel-avanzado: sin error de consola",
+      "pass": true
+    },
+    {
+      "detail": "200",
+      "name": "normalizar-csv: carga HTTP",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "normalizar-csv: sin error de consola",
+      "pass": true
+    },
+    {
+      "detail": "200",
+      "name": "comparar-csv: carga HTTP",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "comparar-csv: sin error de consola",
+      "pass": true
+    },
+    {
+      "detail": "200",
+      "name": "limpiar-datos-tabulares: carga HTTP",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "limpiar-datos-tabulares: sin error de consola",
+      "pass": true
+    },
+    {
+      "detail": "200",
+      "name": "tablas-html-a-excel: carga HTTP",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "tablas-html-a-excel: sin error de consola",
+      "pass": true
+    },
+    {
+      "detail": "200",
+      "name": "csv-a-pdf: carga HTTP",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "csv-a-pdf: sin error de consola",
+      "pass": true
+    },
+    {
+      "detail": "200",
+      "name": "convertir-codificacion-texto: carga HTTP",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "convertir-codificacion-texto: sin error de consola",
+      "pass": true
+    },
+    {
+      "detail": "200",
+      "name": "detectar-tipo-archivo: carga HTTP",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "detectar-tipo-archivo: sin error de consola",
+      "pass": true
+    },
+    {
       "detail": "procesado",
       "name": "flujo real: archivo privado procesado localmente",
       "pass": true
@@ -1718,7 +2068,7 @@
   ],
   "failed": 0,
   "failures": [],
-  "passed": 343,
+  "passed": 413,
   "requests": {
     "external": 3,
     "probes": 3,
@@ -1727,8 +2077,8 @@
   },
   "secret": "TLST-PUBLIC-NET-CANARY-DETERMINISTIC",
   "suite": "public-site-network-negative",
-  "tools": 167,
-  "total": 343,
+  "tools": 202,
+  "total": 413,
   "websocketAttempts": [
     "wss://external.invalid/probe/socket?marker=TLST-PUBLIC-NET-CANARY-DETERMINISTIC"
   ]

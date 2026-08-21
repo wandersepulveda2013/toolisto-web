@@ -81,20 +81,20 @@
       "pass": true
     },
     {
-      "name": "textStatistics reporta palabras y caracteres ",
-      "pass": false
+      "name": "textStatistics reporta palabras y caracteres",
+      "pass": true
     },
     {
-      "name": "textStatistics cuenta las 8 palabras reales ",
-      "pass": false
+      "name": "textStatistics cuenta las 8 palabras reales",
+      "pass": true
     },
     {
       "name": "wordCount message: \"Conteo completado: 8 palabras. Se generaron 2 archivos.\"",
       "pass": true
     },
     {
-      "name": "wordCount cuenta las 8 palabras reales ",
-      "pass": false
+      "name": "wordCount cuenta las 8 palabras reales",
+      "pass": true
     },
     {
       "name": "textDiff message: \"Comparación completada: 2 añadidas, 8 eliminadas.\"",
@@ -225,13 +225,9 @@
       "pass": true
     }
   ],
-  "failed": 3,
-  "failures": [
-    "textStatistics reporta palabras y caracteres ",
-    "textStatistics cuenta las 8 palabras reales ",
-    "wordCount cuenta las 8 palabras reales "
-  ],
-  "passed": 53,
+  "failed": 0,
+  "failures": [],
+  "passed": 56,
   "suite": "gate-e2e-text-tools",
   "tools": [
     "txtToPdf",

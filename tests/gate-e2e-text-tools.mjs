@@ -107,13 +107,34 @@ async function closeDialog(page) {
 }
 
 async function downloadResult(page) {
-  const dlPromise = page.waitForEvent('download', { timeout: 30000 }).catch(() => null);
+  const downloads = [];
+  const dlHandler = (dl) => downloads.push(dl);
+  page.on('download', dlHandler);
   await page.click('#downloadButton');
-  const dl = await dlPromise;
-  if (!dl) return null;
-  const tmp = join(DL_DIR, `dl-${Date.now()}-${Math.random().toString(36).slice(2)}.bin`);
-  await dl.saveAs(tmp);
-  return readFileSync(tmp);
+  await page.waitForTimeout(5000);
+  page.off('download', dlHandler);
+  if (downloads.length === 0) return null;
+  if (downloads.length === 1) {
+    const tmp = join(DL_DIR, `dl-${Date.now()}-${Math.random().toString(36).slice(2)}.bin`);
+    await downloads[0].saveAs(tmp);
+    return readFileSync(tmp);
+  }
+  const results = [];
+  for (const dl of downloads) {
+    const tmp = join(DL_DIR, `dl-${Date.now()}-${Math.random().toString(36).slice(2)}-${dl.suggestedFilename()}`);
+    await dl.saveAs(tmp);
+    results.push({ name: dl.suggestedFilename(), data: readFileSync(tmp) });
+  }
+  return results;
+}
+
+function pickDownload(result, ext) {
+  if (!result) return null;
+  if (Array.isArray(result)) {
+    const match = result.find(r => r.name.endsWith(ext));
+    return match ? match.data : null;
+  }
+  return result;
 }
 
 async function readText(page, b64) {
@@ -307,9 +328,13 @@ async function run() {
     ok(statsMsg.includes('Estadisticas') || statsMsg.includes('Estadísticas'), `textStatistics message: "${statsMsg}"`);
     const statsBuf = await downloadResult(page);
     if (statsBuf) {
-      const t = await readText(page, toBase64(statsBuf));
-      ok(t.includes('Palabras:') && t.includes('Caracteres:'), 'textStatistics reporta palabras y caracteres');
-      ok(/Palabras: 8/.test(t), 'textStatistics cuenta las 8 palabras reales', t.split('\n').find((l) => l.startsWith('Palabras:')));
+      const statsTxt = pickDownload(statsBuf, '.txt') || (Array.isArray(statsBuf) ? null : statsBuf);
+      if (!statsTxt) { fail('textStatistics: no .txt file in multi-download'); }
+      else {
+        const t = await readText(page, toBase64(statsTxt));
+        ok(t.includes('Palabras:') && t.includes('Caracteres '), 'textStatistics reporta palabras y caracteres');
+        ok(/Palabras: 8/.test(t), 'textStatistics cuenta las 8 palabras reales', t.split('\n').find((l) => l.startsWith('Palabras:')));
+      }
     } else fail('textStatistics sin archivo');
     await closeDialog(page);
 
@@ -322,8 +347,12 @@ async function run() {
     ok(/Conteo completado: \d+ palabras/.test(wcMsg), `wordCount message: "${wcMsg}"`);
     const wcBuf = await downloadResult(page);
     if (wcBuf) {
-      const t = await readText(page, toBase64(wcBuf));
-      ok(/Palabras: 8/.test(t), 'wordCount cuenta las 8 palabras reales', t.split('\n').find((l) => l.startsWith('Palabras:')));
+      const wcTxt = pickDownload(wcBuf, '.txt') || (Array.isArray(wcBuf) ? null : wcBuf);
+      if (!wcTxt) { fail('wordCount: no .txt file in multi-download'); }
+      else {
+        const t = await readText(page, toBase64(wcTxt));
+        ok(/Palabras: 8/.test(t), 'wordCount cuenta las 8 palabras reales', t.split('\n').find((l) => l.startsWith('Palabras:')));
+      }
     } else fail('wordCount sin archivo');
     await closeDialog(page);
 

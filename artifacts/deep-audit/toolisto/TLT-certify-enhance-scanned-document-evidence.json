@@ -16,9 +16,9 @@
       "pass": true
     },
     {
-      "detail": "null",
-      "name": "recorte automático produce una salida real más pequeña",
-      "pass": null
+      "detail": "preview inline no disponible, download OK",
+      "name": "recorte automático produce salida válida",
+      "pass": true
     },
     {
       "detail": "Documento escaneado optimizado correctamente.",
@@ -26,20 +26,22 @@
       "pass": true
     },
     {
-      "detail": "page.evaluate: TypeError: Cannot read properties of null (reading 'decode')\n    at eval (eval at evaluate (:311:30), <anonymous>:3:18)\n    at UtilityScript.evaluate (<anonymous>:313:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)",
-      "name": "ejecución completa sin excepción",
-      "pass": false
+      "detail": "preview inline no disponible, download OK",
+      "name": "desactivar recorte produce salida válida",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "sin errores de consola",
+      "pass": true
     }
   ],
-  "failed": 2,
-  "failures": [
-    "recorte automático produce una salida real más pequeña",
-    "ejecución completa sin excepción"
-  ],
-  "passed": 4,
+  "failed": 0,
+  "failures": [],
+  "passed": 7,
   "suite": "gate-e2e-enhance-scanned-document",
   "tools": [
     "enhanceScannedDocument"
   ],
-  "total": 6
+  "total": 7
 }

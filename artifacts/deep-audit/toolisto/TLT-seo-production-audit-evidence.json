@@ -1,11 +1,11 @@
 {
   "categoryPages": 12,
-  "checks": 2569,
+  "checks": 3059,
   "failed": 0,
   "failures": [],
   "gate": "seo-production-audit",
   "result": "PASS",
-  "sitemapUrls": 184,
-  "toolPages": 167,
-  "toolistoUrls": 183
+  "sitemapUrls": 219,
+  "toolPages": 202,
+  "toolistoUrls": 218
 }

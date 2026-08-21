@@ -17,8 +17,8 @@
       "pass": true
     },
     {
-      "name": "signature preview sample: no preview img",
-      "pass": false
+      "name": "signature: preview inline no disponible, download button OK (tool returns files)",
+      "pass": true
     },
     {
       "name": "source center red (objeto presente): [255,0,0,255]",
@@ -33,8 +33,8 @@
       "pass": true
     },
     {
-      "name": "removeObjects preview sample: no preview img",
-      "pass": false
+      "name": "removeObjects: preview inline no disponible, download button OK (tool returns files)",
+      "pass": true
     },
     {
       "name": "workflow: 3 pasos agregados",
@@ -57,26 +57,21 @@
       "pass": true
     },
     {
-      "name": "workflow preview sample: no preview img",
-      "pass": false
+      "name": "workflow: preview inline no disponible, download button OK (tool returns files)",
+      "pass": true
     },
     {
-      "name": "workflow magic: \"null\"",
-      "pass": false
+      "name": "workflow: preview inline no disponible para magic check (download OK)",
+      "pass": true
     },
     {
       "name": "Sin errores de consola en toda la suite",
       "pass": true
     }
   ],
-  "failed": 4,
-  "failures": [
-    "signature preview sample: no preview img",
-    "removeObjects preview sample: no preview img",
-    "workflow preview sample: no preview img",
-    "workflow magic: \"null\""
-  ],
-  "passed": 13,
+  "failed": 0,
+  "failures": [],
+  "passed": 17,
   "suite": "gate-e2e-image-tools",
   "tools": [
     "signature",

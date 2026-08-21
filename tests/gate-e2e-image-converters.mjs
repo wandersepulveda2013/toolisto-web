@@ -334,6 +334,9 @@ async function run() {
     ok(await runDisabled(), 'compress inicia con el botón deshabilitado');
     await upload([{ name: 'foto-grande.jpg', mimeType: 'image/jpeg', buffer: jpgBig }]);
     ok(!(await runDisabled()), 'compress habilita el botón con una imagen');
+    await page.evaluate(() => { const p = document.getElementById('advancedPanel'); if (p) { p.hidden = false; p.open = true; } });
+    await page.evaluate(() => { const d = document.getElementById('compressAdvancedWrap'); if (d) d.open = true; });
+    await page.waitForTimeout(300);
     await page.fill('#targetKb', '30');
     await page.selectOption('#compressFormat', 'image/jpeg');
     await runTool();

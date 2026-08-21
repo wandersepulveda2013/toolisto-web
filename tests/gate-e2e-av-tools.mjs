@@ -51,7 +51,11 @@ function startServer() {
       if (existsSync(filePath) && statSync(filePath).isDirectory()) filePath = join(filePath, 'index.html');
       if (!existsSync(filePath)) { res.writeHead(404); res.end('Not found'); return; }
       const ext = filePath.substring(filePath.lastIndexOf('.'));
-      res.writeHead(200, { 'Content-Type': mimeTypes[ext] || 'application/octet-stream' });
+      res.writeHead(200, {
+        'Content-Type': mimeTypes[ext] || 'application/octet-stream',
+        'Cross-Origin-Opener-Policy': 'same-origin',
+        'Cross-Origin-Embedder-Policy': 'require-corp'
+      });
       res.end(readFileSync(filePath));
     });
     server.listen(0, '127.0.0.1', () => resolve({ server, url: `http://127.0.0.1:${server.address().port}` }));
@@ -175,7 +179,7 @@ async function run() {
   const browser = await chromium.launch({
     executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
     headless: true,
-    args: ['--no-sandbox', '--disable-gpu'],
+    args: ['--no-sandbox', '--disable-gpu', '--enable-features=SharedArrayBuffer'],
   });
   const context = await browser.newContext({ acceptDownloads: true });
   const page = await context.newPage();
