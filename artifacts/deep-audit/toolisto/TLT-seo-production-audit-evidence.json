@@ -5,7 +5,7 @@
   "failures": [],
   "gate": "seo-production-audit",
   "result": "PASS",
-  "sitemapUrls": 219,
+  "sitemapUrls": 225,
   "toolPages": 202,
   "toolistoUrls": 218
 }

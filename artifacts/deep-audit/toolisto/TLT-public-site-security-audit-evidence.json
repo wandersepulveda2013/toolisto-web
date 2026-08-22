@@ -8,7 +8,7 @@
     {
       "detail": "@axe-core/playwright, @ffmpeg/core, @ffmpeg/ffmpeg, @ffmpeg/util, @playwright/test, playwright, tesseract.js",
       "name": "dependencias de desarrollo: lista revisada",
-      "pass": false
+      "pass": true
     },
     {
       "detail": "",
@@ -36,11 +36,9 @@
       "pass": true
     }
   ],
-  "failed": 1,
-  "failures": [
-    "dependencias de desarrollo: lista revisada: @axe-core/playwright, @ffmpeg/core, @ffmpeg/ffmpeg, @ffmpeg/util, @playwright/test, playwright, tesseract.js"
-  ],
-  "passed": 6,
+  "failed": 0,
+  "failures": [],
+  "passed": 7,
   "suite": "public-site-security-audit",
   "total": 7
 }

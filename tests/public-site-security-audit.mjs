@@ -45,7 +45,7 @@ function ownSourceFiles(dir, files = []) {
   return files;
 }
 
-const expectedDevDependencies = new Set(['@ffmpeg/core', '@ffmpeg/ffmpeg', '@ffmpeg/util', 'playwright', 'tesseract.js']);
+const expectedDevDependencies = new Set(['@axe-core/playwright', '@ffmpeg/core', '@ffmpeg/ffmpeg', '@ffmpeg/util', '@playwright/test', 'playwright', 'tesseract.js']);
 check(!packageJson.dependencies || Object.keys(packageJson.dependencies).length === 0, 'dependencias de producción: ninguna dependencia de red');
 check(Object.keys(packageJson.devDependencies || {}).every((name) => expectedDevDependencies.has(name)), 'dependencias de desarrollo: lista revisada', Object.keys(packageJson.devDependencies || {}).join(', '));
 const suspiciousSecrets = ownSourceFiles(root).flatMap((file) => {

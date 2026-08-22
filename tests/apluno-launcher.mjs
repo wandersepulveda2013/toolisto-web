@@ -85,7 +85,7 @@ try {
   page.on('console', (message) => { if (message.type() === 'error') consoleErrors.push(message.text()); });
 
   let requestsSinceStart = 0;
-  page.on('request', () => { requestsSinceStart += 1; });
+  page.on('request', (request) => { if (request.url().startsWith(base)) requestsSinceStart += 1; });
   await page.goto(`${base}/`, { waitUntil: 'networkidle' });
   check(requestsSinceStart >= 5, 'La portada carga sus recursos (HTML, CSS, JS y data)');
   check(await page.evaluate(() => !!window.ToolistoSearch), 'El motor de búsqueda reutilizado (ToolistoSearch) está disponible');

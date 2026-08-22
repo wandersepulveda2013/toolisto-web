@@ -1,0 +1,117 @@
+{
+  "checks": [
+    {
+      "name": "Server started on http://127.0.0.1:<port>",
+      "pass": true
+    },
+    {
+      "name": "fixtures generados",
+      "pass": true
+    },
+    {
+      "name": "removeBackground message: \"Fondo eliminado de 1 imagen(es).\"",
+      "pass": true
+    },
+    {
+      "name": "removeBackground genera archivo",
+      "pass": true
+    },
+    {
+      "name": "removeBackground salida es PNG válido",
+      "pass": true
+    },
+    {
+      "name": "removeBackground produce transparencia (100% transparente)",
+      "pass": true
+    },
+    {
+      "name": "removeBackground reutilización produce resultado",
+      "pass": true
+    },
+    {
+      "name": "upscaleImage message: \"1 imagen(es) ampliada(s) a 2x.\"",
+      "pass": true
+    },
+    {
+      "name": "upscaleImage genera archivo",
+      "pass": true
+    },
+    {
+      "name": "upscaleImage salida es PNG válido",
+      "pass": true
+    },
+    {
+      "name": "upscaleImage produce imagen 400x200 (esperado 400x200 a 2x)",
+      "pass": true
+    },
+    {
+      "name": "faceBlur message: \"Tu navegador no soporta detección facial. Actualiza a Chrome 87+, Edge 87+ o Safari 15.4+. Imagen copiada sin cambios.\"",
+      "pass": true
+    },
+    {
+      "name": "faceBlur genera archivo",
+      "pass": true
+    },
+    {
+      "name": "faceBlur salida es PNG válido",
+      "pass": true
+    },
+    {
+      "name": "faceBlur conserva dimensiones 200x100",
+      "pass": true
+    },
+    {
+      "name": "colorPalette message: \"Paleta de 8 colores extraída.\"",
+      "pass": true
+    },
+    {
+      "name": "colorPalette genera archivo",
+      "pass": true
+    },
+    {
+      "name": "colorPalette salida contiene colores hex y rgb",
+      "pass": true
+    },
+    {
+      "name": "colorPalette salida tiene cabecera correcta",
+      "pass": true
+    },
+    {
+      "name": "colorPalette detecta 8 colores",
+      "pass": true
+    },
+    {
+      "name": "htmlToImage message: \"1 imagen(es) generada(s) desde HTML.\"",
+      "pass": true
+    },
+    {
+      "name": "htmlToImage genera archivo",
+      "pass": true
+    },
+    {
+      "name": "htmlToImage salida es PNG válido",
+      "pass": true
+    },
+    {
+      "name": "htmlToImage produce imagen 1200x456",
+      "pass": true
+    },
+    {
+      "name": "Sin errores de consola en toda la suite",
+      "pass": true
+    }
+  ],
+  "failed": 0,
+  "failures": [],
+  "limitation": "faceBlur usa FaceDetector API cuando disponible, heurística posicional como fallback. removeBackground usa distancia euclidiana por color con feathering. upscaleImage es interpolación bicúbica con unsharp mask (no super-resolution IA).",
+  "passed": 25,
+  "suite": "gate-e2e-advanced-image-tools",
+  "tools": [
+    "removeBackground",
+    "upscaleImage",
+    "faceBlur",
+    "colorPalette",
+    "htmlToImage"
+  ],
+  "total": 25
+}

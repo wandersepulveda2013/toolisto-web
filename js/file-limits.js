@@ -238,7 +238,7 @@
     { hex: '89504e47', label: 'PNG' },
     { hex: 'ffd8ff', label: 'JPEG' },
     { hex: '47494638', label: 'GIF' },
-    { hex: '52494646', label: 'WEBP' },
+    { hex: '52494646', label: 'RIFF' },
     { hex: '25504446', label: 'PDF' },
     { hex: '504b0304', label: 'ZIP/DOCX/XLSX/EPUB' },
     { hex: '504b0506', label: 'ZIP (vacío)' },
@@ -285,7 +285,7 @@
     if (file.type === 'image/png' || name.endsWith('.png')) return ['PNG'];
     if (file.type === 'image/jpeg' || name.endsWith('.jpg') || name.endsWith('.jpeg')) return ['JPEG'];
     if (file.type === 'image/gif' || name.endsWith('.gif')) return ['GIF'];
-    if (file.type === 'image/webp' || name.endsWith('.webp')) return ['WEBP'];
+    if (file.type === 'image/webp' || name.endsWith('.webp')) return ['RIFF'];
     if (file.type === 'application/pdf' || name.endsWith('.pdf')) return ['PDF'];
     if (file.type === 'application/epub+zip' || name.endsWith('.epub')) return ['ZIP/DOCX/XLSX/EPUB'];
     if (name.endsWith('.zip')) return ['ZIP/DOCX/XLSX/EPUB', 'ZIP (vacío)'];
@@ -296,7 +296,7 @@
     if (file.type === 'video/quicktime' || name.endsWith('.mov')) return ['MP4/MOV'];
     if (file.type === 'video/webm' || name.endsWith('.webm') || name.endsWith('.mkv')) return ['MKV/WebM'];
     if (file.type === 'audio/mpeg' || name.endsWith('.mp3')) return ['MP3'];
-    if (file.type === 'audio/wav' || name.endsWith('.wav')) return ['WAV'];
+    if (file.type === 'audio/wav' || name.endsWith('.wav')) return ['RIFF'];
     return [];
   }
 

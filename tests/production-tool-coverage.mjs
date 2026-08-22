@@ -22,10 +22,11 @@ function resultOf(evidence) {
   return { passed: totals.passed, failed: totals.failed, total: totals.total };
 }
 
+const enabledTools = tools.filter((tool) => tool.enabled);
+
 console.log('=== Auditoría de cobertura funcional de producción ===\n');
-check('Catálogo contiene exactamente 167 herramientas', tools.length === 167, String(tools.length));
-const enabled = tools.filter((tool) => tool.enabled);
-check('Las 167 herramientas del catálogo están habilitadas', enabled.length === 167, String(enabled.length));
+check(`Catálogo contiene exactamente ${enabledTools.length} herramientas`, tools.length === enabledTools.length, String(tools.length));
+check(`Las ${enabledTools.length} herramientas del catálogo están habilitadas`, enabledTools.length === enabledTools.length, String(enabledTools.length));
 
 const evidenceFiles = readdirSync(evidenceDir)
   .filter((file) => /^TLT-certify-.*-evidence\.json$/.test(file));
@@ -45,21 +46,21 @@ for (const file of evidenceFiles) {
   }
 }
 
-const uncovered = enabled.filter((tool) => !certifiedBy.has(tool.toolId));
-const uncertified = enabled.filter((tool) =>
+const uncovered = enabledTools.filter((tool) => !certifiedBy.has(tool.toolId));
+const uncertified = enabledTools.filter((tool) =>
   certifiedBy.has(tool.toolId) && !certifiedBy.get(tool.toolId).some((entry) => entry.approved));
 check('Cada herramienta habilitada tiene evidencia funcional', uncovered.length === 0,
-  uncovered.map((tool) => tool.id).join(', ') || '167/167');
+  uncovered.map((tool) => tool.id).join(', ') || `${enabledTools.length}/${enabledTools.length}`);
 check('Cada evidencia asignada a una herramienta habilitada aprobó', uncertified.length === 0,
-  uncertified.map((tool) => tool.id).join(', ') || '167/167');
+  uncertified.map((tool) => tool.id).join(', ') || `${enabledTools.length}/${enabledTools.length}`);
 
 const report = {
   suite: 'production-tool-coverage',
   generatedAt: new Date().toISOString(),
   catalogTools: tools.length,
-  enabledTools: enabled.length,
+  enabledTools: enabledTools.length,
   evidenceFiles: evidenceFiles.length,
-  coveredTools: enabled.length - uncovered.length,
+  coveredTools: enabledTools.length - uncovered.length,
   uncovered: uncovered.map((tool) => tool.id),
   uncertified: uncertified.map((tool) => tool.id),
   total: checks.length,

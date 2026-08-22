@@ -48,7 +48,8 @@
       "pdfExtractResources",
       "csvToPdf",
       "htmlToPdf",
-      "excelToPdf"
+      "excelToPdf",
+      "pptxToPdf"
     ],
     "slugs": [
       "unir-pdf",
@@ -98,7 +99,8 @@
       "extraer-fuentes-recursos-pdf",
       "csv-a-pdf",
       "html-a-pdf",
-      "excel-a-pdf"
+      "excel-a-pdf",
+      "powerpoint-a-pdf"
     ],
     "icon": "📄",
     "enabled": true,
@@ -279,7 +281,6 @@
       "base64Decode",
       "urlEncode",
       "urlDecode",
-      "csvChangeEncoding",
       "textEncodingConverter"
     ],
     "slugs": [
@@ -301,7 +302,6 @@
       "decodificar-base64",
       "codificar-url",
       "decodificar-url",
-      "cambiar-codificacion-csv",
       "convertir-codificacion-texto"
     ],
     "icon": "📄",
@@ -384,7 +384,7 @@
       "compareCsv",
       "cleanTabularData",
       "htmlTableToExcel",
-      "pptxToPdf"
+      "csvChangeEncoding"
     ],
     "slugs": [
       "csv-a-excel",
@@ -424,7 +424,7 @@
       "comparar-csv",
       "limpiar-datos-tabulares",
       "tablas-html-a-excel",
-      "powerpoint-a-pdf"
+      "cambiar-codificacion-csv"
     ],
     "icon": "📊",
     "enabled": true,

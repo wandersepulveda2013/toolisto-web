@@ -1,14 +1,14 @@
 {
-  "catalogTools": 167,
+  "catalogTools": 202,
   "checks": [
     {
-      "detail": "167",
-      "name": "Catálogo contiene exactamente 167 herramientas",
+      "detail": "202",
+      "name": "Catálogo contiene exactamente 202 herramientas",
       "pass": true
     },
     {
-      "detail": "167",
-      "name": "Las 167 herramientas del catálogo están habilitadas",
+      "detail": "202",
+      "name": "Las 202 herramientas del catálogo están habilitadas",
       "pass": true
     },
     {
@@ -17,9 +17,14 @@
       "pass": true
     },
     {
-      "detail": "7 PASS / 1 FAIL",
+      "detail": "25 PASS / 0 FAIL",
+      "name": "TLT-certify-advanced-image-tools-evidence.json: resultado aprobado",
+      "pass": true
+    },
+    {
+      "detail": "47 PASS / 0 FAIL",
       "name": "TLT-certify-av-evidence.json: resultado aprobado",
-      "pass": false
+      "pass": true
     },
     {
       "detail": "24 PASS / 0 FAIL",
@@ -42,9 +47,9 @@
       "pass": true
     },
     {
-      "detail": "4 PASS / 2 FAIL",
+      "detail": "7 PASS / 0 FAIL",
       "name": "TLT-certify-enhance-scanned-document-evidence.json: resultado aprobado",
-      "pass": false
+      "pass": true
     },
     {
       "detail": "70 PASS / 0 FAIL",
@@ -62,6 +67,11 @@
       "pass": true
     },
     {
+      "detail": "52 PASS / 0 FAIL",
+      "name": "TLT-certify-file-text-inspection-evidence.json: resultado aprobado",
+      "pass": true
+    },
+    {
       "detail": "87 PASS / 0 FAIL",
       "name": "TLT-certify-image-converters-evidence.json: resultado aprobado",
       "pass": true
@@ -72,9 +82,14 @@
       "pass": true
     },
     {
-      "detail": "13 PASS / 4 FAIL",
+      "detail": "17 PASS / 0 FAIL",
       "name": "TLT-certify-image-interactive-evidence.json: resultado aprobado",
-      "pass": false
+      "pass": true
+    },
+    {
+      "detail": "19 PASS / 0 FAIL",
+      "name": "TLT-certify-modern-image-formats-evidence.json: resultado aprobado",
+      "pass": true
     },
     {
       "detail": "34 PASS / 0 FAIL",
@@ -97,8 +112,18 @@
       "pass": true
     },
     {
+      "detail": "53 PASS / 0 FAIL",
+      "name": "TLT-certify-pdf-office-new-evidence.json: resultado aprobado",
+      "pass": true
+    },
+    {
       "detail": "43 PASS / 0 FAIL",
       "name": "TLT-certify-qr-family-evidence.json: resultado aprobado",
+      "pass": true
+    },
+    {
+      "detail": "41 PASS / 0 FAIL",
+      "name": "TLT-certify-spreadsheet-cleaning-evidence.json: resultado aprobado",
       "pass": true
     },
     {
@@ -112,9 +137,9 @@
       "pass": true
     },
     {
-      "detail": "53 PASS / 3 FAIL",
+      "detail": "56 PASS / 0 FAIL",
       "name": "TLT-certify-text-family-evidence.json: resultado aprobado",
-      "pass": false
+      "pass": true
     },
     {
       "detail": "67 PASS / 0 FAIL",
@@ -122,51 +147,23 @@
       "pass": true
     },
     {
-      "detail": "167/167",
+      "detail": "202/202",
       "name": "Cada herramienta habilitada tiene evidencia funcional",
       "pass": true
     },
     {
-      "detail": "removeObjects, signature, workflow, txtToPdf, mergeTxt, splitTxt, sortLines, removeDuplicates, convertAudio, trimAudio, mergeAudio, compressVideo, trimVideo, mergeVideos, videoToGif, extractAudioFromVideo, removeAudioFromVideo, textStatistics, wordCount, textDiff, htmlToMarkdown, htmlToText, cssMinifier, base64Encode, base64Decode, urlEncode, urlDecode",
+      "detail": "202/202",
       "name": "Cada evidencia asignada a una herramienta habilitada aprobó",
-      "pass": false
+      "pass": true
     }
   ],
-  "coveredTools": 167,
-  "enabledTools": 167,
-  "evidenceFiles": 22,
-  "failed": 5,
-  "passed": 21,
+  "coveredTools": 202,
+  "enabledTools": 202,
+  "evidenceFiles": 27,
+  "failed": 0,
+  "passed": 31,
   "suite": "production-tool-coverage",
-  "total": 26,
-  "uncertified": [
-    "removeObjects",
-    "signature",
-    "workflow",
-    "txtToPdf",
-    "mergeTxt",
-    "splitTxt",
-    "sortLines",
-    "removeDuplicates",
-    "convertAudio",
-    "trimAudio",
-    "mergeAudio",
-    "compressVideo",
-    "trimVideo",
-    "mergeVideos",
-    "videoToGif",
-    "extractAudioFromVideo",
-    "removeAudioFromVideo",
-    "textStatistics",
-    "wordCount",
-    "textDiff",
-    "htmlToMarkdown",
-    "htmlToText",
-    "cssMinifier",
-    "base64Encode",
-    "base64Decode",
-    "urlEncode",
-    "urlDecode"
-  ],
+  "total": 31,
+  "uncertified": [],
   "uncovered": []
 }

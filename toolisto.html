@@ -291,13 +291,13 @@
           <a class="category-card" href="#herramientas" data-nav-filter="images">
             <span class="category-icon">🖼</span>
             <span class="category-name">Imágenes</span>
-            <span class="category-count">25 herramientas</span>
+            <span class="category-count">35 herramientas</span>
             <span class="category-desc">Comprimir, convertir, recortar y editar imágenes</span>
           </a>
           <a class="category-card" href="#herramientas" data-nav-filter="pdf">
             <span class="category-icon">📄</span>
             <span class="category-name">PDF</span>
-            <span class="category-count">35 herramientas</span>
+            <span class="category-count">48 herramientas</span>
             <span class="category-desc">Dividir, unir, convertir y gestionar documentos PDF</span>
           </a>
           <a class="category-card" href="#herramientas" data-nav-filter="signatures">
@@ -315,7 +315,7 @@
           <a class="category-card" href="#herramientas" data-nav-filter="text">
             <span class="category-icon">📄</span>
             <span class="category-name">Texto y TXT</span>
-            <span class="category-count">18 herramientas</span>
+            <span class="category-count">19 herramientas</span>
             <span class="category-desc">Procesar, convertir y organizar archivos de texto</span>
           </a>
           <a class="category-card" href="#herramientas" data-nav-filter="ebooks">
@@ -327,13 +327,13 @@
           <a class="category-card" href="#herramientas" data-nav-filter="spreadsheets">
             <span class="category-icon">📊</span>
             <span class="category-name">Hojas de cálculo</span>
-            <span class="category-count">28 herramientas</span>
+            <span class="category-count">38 herramientas</span>
             <span class="category-desc">Convertir, fusionar y gestionar CSV, Excel, JSON</span>
           </a>
           <a class="category-card" href="#herramientas" data-nav-filter="files">
             <span class="category-icon">📁</span>
             <span class="category-name">Archivos y seguridad</span>
-            <span class="category-count">9 herramientas</span>
+            <span class="category-count">10 herramientas</span>
             <span class="category-desc">Gestionar, dividir, unir y proteger archivos</span>
           </a>
           <a class="category-card" href="#herramientas" data-nav-filter="qrcodes">
@@ -1402,6 +1402,216 @@
         <a class="tool-card" data-tool="jsonValidator" data-category="spreadsheets" data-input-formats="JSON" data-output-formats="TXT" data-keywords="json validar validación sintaxis error" href="./validar-json">
           <span class="tool-icon">✓</span>
           <span class="tool-body"><strong>Validar JSON</strong><small>Comprueba si tu JSON es válido y dónde está el error si no lo es.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="heicToImage" data-category="images" data-input-formats="HEIC HEIF" data-output-formats="JPEG PNG WebP" data-keywords="heic heif iphone convertir jpg png webp" href="./heic-a-imagen">
+          <span class="tool-icon">Ἠ</span>
+          <span class="tool-body"><strong>HEIC a imagen</strong><small>Convierte archivos HEIC/HEIF a JPG, PNG o WebP sin enviar nada a internet.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="avifToImage" data-category="images" data-input-formats="AVIF" data-output-formats="JPEG PNG WebP" data-keywords="avif convertir jpg png webp formato moderno" href="./avif-a-imagen">
+          <span class="tool-icon">Ἂ</span>
+          <span class="tool-body"><strong>AVIF a imagen</strong><small>Convierte archivos AVIF a JPG, PNG o WebP sin salir de tu navegador.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="svgToImage" data-category="images" data-input-formats="SVG" data-output-formats="PNG JPEG WebP" data-keywords="svg vectorial png rasterizar convertir imagen" href="./svg-a-imagen">
+          <span class="tool-icon">スタ</span>
+          <span class="tool-body"><strong>SVG a imagen</strong><small>Rasteriza archivos SVG a PNG, JPG o WebP con dimensiones y fondo personalizables.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="faviconGenerator" data-category="images" data-input-formats="JPEG PNG WebP SVG" data-output-formats="ICO PNG" data-keywords="favicon ico icono web generar 16x16 32x32" href="./generar-favicon">
+          <span class="tool-icon">★</span>
+          <span class="tool-body"><strong>Generador de favicon</strong><small>Crea favicons ICO y PNG en todos los tamaños estándar desde una sola imagen.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="pwaIconGenerator" data-category="images" data-input-formats="JPEG PNG WebP SVG" data-output-formats="PNG" data-keywords="pwa icono manifest progressive web app android ios" href="./generar-iconos-pwa">
+          <span class="tool-icon">📱</span>
+          <span class="tool-body"><strong>Generador de iconos PWA</strong><small>Crea iconos PWA en todos los tamaños requeridos (72 a 512 px) con zona segura maskable.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="removeBackground" data-category="images" data-input-formats="JPEG PNG WebP" data-output-formats="PNG WebP" data-keywords="quitar fondo fondo transparente remove background png transparencia" href="./quitar-fondo-imagen">
+          <span class="tool-icon">◐</span>
+          <span class="tool-body"><strong>Quitar fondo de imagen</strong><small>Detecta el sujeto principal y genera un fondo transparente, blanco o de color personalizado.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="upscaleImage" data-category="images" data-input-formats="JPEG PNG WebP" data-output-formats="PNG WebP" data-keywords="ampliar resolucion escalar upscaler 2x 4x imagen" href="./aumentar-resolucion-imagen">
+          <span class="tool-icon">⊕</span>
+          <span class="tool-body"><strong>Aumentar resolución de imagen</strong><small>Escala imágenes a 2× o 4× usando interpolación bicúbica directamente en el navegador.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="faceBlur" data-category="images" data-input-formats="JPEG PNG WebP" data-output-formats="PNG WebP" data-keywords="difuminar caras blur pixelar privacidad rostron" href="./difuminar-caras-imagen">
+          <span class="tool-icon">faces</span>
+          <span class="tool-body"><strong>Detectar y difuminar caras</strong><small>Marca y difumina caras detectadas con intensidad configurable, sin salir del navegador.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="colorPalette" data-category="images" data-input-formats="JPEG PNG WebP" data-output-formats="TXT JSON CSS" data-keywords="paleta colores dominantes hex rgb hsl extraer" href="./extraer-paleta-colores">
+          <span class="tool-icon">🎨</span>
+          <span class="tool-body"><strong>Extraer paleta de colores</strong><small>Obtén la paleta de colores dominantes con porcentajes, copia un clic y exporta TXT/JSON/CSS.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="htmlToImage" data-category="images" data-input-formats="HTML" data-output-formats="PNG JPEG WebP" data-keywords="html imagen captura screenshot render png css" href="./html-a-imagen">
+          <span class="tool-icon">⬒</span>
+          <span class="tool-body"><strong>HTML a imagen</strong><small>Renderiza HTML a PNG, JPG o WebP con dimensiones, escala y color de fondo configurables.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="extractTextPdf" data-category="pdf" data-input-formats="PDF" data-output-formats="TXT Markdown JSON" data-keywords="pdf texto extraer copiar txt markdown" href="./extraer-texto-pdf">
+          <span class="tool-icon">📝</span>
+          <span class="tool-body"><strong>Extraer texto de PDF</strong><small>Copia el texto completo de un PDF con texto real a TXT, Markdown o JSON estructurado.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="extractImagesPdf" data-category="pdf" data-input-formats="PDF" data-output-formats="PNG JPEG ZIP" data-keywords="pdf imagenes extraer recursos originales" href="./extraer-imagenes-pdf">
+          <span class="tool-icon">⬒</span>
+          <span class="tool-body"><strong>Extraer imágenes de PDF</strong><small>Obtén las imágenes originales de un PDF con su formato, dimensiones y página de origen.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="pdfToPptx" data-category="pdf" data-input-formats="PDF" data-output-formats="PPTX" data-keywords="pdf powerpoint pptx presentacion convertir diapositiva" href="./pdf-a-powerpoint">
+          <span class="tool-icon">▣</span>
+          <span class="tool-body"><strong>PDF a PowerPoint</strong><small>Transforma PDFs a presentaciones PPTX conservando el layout visual de cada página.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="pptxToPdf" data-category="pdf" data-input-formats="PPTX" data-output-formats="PDF" data-keywords="powerpoint pptx pdf convertir presentacion" href="./powerpoint-a-pdf">
+          <span class="tool-icon">📄</span>
+          <span class="tool-body"><strong>PowerPoint a PDF</strong><small>Exporta presentaciones PowerPoint a PDF con imágenes, texto y elementos preservados.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="excelToPdf" data-category="pdf" data-input-formats="XLSX XLS" data-output-formats="PDF" data-keywords="excel xlsx pdf convertir hoja de calculo" href="./excel-a-pdf">
+          <span class="tool-icon">📊</span>
+          <span class="tool-body"><strong>Excel a PDF</strong><small>Exporta hojas Excel a PDF con opciones de página, orientación y ajuste a hoja.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="htmlToPdf" data-category="pdf" data-input-formats="HTML" data-output-formats="PDF" data-keywords="html pdf convertir render css documento" href="./html-a-pdf">
+          <span class="tool-icon">⬒</span>
+          <span class="tool-body"><strong>HTML a PDF</strong><small>Renderiza HTML a PDF profesional con opciones de página, escala y saltos de página.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="pdfToPdfa" data-category="pdf" data-input-formats="PDF" data-output-formats="PDF" data-keywords="pdf pdfa archivado iso preservacion conversion" href="./pdf-a-pdfa">
+          <span class="tool-icon">📦</span>
+          <span class="tool-body"><strong>PDF a PDF/A</strong><small>Aplica metadatos PDF/A-1b (ISO 19005-1) a un PDF existente.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="pdfToMarkdown" data-category="pdf" data-input-formats="PDF" data-output-formats="Markdown" data-keywords="pdf markdown convertir texto estructura" href="./pdf-a-markdown">
+          <span class="tool-icon">📋</span>
+          <span class="tool-body"><strong>PDF a Markdown</strong><small>Extrae texto de PDF y lo formatea como Markdown estructurado con párrafos y títulos.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="pdfFormFiller" data-category="pdf" data-input-formats="PDF" data-output-formats="PDF" data-keywords="pdf formulario rellenar campos checkbox texto" href="./rellenar-formulario-pdf">
+          <span class="tool-icon">✎</span>
+          <span class="tool-body"><strong>Rellenar formularios PDF</strong><small>Interactúa con campos de formulario PDF y rellena valores directamente en el navegador.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="flattenPdf" data-category="pdf" data-input-formats="PDF" data-output-formats="PDF" data-keywords="pdf aplanar formularios anotaciones permanente" href="./aplanar-pdf">
+          <span class="tool-icon">⊟</span>
+          <span class="tool-body"><strong>Aplanar PDF</strong><small>Fusiona campos de formulario y elimina anotaciones interactivas del PDF.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="imagesToPdfAdvanced" data-category="pdf" data-input-formats="JPEG PNG WebP" data-output-formats="PDF" data-keywords="imagenes pdf optimizado comprimir dpi margenes" href="./imagenes-a-pdf-optimizado">
+          <span class="tool-icon">▤</span>
+          <span class="tool-body"><strong>Imágenes a PDF optimizado</strong><small>Crea PDFs optimizados desde imágenes con reordenación, compresión y ajuste de página.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="pdfExtractResources" data-category="pdf" data-input-formats="PDF" data-output-formats="ZIP" data-keywords="pdf imagenes recursos extraer imagenes incrustadas" href="./extraer-fuentes-recursos-pdf">
+          <span class="tool-icon">📂</span>
+          <span class="tool-body"><strong>Extraer imágenes incrustadas de PDF</strong><small>Extrae imágenes incrustadas de un PDF sin renderizar la página completa.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="cleanExcel" data-category="spreadsheets" data-input-formats="XLSX XLS" data-output-formats="XLSX" data-keywords="excel limpiar depurar vacias espacios invisibles" href="./limpiar-excel">
+          <span class="tool-icon">🧹</span>
+          <span class="tool-body"><strong>Limpiar Excel</strong><small>Depura hojas Excel eliminando vacíos, espacios extra, caracteres invisibles y más.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="removeDuplicatesExcel" data-category="spreadsheets" data-input-formats="XLSX XLS" data-output-formats="XLSX" data-keywords="excel duplicados eliminar filas deduplicar" href="./eliminar-duplicados-excel">
+          <span class="tool-icon">🗑</span>
+          <span class="tool-body"><strong>Eliminar duplicados de Excel</strong><small>Elimina duplicados configurando columnas clave, caso sensible y orden de preferencia.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="csvChangeDelimiter" data-category="spreadsheets" data-input-formats="CSV TSV" data-output-formats="CSV TSV" data-keywords="csv delimitador coma punto y coma tab pipe cambiar" href="./cambiar-delimitador-csv">
+          <span class="tool-icon">⇄</span>
+          <span class="tool-body"><strong>Cambiar delimitador CSV</strong><small>Cambia el delimitador de un CSV preservando el quoting correctamente.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="csvChangeEncoding" data-category="spreadsheets" data-input-formats="CSV TXT" data-output-formats="CSV TXT" data-keywords="csv txt codificacion utf-8 encoding windows-1252" href="./cambiar-codificacion-csv">
+          <span class="tool-icon">⟳</span>
+          <span class="tool-body"><strong>Cambiar codificación CSV/TXT</strong><small>Detecta la codificación actual y convierte entre UTF-8, UTF-16, Windows-1252 e ISO-8859-1.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="flattenJson" data-category="spreadsheets" data-input-formats="JSON" data-output-formats="JSON" data-keywords="json aplanar desanidar flatten nested estructura" href="./aplanar-json">
+          <span class="tool-icon">⊞</span>
+          <span class="tool-body"><strong>Aplanar / desanidar JSON</strong><small>Transforma JSON jerárquico a estructura plana o reconstruye jerarquía desde claves planas.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="jsonToExcelAdvanced" data-category="spreadsheets" data-input-formats="JSON" data-output-formats="XLSX" data-keywords="json excel avanzado anidado arrays normalizar" href="./json-a-excel-avanzado">
+          <span class="tool-icon">📊</span>
+          <span class="tool-body"><strong>JSON a Excel avanzado</strong><small>Normaliza JSON anidado, selecciona campos y genera hojas Excel con preview de estructura.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="normalizeCsv" data-category="spreadsheets" data-input-formats="CSV TSV" data-output-formats="CSV" data-keywords="csv normalizar delimitador encoding columnas whitespace" href="./normalizar-csv">
+          <span class="tool-icon">🔧</span>
+          <span class="tool-body"><strong>Normalizar CSV</strong><small>Unifica delimitador, encoding, columnas, whitespace y saltos de línea en un solo paso.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="compareCsv" data-category="spreadsheets" data-input-formats="CSV TSV" data-output-formats="CSV XLSX" data-keywords="csv comparar diferencias diff versiones columnas" href="./comparar-csv">
+          <span class="tool-icon">≟</span>
+          <span class="tool-body"><strong>Comparar versiones de CSV</strong><small>Detecta diferencias entre dos CSVs con columna clave configurable y exporta reporte.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="cleanTabularData" data-category="spreadsheets" data-input-formats="CSV TSV XLSX" data-output-formats="CSV XLSX" data-keywords="datos tabulares limpiar csv excel cadena operaciones" href="./limpiar-datos-tabulares">
+          <span class="tool-icon">🧹</span>
+          <span class="tool-body"><strong>Limpiar datos tabulares</strong><small>Aplica trim, reemplazo, normalización de caso, eliminación de duplicados y más en cadena.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="htmlTableToExcel" data-category="spreadsheets" data-input-formats="HTML" data-output-formats="XLSX" data-keywords="html tablas excel xlsx colspan rowspan extraer" href="./tablas-html-a-excel">
+          <span class="tool-icon">≣</span>
+          <span class="tool-body"><strong>Tablas HTML a Excel</strong><small>Extrae tablas HTML con colspan/rowspan y exporta a XLSX con una hoja por tabla.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="csvToPdf" data-category="pdf" data-input-formats="CSV TSV" data-output-formats="PDF" data-keywords="csv pdf convertir tabla orientacion margenes" href="./csv-a-pdf">
+          <span class="tool-icon">📄</span>
+          <span class="tool-body"><strong>CSV a PDF</strong><small>Genera PDFs profesionales desde CSV con ajuste de columnas y múltiples páginas.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="textEncodingConverter" data-category="text" data-input-formats="TXT MD HTML CSS JS JSON XML CSV" data-output-formats="TXT MD HTML CSS JS JSON XML CSV" data-keywords="encoding codificacion texto utf-8 convertir charset" href="./convertir-codificacion-texto">
+          <span class="tool-icon">⟳</span>
+          <span class="tool-body"><strong>Convertir encoding de texto</strong><small>Detecta la codificación actual, muestra caracteres problemáticos y convierte entre formatos.</small></span>
+          <span class="tool-arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="tool-card" data-tool="detectFileType" data-category="files" data-input-formats="" data-output-formats="" data-keywords="archivo tipo magic bytes detectar extension firma" href="./detectar-tipo-archivo">
+          <span class="tool-icon">🔍</span>
+          <span class="tool-body"><strong>Detectar tipo real de archivo</strong><small>Compara extensión declarada con el tipo detectado por magic bytes y reporta discrepancias.</small></span>
           <span class="tool-arrow" aria-hidden="true">→</span>
         </a>
       </div>
