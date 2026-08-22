@@ -114,7 +114,7 @@ async function main() {
 
     // ─── Step 1: Open Workspace ─────────────────────────────────
     console.log('--- Step 1: Open Workspace ---');
-    const resp = await page.goto(`http://localhost:${PORT}/workspace/preview.html?preview=internal`, { waitUntil: 'networkidle', timeout: 20000 });
+    const resp = await page.goto(`http://localhost:${PORT}/workspace/index.html?preview=internal`, { waitUntil: 'networkidle', timeout: 20000 });
     ok('1. Workspace loads', resp.status() === 200);
 
     // ─── Step 2: Create Project ─────────────────────────────────

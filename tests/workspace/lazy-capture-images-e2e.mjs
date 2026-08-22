@@ -123,7 +123,7 @@ async function main() {
   try {
     // ─── 1. Abrir workspace ─────────────────────────────────────
     console.log('\n--- 1. Abrir workspace ---');
-    const resp = await page.goto(`${ORIGIN}/workspace/preview.html?preview=internal`, { waitUntil: 'networkidle', timeout: 20000 });
+    const resp = await page.goto(`${ORIGIN}/workspace/index.html?preview=internal`, { waitUntil: 'networkidle', timeout: 20000 });
     ok('1. Workspace carga', resp.status() === 200);
     await page.waitForTimeout(300);
 

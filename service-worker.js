@@ -1,7 +1,8 @@
 /* Toolisto: caché local de recursos públicos. Nunca intercepta ni transmite archivos del usuario. */
 /* El build (generate-seo-pages.mjs) inyecta aquí las rutas públicas de APLUNO
    que este Service Worker NUNCA intercepta: portada, legal, contactos, productos
-   (Ordía, Workspace) y sus assets bajo /apluno-assets/. */
+   (Ordía, Workspace landing en /workspace-about/) y sus assets bajo /apluno-assets/.
+   La aplicación funcional en /workspace/ también queda excluida. */
 const APLUNO_PUBLIC_ROUTES = [];
 
 function isAplunoPublicRoute(pathname) {
@@ -48,7 +49,7 @@ self.addEventListener('fetch', (event) => {
   if (request.method !== 'GET' || url.origin !== self.location.origin) return;
 
   // Nunca interceptar rutas públicas de APLUNO (/, /about/, /contact/, /privacy/,
-  // /terms/, /ordia/, /workspace/ y /apluno-assets/*): pasan por la red sin caché.
+  // /terms/, /ordia/, /workspace-about/, /workspace/ y /apluno-assets/*): pasan por la red sin caché.
   if (isAplunoPublicRoute(url.pathname)) return;
 
   if (request.mode === 'navigate') {

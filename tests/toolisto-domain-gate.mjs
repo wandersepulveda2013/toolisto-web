@@ -43,7 +43,7 @@ check(headers.includes('Referrer-Policy: strict-origin-when-cross-origin'), '_he
 check(headers.includes('Permissions-Policy') && headers.includes('geolocation=()'), '_headers: Permissions-Policy acotada');
 check(headers.includes("default-src 'self'") && headers.includes("object-src 'none'") && headers.includes("frame-ancestors 'none'") && headers.includes("base-uri 'self'"), '_headers: CSP con default-src self y object/frame/base acotados');
 check(!headers.includes('/workspace/*'), '_headers: la landing pública /workspace/ no hereda noindex');
-check(!headers.includes('/workspace/preview.html'), '_headers: no se publica el preview interno de Workspace');
+check(!headers.includes('/workspace/index.html'), '_headers: el runtime de Workspace se publica sin reglas específicas');
 const withoutAllowedCdn = headers.replace(/https:\/\/cdn\.jsdelivr\.net\b/g, '');
 check(!/https?:\/\/[^\s'"]+/.test(withoutAllowedCdn), '_headers: sin egress de terceros salvo el CDN declarado de scripts');
 

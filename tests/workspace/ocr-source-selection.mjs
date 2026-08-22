@@ -70,7 +70,7 @@ async function main() {
     const browser = await chromium.launch({ headless: true });
     const page = await browser.newPage();
 
-    await page.goto(`http://localhost:${PORT}/workspace/preview.html?preview=internal`, { waitUntil: 'networkidle', timeout: 20000 });
+    await page.goto(`http://localhost:${PORT}/workspace/index.html?preview=internal`, { waitUntil: 'networkidle', timeout: 20000 });
 
     const scanClear = join(FIXTURES, 'scan-clear.png');
     const scanTable = join(FIXTURES, 'scan-table.png');

@@ -111,7 +111,7 @@ async function main() {
 
   const browser = await chromium.launch({ headless: true });
   const page = await browser.newPage();
-  await page.goto(`http://localhost:${PORT}/workspace/preview.html?preview=internal`, { waitUntil: 'networkidle', timeout: 20000 });
+  await page.goto(`http://localhost:${PORT}/workspace/index.html?preview=internal`, { waitUntil: 'networkidle', timeout: 20000 });
 
   async function runOcr(dataUrl, preprocessing, pageSegmentationMode) {
     return page.evaluate(async ({ src, preprocessing, pageSegmentationMode }) => {

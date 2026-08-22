@@ -27,7 +27,7 @@ async function testViewport(name, width, height) {
   });
 
   try {
-    await page.goto('http://localhost:8080/workspace/preview.html?preview=internal', { waitUntil: 'networkidle', timeout: 10000 });
+    await page.goto('http://localhost:8080/workspace/?preview=internal', { waitUntil: 'networkidle', timeout: 10000 });
     await page.waitForTimeout(500);
     console.log(`${name} (${width}x${height}): Loaded OK`);
 

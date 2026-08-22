@@ -12,7 +12,6 @@ const wsSrcDir = path.resolve(__dirname, 'workspace');
 function workspaceSourcePath(file) {
   if (!file.startsWith('/workspace/')) return null;
   let rel = file.slice('/workspace/'.length);
-  if (rel === 'preview.html') rel = 'index.html';
   const fp = path.join(wsSrcDir, rel);
   return fs.existsSync(fp) ? fp : null;
 }
@@ -51,9 +50,6 @@ const mime = {
 const server = http.createServer((req, res) => {
   let file = req.url.split('?')[0];
   if (file === '/') file = '/index.html';
-  if (file === '/workspace/' && new URL(req.url, `http://localhost:${PORT}`).searchParams.get('preview') === 'internal') {
-    file = '/workspace/preview.html';
-  }
 
   let fp = path.join(dir, file);
   if (fs.existsSync(fp) && fs.statSync(fp).isDirectory()) {

@@ -327,10 +327,10 @@ function renderWorkspace() {
   return renderPage(pageOptions({
     title: 'Toolisto Workspace — Archivos, herramientas y flujos | Apluno',
     description: 'Toolisto Workspace es un espacio de trabajo en desarrollo para reunir archivos, herramientas y flujos desde un mismo lugar.',
-    pathname: '/workspace/',
+    pathname: '/workspace-about/',
     bodyClass: 'apluno-product-page apluno-workspace',
     content,
-    schemas: [{ '@context': 'https://schema.org', '@type': 'WebPage', name: 'Toolisto Workspace', url: absoluteUrl('/workspace/'), description: product.description, isPartOf: websiteSchema }]
+    schemas: [{ '@context': 'https://schema.org', '@type': 'WebPage', name: 'Toolisto Workspace', url: absoluteUrl('/workspace-about/'), description: product.description, isPartOf: websiteSchema }]
   }));
 }
 
@@ -379,7 +379,7 @@ function renderNotFound() {
 writePage('index.html', renderHome());
 writePage(join('about', 'index.html'), renderAbout());
 writePage(join('ordia', 'index.html'), renderOrdia());
-writePage(join('workspace', 'index.html'), renderWorkspace());
+writePage(join('workspace-about', 'index.html'), renderWorkspace());
 writePage(join('contact', 'index.html'), renderContact());
 writePage(join('privacy', 'index.html'), renderPrivacy());
 writePage(join('terms', 'index.html'), renderTerms());
@@ -394,7 +394,7 @@ const sitemapUrls = [
   { path: '/toolisto', priority: '0.9', changefreq: 'weekly' },
   { path: '/about/', priority: '0.6', changefreq: 'monthly' },
   { path: '/ordia/', priority: '0.6', changefreq: 'monthly' },
-  { path: '/workspace/', priority: '0.6', changefreq: 'monthly' },
+  { path: '/workspace-about/', priority: '0.6', changefreq: 'monthly' },
   { path: '/contact/', priority: '0.3', changefreq: 'yearly' },
   { path: '/privacy/', priority: '0.2', changefreq: 'yearly' },
   { path: '/terms/', priority: '0.2', changefreq: 'yearly' },

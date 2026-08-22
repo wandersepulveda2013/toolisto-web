@@ -126,7 +126,7 @@ async function main() {
   try {
     // ─── 1. Abrir workspace ─────────────────────────────────────
     console.log('\n--- 1. Abrir workspace ---');
-    await page.goto(`${ORIGIN}/workspace/preview.html?preview=internal`, { waitUntil: 'networkidle', timeout: 20000 });
+    await page.goto(`${ORIGIN}/workspace/index.html?preview=internal`, { waitUntil: 'networkidle', timeout: 20000 });
     await page.waitForTimeout(300);
 
     // ─── 2. Seed proyecto + captura ─────────────────────────────

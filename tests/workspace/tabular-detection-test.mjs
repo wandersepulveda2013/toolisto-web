@@ -154,7 +154,7 @@ try {
   const jsErrors = [];
   page.on('pageerror', e => jsErrors.push(e.message));
 
-  await page.goto('http://localhost:8081/workspace/preview.html?preview=internal', { waitUntil: 'networkidle' });
+  await page.goto('http://localhost:8081/workspace/index.html?preview=internal', { waitUntil: 'networkidle' });
 
   // Verify the "Informe" button string exists in source
   const jsContent = await page.evaluate(async () => {

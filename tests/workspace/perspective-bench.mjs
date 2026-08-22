@@ -15,7 +15,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..', '..');
 const DIST = join(ROOT, 'dist');
 const PORT = Number(process.env.E2E_PORT || 8084);
-const BASE = `http://localhost:${PORT}/workspace/preview.html?preview=internal`;
+const BASE = `http://localhost:${PORT}/workspace/index.html?preview=internal`;
 const mimeTypes = {
   '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8',
   '.js': 'application/javascript; charset=utf-8', '.png': 'image/png',

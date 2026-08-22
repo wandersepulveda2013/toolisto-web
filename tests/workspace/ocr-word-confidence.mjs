@@ -57,7 +57,7 @@ async function main() {
 
   const browser = await chromium.launch({ headless: true });
   const page = await browser.newPage();
-  await page.goto(`http://localhost:${PORT}/workspace/preview.html?preview=internal`, { waitUntil: 'domcontentloaded', timeout: 20000 });
+  await page.goto(`http://localhost:${PORT}/workspace/index.html?preview=internal`, { waitUntil: 'domcontentloaded', timeout: 20000 });
   await page.waitForFunction(() => typeof window.EngineLoader !== 'undefined', null, { timeout: 20000 }).catch(() => {});
 
   async function runOcr(dataUrl) {

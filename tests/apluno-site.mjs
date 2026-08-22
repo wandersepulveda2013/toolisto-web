@@ -61,13 +61,12 @@ const requiredPages = [
   '404.html'
 ];
 requiredPages.forEach((page) => check(existsSync(join(dist, page)), `${page} existe`));
-check(!existsSync(join(dist, 'workspace', 'preview.html')), 'El preview interno NO se publica en dist');
+check(existsSync(join(dist, 'workspace', 'index.html')), 'El runtime de Workspace se publica en dist/workspace/index.html');
 
 const home = read('index.html');
 const toolisto = read('toolisto.html');
 const about = read('about/index.html');
 const ordia = read('ordia/index.html');
-const workspace = read('workspace/index.html');
 const sitemap = read('sitemap.xml');
 const robots = read('robots.txt');
 const redirects = read('_redirects');
@@ -80,7 +79,7 @@ check(home.includes('href="/toolisto"'), 'La portada enlaza al catálogo complet
 check(home.includes('apluno-tools-data.js') && home.includes('/js/smart-search.js'), 'La portada carga el buscador con datos generados en build');
 check(home.includes('apluno-header--launcher') && home.includes('apluno-footer--minimal'), 'La portada usa header y footer discretos');
 check(!home.includes('apluno-hero') && !home.includes('product-card') && !home.includes('#productos'), 'La portada no conserva hero corporativo ni promos de productos');
-check(home.includes('/ordia/') && home.includes('/workspace/') && (home.match(/En desarrollo/g) || []).length >= 2, 'Los productos en desarrollo siguen presentes, discretos');
+check(home.includes('/ordia/') && home.includes('/workspace-about/') && (home.match(/En desarrollo/g) || []).length >= 2, 'Los productos en desarrollo siguen presentes, discretos');
 
 const launcherDataFile = join(dist, 'apluno-assets', 'apluno-tools-data.js');
 check(existsSync(launcherDataFile), 'El launcher genera apluno-tools-data.js');
@@ -99,11 +98,15 @@ check(toolisto.includes('Apluno') && toolisto.includes('/ordia') && toolisto.inc
 check(about.includes('No estamos construyendo una historia corporativa'), 'About evita una historia corporativa falsa');
 check(ordia.includes('En desarrollo') && ordia.includes('Menos organización manual'), 'Ordía comunica estado y filosofía');
 check(!/play store|app store|descargar ahora/i.test(ordia), 'Ordía no ofrece descargas falsas');
-check(workspace.includes('En desarrollo') && workspace.includes('acceso público permanece cerrado'), 'Workspace es una landing honesta');
-check(!workspace.includes('id="ws-app"'), 'La landing Workspace no expone el runtime interno');
+const workspaceLanding = read('workspace-about/index.html');
+check(workspaceLanding.includes('En desarrollo') && workspaceLanding.includes('acceso público permanece cerrado'), 'Workspace landing (/workspace-about/) es una landing honesta');
+check(!workspaceLanding.includes('id="ws-app"'), 'La landing Workspace no expone el runtime interno');
+const workspaceApp = read('workspace/index.html');
+check(workspaceApp.includes('id="ws-app"'), 'El Workspace funcional (/workspace/) monta #ws-app');
+check(workspaceApp.includes('noindex,nofollow'), 'El Workspace funcional conserva noindex,nofollow');
 
 check(sitemap.includes('<loc>https://apluno.com/toolisto</loc>'), 'Sitemap incluye /toolisto');
-['about/', 'ordia/', 'workspace/', 'privacy/', 'terms/'].forEach((route) => check(sitemap.includes(`https://apluno.com/${route}`), `Sitemap incluye /${route}`));
+['about/', 'ordia/', 'workspace-about/', 'privacy/', 'terms/'].forEach((route) => check(sitemap.includes(`https://apluno.com/${route}`), `Sitemap incluye /${route}`));
 check(robots.includes('Sitemap: https://apluno.com/sitemap.xml'), 'robots.txt declara el sitemap de Apluno');
 check(!robots.includes('Disallow'), 'robots.txt no bloquea ninguna ruta pública');
 check(redirects.includes('/toolisto /toolisto.html 200') && redirects.includes('/toolisto/ /toolisto 301'), 'Redirects resuelven la ruta limpia de Toolisto');

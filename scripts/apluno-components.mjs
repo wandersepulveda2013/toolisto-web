@@ -90,7 +90,7 @@ export function renderAplunoHeader({ active = '', variant = '' } = {}) {
       <a href="/terms/">Condiciones</a>
       <p class="apluno-launcher-nav-label">Productos de Apluno</p>
       <a href="/toolisto">Toolisto <span>Disponible</span></a>
-      <a href="/workspace/">Workspace <span>En desarrollo</span></a>
+      <a href="/workspace-about/">Workspace <span>En desarrollo</span></a>
       <a href="/ordia/">Ordía <span>En desarrollo</span></a>
     </nav>
   </header>`;
@@ -116,7 +116,7 @@ export function renderAplunoHeader({ active = '', variant = '' } = {}) {
       <a href="/contact/">Contacto</a>
       <a href="/privacy/">Privacidad</a>
       <a href="/terms/">Condiciones</a>
-      <a href="/workspace/">Workspace <span>En desarrollo</span></a>
+      <a href="/workspace-about/">Workspace <span>En desarrollo</span></a>
       <a href="/ordia/">Ordía <span>En desarrollo</span></a>
     </nav>
   </header>`;
@@ -135,7 +135,7 @@ export function renderAplunoFooter({ minimal = false } = {}) {
       </nav>
       <nav class="apluno-footer-minimal-products" aria-label="Productos de Apluno">
         <a href="/toolisto">Toolisto</a>
-        <a href="/workspace/">Workspace</a>
+        <a href="/workspace-about/">Workspace</a>
         <a href="/ordia/">Ordía</a>
       </nav>
       <small>© 2026 Apluno · Herramientas online gratuitas.</small>
@@ -152,7 +152,7 @@ export function renderAplunoFooter({ minimal = false } = {}) {
         <div>
           <h2>Productos</h2>
           <a href="/toolisto">Toolisto</a>
-          <a href="/workspace/">Workspace</a>
+          <a href="/workspace-about/">Workspace</a>
           <a href="/ordia/">Ordía</a>
         </div>
         <div>

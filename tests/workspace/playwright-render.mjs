@@ -57,7 +57,7 @@ try {
 
   // 1. Load
   console.log('--- 1. Page Load ---');
-  const resp = await page.goto(`${BASE}/workspace/preview.html?preview=internal`, { waitUntil: 'networkidle', timeout: 15000 });
+  const resp = await page.goto(`${BASE}/workspace/index.html?preview=internal`, { waitUntil: 'networkidle', timeout: 15000 });
   ok('Page loads', resp.status() === 200, `Status: ${resp.status()}`);
 
   // 2. CSS

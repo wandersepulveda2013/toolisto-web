@@ -50,7 +50,7 @@ try {
   const jsErrors = [];
   page.on('pageerror', e => jsErrors.push(e.message));
 
-  await page.goto('http://localhost:8081/workspace/preview.html?preview=internal', { waitUntil: 'networkidle' });
+  await page.goto('http://localhost:8081/workspace/index.html?preview=internal', { waitUntil: 'networkidle' });
 
   // ─── 1. Model Integration ───
   console.log('--- 1. Model Integration ---');
@@ -150,7 +150,7 @@ try {
   // ─── 8. Index.html Sidebar ───
   console.log('\n--- 8. Sidebar Integration ---');
   const htmlContent = await page.evaluate(async () => {
-    const resp = await fetch('/workspace/preview.html');
+    const resp = await fetch('/workspace/index.html');
     return await resp.text();
   });
   ok('Design sidebar item exists', htmlContent.includes('data-view="design"'));

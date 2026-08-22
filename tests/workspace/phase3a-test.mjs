@@ -56,7 +56,7 @@ try {
   const jsErrors = [];
   page.on('pageerror', err => jsErrors.push(err.message));
 
-  await page.goto('http://localhost:8081/workspace/preview.html?preview=internal', { waitUntil: 'networkidle', timeout: 15000 });
+  await page.goto('http://localhost:8081/workspace/index.html?preview=internal', { waitUntil: 'networkidle', timeout: 15000 });
 
   // ─── Image Processor Module Loading ───
   console.log('--- 1. Module Loading ---');

@@ -18,7 +18,7 @@ const ARTIFACTS = join(ROOT, 'artifacts', 'pdf-image-embed');
 mkdirSync(ARTIFACTS, { recursive: true });
 
 const PORT = Number(process.env.E2E_PORT || 8082);
-const BASE = `http://localhost:${PORT}/workspace/preview.html`;
+const BASE = `http://localhost:${PORT}/workspace/index.html`;
 
 const mimeTypes = {
   '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8',

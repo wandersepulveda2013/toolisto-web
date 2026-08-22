@@ -52,9 +52,9 @@ function productSize(dir) {
 console.log('=== Toolisto Workspace Tests ===\n');
 
 // Pre-read all runtime files (published copy when present, source otherwise).
-// En dist/workspace el runtime vive en preview.html (index.html es la landing
-// pública APLUNO); en la fuente workspace/ el runtime es index.html.
-const wsIndex = existsSync(join(WS_BASE, 'preview.html')) ? 'preview.html' : 'index.html';
+// El build copia workspace/index.html tal cual: el runtime es index.html tanto
+// en la fuente workspace/ como en dist/workspace (ya no se genera preview.html).
+const wsIndex = 'index.html';
 const wsHtml = existsSync(join(WS_BASE, wsIndex)) ? readFileSync(join(WS_BASE, wsIndex), 'utf8') : '';
 const wsCss = existsSync(join(WS_BASE, 'workspace.css')) ? readFileSync(join(WS_BASE, 'workspace.css'), 'utf8') : '';
 const wsJs = existsSync(join(WS_BASE, 'workspace.js')) ? readFileSync(join(WS_BASE, 'workspace.js'), 'utf8') : '';

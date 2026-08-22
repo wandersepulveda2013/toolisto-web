@@ -18,7 +18,7 @@ const ARTIFACTS = join(ROOT, 'artifacts', 'workflow-e2e');
 mkdirSync(ARTIFACTS, { recursive: true });
 
 const PORT = Number(process.env.E2E_PORT || 8082);
-const BASE = `http://localhost:${PORT}/workspace/preview.html`;
+const BASE = `http://localhost:${PORT}/workspace/index.html`;
 const INTERNAL_BASE = `${BASE}?preview=internal`;
 
 const mimeTypes = {

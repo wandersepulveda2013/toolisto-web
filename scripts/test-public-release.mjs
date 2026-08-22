@@ -40,10 +40,13 @@ check(sw.length > 0, 'dist/service-worker.js existe en el build público');
 check(sw.includes('const APLUNO_PUBLIC_ROUTES = [') && !sw.includes('const APLUNO_PUBLIC_ROUTES = [];'), 'la allowlist de rutas públicas fue inyectada por el build (no queda el marcador vacío)');
 const routesMatch = sw.match(/const APLUNO_PUBLIC_ROUTES = (\[[^\n]*\]);/);
 const routes = routesMatch ? JSON.parse(routesMatch[1]) : [];
-const required = ['/', '/about/', '/contact/', '/privacy/', '/terms/', '/ordia/', '/workspace/', '/apluno-assets/'];
+const required = ['/', '/about/', '/contact/', '/privacy/', '/terms/', '/ordia/', '/workspace/', '/workspace-about/', '/apluno-assets/'];
 check(required.every((r) => routes.includes(r)), 'la allowlist cubre portada, legal, contacto, productos y assets públicos');
 check(!routes.includes('/toolisto') && !routes.includes('/offline.html'), 'la allowlist no excluye rutas de Toolisto (catálogo y recuperación offline)');
-check(!existsSync(join(ROOT, 'dist', 'workspace', 'workspace.js')), 'el runtime interno del Workspace NO se publica en el build público');
+check(existsSync(join(ROOT, 'dist', 'workspace', 'workspace.js')), 'el runtime funcional del Workspace SÍ se publica en el build público');
+check(existsSync(join(ROOT, 'dist', 'workspace', 'workspace.css')), 'el CSS funcional del Workspace SÍ se publica en el build público');
+check(existsSync(join(ROOT, 'dist', 'workspace', 'core')), 'los módulos core del Workspace SÍ se publican en el build público');
+check(existsSync(join(ROOT, 'dist', 'workspace', 'index.html')), 'el index.html funcional del Workspace SÍ se publica en el build público');
 check(toolSlugs.includes('comprimir-imagen') && !toolSlugs.includes('recortar-imagen'), 'el catálogo de herramientas coincide con el fixture esperado');
 
 check(home.includes('<title>APLUNO — Herramientas online para PDF, imágenes y archivos</title>') && home.includes('apluno-launcher-search') && !home.includes('product-card'), 'la portada pública es el launcher de herramientas, sin promos de productos');

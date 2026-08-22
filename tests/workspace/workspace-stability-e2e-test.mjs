@@ -10,7 +10,7 @@ import { mkdirSync } from 'node:fs';
 mkdirSync(ARTIFACTS, { recursive: true });
 
 const PORT = process.env.E2E_PORT || 8082;
-const BASE = `http://localhost:${PORT}/workspace/preview.html?preview=internal`;
+const BASE = `http://localhost:${PORT}/workspace/index.html?preview=internal`;
 
 let pass = 0, fail = 0;
 function assert(cond, msg) {

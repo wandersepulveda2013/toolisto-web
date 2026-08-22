@@ -62,7 +62,7 @@ try {
   page.on('pageerror', err => jsErrors.push(err.message));
   page.on('console', msg => { if (msg.type() === 'error') consoleErrors.push(msg.text()); });
 
-  await page.goto(`http://localhost:${PORT}/workspace/preview.html?preview=internal`, { waitUntil: 'networkidle', timeout: 15000 });
+  await page.goto(`http://localhost:${PORT}/workspace/index.html?preview=internal`, { waitUntil: 'networkidle', timeout: 15000 });
 
   // Helper: create a synthetic image as dataUrl in browser
   const createImage = async (opts) => {

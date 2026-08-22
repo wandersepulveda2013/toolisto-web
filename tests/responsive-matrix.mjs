@@ -39,7 +39,7 @@ function startServer() {
   const server = createServer((request, response) => {
     const pathname = decodeURIComponent(new URL(request.url, 'http://localhost').pathname);
     const wsRel = pathname.startsWith('/workspace/')
-      ? (pathname.slice('/workspace/'.length) === 'preview.html' ? 'index.html' : pathname.slice('/workspace/'.length))
+      ? pathname.slice('/workspace/'.length)
       : null;
     const baseDir = wsRel !== null ? wsSrc : dist;
     const relative = wsRel !== null ? wsRel : (pathname === '/' ? 'index.html' : pathname.replace(/^\/+/, ''));
@@ -98,7 +98,7 @@ try {
   for (const viewport of viewports) {
     await page.setViewportSize(viewport);
     const beforeErrors = consoleErrors.length;
-    const response = await page.goto(`${base}/workspace/preview.html?preview=internal`, { waitUntil: 'domcontentloaded' });
+    const response = await page.goto(`${base}/workspace/index.html?preview=internal`, { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(100);
     const metrics = await page.evaluate(() => ({
       scrollWidth: document.documentElement.scrollWidth,

@@ -7,7 +7,7 @@
  * Excel con locales con acentos (es) abra el archivo sin mojibake.
  *
  * Método (sin mocks, sitio en dist/):
- *  1. Abre `/workspace/preview.html?preview=internal` y crea un proyecto.
+ *  1. Abre `/workspace/index.html?preview=internal` y crea un proyecto.
  *  2. En Datos crea una tabla y escribe celdas con acentos españoles.
  *  3. Pulsa "Exportar CSV" de la tabla y verifica los bytes de la descarga:
  *     (a) empieza por EF BB BF, (b) el primer carácter al decodificar es \uFEFF,
@@ -93,7 +93,7 @@ async function main() {
 
     // ─── 1. Open Workspace ──────────────────────────────────────
     console.log('--- 1. Abrir workspace ---');
-    const resp = await page.goto(`${ORIGIN}/workspace/preview.html?preview=internal`, { waitUntil: 'networkidle', timeout: 20000 });
+    const resp = await page.goto(`${ORIGIN}/workspace/index.html?preview=internal`, { waitUntil: 'networkidle', timeout: 20000 });
     ok('1.1 Workspace carga', resp.status() === 200);
 
     // ─── 2. Create project ──────────────────────────────────────

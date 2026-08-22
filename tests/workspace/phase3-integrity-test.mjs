@@ -126,7 +126,7 @@ async function main() {
 
   // ─── Setup: project + scan + OCR + tabla ─────────────────────
   console.log('--- Setup: project, scan, OCR, tabla ---');
-  const resp = await page.goto(`http://localhost:${PORT}/workspace/preview.html?preview=internal`, { waitUntil: 'networkidle', timeout: 25000 });
+  const resp = await page.goto(`http://localhost:${PORT}/workspace/index.html?preview=internal`, { waitUntil: 'networkidle', timeout: 25000 });
   ok('Workspace loads', resp.status() === 200);
 
   await page.click('#ws-welcome-new');

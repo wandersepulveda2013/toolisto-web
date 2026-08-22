@@ -6,8 +6,8 @@ import { dirname } from 'path';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..', 'dist');
-// El runtime del Workspace se sirve desde la FUENTE (workspace/), no desde dist:
-// el build público --production ya no publica el preview interno.
+// El runtime del Workspace se sirve desde la FUENTE (workspace/) para el dev server.
+// En producción, el build copia workspace/ completo a dist/workspace/.
 const WS_SRC = join(__dirname, '..', 'workspace');
 const PORT = 8080;
 
@@ -16,7 +16,6 @@ const PORT = 8080;
 function resolveWorkspaceSource(urlPath) {
   if (!urlPath.startsWith('/workspace/')) return null;
   let rel = urlPath.slice('/workspace/'.length);
-  if (rel === 'preview.html') rel = 'index.html';
   return { dir: WS_SRC, rel };
 }
 

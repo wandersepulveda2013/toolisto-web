@@ -63,7 +63,6 @@ function startServer() {
       if (file === '/') file = '/index.html';
       const base = file.startsWith('/workspace/') ? wsBase : DIST;
       let rel = file.startsWith('/workspace/') ? file.slice('/workspace/'.length) : file;
-      if (rel === 'preview.html') rel = 'index.html';
       let fp = join(base, rel);
       if (existsSync(fp) && statSync(fp).isDirectory()) fp = join(fp, 'index.html');
       if (!existsSync(fp)) fp = join(base, rel + '.html');
@@ -141,7 +140,7 @@ async function main() {
   try {
     // ─── Paso 1: abrir workspace ─────────────────────────────────
     console.log('\n--- 1. Abrir workspace ---');
-    const resp = await page.goto(`${ORIGIN}/workspace/preview.html?preview=internal`, { waitUntil: 'networkidle', timeout: 20000 });
+    const resp = await page.goto(`${ORIGIN}/workspace/index.html?preview=internal`, { waitUntil: 'networkidle', timeout: 20000 });
     ok('1. Workspace carga', resp.status() === 200);
     await page.waitForTimeout(500);
 

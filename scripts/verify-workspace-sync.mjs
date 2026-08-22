@@ -1,12 +1,16 @@
 #!/usr/bin/env node
 /**
- * verify-workspace-sync.mjs — verifica que dist/workspace/ coincide con workspace/
+ * verify-workspace-sync.mjs — verifica que dist/workspace/ es copia fiel de workspace/
  *
- * El source canónico es workspace/. El build público (--production) NO publica
- * el runtime interno (workspace/preview.html); solo la puerta de release del
- * Workspace usa `generate-seo-pages --production --include-workspace` para
- * copiar el runtime a dist/workspace/ y verificar sync. Si dist/workspace/ no
- * existe es la situación esperada del build público y el script pasa.
+ * El source canónico es workspace/. El build (--production) copia workspace/ completo
+ * a dist/workspace/ como parte del artefacto desplegable. La landing promocional
+ * APLUNO se escribe en dist/workspace-about/, sin colisionar.
+ *
+ * Este script:
+ *   1. Verifica que dist/workspace/ exista.
+ *   2. Compara los archivos RUNTIME_FILES por SHA-256.
+ *   3. Verifica que no queden restos de la landing APLUNO (apluno.css).
+ *   4. Verifica que no falten archivos del source en dist.
  *
  * Salida: exit 0 si todo sincronizado; exit 1 si hay diferencias o faltan.
  */
@@ -25,10 +29,6 @@ const RUNTIME_FILES = [
   'core/db.js', 'core/state.js', 'core/events.js', 'core/storage.js',
 ];
 
-function distRelative(rel) {
-  return rel === 'index.html' ? 'preview.html' : rel;
-}
-
 function sha256(p) {
   return createHash('sha256').update(readFileSync(p)).digest('hex');
 }
@@ -44,45 +44,46 @@ function walk(dir, base, out = []) {
 }
 
 let fail = 0;
-const diff = [];
 
 console.log('=== Verificación source -> dist (workspace) ===\n');
 
-if (!existsSync(join(DIST, 'preview.html'))) {
-  console.log('  OK: dist/workspace/preview.html no existe (build público sin --include-workspace):');
-  console.log('      el runtime interno NO se publica por diseño; la landing pública index.html sí.');
-  console.log('\n=== Resultado: SYNC OK (runtime no publicado en dist público) ===');
-  process.exit(0);
+if (!existsSync(DIST)) {
+  console.log('  FAIL: dist/workspace/ no existe tras build --production');
+  process.exit(1);
 }
 
 for (const rel of RUNTIME_FILES) {
   const s = join(SRC, rel);
-  const distRel = distRelative(rel);
-  const d = join(DIST, distRel);
+  const d = join(DIST, rel);
   if (!existsSync(s)) { console.log(`  SKIP (sin source): ${rel}`); continue; }
-  if (!existsSync(d)) { console.log(`  FAIL: falta en dist: ${distRel}`); fail++; diff.push(distRel); continue; }
+  if (!existsSync(d)) { console.log(`  FAIL: falta en dist: ${rel}`); fail++; continue; }
   const hs = sha256(s), hd = sha256(d);
-  if (hs === hd) { console.log(`  PASS: ${rel} -> ${distRel}`); }
-  else { console.log(`  FAIL: dist desincronizado: ${rel} -> ${distRel}`); fail++; diff.push(distRel); }
+  if (hs === hd) { console.log(`  PASS: ${rel} — hash idéntico`); }
+  else { console.log(`  FAIL: ${rel} — dist desincronizado (hash diferente)`); fail++; }
+}
+
+const distIndex = join(DIST, 'index.html');
+if (existsSync(distIndex)) {
+  const html = readFileSync(distIndex, 'utf8');
+  const hasApluno = html.includes('apluno.css');
+  if (hasApluno) {
+    console.log('  FAIL: dist/workspace/index.html referencia apluno.css (landing promocional escrita por error)');
+    fail++;
+  } else {
+    console.log('  PASS: index.html — sin restos de landing APLUNO');
+  }
 }
 
 const srcFiles = walk(SRC, '');
 const distFiles = walk(DIST, '');
-const expectedDistFiles = srcFiles.map(distRelative);
-const allowedPublicFiles = new Set(['index.html']);
-const extraInDist = distFiles.filter(rel => !expectedDistFiles.includes(rel) && !allowedPublicFiles.has(rel));
-const missingInDist = expectedDistFiles.filter(rel => !distFiles.includes(rel));
+const missingInDist = srcFiles.filter(rel => !distFiles.includes(rel));
 
-if (distFiles.includes('index.html')) {
-  console.log('\n  PASS: index.html reservado para la landing pública de Workspace');
-}
-
-if (extraInDist.length) {
-  console.log(`\n  INFO: ${extraInDist.length} archivo(s) extra en dist (remanentes): ${extraInDist.join(', ')}`);
-}
 if (missingInDist.length) {
-  console.log(`\n  FAIL: ${missingInDist.length} archivo(s) del source faltan en dist: ${missingInDist.join(', ')}`);
+  console.log(`\n  FAIL: ${missingInDist.length} archivo(s) del source faltan en dist:`);
+  for (const f of missingInDist) console.log(`    - ${f}`);
   fail += missingInDist.length;
+} else {
+  console.log(`  PASS: todos los ${srcFiles.length} archivos del source están en dist`);
 }
 
 console.log(`\n=== Resultado: ${fail === 0 ? 'SYNC OK' : fail + ' DESINCRONIZADO(S)'} ===`);

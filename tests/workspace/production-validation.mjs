@@ -35,14 +35,14 @@ async function shellState() {
 
 const mainResponse = await page.goto(`${BASE}/toolisto`, { waitUntil: 'networkidle' });
 assert(mainResponse?.status() === 200, 'El catalogo Toolisto responde HTTP 200 en /toolisto');
-assert(await page.locator('a[href="/workspace/"]').count() >= 1, 'El catalogo enlaza la landing publica de Workspace');
+assert(await page.locator('a[href="/workspace/"]').count() >= 1, 'El catalogo enlaza el Workspace funcional');
 
-const landingResponse = await page.goto(`${BASE}/workspace/`, { waitUntil: 'networkidle' });
-assert(landingResponse?.status() === 200, 'La landing publica de Workspace responde HTTP 200');
-assert(await page.locator('main').count() === 1 && await page.locator('h1').count() === 1, 'La landing publica de Workspace conserva estructura semantica');
-assert(await page.locator('#ws-app').count() === 0, 'La landing publica no monta la aplicacion interna');
+const landingResponse = await page.goto(`${BASE}/workspace-about/`, { waitUntil: 'networkidle' });
+assert(landingResponse?.status() === 200, 'La landing informativa de Workspace responde HTTP 200 en /workspace-about/');
+assert(await page.locator('main').count() === 1 && await page.locator('h1').count() === 1, 'La landing informativa conserva estructura semantica');
+assert(await page.locator('#ws-app').count() === 0, 'La landing informativa no monta la aplicacion interna');
 
-const homeResponse = await page.goto(`${BASE}/workspace/preview.html?preview=internal`, { waitUntil: 'networkidle' });
+const homeResponse = await page.goto(`${BASE}/workspace/index.html?preview=internal`, { waitUntil: 'networkidle' });
 assert(homeResponse?.status() === 200, 'Workspace responde HTTP 200');
 await page.waitForTimeout(300);
 await page.screenshot({ path: join(ARTIFACTS, 'home-1366.png'), fullPage: true });
@@ -328,7 +328,7 @@ await page.screenshot({ path: join(ARTIFACTS, 'project-dark-1366.png'), fullPage
 
 for (const width of [390, 768, 1024, 1366, 1920]) {
   await page.setViewportSize({ width, height: 900 });
-  await page.goto(`${BASE}/workspace/preview.html?preview=internal`, { waitUntil: 'networkidle' });
+  await page.goto(`${BASE}/workspace/index.html?preview=internal`, { waitUntil: 'networkidle' });
   await page.waitForTimeout(180);
   state = await shellState();
   assert(!state.horizontalOverflow, `Responsive sin overflow a ${width}px`);

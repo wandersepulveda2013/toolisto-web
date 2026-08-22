@@ -22,7 +22,7 @@ const ARTIFACTS = join(ROOT, 'artifacts', 'workflow-builder-a11y');
 mkdirSync(ARTIFACTS, { recursive: true });
 
 const PORT = Number(process.env.E2E_PORT || 8082);
-const INTERNAL_BASE = `http://localhost:${PORT}/workspace/preview.html?preview=internal`;
+const INTERNAL_BASE = `http://localhost:${PORT}/workspace/index.html?preview=internal`;
 
 const mimeTypes = {
   '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8',

@@ -72,7 +72,7 @@ async function main() {
   const page = await browser.newPage();
   const pageErrors = [];
   page.on('pageerror', error => pageErrors.push(error.message));
-  await page.goto(`http://localhost:${PORT}/workspace/preview.html?preview=internal`, { waitUntil: 'domcontentloaded', timeout: 20000 });
+  await page.goto(`http://localhost:${PORT}/workspace/index.html?preview=internal`, { waitUntil: 'domcontentloaded', timeout: 20000 });
   await page.waitForFunction(() => typeof window.EngineLoader !== 'undefined', null, { timeout: 20000 }).catch(() => {});
 
   console.log('=== Engine idle auto-release (CE-040) ===\n');

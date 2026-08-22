@@ -3,13 +3,6 @@
 
   document.documentElement.classList.add('js');
 
-  var params = new URLSearchParams(window.location.search);
-  var isLocal = /^(localhost|127\.0\.0\.1)$/.test(window.location.hostname);
-  if (isLocal && window.location.pathname === '/workspace/' && params.get('preview') === 'internal') {
-    window.location.replace('/workspace/preview.html?preview=internal');
-    return;
-  }
-
   function ready() {
     var header = document.querySelector('[data-apluno-header]');
     var menuButton = document.querySelector('[data-menu-toggle]');
