@@ -1,0 +1,179 @@
+{
+  "checks": [
+    {
+      "name": "Message mentions metadatos (not \"PDF/A convertido\")",
+      "pass": true
+    },
+    {
+      "name": "Message does NOT claim full PDF/A conversion",
+      "pass": true
+    },
+    {
+      "name": "Output has content",
+      "pass": true
+    },
+    {
+      "name": "PDF contains pdfaid XMP namespace",
+      "pass": true
+    },
+    {
+      "name": "PDF has NO OutputIntent (honest XMP-only approach)",
+      "pass": true
+    },
+    {
+      "name": "Message shows 0 faces detected or browser unsupported (no false positive)",
+      "pass": true
+    },
+    {
+      "name": "PNG output has content",
+      "pass": true
+    },
+    {
+      "name": "Message reports flattening result",
+      "pass": true
+    },
+    {
+      "name": "PDF output has content",
+      "pass": true
+    },
+    {
+      "name": "Annots dict removed from output PDF",
+      "pass": true
+    },
+    {
+      "name": "Message confirms background removed",
+      "pass": true
+    },
+    {
+      "name": "PNG output has content",
+      "pass": true
+    },
+    {
+      "name": "Output is valid PNG",
+      "pass": true
+    },
+    {
+      "name": "Message confirms image upscaled",
+      "pass": true
+    },
+    {
+      "name": "PNG output has content",
+      "pass": true
+    },
+    {
+      "name": "Output is 100x100 (2x from 50x50), got 100x100",
+      "pass": true
+    },
+    {
+      "name": "Message confirms conversion",
+      "pass": true
+    },
+    {
+      "name": "Output file has content",
+      "pass": true
+    },
+    {
+      "name": "Output contains readable content",
+      "pass": true
+    },
+    {
+      "name": "Message reports slides generated",
+      "pass": true
+    },
+    {
+      "name": "PPTX output has content",
+      "pass": true
+    },
+    {
+      "name": "Output is valid ZIP (PK signature)",
+      "pass": true
+    },
+    {
+      "name": "ZIP contains slide1.xml",
+      "pass": true
+    },
+    {
+      "name": "ZIP contains [Content_Types].xml",
+      "pass": true
+    },
+    {
+      "name": "ZIP contains presentation.xml",
+      "pass": true
+    },
+    {
+      "name": "ZIP contains media directory",
+      "pass": true
+    },
+    {
+      "name": "Message reports resources",
+      "pass": true
+    },
+    {
+      "name": "Output has content",
+      "pass": true
+    },
+    {
+      "name": "Report mentions images or \"no images detected\"",
+      "pass": true
+    },
+    {
+      "name": "Report honestly states font limitation",
+      "pass": true
+    },
+    {
+      "name": "Page title mentions AVIF",
+      "pass": true
+    },
+    {
+      "name": "File input element exists in DOM",
+      "pass": true
+    },
+    {
+      "name": "Run button exists in DOM",
+      "pass": true
+    },
+    {
+      "name": "Message reports images or pages",
+      "pass": true
+    },
+    {
+      "name": "Output has content",
+      "pass": true
+    },
+    {
+      "name": "Page title mentions PowerPoint",
+      "pass": true
+    },
+    {
+      "name": "File input element exists in DOM",
+      "pass": true
+    },
+    {
+      "name": "Page title mentions formularios/PDF",
+      "pass": true
+    },
+    {
+      "name": "File input element exists in DOM",
+      "pass": true
+    }
+  ],
+  "fail": 0,
+  "failureReasons": [],
+  "gate": "capability-integrity",
+  "pass": 39,
+  "total": 39,
+  "verdicts": {
+    "avifToImage": "REAL_WITH_LIMITATIONS — Requires browser AVIF support, no WASM fallback",
+    "extractImagesPdf": "REAL — Operator list extraction with page render fallback",
+    "faceBlur": "REAL — FaceDetector API, no false positive fallback",
+    "flattenPdf": "REAL_WITH_LIMITATIONS — Form fields flattened, annotations removed not merged",
+    "pdfExtractResources": "REAL_WITH_LIMITATIONS — Images only, fonts/attachments not extractable",
+    "pdfFormFiller": "REAL_WITH_LIMITATIONS — Text/checkbox/radio/select, round-trip not verified",
+    "pdfToPdfa": "REAL_WITH_LIMITATIONS — XMP metadata only, no ICC/OutputIntent",
+    "pdfToPptx": "REAL_WITH_LIMITATIONS — Page rendered as image, text extracted sequentially",
+    "pptxToPdf": "REAL_WITH_LIMITATIONS — Text + images per slide, no DrawingML layout",
+    "removeBackground": "REAL — Color-distance algorithm, honest about limitations",
+    "textEncodingConverter": "REAL — Supports ISO-8859-1, Win-1252, UTF-16LE/BE, UTF-8",
+    "upscaleImage": "REAL — Canvas interpolation + unsharp mask, honest \"no AI\" claim"
+  }
+}

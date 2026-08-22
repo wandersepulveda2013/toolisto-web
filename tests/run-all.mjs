@@ -20,7 +20,7 @@ const tests = [
   { name: 'Embed PDF', cmd: 'node tests/test-embedpdf.js' },
   { name: 'Lazy Dependencies', cmd: 'node tests/lazy-dependencies.mjs' },
   { name: 'PWA Offline', cmd: 'node tests/pwa-offline.mjs' },
-  { name: 'Responsive Matrix', cmd: 'node tests/responsive-matrix.mjs' },
+  { name: 'Responsive Matrix', cmd: 'node tests/responsive-matrix.mjs', timeout: 600000 },
   { name: 'Accessibility Audit', cmd: 'node tests/accessibility-audit.mjs' },
   { name: 'Public Network Negative', cmd: 'node tests/public-site-network-negative.mjs' },
   { name: 'Public Security Audit', cmd: 'node tests/public-site-security-audit.mjs' },
@@ -68,10 +68,9 @@ for (const test of tests) {
   console.log(`Ejecutando: ${test.name}`);
   console.log('='.repeat(60));
   try {
-    // Timeout por suite: las suites E2E de navegador (gate-e2e-*.mjs) lanzan Chromium
-    // varias veces con descargas reales; ~117s medidos en QR Family. 300s es margen
-    // contra cuelgues, no para ocultar fallos: cada suite auto-informa y sale no-cero.
-    execSync(test.cmd, { cwd: __dirname + '/..', stdio: 'inherit', timeout: 300000 });
+    // Timeout por suite: 300s default (margen contra cuelgues, no para ocultar fallos).
+    // Responsive Matrix usa 600s porque recorre 202 tools × 5 viewports = 1015 page loads.
+    execSync(test.cmd, { cwd: __dirname + '/..', stdio: 'inherit', timeout: test.timeout || 300000 });
     passed++;
     console.log(`✓ ${test.name}: PASÓ`);
   } catch (e) {
