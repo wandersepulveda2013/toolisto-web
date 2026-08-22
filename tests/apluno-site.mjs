@@ -111,7 +111,7 @@ check(sitemap.includes('<loc>https://apluno.com/toolisto</loc>'), 'Sitemap inclu
 ['privacidad', 'condiciones'].forEach((route) => check(sitemap.includes(`https://apluno.com/${route}`), `Sitemap incluye /${route}`));
 check(robots.includes('Sitemap: https://apluno.com/sitemap.xml'), 'robots.txt declara el sitemap de Apluno');
 check(!robots.includes('Disallow'), 'robots.txt no bloquea ninguna ruta pública');
-check(redirects.includes('/toolisto /toolisto.html 200') && redirects.includes('/toolisto/ /toolisto.html 200'), 'Redirects resuelven la ruta limpia de Toolisto');
+check(redirects.includes('/toolisto /toolisto.html 200') && redirects.includes('/toolisto/ /toolisto 301'), 'Redirects resuelven la ruta limpia de Toolisto');
 
 const toolManifest = JSON.parse(readFileSync(join(dist, 'assets', 'manifest.webmanifest'), 'utf8'));
 const aplunoManifest = JSON.parse(readFileSync(join(dist, 'manifest.webmanifest'), 'utf8'));
