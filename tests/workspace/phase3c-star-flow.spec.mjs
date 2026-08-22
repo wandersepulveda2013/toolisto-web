@@ -179,6 +179,9 @@ async function main() {
     ok('7. Capture has ID', !!captureId, captureId);
 
     // ─── Step 8: Run OCR ────────────────────────────────────────
+    // detectamos la aparición del extraction-mode-chooser (`.ws-extraction-mode-card`)
+    // en vez de esperar la desaparición de `.ws-modal-overlay`, porque
+    // extractTextFromScan() cierra el modal de OCR y abre inmediatamente el chooser.
     console.log('\n--- Step 8: Run OCR ---');
     await page.click('.sidebar-item[data-view="capture"]');
     await page.waitForTimeout(500);
@@ -194,8 +197,8 @@ async function main() {
       for (let i = 0; i < 240; i++) {
         await page.waitForTimeout(500);
         process.stdout.write('.');
-        const modalGone = !(await page.$('.ws-modal-overlay'));
-        if (modalGone) { ocrMode = 'ocr'; break; }
+        const hasChooser = !!(await page.$('.ws-extraction-mode-card'));
+        if (hasChooser) { ocrMode = 'ocr'; break; }
         const hasTextarea = !!(await page.$('.ws-modal textarea'));
         if (hasTextarea) { ocrMode = 'fallback'; break; }
       }
@@ -212,6 +215,16 @@ async function main() {
         ok('8. Fallback text entry completed', true);
       } else if (ocrMode === 'ocr') {
         ok('8. OCR completed', true, `${evidence.ocrDuration}ms`);
+        const ocrPreview = await page.evaluate(() => {
+          const card = document.querySelector('.ws-extraction-mode-card');
+          return card ? card.textContent.slice(0, 200) : '';
+        });
+        ok('8. OCR produced non-empty text', ocrPreview.length > 0, ocrPreview.slice(0, 80));
+        const extraerBtn = await page.$('.ws-modal-footer .ws-btn-primary');
+        if (extraerBtn) await extraerBtn.click();
+        await page.waitForTimeout(3000);
+        const modalGone = !(await page.$('.ws-modal-overlay'));
+        ok('8. Modal closed after extraction', modalGone);
       } else {
         ko('8. OCR timed out');
       }
