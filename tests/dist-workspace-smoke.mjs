@@ -130,6 +130,20 @@ try {
   });
   ok(hasCustomProps, 'Variables CSS del workspace están disponibles');
 
+  const hasFontStack = await page.evaluate(() => {
+    const styles = getComputedStyle(document.documentElement);
+    const wsFont = styles.getPropertyValue('--ws-font').trim();
+    const bodyFont = getComputedStyle(document.body).fontFamily;
+    return {
+      wsFontValid: wsFont.length > 10 && !wsFont.includes('var(--ws-font)'),
+      bodyFontNotSerif: bodyFont.startsWith('Inter') || bodyFont.startsWith('"Inter"'),
+      bodyFont,
+      wsFont
+    };
+  });
+  ok(hasFontStack.wsFontValid, `--ws-font resolves to real stack: "${hasFontStack.wsFont.substring(0, 60)}..."`);
+  ok(hasFontStack.bodyFontNotSerif, `body font-family starts with Inter: "${hasFontStack.bodyFont.substring(0, 60)}"`);
+
   /* ── 4. JS modules ── */
   console.log('\n--- 4. JS Modules ---');
   const moduleCheck = await page.evaluate(async () => {
