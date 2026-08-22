@@ -1,10 +1,62 @@
 # OCR E2E Blocker — phase3c-star-flow step 8
 
-**Estado:** BLOCKED — known, not remediable con cambio de timeout sin evidencia previa.
+**Estado:** ROOT CAUSE ISOLATED — defecto del test, no del producto.
 **Fecha de primera observación:** 2026-08-17
 **Última verificación:** 2026-08-22
+**Diagnóstico:** 2026-08-22 (CE-051 diagnostic v2, 10+10 corridas instrumentadas)
 
-## Suite afectada
+## ROOT CAUSE ISOLATED (CE-051)
+
+**El OCR no tiene ningún problema de performance ni de timeout.**
+
+El timeout del step 8 es un **defecto del test**, no del producto.
+
+### Mecanismo del defecto
+
+1. `extractTextFromScan()` en `workspace.js:2541` llama `recognizeText(canvas)`.
+2. `recognizeText()` completa en **~3 segundos** (workerInit ~1s + recognize ~0.5s).
+3. `extractTextFromScan()` llama `closeModal()` → el overlay se remueve.
+4. **Inmediatamente después**, llama `showExtractionModeChooser()` → abre un NUEVO modal con `.ws-modal-overlay`.
+5. El test (`phase3c-star-flow.spec.mjs:194`) polls `!(await page.$('.ws-modal-overlay'))` cada 500ms.
+6. **El overlay NUNCA desaparece** — se reemplaza por el modal del extraction mode chooser.
+7. El loop agota 240 iteraciones × 500ms = 120s → `ocrMode = 'timeout'` → FAIL.
+
+### Evidencia (diagnostic v2, 10+10 corridas)
+
+| Escenario | Éxito | workerInit (avg) | recognize (avg) | total (avg) | chars | conf |
+|-----------|-------|-------------------|-----------------|-------------|-------|------|
+| **Modal (phase3c path)** | 1/10* | 1428ms | 476ms | 2759ms | 148 | 89% |
+| **Workflow (capture-flow-chain)** | **10/10** | 839ms | 488ms | 2752ms | 148 | 89% |
+
+*Los 9 fallos del escenario modal son excepciones de Playwright porque el modal del extraction chooser queda abierto al final de la corrida anterior, impidiendo que la siguiente abra el welcome screen.
+
+### Modal timeline capturado (run 0, modal)
+
+```
++889ms  "Extracción de texto (OCR)" — initializing tesseract
++2748ms "Modo de extracción (§53)" — Selecciona cómo procesar el texto extraído
+```
+
+El test nunca ve el primer modal desaparecer porque el segundo aparece inmediatamente.
+
+### Por qué capture-flow-chain (CE-050) pasa
+
+El workflow usa `page.waitForSelector('#wf-results-section')` — un elemento específico del workflow, no la ausencia de un overlay. No depende del estado del modal.
+
+### Clasificación del fallo
+
+| Componente | Estado |
+|------------|--------|
+| Tesseract WASM engine | Funciona correctamente (~3s total) |
+| `recognizeText()` | Funciona correctamente (148 chars, 89% conf) |
+| `extractTextFromScan()` | Funciona correctamente (muestra extraction chooser) |
+| `phase3c-star-flow.spec.mjs` step 8 | **Defecto del test** — selector de polling equivocado |
+
+### Corrección necesaria
+
+Cambiar el polling del step 8 en `phase3c-star-flow.spec.mjs:194` para detectar la aparición del extraction mode chooser (`.ws-modal-title` con texto "Modo de extracción") en vez de la ausencia de `.ws-modal-overlay`.
+
+**No es necesario aumentar el timeout. No es necesario modificar el engine-loader ni recognizeText().**
 
 `tests/workspace/phase3c-star-flow.spec.mjs` — Star-Flow E2E (40 pasos)
 
