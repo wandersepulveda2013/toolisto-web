@@ -56,10 +56,11 @@ assert(await page.locator('.ws-hero-drawing').count() === 1, 'La portada monta l
 assert(await page.locator('.ws-home-stats > div').count() === 4, 'La portada muestra cuatro indicadores de valor');
 const templateCard = page.locator('.ws-studio-templates .ws-template-card').filter({ hasText: 'Informe' });
 assert(await templateCard.count() === 1, 'La plantilla de informe es visible');
-const templateBox = await templateCard.boundingBox();
-if (templateBox) await page.mouse.move(templateBox.x + templateBox.width / 2, templateBox.y + templateBox.height / 2);
+await templateCard.hover();
+await page.waitForTimeout(200);
 const templateContrast = await page.evaluate(() => {
-  const card = document.querySelector('.ws-studio-templates .ws-template-card');
+  const card = document.querySelector('.ws-studio-templates .ws-template-card:hover')
+    || document.querySelector('.ws-studio-templates .ws-template-card');
   const parse = value => (value.match(/[\d.]+/g) || []).slice(0, 3).map(Number);
   const luminance = value => {
     const [r, g, b] = parse(value).map(channel => {
@@ -183,7 +184,7 @@ for (const view of ['capture', 'documents', 'data', 'model', 'query', 'dashboard
     assert(await newSheet.count() === 1, 'La tabla ofrece crear una nueva hoja');
     await newSheet.click();
     await page.locator('.ws-sheet-tab.active').filter({ hasText: 'Hoja 2' }).waitFor({ state: 'visible' });
-    const dataSheetDebug = await page.locator('.ws-sheet-tab.active').allTextContents();
+    const dataSheetDebug = await page.locator('.ws-sheet-tab.active .ws-sheet-tab-label').allTextContents();
     assert(dataSheetDebug.length === 1 && dataSheetDebug[0].trim() === 'Hoja 2', `Crear hoja abre una hoja nueva real (actual: ${dataSheetDebug.join(' | ')})`);
     assert(await page.locator('.ws-sheet-tab').count() >= 3, 'La tabla conserva las pestañas del libro');
     await page.waitForTimeout(1200);

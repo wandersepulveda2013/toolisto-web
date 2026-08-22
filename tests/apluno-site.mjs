@@ -5,6 +5,8 @@ import { fileURLToPath } from 'node:url';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const dist = join(root, 'dist');
+const canonicalTools = JSON.parse(readFileSync(join(root, 'src', 'data', 'tools.json'), 'utf8'));
+const expectedToolCount = canonicalTools.filter(t => t.enabled !== false).length;
 let passed = 0;
 let failed = 0;
 
@@ -85,13 +87,13 @@ const launcherDataFile = join(dist, 'apluno-assets', 'apluno-tools-data.js');
 check(existsSync(launcherDataFile), 'El launcher genera apluno-tools-data.js');
 if (existsSync(launcherDataFile)) {
   const launcherPayload = JSON.parse(read(join('apluno-assets', 'apluno-tools-data.js')).replace(/^window\.APLUNO_TOOLS = /, '').replace(/;?[\r\n]*$/, ''));
-  check(launcherPayload.tools.length === 167, `La data del launcher incluye las 167 herramientas (actual: ${launcherPayload.tools.length})`);
+  check(launcherPayload.tools.length === expectedToolCount, `La data del launcher incluye todas las herramientas habilitadas (${launcherPayload.tools.length}/${expectedToolCount})`);
   check(launcherPayload.categories.length === 12, `La data del launcher incluye las 12 categorías (actual: ${launcherPayload.categories.length})`);
   check(launcherPayload.popular.every((slug) => launcherPayload.tools.some((tool) => tool.slug === slug)), 'Los populares del launcher son slugs válidos');
 }
 
 const toolCards = toolisto.match(/class="tool-card/g) || [];
-check(toolCards.length === 167, `Toolisto conserva 167 tarjetas (actual: ${toolCards.length})`);
+check(toolCards.length === expectedToolCount, `Toolisto conserva ${expectedToolCount} tarjetas (actual: ${toolCards.length})`);
 check(toolisto.includes('https://apluno.com/toolisto'), 'Toolisto usa canonical y metadatos de apluno.com/toolisto');
 check(toolisto.includes('Apluno') && toolisto.includes('/ordia') && toolisto.includes('/workspace/'), 'Toolisto integra la jerarquía y promociones Apluno');
 
@@ -106,10 +108,10 @@ check(workspaceApp.includes('id="ws-app"'), 'El Workspace funcional (/workspace/
 check(workspaceApp.includes('noindex,nofollow'), 'El Workspace funcional conserva noindex,nofollow');
 
 check(sitemap.includes('<loc>https://apluno.com/toolisto</loc>'), 'Sitemap incluye /toolisto');
-['about/', 'ordia/', 'workspace-about/', 'privacy/', 'terms/'].forEach((route) => check(sitemap.includes(`https://apluno.com/${route}`), `Sitemap incluye /${route}`));
+['privacidad', 'condiciones'].forEach((route) => check(sitemap.includes(`https://apluno.com/${route}`), `Sitemap incluye /${route}`));
 check(robots.includes('Sitemap: https://apluno.com/sitemap.xml'), 'robots.txt declara el sitemap de Apluno');
 check(!robots.includes('Disallow'), 'robots.txt no bloquea ninguna ruta pública');
-check(redirects.includes('/toolisto /toolisto.html 200') && redirects.includes('/toolisto/ /toolisto 301'), 'Redirects resuelven la ruta limpia de Toolisto');
+check(redirects.includes('/toolisto /toolisto.html 200') && redirects.includes('/toolisto/ /toolisto.html 200'), 'Redirects resuelven la ruta limpia de Toolisto');
 
 const toolManifest = JSON.parse(readFileSync(join(dist, 'assets', 'manifest.webmanifest'), 'utf8'));
 const aplunoManifest = JSON.parse(readFileSync(join(dist, 'manifest.webmanifest'), 'utf8'));

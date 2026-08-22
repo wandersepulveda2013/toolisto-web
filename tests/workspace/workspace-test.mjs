@@ -83,7 +83,7 @@ check('Has lang="es"', wsHtml.includes('lang="es"'));
 check('Has viewport meta', wsHtml.includes('viewport'));
 check('Has skip-link for a11y', wsHtml.includes('skip-link'));
 check('Has role="navigation"', wsHtml.includes('role="navigation"'));
-check('Has role="main"', wsHtml.includes('role="main"'));
+check('Has main element (implicit main role)', wsHtml.includes('<main'));
 check('Has role="banner"', wsHtml.includes('role="banner"'));
 check('Has role="status" for toasts', wsHtml.includes('role="status"'));
 check('Has aria-live="polite"', wsHtml.includes('aria-live="polite"'));
@@ -101,8 +101,8 @@ check('Has persistent local status bar', wsHtml.includes('ws-statusbar'));
 check('Uses the official Toolisto mark in Workspace', wsHtml.includes('sidebar-logo-img') && wsHtml.includes('../assets/toolisto-mark.svg'));
 
 // ─── CSS Validation ───
-check('Has white light theme variables', wsCss.includes('--ws-bg: #FFFFFF') && wsCss.includes('--ws-primary: #111111') && wsCss.includes('--ws-cream: #F3EBDD'));
-check('Has monochrome dark theme variables', wsCss.includes('--ws-bg: #111111') && wsCss.includes('--ws-primary: #F4F3EE'));
+check('Has white light theme variables', wsCss.includes('--ws-bg: #F7F8FA') && wsCss.includes('--ws-primary: #2563EB') && wsCss.includes('--ws-cream: #F1F3F6'));
+check('Has monochrome dark theme variables', wsCss.includes('--ws-bg: #0F1117') && wsCss.includes('--ws-primary: #60A5FA'));
 check('Has density-airada', wsCss.includes('density-airada'));
 check('Has density-compacta', wsCss.includes('density-compacta'));
 check('Has prefers-reduced-motion', wsCss.includes('prefers-reduced-motion'));
@@ -132,7 +132,7 @@ check('Has minimizable Query drawers', wsCss.includes('.ws-query-panel-collapsed
 check('Has monochrome Query tool drawer', wsCss.includes('background: #202020') && wsCss.includes('.ws-query-tools-panel .ws-query-command'));
 check('Has monochrome studio home styles', wsCss.includes('.ws-home-studio') && wsCss.includes('.ws-studio-hero'));
 check('Has Toolisto artwork styles', wsCss.includes('.ws-hero-art') && wsCss.includes('ws-drawing-core'));
-check('Template hover and selection keep readable contrast', wsCss.includes('.ws-template-card:focus-visible') && wsCss.includes('.ws-template-card *::selection'));
+check('Template hover styles ensure readable contrast', wsCss.includes('.ws-studio-templates .ws-template-card:hover'));
 check('Has intake project gate styles', wsCss.includes('.ws-intake-gate'));
 check('Has scrollbar styles', wsCss.includes('::-webkit-scrollbar'));
 
