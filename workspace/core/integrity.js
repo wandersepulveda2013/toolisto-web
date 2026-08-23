@@ -47,16 +47,6 @@ const CONFIG_FIELDS = [
   'sourceId',
 ];
 
-function collectIdSet(all) {
-  const ids = new Set();
-  for (const storeName of OBJECT_STORES) {
-    for (const obj of (all[storeName] || [])) {
-      if (obj && obj.id) ids.add(obj.id);
-    }
-  }
-  return ids;
-}
-
 function pushOrphan(orphans, ownerStore, ownerId, field, value) {
   orphans.push({ ownerStore, ownerId, field, value });
 }

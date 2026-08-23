@@ -1,3 +1,11 @@
+function deepFreeze(obj) {
+  if (obj && typeof obj === 'object' && !Object.isFrozen(obj)) {
+    Object.freeze(obj);
+    for (const val of Object.values(obj)) deepFreeze(val);
+  }
+  return obj;
+}
+
 export function createOperationRegistry() {
   const ops = new Map();
 
@@ -34,7 +42,7 @@ export function createOperationRegistry() {
       console.warn('[operation-registry] Duplicate operation ID:', op.id);
       return false;
     }
-    ops.set(op.id, Object.freeze({ ...op }));
+    ops.set(op.id, Object.freeze(deepFreeze({ ...op })));
     return true;
   }
 

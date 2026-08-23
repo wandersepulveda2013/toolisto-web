@@ -7,6 +7,7 @@
  *
  * Version: 1
  */
+import { generateId } from './db.js';
 const MODEL_VERSION = 1;
 
 function createBaseObject(type, name, projectId, extra = {}) {
@@ -410,10 +411,6 @@ function migrateProjectBundle(bundle) {
 }
 
 /* ── Export ──────────────────────────────────────────────────── */
-
-function generateId() {
-  return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
-}
 
 export {
   MODEL_VERSION,
