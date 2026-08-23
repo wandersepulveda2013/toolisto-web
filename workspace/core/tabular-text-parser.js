@@ -1,11 +1,13 @@
 // Parser compartido para convertir texto OCR o delimitado en una tabla editable.
 // Mantiene juntos los importes con coma decimal y reconstruye etiquetas OCR con espacios.
 
+import { detectSeparator } from './locale-parser.js';
+
 export function parseTabularText(input) {
   const lines = String(input || '').split(/\r?\n/).map(line => line.trim()).filter(Boolean);
   if (!lines.length) throw new Error('No text content to convert');
 
-  const delimiter = detectDelimiter(lines);
+  const delimiter = detectSeparator(lines, { maxLines: 10 }) || '';
   const parsed = delimiter
     ? lines.map(line => splitDelimitedLine(line, delimiter))
     : parseWhitespaceRows(lines);
@@ -17,16 +19,6 @@ export function parseTabularText(input) {
     rows: rows.length ? rows : [headers.map(() => '')],
     delimiter: delimiter || 'whitespace',
   };
-}
-
-function detectDelimiter(lines) {
-  for (const delimiter of ['\t', ';', '|']) {
-    if (lines.filter(line => line.includes(delimiter)).length >= 2) return delimiter;
-  }
-  // Una coma entre digitos suele ser decimal en OCR español (p. ej. 1,50), no una columna.
-  const commaLines = lines.filter(line => line.includes(','));
-  if (commaLines.length >= 2 && commaLines.some(line => !/\d,\d/.test(line))) return ',';
-  return '';
 }
 
 function splitDelimitedLine(line, delimiter) {

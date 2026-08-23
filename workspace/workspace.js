@@ -2,6 +2,7 @@
 import { appStore } from './core/state.js';
 import { on, emit } from './core/events.js';
 import { generateId } from './core/db.js';
+import { detectSeparator, parseLocaleNumber } from './core/locale-parser.js';
 import {
   createProject, updateProject, deleteProject, loadProjects as _loadProjects,
   selectProject, saveDoc, loadDocs, deleteDoc, saveData, loadData, deleteData, saveCapture,
@@ -73,29 +74,6 @@ const formatBytes = (b) => {
   const unit = Math.min(i, u.length - 1);
   return (b / Math.pow(1024, unit)).toFixed(unit ? 1 : 0) + ' ' + u[unit];
 };
-function parseLocaleNumber(value) {
-  let text = String(value ?? '').trim();
-  if (!text) return null;
-  if (/[A-Za-zÀ-ÿ]/.test(text)) return null;
-  const negativeByParentheses = /^\(.*\)$/.test(text);
-  text = text.replace(/\s+/g, '').replace(/[^\d,.+\-()]/g, '').replace(/[()]/g, '');
-  if (!text || !/[\d]/.test(text)) return null;
-  const comma = text.lastIndexOf(',');
-  const dot = text.lastIndexOf('.');
-  if (comma >= 0 && dot >= 0) {
-    if (comma > dot) text = text.replace(/\./g, '').replace(',', '.');
-    else text = text.replace(/,/g, '');
-  } else if (comma >= 0) {
-    const groups = text.split(',');
-    text = groups.length > 2 && groups.at(-1).length === 3 ? groups.join('') : text.replace(',', '.');
-  } else if (dot >= 0) {
-    const groups = text.split('.');
-    text = groups.length > 2 && groups.at(-1).length === 3 ? groups.join('') : text;
-  }
-  const number = Number(text);
-  if (!Number.isFinite(number)) return null;
-  return negativeByParentheses ? -Math.abs(number) : number;
-}
 /**
  * WAI-ARIA tabs contract for ribbon tablists of the Workspace.
  * Establishes roving tabindex (only the active tab is in the tab order),
@@ -2173,8 +2151,7 @@ function convertDocToTable(doc) {
   const start = Date.now();
   const table = createTableDocument(doc.name || 'Tabla extraida', project.id);
   const sheet = table.sheets[0];
-  const first = lines[0] || '';
-  const separator = first.includes('\t') ? '\t' : first.includes(';') ? ';' : first.includes('|') ? '|' : first.includes(',') ? ',' : ' ';
+  const separator = detectSeparator(lines, { maxLines: 5 }) || ' ';
   const parsedRows = lines.map(line => line.split(separator).map(cell => cell.trim()));
   const headerCount = parsedRows.length > 0 ? parsedRows[0].length : 1;
   const normalizedRows = parsedRows.map((row, index) => {
@@ -4306,25 +4283,7 @@ function importCSV() {
 }
 
 function detectCSVSeparator(text) {
-  const sampleLines = text.split(/\r?\n/).slice(0, 5);
-  const counts = { ',': 0, '\t': 0, ';': 0 };
-  for (const line of sampleLines) {
-    let inQuote = false;
-    for (let i = 0; i < line.length; i++) {
-      const ch = line[i];
-      if (ch === '"') { inQuote = !inQuote; }
-      else if (!inQuote) {
-        if (ch === ',') counts[',']++;
-        else if (ch === '\t') counts['\t']++;
-        else if (ch === ';') counts[';']++;
-      }
-    }
-  }
-  let max = 0, sep = ',';
-  for (const k in counts) {
-    if (counts[k] > max) { max = counts[k]; sep = k; }
-  }
-  return sep;
+  return detectSeparator(text, { maxLines: 10 }) || ',';
 }
 
 function parseCSVText(text, separator) {

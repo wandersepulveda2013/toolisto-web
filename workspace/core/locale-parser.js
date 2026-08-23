@@ -277,14 +277,16 @@ export function inferDateFormat(values, hints) {
  *
  * Score-based, quote-aware delimiter detection over up to 10 meaningful lines.
  *
- * @param {string} text — raw text content
+ * @param {string|string[]} text — raw text content, or pre-split array of lines
  * @param {object} [options]
  * @param {number} [options.maxLines=10] — max lines to sample
  * @returns {string} — detected delimiter or '' for whitespace
  */
 export function detectSeparator(text, options) {
   const maxLines = options?.maxLines || 10;
-  const allLines = String(text || '').split(/\r?\n/).filter(l => l.trim().length > 0);
+  const allLines = Array.isArray(text)
+    ? text.filter(l => String(l || '').trim().length > 0)
+    : String(text || '').split(/\r?\n/).filter(l => l.trim().length > 0);
   const lines = allLines.slice(0, maxLines);
   if (lines.length < 2) return '';
 

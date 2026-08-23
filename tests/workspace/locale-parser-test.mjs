@@ -166,6 +166,9 @@ check('pipe with mixed content', detectSeparator('id|nombre|importe\n1|Ana|1.234
 
 check('ragged rows still detect', detectSeparator('a,b,c\nd,e\nf,g,h') === ',');
 check('whitespace not comma', detectSeparator('hello world\ngoodbye world') !== ',');
+check('array input', detectSeparator(['a,b', 'c,d', 'e,f']) === ',');
+check('array input semicolon', detectSeparator(['a;b', 'c;d', 'e;f']) === ';');
+check('array input tab', detectSeparator(['a\tb', 'c\td', 'e\tf']) === '\t');
 
 /* ════════════════════════════════════════════════════════════════ */
 console.log(`\n=== Resultado ===`);
