@@ -1,8 +1,8 @@
 import { appStore } from './state.js';
 import { generateId, dbPut, dbGet, dbDelete, dbGetAll, dbClear } from './db.js';
+import { SESSION_SCHEMA_VERSION } from './schema-versions.js';
 
 const SESSION_KEY = 'ws:session';
-const SCHEMA_VERSION = 1;
 const MAX_SESSIONS = 5;
 
 function isStorageAvailable() {
@@ -21,7 +21,7 @@ export async function saveWorkspaceSession(sessionData) {
     const doc = appStore.get('currentDoc');
     const dataTable = appStore.get('currentDataTable');
     const session = {
-      schemaVersion: SCHEMA_VERSION,
+      schemaVersion: SESSION_SCHEMA_VERSION,
       sessionId,
       createdAt: appStore.get('_sessionCreatedAt') || new Date().toISOString(),
       updatedAt: new Date().toISOString(),

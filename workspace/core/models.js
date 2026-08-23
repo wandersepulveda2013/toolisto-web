@@ -8,7 +8,7 @@
  * Version: 1
  */
 import { generateId } from './db.js';
-const MODEL_VERSION = 1;
+import { OBJECT_SCHEMA_VERSION } from './schema-versions.js';
 
 function createBaseObject(type, name, projectId, extra = {}) {
   const now = Date.now();
@@ -19,7 +19,7 @@ function createBaseObject(type, name, projectId, extra = {}) {
     createdAt: extra.createdAt || now,
     updatedAt: now,
     projectId: projectId || null,
-    _version: MODEL_VERSION,
+    _version: extra._version || OBJECT_SCHEMA_VERSION,
     metadata: extra.metadata || {},
     history: extra.history || [],
     relations: extra.relations || [],
@@ -373,8 +373,6 @@ function pushHistory(obj, action, details) {
 const migrations = {
   1: (obj) => {
     if (!obj._version) obj._version = 1;
-    if (!obj.deleted) obj.deleted = false;
-    if (!obj.deletedAt) obj.deletedAt = null;
     if (!obj.history) obj.history = [];
     if (!obj.relations) obj.relations = [];
     if (!obj.processingState) obj.processingState = 'idle';
@@ -383,12 +381,37 @@ const migrations = {
     if (!obj.derivedIds) obj.derivedIds = [];
     return obj;
   },
+  2: (obj) => {
+    if (obj.type === 'table-document') {
+      if (!Array.isArray(obj.sheets) || obj.sheets.length === 0) {
+        const columns = Array.isArray(obj.headers) ? obj.headers : [];
+        const rows = Array.isArray(obj.rows) ? obj.rows : [];
+        obj.sheets = [{
+          id: obj.id || generateId(),
+          name: 'Sheet 1',
+          index: 0,
+          columns,
+          rows,
+          columnFormats: {},
+          cellFormats: {},
+          conditionalFormats: [],
+          validations: {},
+          frozenColumns: 0,
+          frozenRows: 0,
+          sortState: null,
+          filterState: null,
+        }];
+        obj.activeSheetIndex = 0;
+      }
+    }
+    return obj;
+  },
 };
 
 function migrateObject(obj) {
   if (!obj || !obj.type) return obj;
   let current = obj._version || 0;
-  while (current < MODEL_VERSION) {
+  while (current < OBJECT_SCHEMA_VERSION) {
     const migration = migrations[current + 1];
     if (migration) {
       obj = migration(obj);
@@ -413,7 +436,7 @@ function migrateProjectBundle(bundle) {
 /* ── Export ──────────────────────────────────────────────────── */
 
 export {
-  MODEL_VERSION,
+  OBJECT_SCHEMA_VERSION as MODEL_VERSION,
   createProjectModel,
   createFileAsset,
   createImageAsset,

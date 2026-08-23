@@ -12,7 +12,8 @@
  * devuelve `{ ok: true, legacy: true }`.
  */
 
-const BUNDLE_SCHEMA_VERSION = 3;
+import { BUNDLE_SCHEMA_VERSION } from './schema-versions.js';
+
 const APP_VERSION = '1.0.0';
 
 const IMPORT_LIMITS = Object.freeze({

@@ -26,6 +26,7 @@ import {
   migrateProjectBundle,
   MODEL_VERSION,
 } from './models.js';
+import { STORAGE_ENVELOPE_VERSION } from './schema-versions.js';
 
 async function createProject(name, description = '') {
   const project = createProjectModel(name, description);
@@ -267,7 +268,7 @@ async function exportProject(projectId) {
   const query = await dbGet(STORES.settings, 'query:' + projectId);
   const dataModel = await dbGet(STORES.settings, 'model:' + projectId);
   const bundle = {
-    version: 2, project, documents: docs, dataTables: data, captures: caps,
+    version: STORAGE_ENVELOPE_VERSION, project, documents: docs, dataTables: data, captures: caps,
     assets, executions: execs, workflows: wfs,
     dashboard: dashboard?.value || null, query: query?.value || null,
     dataModel: dataModel?.value || null, exportedAt: Date.now(),

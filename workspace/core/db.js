@@ -1,7 +1,8 @@
 import { applyMigrations } from './migrations.js';
+import { DB_SCHEMA_VERSION } from './schema-versions.js';
 
 const DB_NAME = 'toolisto-workspace';
-const DB_VERSION = 3;
+const DB_VERSION = DB_SCHEMA_VERSION;
 
 const STORES = {
   projects: 'projects',

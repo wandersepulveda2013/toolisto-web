@@ -1,4 +1,6 @@
-const MODEL_VERSION = 1;
+import { DATA_MODEL_SCHEMA_VERSION } from './schema-versions.js';
+
+const MODEL_VERSION = DATA_MODEL_SCHEMA_VERSION;
 
 function modelCanonical(value) {
   return String(value || '')
