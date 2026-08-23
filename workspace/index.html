@@ -14,6 +14,13 @@
       window.__TOOLISTO_WORKSPACE_INTERNAL_PREVIEW__ = internalPreview;
       document.documentElement.dataset.workspacePreview = internalPreview ? 'true' : 'false';
       document.documentElement.dataset.workspaceLocked = internalPreview ? 'false' : 'true';
+      if (internalPreview) {
+        var gate = document.getElementById('ws-access-gate');
+        if (gate) gate.remove();
+      } else {
+        var app = document.getElementById('ws-app');
+        if (app) app.remove();
+      }
     })();
   </script>
   <link rel="stylesheet" href="workspace.css?v=20260822-apluno">
