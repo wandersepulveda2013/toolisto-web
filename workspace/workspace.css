@@ -7833,6 +7833,33 @@ html.theme-auto {
   font-variant-numeric: tabular-nums;
 }
 
+/* Scanner fullscreen layout — overrides .ws-content scroll so the CTA is always reachable */
+.ws-content.scanner-active {
+  padding: 0 !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+.ws-content.scanner-active > .ws-start {
+  display: flex !important;
+  flex-direction: column !important;
+  max-width: none;
+  flex: 1;
+  min-height: 0;
+}
+.ws-content.scanner-active > .ws-start > .hero {
+  flex-shrink: 0;
+  padding: 12px 16px 8px;
+  text-align: left;
+}
+.ws-content.scanner-active > .ws-start > .hero h1 {
+  font-size: 18px;
+  margin-bottom: 2px;
+}
+.ws-content.scanner-active > .ws-start > .hero p {
+  font-size: 13px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .ws-hero-drawing,
   .ws-drawing-core,

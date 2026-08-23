@@ -13,6 +13,9 @@ const PORT = Number(process.env.E2E_PORT || 8082);
 const BASE = `http://127.0.0.1:${PORT}`;
 mkdirSync(SCREENSHOTS, { recursive: true });
 
+const toolsJson = JSON.parse(readFileSync(join(ROOT, 'src', 'data', 'tools.json'), 'utf8'));
+const enabledToolCount = toolsJson.filter(t => t.enabled !== false).length;
+
 const mimeTypes = {
   '.html':'text/html; charset=utf-8', '.css':'text/css; charset=utf-8',
   '.js':'application/javascript; charset=utf-8', '.png':'image/png',
@@ -109,9 +112,9 @@ try {
   await navigateSidebar('intake', 'Captura Universal');
   const ic = await page.$eval('#ws-main-content', e => e.innerHTML);
   ok('Intake view', ic.includes('Captura Universal'));
-  await navigateSidebar('tools', '144');
+  await navigateSidebar('tools', String(enabledToolCount));
   const tc = await page.$eval('#ws-main-content', e => e.innerHTML);
-  ok('Tools view', tc.includes('144'));
+  ok('Tools view', tc.includes(String(enabledToolCount)));
   const tCards = await page.$$('[data-tool-id]');
   ok('Tool cards > 100', tCards.length > 100, `Found: ${tCards.length}`);
   await navigateSidebar('projects', 'Proyecto');
@@ -154,7 +157,7 @@ try {
   await page.waitForTimeout(200);
 
   // Tools screenshot
-  await navigateSidebar('tools', '144');
+  await navigateSidebar('tools', String(enabledToolCount));
   await page.screenshot({ path: join(SCREENSHOTS, '05-tools-1920.png') });
   ok('Screenshot: tools 1920px');
 

@@ -1713,12 +1713,14 @@ function renderScannerView(container, project) {
     navigateTo('capture');
     return;
   }
-  const el = h('div', { className: 'ws-start', style: 'animation:fadeIn 0.3s ease;height:100%' });
+  const contentEl = container.closest('.ws-content');
+  if (contentEl) contentEl.classList.add('scanner-active');
+  const el = h('div', { className: 'ws-start', style: 'animation:fadeIn 0.3s ease;flex:1;min-height:0;display:flex;flex-direction:column' });
   el.appendChild(h('div', { className: 'hero', style: 'padding:8px 16px' },
     h('h1', null, 'Escaneo de documento'),
     h('p', null, 'Ajusta las esquinas del documento para obtener una imagen corregida.')
   ));
-  const scannerContainer = h('div', { style: 'flex:1;min-height:0;height:calc(100% - 80px)' });
+  const scannerContainer = h('div', { style: 'flex:1;min-height:0;position:relative' });
   el.appendChild(scannerContainer);
   container.appendChild(el);
 
@@ -1815,6 +1817,7 @@ function renderScannerView(container, project) {
         appStore.set({ captures: [persistedCapture, ...appStore.get('captures').filter(c => c.id !== persistedCapture.id)], lastSaved: Date.now() });
         appStore.set({ scannerDataUrl: null });
         scanner.destroy();
+        if (contentEl) contentEl.classList.remove('scanner-active');
         navigateTo('capture');
         toast('ScanDocument creado y guardado', 'success');
         return { ok: true };
@@ -1831,6 +1834,7 @@ function renderScannerView(container, project) {
     onCancel: () => {
       appStore.set({ scannerDataUrl: null });
       scanner.destroy();
+      if (contentEl) contentEl.classList.remove('scanner-active');
       navigateTo('capture');
     },
   });
@@ -4010,7 +4014,7 @@ async function deleteDataSheet(sheet, container) {
   }
   showConfirm({
     title: 'Eliminar hoja "' + (sheet.name || 'Hoja') + '"',
-    body: 'Esta accion es permanente. Se perderan todos los datos de esta hoja.',
+    message: 'Esta accion es permanente. Se perderan todos los datos de esta hoja.',
     confirmText: 'Eliminar',
     onConfirm: async () => {
       await deleteData(project.id, sheet.id);
@@ -4243,12 +4247,13 @@ function importCSV() {
     if (!file) return;
     const validation = validateWorkspaceFile(file, ['.csv', '.tsv', '.txt']);
     if (!validation.ok) { toast(validation.message, 'warning'); return; }
-    const text = await file.text();
+    const rawText = await file.text();
+    const text = stripBOM(rawText);
     const sep = detectCSVSeparator(text);
-    const lines = text.split('\n').filter(l => l.trim());
-    if (lines.length < 1) { toast('Archivo vacio', 'warning'); return; }
-    const headers = lines[0].split(sep).map(h => h.trim().replace(/^"|"$/g, ''));
-    const rows = lines.slice(1).map(l => l.split(sep).map(c => c.trim().replace(/^"|"$/g, '')));
+    const records = parseCSVText(text, sep);
+    if (records.length < 1) { toast('Archivo vacio', 'warning'); return; }
+    const headers = records[0].map(stripCSVQuotes);
+    const rows = records.slice(1).map(r => r.map(stripCSVQuotes));
     const config = getWorkspaceConfig();
     if (headers.length > config.maxTableColumns || rows.length > config.maxTableRows) {
       toast(`El archivo supera el límite de ${config.maxTableRows.toLocaleString('es')} filas o ${config.maxTableColumns} columnas`, 'warning');
@@ -4274,19 +4279,60 @@ function importCSV() {
 }
 
 function detectCSVSeparator(text) {
-  var firstLine = text.split('\n')[0];
-  var counts = { ',': 0, '\t': 0, ';': 0 };
-  for (var i = 0; i < firstLine.length; i++) {
-    var ch = firstLine[i];
-    if (ch === ',') counts[',']++;
-    else if (ch === '\t') counts['\t']++;
-    else if (ch === ';') counts[';']++;
+  const sampleLines = text.split(/\r?\n/).slice(0, 5);
+  const counts = { ',': 0, '\t': 0, ';': 0 };
+  for (const line of sampleLines) {
+    let inQuote = false;
+    for (let i = 0; i < line.length; i++) {
+      const ch = line[i];
+      if (ch === '"') { inQuote = !inQuote; }
+      else if (!inQuote) {
+        if (ch === ',') counts[',']++;
+        else if (ch === '\t') counts['\t']++;
+        else if (ch === ';') counts[';']++;
+      }
+    }
   }
-  var max = 0, sep = ',';
-  for (var k in counts) {
+  let max = 0, sep = ',';
+  for (const k in counts) {
     if (counts[k] > max) { max = counts[k]; sep = k; }
   }
   return sep;
+}
+
+function parseCSVText(text, separator) {
+  const sep = separator || detectCSVSeparator(text);
+  const records = [];
+  let row = [];
+  let cell = '';
+  let inQuote = false;
+  let i = 0;
+  while (i < text.length) {
+    const ch = text[i];
+    const next = text[i + 1];
+    if (inQuote) {
+      if (ch === '"' && next === '"') { cell += '"'; i += 2; continue; }
+      if (ch === '"') { inQuote = false; i++; continue; }
+      cell += ch; i++;
+    } else {
+      if (ch === '"') { inQuote = true; i++; continue; }
+      if (ch === sep) { row.push(cell); cell = ''; i++; continue; }
+      if (ch === '\r' && next === '\n') { i += 2; row.push(cell); if (row.some(c => c.trim() !== '')) records.push(row); row = []; cell = ''; continue; }
+      if (ch === '\n' || ch === '\r') { i++; row.push(cell); if (row.some(c => c.trim() !== '')) records.push(row); row = []; cell = ''; continue; }
+      cell += ch; i++;
+    }
+  }
+  row.push(cell);
+  if (row.some(c => c.trim() !== '')) records.push(row);
+  return records;
+}
+
+function stripBOM(text) {
+  return text.charCodeAt(0) === 0xFEFF ? text.slice(1) : text;
+}
+
+function stripCSVQuotes(cell) {
+  return cell.trim().replace(/^"|"$/g, '');
 }
 
 function columnNameToIndex(name) {

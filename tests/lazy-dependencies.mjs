@@ -1,10 +1,13 @@
-// lazy-dependencies.mjs — evita que las 167 páginas descarguen motores ajenos
+// lazy-dependencies.mjs — evita que las páginas de herramientas descarguen motores ajenos
 // a la herramienta elegida antes de que el usuario inicie un procesamiento.
 import { readFileSync, readdirSync, existsSync, statSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createServer } from 'node:http';
 import { chromium } from 'playwright-core';
+
+const allTools = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), '..', 'src', 'data', 'tools.json'), 'utf8'));
+const enabledCount = allTools.filter(t => t.enabled !== false).length;
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const dist = join(root, 'dist');
@@ -29,7 +32,7 @@ function startServer() {
 async function run() {
   console.log('=== Lazy-load de dependencias pesadas ===\n');
   const pages = readdirSync(dist).filter(name => name.endsWith('.html') && name !== '404.html');
-  check('se generaron las 167 páginas de herramientas', pages.length >= 167, String(pages.length));
+  check(`se generaron las ${enabledCount} páginas de herramientas`, pages.length >= enabledCount, String(pages.length));
   const eager = pages.filter(name => {
     const html = readFileSync(join(dist, name), 'utf8');
     return heavyAssets.some(asset => html.includes(`src="./${asset}"`));

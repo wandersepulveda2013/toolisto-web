@@ -76,7 +76,8 @@ export function createWorkflowModel() {
     const w = createWorkflowModel();
     w.setInputs(inputIds);
     for (const s of steps) {
-      w.addStep(s.operationId, s.options);
+      const step = w.addStep(s.operationId, s.options);
+      if (s.enabled === false) w.disableStep(step.id);
     }
     w.setName(name + ' (copia)');
     return w;

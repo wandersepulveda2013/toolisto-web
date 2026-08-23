@@ -3,7 +3,8 @@ import { createWorkflowValidator } from './workflow-validator.js';
 
 export function createWorkflowEngine(registry, options = {}) {
   const validator = createWorkflowValidator(registry);
-  const queue = createJobQueue({ maxConcurrency: options.maxConcurrency || 2 });
+  const maxConcurrency = options.maxConcurrency || 2;
+  const queue = createJobQueue({ maxConcurrency });
   const listeners = new Set();
   let state = 'idle';
   let workflowRef = null;
@@ -11,6 +12,7 @@ export function createWorkflowEngine(registry, options = {}) {
   let results = {};
   let executionId = null;
   let cancelled = false;
+  const cancelledInputs = new Set();
   const tempUrls = [];
 
   function _notify(event) {
@@ -52,6 +54,7 @@ export function createWorkflowEngine(registry, options = {}) {
       throw new Error('Engine is already running');
     }
     cancelled = false;
+    cancelledInputs.clear();
     executionId = 'exec-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6);
     workflowRef = workflow;
     inputsRef = inputs || {};
@@ -72,8 +75,6 @@ export function createWorkflowEngine(registry, options = {}) {
     const inputIds = workflow.getInputIds ? workflow.getInputIds() : (workflow.inputIds || []);
     const steps = workflow.getActiveSteps ? workflow.getActiveSteps() : (workflow.steps || []).filter(s => s.enabled !== false);
     const finalOperation = steps.length ? registry.get(steps[steps.length - 1].operationId) : null;
-    // Las operaciones terminales de lote reciben todas las salidas transformadas
-    // una sola vez (por ejemplo, empaquetar imágenes en un ZIP).
     const batchTerminalStep = finalOperation?.batchTerminal ? steps[steps.length - 1] : null;
     const processingSteps = batchTerminalStep ? steps.slice(0, -1) : steps;
 
@@ -85,87 +86,100 @@ export function createWorkflowEngine(registry, options = {}) {
     state = 'running';
     _notify({ type: 'state', state, total: totalJobs });
 
-    for (let i = 0; i < inputIds.length; i++) {
-      if (cancelled) break;
-      const inputId = inputIds[i];
-      const inputData = inputsRef[inputId];
-      if (!inputData) {
-        results[inputId] = { error: 'Input not found: ' + inputId, status: 'failed' };
-        failedCount++;
-        _notify({ type: 'job-status', inputId, status: 'failed', error: 'Input not found' });
-        continue;
-      }
+    const jobPromises = inputIds.map((inputId, i) => {
+      return new Promise((resolve) => {
+        queue.add({
+          id: inputId,
+          execute: async (jobCtx) => {
+            const inputData = inputsRef[inputId];
+            if (!inputData) {
+              results[inputId] = { error: 'Input not found: ' + inputId, status: 'failed' };
+              failedCount++;
+              _notify({ type: 'job-status', inputId, status: 'failed', error: 'Input not found' });
+              resolve();
+              return;
+            }
 
-      let currentData = inputData;
-      let currentKind = currentData.kind || 'file';
-      let stepIndex = 0;
+            let currentData = inputData;
+            let currentKind = currentData.kind || 'file';
+            let stepIndex = 0;
 
-      for (const step of processingSteps) {
-        if (cancelled) break;
-        const op = registry.get(step.operationId);
-        if (!op) {
-          results[inputId] = { error: 'Operation not registered: ' + step.operationId, status: 'failed' };
-          failedCount++;
-          break;
-        }
+            for (const step of processingSteps) {
+              if (cancelled || cancelledInputs.has(inputId)) {
+                results[inputId] = { status: 'cancelled' };
+                cancelledCount++;
+                _notify({ type: 'job-status', inputId, status: 'cancelled' });
+                resolve();
+                return;
+              }
+              const op = registry.get(step.operationId);
+              if (!op) {
+                results[inputId] = { error: 'Operation not registered: ' + step.operationId, status: 'failed' };
+                failedCount++;
+                _notify({ type: 'job-status', inputId, status: 'failed', error: 'Operation not registered: ' + step.operationId });
+                resolve();
+                return;
+              }
 
-        _notify({
-          type: 'step-start', inputId, stepIndex,
-          operationName: op.name,
-          jobId: inputId + '-' + stepIndex,
-          total: totalJobs,
+              _notify({
+                type: 'step-start', inputId, stepIndex,
+                operationName: op.name,
+                jobId: inputId + '-' + stepIndex,
+                total: totalJobs,
+              });
+
+              try {
+                const context = {
+                  input: currentData,
+                  options: step.options || {},
+                  signal: { get cancelled() { return cancelled || cancelledInputs.has(inputId); } },
+                  reportProgress: (pct, msg) => {
+                    _notify({ type: 'progress', inputId, stepIndex, percent: pct, message: msg, jobId: inputId + '-' + stepIndex });
+                  },
+                  reportMessage: (msg) => {
+                    _notify({ type: 'message', inputId, stepIndex, message: msg, jobId: inputId + '-' + stepIndex });
+                  },
+                  makeTempUrl: _makeTempUrl,
+                  metadata: { inputId, stepIndex, executionId },
+                };
+
+                const stepResult = await op.execute(context);
+
+                if (cancelled || cancelledInputs.has(inputId)) {
+                  results[inputId] = { status: 'cancelled' };
+                  cancelledCount++;
+                  _notify({ type: 'job-status', inputId, status: 'cancelled' });
+                  resolve();
+                  return;
+                }
+
+                if (stepResult && stepResult._multiple) {
+                  currentData = stepResult;
+                  currentKind = 'multiple';
+                } else {
+                  currentData = { data: stepResult, kind: op.outputKind || currentKind, name: outputName(inputData.name || 'output', stepResult) };
+                  currentKind = op.outputKind || currentKind;
+                }
+                stepIndex++;
+              } catch (err) {
+                results[inputId] = { error: err.message || String(err), status: 'failed', step: stepIndex };
+                failedCount++;
+                _notify({ type: 'job-status', inputId, status: 'failed', error: err.message, step: stepIndex });
+                resolve();
+                return;
+              }
+            }
+
+            results[inputId] = { data: currentData, status: 'completed', kind: currentKind, name: currentData.name || inputData.name || ('output-' + i), inputId };
+            completedCount++;
+            _notify({ type: 'job-status', inputId, status: 'completed' });
+            resolve();
+          },
         });
+      });
+    });
 
-        try {
-          const context = {
-            input: currentData,
-            options: step.options || {},
-            signal: { get cancelled() { return cancelled; } },
-            reportProgress: (pct, msg) => {
-              _notify({ type: 'progress', inputId, stepIndex, percent: pct, message: msg, jobId: inputId + '-' + stepIndex });
-            },
-            reportMessage: (msg) => {
-              _notify({ type: 'message', inputId, stepIndex, message: msg, jobId: inputId + '-' + stepIndex });
-            },
-            makeTempUrl: _makeTempUrl,
-            metadata: { inputId, stepIndex, executionId },
-          };
-
-          const stepResult = await op.execute(context);
-
-          if (cancelled) {
-            results[inputId] = { status: 'cancelled' };
-            cancelledCount++;
-            break;
-          }
-
-          if (stepResult && stepResult._multiple) {
-            currentData = stepResult;
-            currentKind = 'multiple';
-          } else {
-            currentData = { data: stepResult, kind: op.outputKind || currentKind, name: outputName(inputData.name || 'output', stepResult) };
-            currentKind = op.outputKind || currentKind;
-          }
-          stepIndex++;
-        } catch (err) {
-          results[inputId] = { error: err.message || String(err), status: 'failed', step: stepIndex };
-          failedCount++;
-          _notify({ type: 'job-status', inputId, status: 'failed', error: err.message, step: stepIndex });
-          break;
-        }
-      }
-
-      if (!results[inputId] || results[inputId].status !== 'failed') {
-        if (!cancelled) {
-          results[inputId] = { data: currentData, status: 'completed', kind: currentKind, name: currentData.name || inputData.name || ('output-' + i), inputId };
-          completedCount++;
-          _notify({ type: 'job-status', inputId, status: 'completed' });
-        } else {
-          results[inputId] = { status: 'cancelled' };
-          cancelledCount++;
-        }
-      }
-    }
+    await Promise.all(jobPromises);
 
     if (!cancelled && batchTerminalStep) {
       const completedItems = Object.values(results)
@@ -220,17 +234,20 @@ export function createWorkflowEngine(registry, options = {}) {
   }
 
   function cancelJob(inputId) {
-    const jobId = Object.keys(results).find(k => k === inputId);
-    if (jobId) {
-      results[jobId] = { status: 'cancelled' };
-      _notify({ type: 'job-status', inputId, status: 'cancelled' });
+    if (cancelledInputs.has(inputId)) return true;
+    cancelledInputs.add(inputId);
+    const entry = Object.keys(results).find(k => k === inputId);
+    if (entry) {
+      results[entry] = { status: 'cancelled' };
     }
+    _notify({ type: 'job-status', inputId, status: 'cancelled' });
+    queue.cancel(inputId);
+    return true;
   }
 
   function retryFailed() {
     const failedIds = Object.entries(results).filter(([, r]) => r.status === 'failed').map(([id]) => id);
     if (failedIds.length === 0) return;
-    const workflow = workflowRef;
     const inputs = inputsRef;
     state = 'idle';
     _notify({ type: 'state', state: 'idle' });
@@ -238,11 +255,11 @@ export function createWorkflowEngine(registry, options = {}) {
     for (const id of failedIds) {
       if (inputs[id]) filteredInputs[id] = inputs[id];
     }
-    const filteredWorkflow = workflow;
-    if (filteredWorkflow && typeof filteredWorkflow.setInputs === 'function') {
-      filteredWorkflow.setInputs(failedIds);
+    const retryWorkflow = workflowRef?.cloneWorkflow ? workflowRef.cloneWorkflow() : workflowRef;
+    if (retryWorkflow && typeof retryWorkflow.setInputs === 'function') {
+      retryWorkflow.setInputs(failedIds);
     }
-    return run(filteredWorkflow, filteredInputs);
+    return run(retryWorkflow, filteredInputs);
   }
 
   function getSnapshot() {

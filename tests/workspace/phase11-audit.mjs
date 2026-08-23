@@ -146,7 +146,7 @@ const modules = [
   ['Toolisto Query', 'renderQuery', 'showAddQueryStepModal', 'executeQuery'],
   ['Dashboards', 'renderDashboards'],
   ['Toolisto Flow', 'renderFlow', 'setupFlowCanvas', 'addFlowNode', 'renderFlowEdges'],
-  ['144 Tools', 'renderTools', 'renderToolView', 'toggleFavoriteTool', 'addToRecentTools'],
+  ['Tools', 'renderTools', 'renderToolView', 'toggleFavoriteTool', 'addToRecentTools'],
   ['Ctrl+K Palette', 'togglePalette', 'openPalette', 'closePalette', 'getPaletteCommands'],
   ['Modals', 'showModal', 'closeModal', 'closeTopModal'],
   ['Toasts', 'showToast'],

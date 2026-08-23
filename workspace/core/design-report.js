@@ -27,7 +27,7 @@ function createReportConfig(opts = {}) {
   return {
     format: opts.format || 'A4',
     orientation: opts.orientation || 'portrait',
-    margins: { top: opts.marginTop || 20, right: opts.marginRight || 20, bottom: opts.marginBottom || 20, left: opts.marginLeft || 20 },
+    margins: { top: opts.marginTop ?? 20, right: opts.marginRight ?? 20, bottom: opts.marginBottom ?? 20, left: opts.marginLeft ?? 20 },
     sections: opts.sections || [],
     title: opts.title || 'Reporte sin titulo',
     author: opts.author || '',
@@ -57,6 +57,7 @@ function renderReportPreview(config, projectData = {}) {
   function addSection(section, pageIdx) {
     if (section.type === 'page-break') {
       pages.push([]);
+      currentY = 0;
       return pages.length - 1;
     }
     const sectionH = estimateSectionHeight(section, contentW);
