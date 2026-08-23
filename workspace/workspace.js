@@ -4032,8 +4032,9 @@ async function deleteDataSheet(sheet, container) {
   });
 }
 
-function renderDataView(container, project) {
-  const tables = appStore.get('dataTables');
+async function renderDataView(container, project) {
+  const tables = await loadData(project.id);
+  appStore.set({ dataTables: tables });
   const el = h('div', { className: 'ws-start', style: 'animation:fadeIn 0.3s ease' });
   el.appendChild(h('div', { className: 'hero' },
     h('h1', null, 'Datos'),

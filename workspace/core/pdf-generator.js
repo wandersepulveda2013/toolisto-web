@@ -167,13 +167,12 @@ function generatePDF(config) {
   });
 
   const pageKids = pageObjIds.map(id => `${id} 0 R`).join(' ');
-  const infoId = addObj(`<< /Title ${pdfString(config.title || 'Reporte')} /Author ${pdfString(config.author || '')} /Creator ${pdfString('Toolisto Workspace')} /Producer ${pdfString('Toolisto PDF Engine')} >>`);
+  const infoId = addObj(`<< /Title ${pdfString(config.title || 'Reporte')} /Author ${pdfString(config.author || '')} /Creator ${pdfString('APLUNO Workspace')} /Producer ${pdfString('APLUNO PDF Engine')} >>`);
   const catalogId = addObj(`<< /Type /Catalog /Pages 0 0 R /Info ${infoId} 0 R >>`);
   const pagesId = addObj(`<< /Type /Pages /Kids [${pageKids}] /Count ${pages.length} >>`);
 
   objects.forEach(obj => {
-    if (obj.id === catalogId) obj.content = obj.content.replace('0 0 R', `${catalogId} 0 R`);
-    if (obj.id === pagesId) obj.content = obj.content.replace('0 0 R', `${pagesId} 0 R`);
+    if (obj.id === catalogId) obj.content = obj.content.replace('/Pages 0 0 R', `/Pages ${pagesId} 0 R`);
   });
 
   pageObjIds.forEach(id => {
