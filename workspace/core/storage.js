@@ -332,7 +332,13 @@ async function importProject(bundle, options = {}) {
   const dataTables = (bundle.dataTables || []).map(t => remapRefs(migrateObject({ ...t, id: tableIdMap.get(t.id), projectId })));
   const assets = (bundle.assets || []).map(a => remapRefs(migrateObject({ ...a, id: assetIdMap.get(a.id), projectId })));
   const executions = (bundle.executions || []).map(e => remapRefs(migrateObject({ ...e, id: execIdMap.get(e.id), projectId })));
-  const workflows = (bundle.workflows || []).map(w => migrateObject({ ...w, id: wfIdMap.get(w.id), projectId }));
+  const workflows = (bundle.workflows || []).map(w => {
+    const wf = migrateObject({ ...w, id: wfIdMap.get(w.id), projectId });
+    if (Array.isArray(wf.steps)) {
+      wf.steps = wf.steps.map(step => remapRefs({ ...step }));
+    }
+    return wf;
+  });
 
   const project = {
     ...migrateObject({ ...bundle.project, id: projectId, updatedAt: now }),
@@ -346,6 +352,13 @@ async function importProject(bundle, options = {}) {
 
   const dashboard = bundle.dashboard && typeof bundle.dashboard === 'object' ? { ...bundle.dashboard } : null;
   const query = bundle.query && typeof bundle.query === 'object' ? { ...bundle.query } : null;
+
+  if (dashboard && dashboard.config && typeof dashboard.config === 'object') {
+    if (dashboard.config.sourceId) dashboard.config.sourceId = remapId(dashboard.config.sourceId);
+  }
+  if (query && query.config && typeof query.config === 'object') {
+    if (query.config.sourceId) query.config.sourceId = remapId(query.config.sourceId);
+  }
   let dataModel = null;
   if (bundle.dataModel) {
     const sourceModel = bundle.dataModel?.model && typeof bundle.dataModel.model === 'object' ? bundle.dataModel.model : bundle.dataModel;
