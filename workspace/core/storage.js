@@ -27,6 +27,7 @@ import {
   MODEL_VERSION,
 } from './models.js';
 import { STORAGE_ENVELOPE_VERSION } from './schema-versions.js';
+import { cleanupSessionsForProject } from './workspace-storage.js';
 
 async function createProject(name, description = '') {
   const project = createProjectModel(name, description);
@@ -74,7 +75,7 @@ async function deleteProject(id) {
     stores[STORES.settings].delete('query:' + id);
     stores[STORES.settings].delete('model:' + id);
   });
-  await pruneDanglingReferences([
+  const allIds = [
     id,
     ...docs.map(doc => doc.id),
     ...data.map(table => table.id),
@@ -82,7 +83,9 @@ async function deleteProject(id) {
     ...assets.map(asset => asset.id),
     ...execs.map(execution => execution.id),
     ...wfs.map(workflow => workflow.id),
-  ]);
+  ];
+  await pruneDanglingReferences(allIds);
+  await cleanupSessionsForProject(id, allIds);
   const projects = await dbGetAll(STORES.projects);
   appStore.set({ projects, currentProject: null, currentView: 'projects' });
   emit('project:deleted', id);

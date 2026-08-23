@@ -130,3 +130,37 @@ async function _loadAllSessions() {
     return entry.value.filter(s => s && typeof s === 'object' && s.schemaVersion != null);
   } catch (e) { return []; }
 }
+
+export async function cleanupSessionsForProject(projectId, deletedIds = []) {
+  try {
+    const sessions = await _loadAllSessions();
+    if (sessions.length === 0) return;
+    const idSet = new Set(deletedIds);
+    let changed = false;
+    for (const session of sessions) {
+      const w = session.workspace || {};
+      if (w.currentProjectId === projectId) {
+        w.currentProjectId = null;
+        changed = true;
+      }
+      if (Array.isArray(w.documents)) {
+        const before = w.documents.length;
+        w.documents = w.documents.filter(d => !idSet.has(d));
+        if (w.documents.length !== before) changed = true;
+      }
+      if (Array.isArray(w.dataTables)) {
+        const before = w.dataTables.length;
+        w.dataTables = w.dataTables.filter(d => !idSet.has(d));
+        if (w.dataTables.length !== before) changed = true;
+      }
+      if (Array.isArray(w.captures)) {
+        const before = w.captures.length;
+        w.captures = w.captures.filter(c => !idSet.has(c));
+        if (w.captures.length !== before) changed = true;
+      }
+    }
+    if (changed) {
+      await dbPut('settings', { key: SESSION_KEY, value: sessions });
+    }
+  } catch (e) { console.error('Cleanup sessions for project error:', e); }
+}
