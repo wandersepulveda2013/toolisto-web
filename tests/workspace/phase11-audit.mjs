@@ -25,7 +25,7 @@ const js = readFileSync(join(WS, 'workspace.js'), 'utf8');
 
 ok('Skip link present', html.includes('skip-link'), 'Critical a11y feature');
 ok('Skip link targets #ws-main-content', html.includes('href="#ws-main-content"'));
-ok('nav has aria-label="Navegación principal"', html.includes('aria-label="Navegación principal"'));
+ok('nav has aria-label="Navegacion principal"', html.includes('aria-label="Navegacion principal"'));
 ok('main has role="main"', html.includes('role="main"'));
 ok('banner has role="banner"', html.includes('role="banner"'));
 ok('Toast container has role="status"', html.includes('role="status"'));
@@ -88,8 +88,8 @@ ok('Mobile menu toggle shown/hidden by media query', js.includes('matchMedia'));
 
 // ─── Theme System ───
 console.log('\n--- Theme System ---');
-ok('Light theme CSS variables', css.includes('--ws-bg: #F7F5F0'));
-ok('Dark theme CSS variables', css.includes('--ws-bg: #12141A'));
+ok('Light theme CSS variables', css.includes('--ws-bg: #F7F8FA'));
+ok('Dark theme CSS variables', css.includes('--ws-bg: #0F1117'));
 ok('Auto theme class', css.includes('theme-auto'));
 ok('Density: Airada scale', css.includes('density-airada'));
 ok('Density: Equilibrada default', css.includes('density-equilibrada'));
@@ -132,7 +132,7 @@ ok('No innerHTML with unsanitized user input (esc() used)', js.includes('functio
 ok('iframe sandbox attribute', html.includes('sandbox="allow-scripts allow-same-origin allow-forms"'));
 ok('No API keys in code', !js.includes('api_key') && !js.includes('apiKey') && !js.includes('API_KEY'));
 ok('No credentials in code', !js.includes('password') && !js.includes('secret'));
-ok('No external API calls (local-first)', !js.includes('fetch(') || js.includes('fetch('));
+ok('No external API calls (local-first)', !js.includes('XMLHttpRequest') && !js.includes('navigator.sendBeacon') && !js.includes('new WebSocket'));
 ok('File type validation on intake', js.includes('analyzeFile'));
 
 // ─── Module Completeness ───

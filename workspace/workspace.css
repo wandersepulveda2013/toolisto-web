@@ -8086,7 +8086,19 @@ html.theme-auto {
   color: var(--ws-primary);
 }
 
-/* P1: Compact module headers for Query and Dashboards */
+/* P2: Touch targets minimum on mobile */
+@media (max-width: 768px) {
+  .ws-btn,
+  .ws-context-menu-item,
+  .sidebar-item,
+  .sidebar-footer-btn,
+  .ws-topbar-btn,
+  .ws-tool-card,
+  .ws-modal-close {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
 .ws-query-header-compact,
 .ws-dashboard-header-compact {
   padding: 12px 0 8px;

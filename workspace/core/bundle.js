@@ -131,10 +131,11 @@ function validateImportLimits(bundle, limits = IMPORT_LIMITS) {
   }
   if (errors.length) return errors;
 
-  let total = bundle.project ? canonicalJson(bundle.project).length : 0;
+  const enc = new TextEncoder();
+  let total = bundle.project ? enc.encode(canonicalJson(bundle.project)).length : 0;
   for (const key of OBJECT_KEYS) {
     for (const obj of (bundle[key] || [])) {
-      total += canonicalJson(obj).length;
+      total += enc.encode(canonicalJson(obj)).length;
     }
   }
   if (total > limits.maxJsonBytes) {

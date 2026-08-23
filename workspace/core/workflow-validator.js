@@ -18,6 +18,8 @@ export function createWorkflowValidator(registry) {
       errors.push('No active steps in workflow');
     }
 
+    const inputIdSet = new Set(inputIds);
+
     let prevOutputKind = null;
     for (let i = 0; i < steps.length; i++) {
       const step = steps[i];
@@ -37,6 +39,10 @@ export function createWorkflowValidator(registry) {
 
       if (i === 0 && inputIds.length > 0 && inputsMap) {
         for (const inputId of inputIds) {
+          if (!inputsMap[inputId]) {
+            errors.push('Step 1 ("' + op.name + '"): input "' + inputId + '" references an input not present in the input set');
+            continue;
+          }
           const input = inputsMap[inputId];
           if (input && !op.inputKinds.includes(input.kind)) {
             errors.push('Step 1 ("' + op.name + '"): input "' + (input.name || inputId) + '" is type "' + input.kind + '" but operation expects: ' + op.inputKinds.join(', '));
@@ -48,10 +54,26 @@ export function createWorkflowValidator(registry) {
         errors.push('Step ' + (i + 1) + ' ("' + op.name + '"): expected input ' + op.inputKinds.join(', ') + ' but previous step outputs "' + prevOutputKind + '"');
       }
 
-      if (step.options && op.optionSchema) {
+      if (op.optionSchema) {
+        const stepOpts = step.options || {};
         for (const [key, schema] of Object.entries(op.optionSchema)) {
-          if (schema.required && (step.options[key] === undefined || step.options[key] === null || step.options[key] === '')) {
+          const val = stepOpts[key];
+          if (schema.required && (val === undefined || val === null || val === '')) {
             errors.push('Step ' + (i + 1) + ' ("' + op.name + '"): option "' + key + '" is required');
+          }
+          if (val !== undefined && val !== null && val !== '') {
+            if (schema.type === 'number' && typeof val !== 'number' && isNaN(Number(val))) {
+              errors.push('Step ' + (i + 1) + ' ("' + op.name + '"): option "' + key + '" must be a number');
+            }
+            if (schema.enum && !schema.enum.includes(val)) {
+              errors.push('Step ' + (i + 1) + ' ("' + op.name + '"): option "' + key + '" value "' + val + '" is not in allowed values: ' + schema.enum.join(', '));
+            }
+            if (schema.min !== undefined && Number(val) < schema.min) {
+              errors.push('Step ' + (i + 1) + ' ("' + op.name + '"): option "' + key + '" must be >= ' + schema.min);
+            }
+            if (schema.max !== undefined && Number(val) > schema.max) {
+              errors.push('Step ' + (i + 1) + ' ("' + op.name + '"): option "' + key + '" must be <= ' + schema.max);
+            }
           }
         }
       }

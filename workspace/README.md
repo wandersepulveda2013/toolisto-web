@@ -1,4 +1,4 @@
-# Toolisto Workspace
+# APLUNO Workspace
 
 ## Modelo gratuito
 
@@ -6,7 +6,7 @@ Esta superficie está pensada para ser gratuita desde el primer uso: no requiere
 
 La experiencia visual usa una estructura limpia tipo Notion: barra lateral, proyectos, plantillas, acciones rápidas, estados de guardado y modo claro/oscuro. La captura admite archivo/cámara, pantalla y portapapeles cuando el navegador concede esos permisos.
 
-Toolisto Workspace es una superficie local-first para organizar proyectos, capturas, documentos, datos y herramientas. La interfaz se sirve desde `dist/workspace` y no necesita una API del producto para crear o editar proyectos básicos.
+APLUNO Workspace es una superficie local-first para organizar proyectos, capturas, documentos, datos y herramientas. La interfaz se sirve desde `dist/workspace` y no necesita una API del producto para crear o editar proyectos básicos.
 
 ## Arquitectura
 
@@ -14,7 +14,7 @@ Toolisto Workspace es una superficie local-first para organizar proyectos, captu
 - `workspace.js`: estado de interfaz y renderizado vanilla. Los iconos pasan por un registro SVG controlado y se montan como nodos DOM.
 - `core/db.js`: IndexedDB para proyectos y contenido.
 - `core/storage.js`: creación, guardado, exportación e importación del formato `.toolisto`.
-- `tools-data.js`: catálogo completo de 144 herramientas y sus 12 categorías.
+- `tools-data.js`: catálogo completo de herramientas y sus categorías.
 - `workspace.css`: tokens visuales, modo oscuro, densidades y breakpoints responsive.
 
 ## Estado funcional

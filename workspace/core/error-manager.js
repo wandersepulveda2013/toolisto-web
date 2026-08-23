@@ -1,16 +1,16 @@
 const ERROR_CATEGORIES = {
   incompatibleFile: { message: 'El archivo no es compatible o tiene un formato que no podemos leer.', level: 'error' },
-  corruptFile: { message: 'El archivo podria estar danado o incompleto.', level: 'error' },
-  outOfMemory: { message: 'No hay suficiente memoria para completar esta operacion.', level: 'error' },
+  corruptFile: { message: 'El archivo podría estar dañado o incompleto.', level: 'error' },
+  outOfMemory: { message: 'No hay suficiente memoria para completar esta operación.', level: 'error' },
   readError: { message: 'No se pudo leer el archivo. Revisa los permisos e intenta de nuevo.', level: 'error' },
-  ocrError: { message: 'El reconocimiento de texto no pudo completarse. La imagen podria ser muy pequena o estar borrosa.', level: 'error' },
+  ocrError: { message: 'El reconocimiento de texto no pudo completarse. La imagen podría ser muy pequeña o estar borrosa.', level: 'error' },
   canvasError: { message: 'No se pudo procesar la imagen.', level: 'error' },
   saveError: { message: 'No se pudo guardar el trabajo. Revisa el espacio disponible.', level: 'error' },
-  recoveryError: { message: 'No se pudo recuperar la sesion anterior. Se ha iniciado una sesion nueva.', level: 'warning' },
-  canceled: { message: 'Operacion cancelada.', level: 'info' },
-  notSupported: { message: 'Esta funcion no es compatible con tu navegador.', level: 'warning' },
-  storageUnavailable: { message: 'El almacenamiento local no esta disponible. Los cambios no se guardaran automaticamente.', level: 'warning' },
-  unexpected: { message: 'Ocurrio un error inesperado. El trabajo deberia estar seguro.', level: 'error' },
+  recoveryError: { message: 'No se pudo recuperar la sesión anterior. Se ha iniciado una sesión nueva.', level: 'warning' },
+  canceled: { message: 'Operación cancelada.', level: 'info' },
+  notSupported: { message: 'Esta función no es compatible con tu navegador.', level: 'warning' },
+  storageUnavailable: { message: 'El almacenamiento local no está disponible. Los cambios no se guardarán automáticamente.', level: 'warning' },
+  unexpected: { message: 'Ocurrió un error inesperado. El trabajo podría estar seguro.', level: 'error' },
 };
 
 function _getCategoryInfo(category) {

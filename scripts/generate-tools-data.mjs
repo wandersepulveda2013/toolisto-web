@@ -6,7 +6,9 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
 const tools = JSON.parse(readFileSync(join(ROOT, 'src', 'data', 'tools.json'), 'utf8'));
 
-const simplified = tools.map(t => ({
+const enabledTools = tools.filter(t => t.enabled !== false);
+
+const simplified = enabledTools.map(t => ({
   id: t.id,
   toolId: t.toolId || t.id,
   slug: t.slug || t.id,

@@ -14,7 +14,7 @@ const expectedText = [
   'im\u00e1genes',
   'm\u00f3dulo',
   'RITUALES \u00daTILES',
-  'LOCAL / LISTO \u00b7',
+  'LOCAL \u00b7 Guardado',
   'Alt + \u2190',
   'Alt + \u2192'
 ];

@@ -220,6 +220,12 @@ function validateWorkspaceFile(file, allowedExtensions = []) {
     const hint = allowedExtensions.length ? allowedExtensions.join(', ') : [...WORKSPACE_KNOWN_EXTENSIONS].join(', ');
     return { ok: false, message: `Formato no admitido aquí. Usa: ${hint}.` };
   }
+  if (extension === 'json' && file.type && !file.type.includes('json') && file.type !== 'application/octet-stream') {
+    return { ok: false, message: 'El tipo MIME del archivo no coincide con la extensión JSON.' };
+  }
+  if (extension === 'csv' && file.type && !file.type.includes('csv') && !file.type.includes('text/plain') && file.type !== 'application/octet-stream') {
+    return { ok: false, message: 'El tipo MIME del archivo no coincide con la extensión CSV.' };
+  }
   return { ok: true };
 }
 
@@ -544,7 +550,7 @@ function updateTopbar(view, project) {
   const statusText = $('#ws-statusbar-text');
   if (statusText) {
     const counts = project ? `${project.captureCount || 0} capturas · ${project.docCount || 0} documentos · ${project.dataCount || 0} tablas` : 'Espacio personal';
-    statusText.textContent = `LOCAL / LISTO · ${counts}`;
+    statusText.textContent = `LOCAL · Guardado${counts ? ' · ' + counts : ''}`;
   }
   const actions = $('#ws-topbar-actions');
   actions.replaceChildren();
@@ -966,7 +972,14 @@ async function initApp() {
     if (btn) btn.disabled = !val;
   });
   appStore.subscribe('isDirty', (val) => {
-    _saveIndicator(val ? 'LOCAL / SIN GUARDAR' : 'LOCAL / LISTO');
+    _saveIndicator(val ? 'Guardando...' : 'Guardado');
+    const statusText = $('#ws-statusbar-text');
+    if (statusText) {
+      const project = appStore.get('currentProject');
+      const counts = project ? `${project.captureCount || 0} capturas · ${project.docCount || 0} docs · ${project.dataCount || 0} tablas` : '';
+      const state = val ? 'Guardando...' : 'Guardado';
+      statusText.textContent = `LOCAL · ${state}${counts ? ' · ' + counts : ''}`;
+    }
   });
 
   function _applyState(snapshot) {
@@ -981,7 +994,7 @@ async function initApp() {
       flowNodes: snapshot.flowNodes || [],
       flowEdges: snapshot.flowEdges || [],
     });
-    _saveIndicator('LOCAL / LISTO');
+    _saveIndicator('Guardado');
     renderView(snapshot.currentView || 'projects');
   }
 
@@ -7726,14 +7739,20 @@ function showModal(opts) {
   const root = $('#ws-modal-root');
   _modalRestoreFocus = document.activeElement;
   root.replaceChildren();
+  const _requestClose = async (reason) => {
+    try {
+      if (reason === 'cancel' && opts.onCancel) await opts.onCancel();
+      else if (opts.onClose) await opts.onClose();
+    } finally { closeModal(); }
+  };
   const overlay = h('div', { className: 'ws-modal-overlay', onClick: (e) => {
-    if (e.target === overlay) closeModal();
+    if (e.target === overlay) _requestClose('backdrop');
   }});
   const titleId = 'ws-modal-title-' + Date.now();
   const modal = h('div', { className: 'ws-modal' + (opts.size ? ' size-' + opts.size : ''), role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': titleId });
   const header = h('div', { className: 'ws-modal-header' },
     h('div', { className: 'ws-modal-title', id: titleId }, opts.title || ''),
-    h('button', { className: 'ws-modal-close', onClick: async () => { try { if (opts.onClose) await opts.onClose(); } finally { closeModal(); } }, ariaLabel: 'Cerrar diálogo' }, svgIcon('close', 18))
+    h('button', { className: 'ws-modal-close', onClick: () => _requestClose('close'), ariaLabel: 'Cerrar diálogo' }, svgIcon('close', 18))
   );
   modal.appendChild(header);
   const body = h('div', { className: 'ws-modal-body' });
@@ -7750,7 +7769,7 @@ function showModal(opts) {
     else footer.appendChild(opts.footer);
     modal.appendChild(footer);
   } else if (opts.confirmText) {
-    const cancelBtn = h('button', { className: 'ws-btn ws-btn-ghost', onClick: async () => { try { if (opts.onCancel) await opts.onCancel(); } finally { closeModal(); } } }, opts.cancelText || 'Cancelar');
+    const cancelBtn = h('button', { className: 'ws-btn ws-btn-ghost', onClick: () => _requestClose('cancel') }, opts.cancelText || 'Cancelar');
     const confirmBtn = h('button', { className: 'ws-btn ' + (opts.confirmClass || 'ws-btn-primary') + ' ws-btn-confirm', onClick: async () => {
       if (opts.onConfirm) {
         try { await opts.onConfirm(); } catch (e) { return; }
@@ -7764,7 +7783,7 @@ function showModal(opts) {
   overlay.appendChild(modal);
   root.appendChild(overlay);
   modal.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') { closeModal(); return; }
+    if (e.key === 'Escape') { _requestClose('escape'); return; }
     if (e.key !== 'Tab') return;
     const focusable = modal.querySelectorAll('button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])');
     if (!focusable.length) return;

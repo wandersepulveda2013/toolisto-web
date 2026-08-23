@@ -42,7 +42,11 @@ async function updateProject(id, updates) {
   const updated = { ...project, ...updates, updatedAt: Date.now() };
   await dbPut(STORES.projects, updated);
   const projects = await dbGetAll(STORES.projects);
-  appStore.set({ projects, currentProject: updated });
+  const currentProject = appStore.get('currentProject');
+  appStore.set({
+    projects,
+    ...(currentProject?.id === id ? { currentProject: updated } : {}),
+  });
   emit('project:updated', updated);
   return updated;
 }
@@ -218,7 +222,11 @@ async function loadCapturesByDoc(docId) {
 }
 
 async function deleteCapture(id) {
+  const capture = await dbGet(STORES.captures, id);
   const result = await deleteWithCascade(STORES.captures, id);
+  if (capture?.projectId) {
+    await refreshProjectCounts(capture.projectId).catch(() => {});
+  }
   emit('capture:deleted', id);
   return result;
 }

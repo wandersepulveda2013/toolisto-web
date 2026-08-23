@@ -54,7 +54,7 @@ export function createWorkflowUI(registry, appHelpers) {
 
     const header = h('div', { style: 'display:flex;align-items:center;gap:12px;margin-bottom:4px' });
     header.appendChild(h('h2', { style: 'margin:0;font-size:16px' }, 'Constructor de flujos'));
-    header.appendChild(h('span', { style: 'font-size:11px;color:var(--ws-text-secondary)', 'aria-live': 'polite' }, 'Selecciona archivos, anade operaciones y ejecuta'));
+    header.appendChild(h('span', { style: 'font-size:11px;color:var(--ws-text-secondary)', 'aria-live': 'polite' }, 'Selecciona archivos, añade operaciones y ejecuta'));
     container.appendChild(header);
 
     // Main layout: 2 columns
@@ -217,7 +217,7 @@ export function createWorkflowUI(registry, appHelpers) {
     addOpBtn = h('button', {
       className: 'ws-btn ws-btn-sm ws-btn-secondary',
       onClick: () => toggleOpSelector(),
-    }, svgIcon('plus', 12), ' Anadir operacion');
+    }, svgIcon('plus', 12), ' Añadir operación');
     headerRow.appendChild(addOpBtn);
     section.appendChild(headerRow);
 
@@ -225,8 +225,8 @@ export function createWorkflowUI(registry, appHelpers) {
     opListEl = h('div', { style: 'display:none;border:1px solid var(--ws-border);border-radius:6px;padding:8px;margin-bottom:8px;max-height:200px;overflow-y:auto;background:var(--ws-bg)' });
 
     opSearchEl = h('input', {
-      type: 'text', className: 'ws-form-input', placeholder: 'Buscar operacion...',
-      'aria-label': 'Buscar operacion por nombre o descripcion',
+      type: 'text', className: 'ws-form-input', placeholder: 'Buscar operación...',
+      'aria-label': 'Buscar operación por nombre o descripción',
       style: 'width:100%;margin-bottom:6px;font-size:12px',
       onInput: () => renderOpList(),
     });
@@ -248,7 +248,7 @@ export function createWorkflowUI(registry, appHelpers) {
           });
           renderOpList();
         },
-      }, { all: 'Todas', image: 'Imagen', text: 'Texto', report: 'Informe', chart: 'Grafico', pdf: 'PDF', output: 'Salida' }[cat] || cat);
+      }, { all: 'Todas', image: 'Imagen', text: 'Texto', report: 'Informe', chart: 'Gráfico', pdf: 'PDF', output: 'Salida' }[cat] || cat);
       categoryButtons.push({ category: cat, button: btn });
       catFilter.appendChild(btn);
     }
@@ -262,7 +262,7 @@ export function createWorkflowUI(registry, appHelpers) {
       id: 'wf-step-list',
       style: 'flex:1;overflow-y:auto;min-height:100px',
     });
-    stepListEl.appendChild(h('div', { style: 'font-size:12px;color:var(--ws-text-tertiary);padding:16px;text-align:center' }, 'Anade operaciones para comenzar'));
+    stepListEl.appendChild(h('div', { style: 'font-size:12px;color:var(--ws-text-tertiary);padding:16px;text-align:center' }, 'Añade operaciones para comenzar'));
     section.appendChild(stepListEl);
     parent.appendChild(section);
   }
@@ -311,7 +311,7 @@ export function createWorkflowUI(registry, appHelpers) {
         style: 'display:flex;align-items:center;gap:6px;padding:6px 4px;border-radius:4px;cursor:pointer',
         role: 'button',
         tabindex: 0,
-        'aria-label': 'Anadir operacion ' + op.name,
+        'aria-label': 'Añadir operación ' + op.name,
         onMouseEnter: (e) => e.currentTarget.style.background = 'var(--ws-bg-secondary)',
         onMouseLeave: (e) => e.currentTarget.style.background = 'transparent',
         onClick: () => { addOperation(op.id); hideOpSelector(); },
@@ -373,7 +373,7 @@ export function createWorkflowUI(registry, appHelpers) {
     stepListEl.replaceChildren();
     const steps = workflow.getSteps();
     if (steps.length === 0) {
-      stepListEl.appendChild(h('div', { style: 'font-size:12px;color:var(--ws-text-tertiary);padding:16px;text-align:center' }, 'Anade operaciones para comenzar'));
+      stepListEl.appendChild(h('div', { style: 'font-size:12px;color:var(--ws-text-tertiary);padding:16px;text-align:center' }, 'Añade operaciones para comenzar'));
       return;
     }
     for (let i = 0; i < steps.length; i++) {
@@ -384,7 +384,7 @@ export function createWorkflowUI(registry, appHelpers) {
       });
       row.appendChild(h('span', { style: 'font-size:11px;color:var(--ws-text-tertiary);min-width:20px' }, String(i + 1)));
       row.appendChild(h('div', { style: 'flex:1' },
-        h('div', { style: 'font-size:12px;font-weight:500' }, op ? op.name : '(operacion no disponible)'),
+        h('div', { style: 'font-size:12px;font-weight:500' }, op ? op.name : '(operación no disponible)'),
         h('div', { style: 'font-size:10px;color:var(--ws-text-tertiary)' }, op ? op.description : step.operationId),
       ));
       const toggleBtn = h('button', {

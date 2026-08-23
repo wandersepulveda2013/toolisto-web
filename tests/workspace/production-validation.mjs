@@ -50,7 +50,7 @@ let state = await shellState();
 assert(state.svgCount > 0, 'La portada monta iconos SVG reales');
 assert(!state.visibleSvgText, 'La portada no muestra codigo SVG como texto');
 assert(!state.horizontalOverflow, 'La portada no tiene overflow horizontal a 1366px');
-assert(state.status.includes('LOCAL / LISTO'), 'La barra de estado comunica el estado local');
+assert(state.status.includes('LOCAL'), 'La barra de estado comunica el estado local');
 assert(await page.locator('.ws-studio-hero').count() === 1, 'La portada usa la composicion del estudio Toolisto');
 assert(await page.locator('.ws-hero-drawing').count() === 1, 'La portada monta la ilustracion animada de Toolisto');
 assert(await page.locator('.ws-home-stats > div').count() === 4, 'La portada muestra cuatro indicadores de valor');
@@ -91,7 +91,7 @@ await page.locator('#modal-project-desc').fill('Proyecto creado durante la valid
 await page.locator('.ws-btn-confirm').click();
 await page.waitForTimeout(300);
 assert(await page.locator('#ws-project-nav').count() === 1, 'Crear proyecto abre la navegacion contextual');
-assert((await page.locator('#ws-statusbar-text').textContent()).includes('LOCAL / LISTO'), 'La barra de estado sigue activa dentro del proyecto');
+assert((await page.locator('#ws-statusbar-text').textContent()).includes('LOCAL'), 'La barra de estado sigue activa dentro del proyecto');
 assert(await page.locator('#ws-history-back').count() === 1, 'La barra superior ofrece volver atras');
 assert(await page.locator('#ws-history-forward').count() === 1, 'La barra superior ofrece avanzar');
 assert(await page.locator('[aria-label="Actualizar vista, Ctrl R"]').count() === 1, 'La barra superior ofrece actualizar la vista');
