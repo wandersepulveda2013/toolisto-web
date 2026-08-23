@@ -61,7 +61,7 @@ export function createWorkflowEngine(registry, options = {}) {
       state = 'failed';
       _notify({ type: 'state', state, validation });
       currentResources.dispose();
-      return { success: false, validation, results: {} };
+      return { success: false, state, validation, results: {} };
     }
 
     state = 'queued';
@@ -269,7 +269,7 @@ export function createWorkflowEngine(registry, options = {}) {
     return true;
   }
 
-  function retryFailed() {
+  async function retryFailed() {
     const failedIds = Object.entries(results)
       .filter(([, r]) => r.status === 'failed')
       .map(([id]) => id);
