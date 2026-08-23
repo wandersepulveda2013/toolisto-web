@@ -7,9 +7,12 @@ import { fileURLToPath } from 'node:url';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const read = relative => fs.readFileSync(path.join(root, relative), 'utf8');
 
-function loadModule(relative, exports) {
-  const source = read(relative).replace(/export\s*\{[\s\S]*?\};\s*$/, exports.map(name => `globalThis.${name} = ${name};`).join('\n'));
-  const context = { console, localStorage: { getItem: () => null, setItem: () => {} } };
+function loadModule(relative, exports, deps = {}) {
+  const source = read(relative)
+    .replace(/^import\s+.*\s+from\s+['"].*['"];?\s*$/gm, '')
+    .replace(/^export\s+(const|let|var|function|class)\s+/gm, '$1 ')
+    .replace(/export\s*\{[\s\S]*?\};\s*$/, exports.map(name => `globalThis.${name} = ${name};`).join('\n'));
+  const context = { console, localStorage: { getItem: () => null, setItem: () => {} }, ...deps };
   vm.runInNewContext(source, context, { filename: relative });
   return context;
 }
@@ -27,7 +30,18 @@ assert.equal(callsB, 1, 'el store propio debe recibir su cambio');
 storeA.set({ value: 1 });
 assert.equal(callsA, 1, 'el listener propio debe seguir funcionando');
 
-const model = loadModule('workspace/core/model.js', ['MODEL_VERSION', 'modelCanonical', 'modelFieldMeta', 'modelIsKeyName', 'normalizeDataModel', 'detectDataModelRelationships', 'modelRelationshipKey', 'modelRelationshipTitle']);
+const schemaVersions = loadModule('workspace/core/schema-versions.js', ['DATA_MODEL_SCHEMA_VERSION', 'OBJECT_SCHEMA_VERSION', 'DB_SCHEMA_VERSION']);
+const localeParser = loadModule('workspace/core/locale-parser.js', ['parseLocaleNumber', 'inferNumericHints', 'classifyDate', 'inferDateFormat', 'detectSeparator']);
+const tableHelpers = loadModule('workspace/core/table-helpers.js', ['getActiveSheet', 'getTableHeaders', 'getTableRows']);
+const model = loadModule('workspace/core/model.js', ['MODEL_VERSION', 'modelCanonical', 'modelFieldMeta', 'modelIsKeyName', 'normalizeDataModel', 'detectDataModelRelationships', 'modelRelationshipKey', 'modelRelationshipTitle', 'inferCardinality'], {
+  DATA_MODEL_SCHEMA_VERSION: schemaVersions.DATA_MODEL_SCHEMA_VERSION,
+  parseLocaleNumber: localeParser.parseLocaleNumber,
+  inferNumericHints: localeParser.inferNumericHints,
+  classifyDate: localeParser.classifyDate,
+  inferDateFormat: localeParser.inferDateFormat,
+  getTableRows: tableHelpers.getTableRows,
+  getTableHeaders: tableHelpers.getTableHeaders,
+});
 const tables = [
   { id: 'users', name: 'Usuarios', headers: ['id', 'nombre'], rows: [['1', 'Ana']] },
   { id: 'orders', name: 'Pedidos', headers: ['id', 'usuario_id'], rows: [['8', '1']] },

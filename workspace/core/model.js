@@ -120,6 +120,24 @@ function modelRelationshipTitle(relation, tables) {
   return `${from?.name || 'Tabla'} · ${relation?.fromField || 'campo'} → ${to?.name || 'Tabla'} · ${relation?.toField || 'campo'}`;
 }
 
+function inferCardinality(pkValues, fkValues) {
+  const pkSet = new Set(pkValues.map(v => String(v ?? '').trim()).filter(Boolean));
+  const fkFiltered = fkValues.map(v => String(v ?? '').trim()).filter(Boolean);
+  if (pkSet.size === 0 || fkFiltered.length === 0) return '1:*';
+  const fkDistinct = new Set(fkFiltered);
+  const hasDuplicates = fkDistinct.size < fkFiltered.length;
+  const fkDistinctArray = [...fkDistinct];
+  const allFkExistInPk = fkDistinctArray.every(v => pkSet.has(v));
+  const allPkExistInFk = [...pkSet].every(v => fkDistinct.has(v));
+  if (hasDuplicates) {
+    if (allFkExistInPk) return '1:*';
+    return '*:*';
+  }
+  if (!allFkExistInPk) return '*:*';
+  if (allPkExistInFk && pkSet.size === fkDistinct.size) return '1:1';
+  return '1:*';
+}
+
 function detectDataModelRelationships(tables, existing = []) {
   const relationships = [...existing];
   const known = new Set(relationships.map(modelRelationshipKey));
@@ -152,10 +170,17 @@ function detectDataModelRelationships(tables, existing = []) {
         });
       });
       if (!candidate) return;
+      const fromTable = tables.find(t => t.id === candidate.fromTableId);
+      const toTable = tables.find(t => t.id === candidate.toTableId);
+      const fromColIndex = modelFieldMeta(fromTable).findIndex(f => f.name === candidate.fromField);
+      const toColIndex = modelFieldMeta(toTable).findIndex(f => f.name === candidate.toField);
+      const fromValues = fromColIndex >= 0 ? modelColumnValues(fromTable, fromColIndex) : [];
+      const toValues = toColIndex >= 0 ? modelColumnValues(toTable, toColIndex) : [];
+      const cardinality = inferCardinality(fromValues, toValues);
       const relationship = {
         id: 'rel-' + Math.random().toString(36).slice(2, 9),
         ...candidate,
-        cardinality: '1:*',
+        cardinality,
         filterDirection: 'single',
         active: true,
         detected: true,
@@ -177,6 +202,7 @@ export {
   modelIsKeyName,
   normalizeDataModel,
   detectDataModelRelationships,
+  inferCardinality,
   modelRelationshipKey,
   modelRelationshipTitle,
 };
