@@ -258,10 +258,12 @@ export function registerWorkflowOperations(registry) {
       async execute(ctx) {
         const lang = ctx.options.language || 'spa';
         let img = ctx.input.data || ctx.input;
+        if (ctx.signal && ctx.signal.cancelled) return null;
         if (img instanceof Blob || img instanceof File) {
           const url = URL.createObjectURL(img);
           try {
             const image = await loadImage(url);
+            if (ctx.signal && ctx.signal.cancelled) return null;
             const canvas = document.createElement('canvas');
             canvas.width = image.naturalWidth;
             canvas.height = image.naturalHeight;
@@ -270,9 +272,11 @@ export function registerWorkflowOperations(registry) {
             if (ctx.reportProgress) ctx.reportProgress(0.1, 'Cargando motor OCR...');
             const result = await recognizeText(canvas, {
               lang,
+              signal: ctx.signal,
               onProgress: (pct, msg) => { if (ctx.reportProgress) ctx.reportProgress(0.1 + pct * 0.6, msg); },
               onPhase: (phase) => { if (phase === 'recognizing' && ctx.reportProgress) ctx.reportProgress(0.8, 'Reconociendo texto...'); },
             });
+            if (ctx.signal && ctx.signal.cancelled) return null;
             if (ctx.reportProgress) ctx.reportProgress(1, 'OCR completado');
             return result.text;
           } finally { URL.revokeObjectURL(url); }

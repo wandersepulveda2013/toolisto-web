@@ -34,6 +34,8 @@ export function createJobQueue(options = {}) {
       result: null,
       progress: null,
       cancelRequested: false,
+      _cancelFn: null,
+      _onTerminated: job._onTerminated || null,
     };
     queue.push(entry);
     _notify({ type: 'added', job: entry });
@@ -102,8 +104,6 @@ export function createJobQueue(options = {}) {
     }).finally(() => {
       running--;
       entry.startedAt = null;
-      // Remove from queue if completed/failed/cancelled (but keep for retry if failed)
-      // We keep failed jobs for potential retry; completed/cancelled are cleaned up
       if (entry.status === 'completed' || entry.status === 'cancelled') {
         const rmIdx = queue.indexOf(entry);
         if (rmIdx !== -1) queue.splice(rmIdx, 1);
@@ -112,15 +112,22 @@ export function createJobQueue(options = {}) {
     });
   }
 
+  function _terminateEntry(entry, status) {
+    entry.status = status;
+    entry.completedAt = Date.now();
+    _notify({ type: status, job: entry });
+    if (typeof entry._onTerminated === 'function') {
+      try { entry._onTerminated(status); } catch (_) { /* owner handles */ }
+    }
+    const rmIdx = queue.indexOf(entry);
+    if (rmIdx !== -1) queue.splice(rmIdx, 1);
+  }
+
   function cancel(jobId) {
     const entry = queue.find(j => j.id === jobId);
     if (!entry) return false;
     if (entry.status === 'pending') {
-      entry.status = 'cancelled';
-      entry.completedAt = Date.now();
-      _notify({ type: 'cancelled', job: entry });
-      const rmIdx = queue.indexOf(entry);
-      if (rmIdx !== -1) queue.splice(rmIdx, 1);
+      _terminateEntry(entry, 'cancelled');
     } else if (entry.status === 'running') {
       entry.cancelRequested = true;
       if (entry._cancelFn) entry._cancelFn();
@@ -129,18 +136,14 @@ export function createJobQueue(options = {}) {
   }
 
   function cancelAll() {
-    for (const entry of queue) {
+    for (let i = queue.length - 1; i >= 0; i--) {
+      const entry = queue[i];
       if (entry.status === 'pending') {
-        entry.status = 'cancelled';
-        entry.completedAt = Date.now();
-        _notify({ type: 'cancelled', job: entry });
+        _terminateEntry(entry, 'cancelled');
       } else if (entry.status === 'running') {
         entry.cancelRequested = true;
         if (entry._cancelFn) entry._cancelFn();
       }
-    }
-    for (let i = queue.length - 1; i >= 0; i--) {
-      if (queue[i].status === 'cancelled') queue.splice(i, 1);
     }
     _process();
   }
@@ -181,19 +184,18 @@ export function createJobQueue(options = {}) {
   }
 
   function getSnapshot() {
-    const pending = queue.filter(j => j.status === 'pending');
-    const runningJobs = queue.filter(j => j.status === 'running');
-    const completed = queue.filter(j => j.status === 'completed');
-    const failed = queue.filter(j => j.status === 'failed');
-    const cancelled = queue.filter(j => j.status === 'cancelled');
     return {
-      pending, running: runningJobs, completed, failed, cancelled,
-      total: pending.length + runningJobs.length + completed.length + failed.length + cancelled.length,
-      runningCount: runningJobs.length,
-      pendingCount: pending.length,
-      completedCount: completed.length,
-      failedCount: failed.length,
-      cancelledCount: cancelled.length,
+      pending: queue.filter(j => j.status === 'pending').map(j => ({ id: j.id, status: j.status })),
+      running: queue.filter(j => j.status === 'running').map(j => ({ id: j.id, status: j.status, progress: j.progress })),
+      completed: queue.filter(j => j.status === 'completed').map(j => ({ id: j.id, status: j.status, result: j.result })),
+      failed: queue.filter(j => j.status === 'failed').map(j => ({ id: j.id, status: j.status, error: j.error })),
+      cancelled: queue.filter(j => j.status === 'cancelled').map(j => ({ id: j.id, status: j.status })),
+      total: queue.length,
+      runningCount: queue.filter(j => j.status === 'running').length,
+      pendingCount: queue.filter(j => j.status === 'pending').length,
+      completedCount: queue.filter(j => j.status === 'completed').length,
+      failedCount: queue.filter(j => j.status === 'failed').length,
+      cancelledCount: queue.filter(j => j.status === 'cancelled').length,
       isPaused: paused,
     };
   }

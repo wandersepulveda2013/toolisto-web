@@ -53,10 +53,14 @@ export async function recognizeText(canvas, options = {}) {
   const lang = options.lang || 'spa';
   const onProgress = options.onProgress || (() => {});
   const onPhase = options.onPhase || (() => {});
+  const signal = options.signal || null;
+  if (signal && signal.cancelled) return { text: '', confidence: 0, words: [], cancelled: true };
   onPhase('loading');
   const worker = await loadOcrEngine(lang, onProgress);
+  if (signal && signal.cancelled) return { text: '', confidence: 0, words: [], cancelled: true };
   onPhase('recognizing');
   const result = await worker.recognize(canvas);
+  if (signal && signal.cancelled) return { text: '', confidence: 0, words: [], cancelled: true };
   const data = (result && result.data) || {};
   const text = typeof data.text === 'string' ? data.text.trim() : '';
   const confidence = Number(data.confidence) || 0;

@@ -42,6 +42,14 @@ export function createWorkflowUI(registry, appHelpers) {
   let execStateEl = null;
   let activeCategory = 'all';
   let categoryButtons = [];
+  const resultUrls = new Set();
+
+  function _revokeResultUrls() {
+    for (const url of resultUrls) {
+      try { URL.revokeObjectURL(url); } catch (_) { /* ignore */ }
+    }
+    resultUrls.clear();
+  }
 
   function render(container) {
     container.replaceChildren();
@@ -619,6 +627,8 @@ export function createWorkflowUI(registry, appHelpers) {
       }
     }
 
+    if (engine) { engine.destroy(); }
+    _revokeResultUrls();
     engine = createWorkflowEngine(registry, { maxConcurrency: 2 });
 
     // Show monitor
@@ -697,6 +707,7 @@ export function createWorkflowUI(registry, appHelpers) {
         const blob = r.data instanceof Blob ? r.data : (r.data.data instanceof Blob ? r.data.data : null);
         if (blob) {
           const url = URL.createObjectURL(blob);
+          resultUrls.add(url);
           item.appendChild(h('button', {
             className: 'ws-btn ws-btn-xs ws-btn-secondary',
             onClick: () => {
@@ -706,7 +717,6 @@ export function createWorkflowUI(registry, appHelpers) {
               document.body?.appendChild(a);
               a.click();
               a.remove?.();
-              setTimeout(() => URL.revokeObjectURL(url), 60000);
             },
           }, 'Descargar'));
         }
@@ -814,7 +824,6 @@ export function createWorkflowUI(registry, appHelpers) {
     const resultsSection = document.getElementById('wf-results-section');
     if (resultsSection) resultsSection.style.display = 'none';
     if (execStateEl) execStateEl.textContent = 'Reintentando...';
-    engine.subscribe((event) => updateMonitor(event, engine));
     engine.retryFailed().then(r => {
       if (resultsSection && r.results) {
         resultsSection.style.display = 'block';
@@ -829,6 +838,7 @@ export function createWorkflowUI(registry, appHelpers) {
     inputs = {};
     inputFiles = [];
     currentResults = null;
+    _revokeResultUrls();
     if (engine) { engine.destroy(); engine = null; }
     releaseOcrEngine();
     if (instructionAssistant) {
