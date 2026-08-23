@@ -201,8 +201,7 @@ export function createWorkflowUI(registry, appHelpers) {
     }
     // Auto-execute if mode is enabled and there are inputs
     if (!editMode && autoExecute && Object.keys(inputs).length > 0) {
-      // Wait a tick for the DOM to update, then execute
-      setTimeout(() => executeFlow(), 100);
+      requestAnimationFrame(() => executeFlow());
     }
   }
 

@@ -188,7 +188,7 @@ export function createJobQueue(options = {}) {
     const cancelled = queue.filter(j => j.status === 'cancelled');
     return {
       pending, running: runningJobs, completed, failed, cancelled,
-      total: queue.length + completed.length + failed.length + cancelled.length,
+      total: pending.length + runningJobs.length + completed.length + failed.length + cancelled.length,
       runningCount: runningJobs.length,
       pendingCount: pending.length,
       completedCount: completed.length,

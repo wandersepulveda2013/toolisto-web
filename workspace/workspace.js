@@ -4275,7 +4275,12 @@ function importCSV() {
     const records = parseCSVText(text, sep);
     if (records.length < 1) { toast('Archivo vacio', 'warning'); return; }
     const headers = records[0].map(stripCSVQuotes);
-    const rows = records.slice(1).map(r => r.map(stripCSVQuotes));
+    const maxCols = headers.length;
+    const rows = records.slice(1).map(r => {
+      const padded = r.map(stripCSVQuotes);
+      while (padded.length < maxCols) padded.push('');
+      return padded.slice(0, maxCols);
+    });
     const config = getWorkspaceConfig();
     if (headers.length > config.maxTableColumns || rows.length > config.maxTableRows) {
       toast(`El archivo supera el límite de ${config.maxTableRows.toLocaleString('es')} filas o ${config.maxTableColumns} columnas`, 'warning');

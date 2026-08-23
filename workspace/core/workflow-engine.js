@@ -49,7 +49,7 @@ export function createWorkflowEngine(registry, options = {}) {
     tempUrls.length = 0;
   }
 
-  async function run(workflow, inputs, runOptions = {}) {
+  async function run(workflow, inputs) {
     if (state === 'running' || state === 'queued') {
       throw new Error('Engine is already running');
     }

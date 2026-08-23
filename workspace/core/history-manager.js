@@ -1,6 +1,9 @@
 export function createHistoryManager(options = {}) {
   const maxEntries = options.maxEntries || 50;
-  const cloneState = options.cloneState || (s => JSON.parse(JSON.stringify(s)));
+  const cloneState = options.cloneState || (s => {
+    try { return typeof structuredClone === 'function' ? structuredClone(s) : JSON.parse(JSON.stringify(s)); }
+    catch { return JSON.parse(JSON.stringify(s)); }
+  });
   const onChange = options.onChange || (() => {});
   const writeDebounce = options.writeDebounce || 600;
 
