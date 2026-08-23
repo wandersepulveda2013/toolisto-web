@@ -8050,3 +8050,54 @@ html.theme-auto {
     min-height: 400px;
   }
 }
+
+/* P1: Ribbon UX — better grouping, spacing, wider content area */
+.ws-doc-editor {
+  width: min(100%, 1400px);
+}
+.ws-doc-toolbar {
+  width: min(100%, 1340px);
+}
+.ws-doc-ribbon-panel {
+  gap: 4px;
+}
+.ws-doc-tool-group {
+  gap: 3px;
+  padding: 3px 10px;
+  border-radius: 6px;
+  background: transparent;
+}
+.ws-doc-tool-group:hover {
+  background: var(--ws-surface-hover);
+}
+.ws-doc-tool {
+  min-width: 48px;
+  min-height: 48px;
+  gap: 3px;
+  border-radius: 6px;
+}
+.ws-doc-tool .ws-doc-tool-label {
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--ws-text-tertiary);
+  white-space: nowrap;
+}
+.ws-doc-tool:hover .ws-doc-tool-label {
+  color: var(--ws-primary);
+}
+
+/* P1: Compact module headers for Query and Dashboards */
+.ws-query-header-compact,
+.ws-dashboard-header-compact {
+  padding: 12px 0 8px;
+}
+.ws-query-header-compact h1,
+.ws-dashboard-header-compact h1 {
+  font-size: 22px;
+  margin-bottom: 4px;
+}
+.ws-query-header-compact p,
+.ws-dashboard-header-compact p {
+  font-size: 13px;
+  margin: 0;
+}

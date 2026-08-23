@@ -7744,7 +7744,10 @@ function showModal(opts) {
   } else if (opts.confirmText) {
     const cancelBtn = h('button', { className: 'ws-btn ws-btn-ghost', onClick: async () => { try { if (opts.onCancel) await opts.onCancel(); } finally { closeModal(); } } }, opts.cancelText || 'Cancelar');
     const confirmBtn = h('button', { className: 'ws-btn ' + (opts.confirmClass || 'ws-btn-primary') + ' ws-btn-confirm', onClick: async () => {
-      try { if (opts.onConfirm) await opts.onConfirm(); } finally { closeModal(); }
+      if (opts.onConfirm) {
+        try { await opts.onConfirm(); } catch (e) { return; }
+      }
+      closeModal();
     }}, opts.confirmText);
     footer.appendChild(cancelBtn);
     footer.appendChild(confirmBtn);
@@ -7755,14 +7758,14 @@ function showModal(opts) {
   modal.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') { closeModal(); return; }
     if (e.key !== 'Tab') return;
-    const focusable = modal.querySelectorAll('button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])');
+    const focusable = modal.querySelectorAll('button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])');
     if (!focusable.length) return;
     const first = focusable[0], last = focusable[focusable.length - 1];
     if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
     else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
   });
   setTimeout(() => {
-    const focusable = modal.querySelector('button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])');
+    const focusable = modal.querySelector('button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])');
     if (focusable) focusable.focus();
   }, 0);
 }
