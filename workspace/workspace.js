@@ -763,6 +763,7 @@ let _appHistory = null;
 let _autosaveTimer = null;
 let _lastAutosaveSnapshot = '';
 let _lastAutosaveTableSnapshot = '';
+let _quotaWarned = false;
 
 function _captureWorkspaceState() {
   const s = appStore.get();
@@ -812,6 +813,13 @@ function _setupAutosave() {
         }
       }
       if (saved) appStore.set({ isDirty: false, lastSaved: Date.now() });
+      if (saved && !_quotaWarned) {
+        const est = await getBrowserStorageEstimate();
+        if (est && est.quota > 0 && est.usage / est.quota > 0.8) {
+          _quotaWarned = true;
+          toast('Almacenamiento casi lleno (' + formatBytes(est.usage) + ' / ' + formatBytes(est.quota) + '). Exporta tus proyectos para liberar espacio.', 'warning');
+        }
+      }
     } catch (error) {
       reportError(error, 'autosave', {});
     }
