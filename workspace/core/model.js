@@ -1,4 +1,6 @@
 import { DATA_MODEL_SCHEMA_VERSION } from './schema-versions.js';
+import { parseLocaleNumber, inferNumericHints, classifyDate, inferDateFormat } from './locale-parser.js';
+import { getTableRows, getTableHeaders } from './table-helpers.js';
 
 const MODEL_VERSION = DATA_MODEL_SCHEMA_VERSION;
 
@@ -18,7 +20,7 @@ function modelSingular(value) {
 }
 
 function modelColumnValues(table, index) {
-  return (table?.rows || [])
+  return getTableRows(table)
     .map(row => row?.[index])
     .filter(value => value !== null && value !== undefined && String(value).trim() !== '')
     .map(value => String(value).trim());
@@ -27,13 +29,11 @@ function modelColumnValues(table, index) {
 function modelFieldType(table, index) {
   const values = modelColumnValues(table, index);
   if (!values.length) return 'texto';
-  const numeric = values.every(value => Number.isFinite(Number(value.replace(',', '.'))));
-  if (numeric) return 'numero';
-  const dates = values.every(value => {
-    const parsed = Date.parse(value);
-    return Number.isFinite(parsed) && /[-/]/.test(value);
-  });
-  if (dates) return 'fecha';
+  const hints = inferNumericHints(values);
+  const numericCount = values.filter(v => parseLocaleNumber(v, hints) !== null).length;
+  if (numericCount === values.length) return 'numero';
+  const dateResult = inferDateFormat(values);
+  if (dateResult.format !== 'text' && !dateResult.ambiguous && dateResult.confidence > 0.5) return 'fecha';
   return 'texto';
 }
 
@@ -43,7 +43,7 @@ function modelIsKeyName(value) {
 }
 
 function modelFieldMeta(table) {
-  const headers = Array.isArray(table?.headers) ? table.headers : [];
+  const headers = getTableHeaders(table);
   return headers.map((header, index) => {
     const name = String(header || 'Columna ' + (index + 1));
     const values = modelColumnValues(table, index);
