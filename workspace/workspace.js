@@ -27,6 +27,9 @@ import { setToastHandler, showUserError, showWarning, showSuccess, setupGlobalEr
 import { createOperationRegistry } from './core/operation-registry.js';
 import { registerWorkflowOperations } from './core/workflow-operations.js';
 import { createWorkflowUI } from './core/workflow-ui.js';
+import { createWorkflowPersistence, WORKFLOW_SCHEMA_VERSION } from './core/workflow-persistence.js';
+import { WORKFLOW_TEMPLATES, getTemplateById } from './core/workflow-templates.js';
+import * as storageModule from './core/storage.js';
 import { createInstructionAssistant } from './core/instruction-assistant-ui.js';
 import { isOcrEngineAvailable, loadCanvasFromImageSource, recognizeText } from './core/ocr-engine.js';
 import { normalizeDataModel, detectDataModelRelationships, modelFieldMeta, modelRelationshipTitle } from './core/model.js';
@@ -7238,7 +7241,246 @@ function renderWorkflowView(container) {
     });
   }
   workflowUIContainer = container;
-  workflowUI.render(container);
+
+  const project = appStore.get('currentProject');
+  const persistence = project ? createWorkflowPersistence(storageModule, appStore) : null;
+
+  const toolbar = h('div', { style: 'display:flex;align-items:center;gap:8px;padding:8px 16px;border-bottom:1px solid var(--ws-border);background:var(--ws-bg-secondary);flex-shrink:0;min-height:40px' });
+
+  const nameInput = h('input', {
+    type: 'text', value: workflowUI.getWorkflowName(),
+    style: 'flex:0 0 200px;padding:4px 8px;border:1px solid var(--ws-border);border-radius:4px;font-size:12px;background:var(--ws-bg);color:var(--ws-text)',
+    'aria-label': 'Nombre del flujo',
+  });
+  nameInput.addEventListener('change', () => { workflowUI.setWorkflowName(nameInput.value.trim() || 'Sin nombre'); });
+  toolbar.appendChild(nameInput);
+
+  const saveBtn = h('button', {
+    className: 'ws-btn ws-btn-xs ws-btn-primary',
+    'aria-label': 'Guardar flujo',
+  }, svgIcon('save', 12), ' Guardar');
+  toolbar.appendChild(saveBtn);
+
+  const loadSelect = h('select', {
+    style: 'padding:4px 8px;border:1px solid var(--ws-border);border-radius:4px;font-size:11px;background:var(--ws-bg);color:var(--ws-text);max-width:180px',
+    'aria-label': 'Flujos guardados',
+  });
+  loadSelect.appendChild(h('option', { value: '' }, '-- Seleccionar --'));
+  toolbar.appendChild(loadSelect);
+
+  const newBtn = h('button', { className: 'ws-btn ws-btn-xs ws-btn-ghost', 'aria-label': 'Nuevo flujo' }, svgIcon('plus', 12), ' Nuevo');
+  toolbar.appendChild(newBtn);
+
+  const templatesSelect = h('select', {
+    style: 'padding:4px 8px;border:1px solid var(--ws-border);border-radius:4px;font-size:11px;background:var(--ws-bg);color:var(--ws-text);max-width:160px',
+    'aria-label': 'Plantillas',
+  });
+  templatesSelect.appendChild(h('option', { value: '' }, 'Plantillas'));
+  for (const tpl of WORKFLOW_TEMPLATES) {
+    templatesSelect.appendChild(h('option', { value: tpl.id }, tpl.name));
+  }
+  toolbar.appendChild(templatesSelect);
+
+  const dupBtn = h('button', { className: 'ws-btn ws-btn-xs ws-btn-ghost', 'aria-label': 'Duplicar flujo' }, svgIcon('copy', 12), ' Duplicar');
+  toolbar.appendChild(dupBtn);
+
+  const delBtn = h('button', { className: 'ws-btn ws-btn-xs ws-btn-ghost', style: 'color:var(--ws-error)', 'aria-label': 'Eliminar flujo' }, svgIcon('trash', 12), ' Eliminar');
+  toolbar.appendChild(delBtn);
+
+  const exportBtn = h('button', { className: 'ws-btn ws-btn-xs ws-btn-ghost', 'aria-label': 'Exportar flujo' }, svgIcon('download', 12), ' Exportar');
+  toolbar.appendChild(exportBtn);
+
+  const importBtn = h('button', { className: 'ws-btn ws-btn-xs ws-btn-ghost', 'aria-label': 'Importar flujo' }, svgIcon('upload', 12), ' Importar');
+  toolbar.appendChild(importBtn);
+
+  const saveStatus = h('span', { style: 'font-size:11px;color:var(--ws-text-tertiary);margin-left:auto' }, '');
+  toolbar.appendChild(saveStatus);
+
+  async function refreshWorkflowList() {
+    if (!persistence) return;
+    try {
+      const list = await persistence.listByProject();
+      loadSelect.replaceChildren();
+      loadSelect.appendChild(h('option', { value: '' }, '-- Seleccionar --'));
+      for (const wf of list) {
+        const opt = h('option', { value: wf.id }, wf.name || 'Sin nombre');
+        if (wf.id === appStore.get('currentWorkflowId')) opt.selected = true;
+        loadSelect.appendChild(opt);
+      }
+    } catch (e) { /* ignore */ }
+  }
+
+  saveBtn.addEventListener('click', async () => {
+    if (!persistence) { toast('No hay proyecto activo', 'warning'); return; }
+    saveStatus.textContent = 'Guardando...';
+    try {
+      const model = workflowUI.getModel();
+      const saved = await persistence.save(model, { name: nameInput.value.trim() || model.getName() });
+      appStore.set({ currentWorkflowId: saved.id });
+      saveStatus.textContent = 'Guardado';
+      toast('Flujo guardado', 'success');
+      await refreshWorkflowList();
+    } catch (e) {
+      saveStatus.textContent = 'Error al guardar';
+      toast('Error al guardar: ' + e.message, 'error');
+    }
+  });
+
+  loadSelect.addEventListener('change', async () => {
+    const wfId = loadSelect.value;
+    if (!wfId || !persistence) return;
+    try {
+      const record = await persistence.load(wfId);
+      if (record && record.definition) {
+        workflowUI.setWorkflowFromSnapshot(record.definition);
+        nameInput.value = record.name || '';
+        appStore.set({ currentWorkflowId: wfId });
+        toast('Flujo cargado: ' + (record.name || 'Sin nombre'), 'success');
+      }
+    } catch (e) {
+      toast('Error al cargar: ' + e.message, 'error');
+    }
+  });
+
+  newBtn.addEventListener('click', () => {
+    workflowUI.clearFlow();
+    nameInput.value = 'Nuevo flujo';
+    appStore.set({ currentWorkflowId: null });
+    saveStatus.textContent = '';
+  });
+
+  templatesSelect.addEventListener('change', () => {
+    const tplId = templatesSelect.value;
+    if (!tplId) return;
+    const tpl = getTemplateById(tplId);
+    if (!tpl) return;
+    workflowUI.clearFlow();
+    const model = workflowUI.getModel();
+    model.setName(tpl.name);
+    nameInput.value = tpl.name;
+    for (const step of tpl.steps) {
+      model.addStep(step.operationId, step.options);
+      if (step.enabled === false) {
+        const steps = model.getSteps();
+        model.disableStep(steps[steps.length - 1].id);
+      }
+    }
+    workflowUI.render(workflowUIContainer);
+    templatesSelect.value = '';
+    toast('Plantilla cargada: ' + tpl.name, 'success');
+  });
+
+  dupBtn.addEventListener('click', async () => {
+    if (!persistence) { toast('No hay proyecto activo', 'warning'); return; }
+    const currentId = appStore.get('currentWorkflowId');
+    if (!currentId) { toast('Guarda el flujo primero', 'warning'); return; }
+    try {
+      const saved = await persistence.duplicate(currentId);
+      appStore.set({ currentWorkflowId: saved.id });
+      toast('Flujo duplicado', 'success');
+      await refreshWorkflowList();
+    } catch (e) {
+      toast('Error al duplicar: ' + e.message, 'error');
+    }
+  });
+
+  delBtn.addEventListener('click', async () => {
+    if (!persistence) return;
+    const currentId = appStore.get('currentWorkflowId');
+    if (!currentId) { toast('No hay flujo guardado para eliminar', 'warning'); return; }
+    showModal({
+      title: 'Eliminar flujo',
+      message: '¿Seguro que quieres eliminar este flujo? Esta accion no se puede deshacer.',
+      confirmText: 'Eliminar',
+      onConfirm: async () => {
+        try {
+          await persistence.remove(currentId);
+          appStore.set({ currentWorkflowId: null });
+          workflowUI.clearFlow();
+          nameInput.value = 'Nuevo flujo';
+          toast('Flujo eliminado', 'success');
+          await refreshWorkflowList();
+        } catch (e) {
+          toast('Error al eliminar: ' + e.message, 'error');
+        }
+      },
+    });
+  });
+
+  exportBtn.addEventListener('click', async () => {
+    if (!persistence) { toast('No hay proyecto activo', 'warning'); return; }
+    const currentId = appStore.get('currentWorkflowId');
+    if (!currentId) { toast('Guarda el flujo primero', 'warning'); return; }
+    try {
+      const bundle = await persistence.exportWorkflow(currentId);
+      const blob = new Blob([JSON.stringify(bundle, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const name = (bundle.workflow.name || 'flujo').replace(/[\\/:*?"<>|]/g, '-');
+      const a = h('a', { href: url, download: name + '.toolisto' });
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      toast('Flujo exportado', 'success');
+    } catch (e) {
+      toast('Error al exportar: ' + e.message, 'error');
+    }
+  });
+
+  importBtn.addEventListener('click', () => {
+    if (!persistence) { toast('No hay proyecto activo', 'warning'); return; }
+    const input = h('input', { type: 'file', accept: '.toolisto,.json,application/json' });
+    input.addEventListener('change', async () => {
+      const file = input.files?.[0];
+      if (!file) return;
+      try {
+        const text = await file.text();
+        const bundle = JSON.parse(text);
+        const saved = await persistence.importWorkflow(bundle);
+        appStore.set({ currentWorkflowId: saved.id });
+        if (saved.definition) workflowUI.setWorkflowFromSnapshot(saved.definition);
+        nameInput.value = saved.name || '';
+        toast('Flujo importado: ' + (saved.name || 'Sin nombre'), 'success');
+        await refreshWorkflowList();
+      } catch (e) {
+        toast('Error al importar: ' + e.message, 'error');
+      }
+    });
+    input.click();
+  });
+
+  container.appendChild(toolbar);
+
+  const builderContainer = h('div', { style: 'flex:1;overflow:hidden;display:flex;flex-direction:column' });
+  container.style.display = 'flex';
+  container.style.flexDirection = 'column';
+  workflowUI.render(builderContainer);
+  container.appendChild(builderContainer);
+
+  refreshWorkflowList();
+
+  let _autoSaveTimer = null;
+  function scheduleAutoSave() {
+    if (_autoSaveTimer) clearTimeout(_autoSaveTimer);
+    _autoSaveTimer = setTimeout(async () => {
+      if (!persistence) return;
+      const currentId = appStore.get('currentWorkflowId');
+      if (!currentId) return;
+      try {
+        const model = workflowUI.getModel();
+        await persistence.updateDefinition(currentId, model);
+      } catch (e) { /* auto-save silent */ }
+    }, 3000);
+  }
+
+  const _workflowKeyHandler = (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+      e.preventDefault();
+      saveBtn.click();
+    }
+  };
+  document.addEventListener('keydown', _workflowKeyHandler);
+
   const pendingInputs = appStore.get('pendingWorkflowInputs');
   if (Array.isArray(pendingInputs) && pendingInputs.length > 0) {
     const added = workflowUI.addWorkspaceItems(pendingInputs);

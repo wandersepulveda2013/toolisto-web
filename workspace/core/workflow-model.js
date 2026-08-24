@@ -1,7 +1,31 @@
+import { WORKFLOW_DEFINITION_VERSION } from './schema-versions.js';
+
+/**
+ * Creates a linear workflow model (step-list).
+ * @returns {{
+ *   getId: () => string,
+ *   getName: () => string,
+ *   getInputIds: () => string[],
+ *   getSteps: () => Array<{id:string, operationId:string, options:Object, enabled:boolean}>,
+ *   getActiveSteps: () => Array,
+ *   addStep: (operationId:string, options?:Object, index?:number) => object,
+ *   removeStep: (stepId:string) => boolean,
+ *   moveStep: (stepId:string, newIndex:number) => boolean,
+ *   updateStep: (stepId:string, updates:Object) => boolean,
+ *   enableStep: (stepId:string) => boolean,
+ *   disableStep: (stepId:string) => boolean,
+ *   cloneWorkflow: () => object,
+ *   serializeWorkflow: () => Object,
+ *   deserializeWorkflow: (data:Object) => boolean,
+ *   setName: (n:string) => void,
+ *   setInputs: (ids:string[]) => void,
+ *   getSchemaVersion: () => number,
+ * }}
+ */
 export function createWorkflowModel() {
   let id = 'workflow-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6);
   let name = 'Nuevo flujo';
-  let version = 1;
+  let version = WORKFLOW_DEFINITION_VERSION;
   let createdAt = Date.now();
   let updatedAt = Date.now();
   let inputIds = [];
@@ -116,8 +140,21 @@ export function createWorkflowModel() {
       enabled: s.enabled !== false,
     }));
     stepCounter = Math.max(steps.length, stepCounter);
+    _migrateIfNeeded();
     _touch();
     return true;
+  }
+
+  function _migrateIfNeeded() {
+    if (version < WORKFLOW_DEFINITION_VERSION) {
+      if (version < 2) {
+        for (const s of steps) {
+          if (s.enabled === undefined) s.enabled = true;
+        }
+      }
+      version = WORKFLOW_DEFINITION_VERSION;
+      _touch();
+    }
   }
 
   function setName(n) { name = n; _touch(); }
@@ -125,6 +162,7 @@ export function createWorkflowModel() {
   function getId() { return id; }
   function getName() { return name; }
   function getVersion() { return version; }
+  function getSchemaVersion() { return WORKFLOW_DEFINITION_VERSION; }
   function getCreatedAt() { return createdAt; }
   function getUpdatedAt() { return updatedAt; }
   function getInputIds() { return inputIds.slice(); }
@@ -159,7 +197,7 @@ export function createWorkflowModel() {
   return {
     setInputs, addStep, removeStep, moveStep, updateStep, enableStep, disableStep,
     cloneWorkflow, serializeWorkflow, deserializeWorkflow,
-    setName, setId, getName, getId, getVersion, getCreatedAt, getUpdatedAt,
+    setName, setId, getName, getId, getVersion, getSchemaVersion, getCreatedAt, getUpdatedAt,
     getInputIds, getSteps, getActiveSteps, getStep, copy,
     validateWorkflow,
   };

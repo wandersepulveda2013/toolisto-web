@@ -40,6 +40,8 @@ export function createWorkflowUI(registry, appHelpers) {
   let addOpBtn = null;
   let cleanupBtn = null;
   let execStateEl = null;
+  let validationErrorsEl = null;
+  let execErrorsEl = null;
   let activeCategory = 'all';
   let categoryButtons = [];
   const resultUrls = new Set();
@@ -80,6 +82,8 @@ export function createWorkflowUI(registry, appHelpers) {
     renderPlanPreview(rightCol);
     renderMonitor(rightCol);
     renderResults(rightCol);
+    renderValidationErrors(rightCol);
+    renderExecErrors(rightCol);
     mainRow.appendChild(rightCol);
 
     container.appendChild(mainRow);
@@ -297,6 +301,24 @@ export function createWorkflowUI(registry, appHelpers) {
     section.appendChild(h('div', { style: 'font-weight:600;font-size:13px;margin-bottom:8px' }, 'Resultados'));
     resultsEl = h('div', { style: 'font-size:12px' });
     section.appendChild(resultsEl);
+    parent.appendChild(section);
+  }
+
+  function renderValidationErrors(parent) {
+    const section = h('div', { style: 'border:1px solid var(--ws-error,#dc2626);border-radius:8px;padding:12px;display:none;background:var(--ws-bg-error,#fef2f2)' });
+    section.id = 'wf-validation-errors-section';
+    section.appendChild(h('div', { style: 'font-weight:600;font-size:13px;margin-bottom:8px;color:var(--ws-error,#dc2626)' }, 'Errores de validacion'));
+    validationErrorsEl = h('div', { style: 'font-size:12px' });
+    section.appendChild(validationErrorsEl);
+    parent.appendChild(section);
+  }
+
+  function renderExecErrors(parent) {
+    const section = h('div', { style: 'border:1px solid var(--ws-error,#dc2626);border-radius:8px;padding:12px;display:none;background:var(--ws-bg-error,#fef2f2)' });
+    section.id = 'wf-exec-errors-section';
+    section.appendChild(h('div', { style: 'font-weight:600;font-size:13px;margin-bottom:8px;color:var(--ws-error,#dc2626)' }, 'Errores de ejecucion'));
+    execErrorsEl = h('div', { style: 'font-size:12px' });
+    section.appendChild(execErrorsEl);
     parent.appendChild(section);
   }
 
@@ -597,10 +619,25 @@ export function createWorkflowUI(registry, appHelpers) {
     if (activeSteps.length === 0) { toast('No hay pasos activos', 'warning'); return; }
     if (Object.keys(inputs).length === 0) { toast('No hay archivos de entrada', 'warning'); return; }
 
+    if (validationErrorsEl) validationErrorsEl.parentElement.style.display = 'none';
+    if (execErrorsEl) execErrorsEl.parentElement.style.display = 'none';
+
+    const validatorResult = workflow.validateWorkflow(registry);
+    if (!validatorResult.valid && validatorResult.errors.length > 0) {
+      if (validationErrorsEl) {
+        validationErrorsEl.replaceChildren();
+        for (const err of validatorResult.errors) {
+          validationErrorsEl.appendChild(h('div', { style: 'padding:2px 0;font-size:12px' }, err));
+        }
+        validationErrorsEl.parentElement.style.display = 'block';
+      }
+      toast('Hay ' + validatorResult.errors.length + ' error(es) de validacion', 'error');
+      return;
+    }
+
     executeBtn.disabled = true;
     if (execStateEl) execStateEl.textContent = 'Validando...';
 
-    // Build inputs map with actual file data for the engine
     const inputsForEngine = {};
     for (const [id, inp] of Object.entries(inputs)) {
       if (inp.file) {
@@ -616,9 +653,6 @@ export function createWorkflowUI(registry, appHelpers) {
         } else if (table) {
           inputsForEngine[id] = { data: table, name: table.name, kind: 'data' };
         } else if (inp.workspaceRef.startsWith('capture-') && appHelpers.resolveCaptureImage) {
-          // Una captura escaneada entra al flujo por referencia: el helper
-          // inyectado resuelve el asset corregido y devuelve la imagen como
-          // Blob (patrón CE-029) para poder encadenarla (p. ej. OCR).
           const image = await appHelpers.resolveCaptureImage(wsId);
           if (image && image.blob) {
             inputsForEngine[id] = { data: image.blob, name: image.name || inp.name, kind: 'image' };
@@ -631,21 +665,38 @@ export function createWorkflowUI(registry, appHelpers) {
     _revokeResultUrls();
     engine = createWorkflowEngine(registry, { maxConcurrency: 2 });
 
-    // Show monitor
     const monitorSection = document.getElementById('wf-monitor-section');
     const resultsSection = document.getElementById('wf-results-section');
     if (monitorSection) monitorSection.style.display = 'block';
     if (resultsSection) resultsSection.style.display = 'none';
 
-    // Subscribe to events
     engine.subscribe((event) => {
       updateMonitor(event, engine);
+      if (event.type === 'step-error' || event.type === 'error') {
+        if (execErrorsEl) {
+          execErrorsEl.appendChild(h('div', { style: 'padding:2px 0;font-size:12px' }, event.error || event.message || 'Error desconocido'));
+          execErrorsEl.parentElement.style.display = 'block';
+        }
+      }
     });
 
     if (execStateEl) execStateEl.textContent = 'Ejecutando...';
     const result = await engine.run(workflow, inputsForEngine);
 
     if (execStateEl) execStateEl.textContent = result.state === 'completed' ? 'Completado' : result.state === 'completed_with_errors' ? 'Completado con errores' : result.state === 'cancelled' ? 'Cancelado' : 'Fallido';
+
+    if (result.failed > 0 && execErrorsEl) {
+      const snap = engine.getSnapshot();
+      const failedJobs = snap?.failed || [];
+      if (Array.isArray(failedJobs)) {
+        for (const fj of failedJobs) {
+          if (fj.error) {
+            execErrorsEl.appendChild(h('div', { style: 'padding:2px 0;font-size:12px' }, fj.error));
+          }
+        }
+      }
+      if (execErrorsEl.children.length > 0) execErrorsEl.parentElement.style.display = 'block';
+    }
 
     currentResults = result.results;
     if (resultsSection && result.results) {
@@ -873,5 +924,15 @@ export function createWorkflowUI(registry, appHelpers) {
     return workflow.getActiveSteps().length > 0 || Object.keys(inputs).length > 0;
   }
 
-  return { render, clearFlow, getWorkflowSnapshot, setWorkflowFromSnapshot, hasWorkflow, addFiles, addWorkspaceItems, setAutoExecute, addResultToWorkspace };
+  function getModel() { return workflow; }
+
+  function setModel(m) { workflow = m; }
+
+  function getWorkflowId() { return workflow.getId(); }
+
+  function setWorkflowName(n) { workflow.setName(n); }
+
+  function getWorkflowName() { return workflow.getName(); }
+
+  return { render, clearFlow, getWorkflowSnapshot, setWorkflowFromSnapshot, hasWorkflow, addFiles, addWorkspaceItems, setAutoExecute, addResultToWorkspace, getModel, setModel, getWorkflowId, setWorkflowName, getWorkflowName };
 }

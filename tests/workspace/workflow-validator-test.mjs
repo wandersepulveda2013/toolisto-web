@@ -74,5 +74,25 @@ check('Estimated work count', validator.validateWorkflow(makeMock(['img1', 'img2
   { operationId: 'image.rotate', enabled: true, options: { angle: 90 } },
 ]), inputsMap).estimatedWork.totalJobs === 4);
 
+// AW-083: Enhanced validation
+check('Step limit exceeded rejected', !validator.validateWorkflow(makeMock(['img1'],
+  Array.from({ length: 51 }, () => ({ operationId: 'image.resize', enabled: true, options: { width: 800 } }))
+), inputsMap).valid);
+
+check('Duplicate operation warns', validator.validateWorkflow(makeMock(['img1'], [
+  { operationId: 'image.resize', enabled: true, options: { width: 800 } },
+  { operationId: 'image.resize', enabled: true, options: { width: 600 } },
+]), inputsMap).warnings.some(w => w.includes('appears more than once')));
+
+check('Destructive operation warns', (() => {
+  registry.register({ id: 'image.destroy', name: 'Destroy', description: 'x', category: 'image', inputKinds: ['image'], outputKind: 'image', supportsBatch: true, supportsCancellation: false, destructive: true, execute() {} });
+  return validator.validateWorkflow(makeMock(['img1'], [{ operationId: 'image.destroy', enabled: true, options: {} }]), inputsMap).warnings.some(w => w.includes('destructive'));
+})());
+
+check('Incompatible output chain rejected', !validator.validateWorkflow(makeMock(['img1'], [
+  { operationId: 'image.resize', enabled: true, options: { width: 800 } },
+  { operationId: 'text.export', enabled: true, options: {} },
+]), inputsMap).valid);
+
 console.log('\nResultados: ' + pass + ' pass, ' + fail + ' fail, ' + (pass + fail) + ' tests\n');
 process.exit(fail > 0 ? 1 : 0);

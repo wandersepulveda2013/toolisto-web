@@ -39,6 +39,8 @@ const appStore = createStore({
   documents: [],
   captures: [],
   dataTables: [],
+  workflows: [],
+  currentWorkflowId: null,
   dataModel: null,
   querySheets: [],
   activeQuerySheetId: null,

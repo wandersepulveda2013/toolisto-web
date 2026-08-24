@@ -1,4 +1,6 @@
 export function createWorkflowValidator(registry) {
+  const MAX_STEPS = 50;
+
   function validateWorkflow(workflow, inputsMap) {
     const errors = [];
     const warnings = [];
@@ -18,8 +20,13 @@ export function createWorkflowValidator(registry) {
       errors.push('No active steps in workflow');
     }
 
+    if (steps.length > MAX_STEPS) {
+      errors.push('Workflow has ' + steps.length + ' steps, exceeds maximum of ' + MAX_STEPS);
+    }
+
     const inputIdSet = new Set(inputIds);
 
+    const opCounts = {};
     let prevOutputKind = null;
     for (let i = 0; i < steps.length; i++) {
       const step = steps[i];
@@ -52,6 +59,11 @@ export function createWorkflowValidator(registry) {
 
       if (i > 0 && prevOutputKind && op.inputKinds && !op.inputKinds.includes(prevOutputKind)) {
         errors.push('Step ' + (i + 1) + ' ("' + op.name + '"): expected input ' + op.inputKinds.join(', ') + ' but previous step outputs "' + prevOutputKind + '"');
+      }
+
+      opCounts[step.operationId] = (opCounts[step.operationId] || 0) + 1;
+      if (opCounts[step.operationId] > 1) {
+        warnings.push('Step ' + (i + 1) + ' ("' + op.name + '"): operation "' + step.operationId + '" appears more than once');
       }
 
       if (op.optionSchema) {
