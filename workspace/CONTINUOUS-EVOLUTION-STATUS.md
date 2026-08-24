@@ -21,7 +21,7 @@
 | **Tests ejecutados** | autosave-lock-test.mjs 18/18; workspace-test 157/157; phase3a-test 80/80; phase3b-test 59/59; phase11-audit 106/106; workflow-ui-test 65/65; operation-registry 26/26. |
 | **Tests PASS** | 18/18 autosave lock (serialization, latest-wins, error handling, cancel, burst, failsafe). Regresión: workspace 157/157, phase3a 80/80, phase3b 59/59, phase11 106/106, UI 65/65, registry 26/26. Total: 511+ passing. |
 | **Tests FAIL** | 0 (concurrency-test and workflow-engine-test failures are pre-existing: `createExecutionResources` missing from VM context, unrelated) |
-| **Commits** | (pending) |
+| **Commits** | 9052348 |
 | **Bloqueos** | Ninguno. |
 | **Proxima prioridad** | CE-058 or next DISCOVERY; audit remaining core modules (instruction-planner, scanner-ui). |
 
