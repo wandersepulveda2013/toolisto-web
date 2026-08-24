@@ -46,6 +46,19 @@ export function createWorkflowUI(registry, appHelpers) {
   let categoryButtons = [];
   const resultUrls = new Set();
 
+  const MAX_UNDO = 50;
+  let undoStack = [];
+  let redoStack = [];
+  let clipboard = [];
+  let selectedStepIds = new Set();
+  let inspectorEl = null;
+  let progressBarEl = null;
+  let progressTextEl = null;
+  let historyEl = null;
+  let _onDirtyChange = null;
+  let _persistence = null;
+  let _selectedInspectorStep = null;
+
   function _revokeResultUrls() {
     for (const url of resultUrls) {
       try { URL.revokeObjectURL(url); } catch (_) { /* ignore */ }
@@ -77,13 +90,15 @@ export function createWorkflowUI(registry, appHelpers) {
     renderStepsSection(leftCol);
     mainRow.appendChild(leftCol);
 
-    // Right column: plan + monitor + results
+    // Right column: plan + monitor + results + inspector + history
     const rightCol = h('div', { style: 'display:flex;flex-direction:column;gap:12px;overflow:hidden' });
     renderPlanPreview(rightCol);
     renderMonitor(rightCol);
     renderResults(rightCol);
     renderValidationErrors(rightCol);
     renderExecErrors(rightCol);
+    renderInspectorPanel(rightCol);
+    renderHistoryPanel(rightCol);
     mainRow.appendChild(rightCol);
 
     container.appendChild(mainRow);
@@ -185,6 +200,7 @@ export function createWorkflowUI(registry, appHelpers) {
       toast('No hay pasos en el flujo planificado', 'warning');
       return;
     }
+    _pushUndo();
     const existingSteps = workflow.getSteps();
     for (const step of existingSteps) {
       workflow.removeStep(step.id);
@@ -215,6 +231,7 @@ export function createWorkflowUI(registry, appHelpers) {
     if (!editMode && autoExecute && Object.keys(inputs).length > 0) {
       requestAnimationFrame(() => executeFlow());
     }
+    _notifyStepChange();
   }
 
   function setAutoExecute(enabled) {
@@ -290,6 +307,15 @@ export function createWorkflowUI(registry, appHelpers) {
     const section = h('div', { style: 'border:1px solid var(--ws-border);border-radius:8px;padding:12px;display:none' });
     section.id = 'wf-monitor-section';
     section.appendChild(h('div', { style: 'font-weight:600;font-size:13px;margin-bottom:8px' }, 'Ejecucion'));
+
+    const progressContainer = h('div', { style: 'width:100%;height:8px;background:var(--ws-bg-secondary);border-radius:4px;overflow:hidden;margin-bottom:6px' });
+    progressBarEl = h('div', { style: 'width:0%;height:100%;background:var(--ws-primary,#3b82f6);transition:width 0.3s ease;border-radius:4px' });
+    progressContainer.appendChild(progressBarEl);
+    section.appendChild(progressContainer);
+
+    progressTextEl = h('div', { style: 'font-size:12px;margin-bottom:4px' });
+    section.appendChild(progressTextEl);
+
     monitorEl = h('div', { style: 'font-size:12px', role: 'log', 'aria-label': 'Progreso de la ejecucion', 'aria-live': 'polite' });
     section.appendChild(monitorEl);
     parent.appendChild(section);
@@ -380,12 +406,15 @@ export function createWorkflowUI(registry, appHelpers) {
   }
 
   function addOperation(opId) {
+    _pushUndo();
     const op = registry.get(opId);
     if (!op) { toast('Operacion no disponible', 'warning'); return; }
     const step = workflow.addStep(opId, defaultOptions(op));
     renderStepList();
     updatePlan();
     updateExecuteBtn();
+    _notifyStepChange();
+    _markDirty();
     toast('Anadido: ' + op.name, 'success');
   }
 
@@ -408,8 +437,10 @@ export function createWorkflowUI(registry, appHelpers) {
     for (let i = 0; i < steps.length; i++) {
       const step = steps[i];
       const op = registry.get(step.operationId);
+      const isSelected = selectedStepIds.has(step.id);
       const row = h('div', {
-        style: 'display:flex;align-items:center;gap:6px;padding:8px;border:1px solid var(--ws-border);border-radius:6px;margin-bottom:4px;background:' + (step.enabled ? 'var(--ws-bg)' : 'var(--ws-bg-secondary)') + ';opacity:' + (step.enabled ? '1' : '0.5'),
+        style: 'display:flex;align-items:center;gap:6px;padding:8px;border:1px solid ' + (isSelected ? 'var(--ws-primary,#3b82f6)' : 'var(--ws-border)') + ';border-radius:6px;margin-bottom:4px;background:' + (isSelected ? 'var(--ws-bg-active,#eff6ff)' : step.enabled ? 'var(--ws-bg)' : 'var(--ws-bg-secondary)') + ';opacity:' + (step.enabled ? '1' : '0.5') + ';cursor:pointer',
+        onClick: (e) => { if (e.target.closest('button')) return; selectStep(step.id, e.ctrlKey || e.metaKey); },
       });
       row.appendChild(h('span', { style: 'font-size:11px;color:var(--ws-text-tertiary);min-width:20px' }, String(i + 1)));
       row.appendChild(h('div', { style: 'flex:1' },
@@ -421,7 +452,7 @@ export function createWorkflowUI(registry, appHelpers) {
         title: step.enabled ? 'Desactivar paso ' + (i + 1) : 'Activar paso ' + (i + 1),
         'aria-label': step.enabled ? 'Desactivar paso ' + (i + 1) : 'Activar paso ' + (i + 1),
         'aria-pressed': step.enabled ? 'true' : 'false',
-        onClick: () => { if (step.enabled) workflow.disableStep(step.id); else workflow.enableStep(step.id); renderStepList(); updatePlan(); updateExecuteBtn(); },
+        onClick: () => { _pushUndo(); if (step.enabled) workflow.disableStep(step.id); else workflow.enableStep(step.id); renderStepList(); updatePlan(); updateExecuteBtn(); _notifyStepChange(); _markDirty(); },
       }, svgIcon(step.enabled ? 'check' : 'close', 12));
       row.appendChild(toggleBtn);
 
@@ -429,20 +460,20 @@ export function createWorkflowUI(registry, appHelpers) {
         row.appendChild(h('button', {
           className: 'ws-btn ws-btn-xs ws-btn-ghost',
           title: 'Subir paso ' + (i + 1), 'aria-label': 'Subir paso ' + (i + 1),
-          onClick: () => { workflow.moveStep(step.id, i - 1); renderStepList(); updatePlan(); }
+          onClick: () => { _pushUndo(); workflow.moveStep(step.id, i - 1); renderStepList(); updatePlan(); _notifyStepChange(); _markDirty(); }
         }, svgIcon('back', 12)));
       }
       if (i < steps.length - 1) {
         row.appendChild(h('button', {
           className: 'ws-btn ws-btn-xs ws-btn-ghost',
           title: 'Bajar paso ' + (i + 1), 'aria-label': 'Bajar paso ' + (i + 1),
-          onClick: () => { workflow.moveStep(step.id, i + 1); renderStepList(); updatePlan(); }
+          onClick: () => { _pushUndo(); workflow.moveStep(step.id, i + 1); renderStepList(); updatePlan(); _notifyStepChange(); _markDirty(); }
         }, svgIcon('redo', 12)));
       }
       row.appendChild(h('button', {
         className: 'ws-btn ws-btn-xs ws-btn-ghost', title: 'Eliminar paso ' + (i + 1),
         'aria-label': 'Eliminar paso ' + (i + 1),
-        onClick: () => { workflow.removeStep(step.id); renderStepList(); updatePlan(); updateExecuteBtn(); }
+        onClick: () => { _pushUndo(); workflow.removeStep(step.id); selectedStepIds.delete(step.id); renderStepList(); updatePlan(); updateExecuteBtn(); _notifyStepChange(); _markDirty(); }
       }, svgIcon('close', 12)));
       stepListEl.appendChild(row);
     }
@@ -667,16 +698,39 @@ export function createWorkflowUI(registry, appHelpers) {
 
     const monitorSection = document.getElementById('wf-monitor-section');
     const resultsSection = document.getElementById('wf-results-section');
+    const historySection = document.getElementById('wf-history-section');
     if (monitorSection) monitorSection.style.display = 'block';
     if (resultsSection) resultsSection.style.display = 'none';
 
+    const startTime = Date.now();
+    const inputCount = Object.keys(inputsForEngine).length;
+    const stepCount = activeSteps.length;
+    const executedNodes = [];
+    const failedNodes = [];
+    const cancelledNodes = [];
+    const errors = [];
+
     engine.subscribe((event) => {
       updateMonitor(event, engine);
-      if (event.type === 'step-error' || event.type === 'error') {
+      if (event.type === 'job-status' && event.status === 'failed') {
         if (execErrorsEl) {
-          execErrorsEl.appendChild(h('div', { style: 'padding:2px 0;font-size:12px' }, event.error || event.message || 'Error desconocido'));
+          const inputName = inputsForEngine[event.inputId]?.name || event.inputId || '';
+          const stepInfo = event.step !== undefined ? ' (paso ' + (event.step + 1) + ')' : '';
+          execErrorsEl.appendChild(h('div', { style: 'padding:2px 0;font-size:12px' },
+            inputName + stepInfo + ': ' + (event.error || 'Error desconocido')));
           execErrorsEl.parentElement.style.display = 'block';
         }
+        const nodeId = event.inputId || '';
+        if (nodeId && !failedNodes.includes(nodeId)) failedNodes.push(nodeId);
+        if (event.error) errors.push({ message: event.error, step: event.step });
+      }
+      if (event.type === 'step-start') {
+        const nodeInfo = (event.inputId || '') + ':' + (event.operationName || '');
+        if (!executedNodes.includes(nodeInfo)) executedNodes.push(nodeInfo);
+      }
+      if (event.type === 'job-status' && event.status === 'cancelled') {
+        const nodeId = event.inputId || '';
+        if (nodeId && !cancelledNodes.includes(nodeId)) cancelledNodes.push(nodeId);
       }
     });
 
@@ -685,18 +739,7 @@ export function createWorkflowUI(registry, appHelpers) {
 
     if (execStateEl) execStateEl.textContent = result.state === 'completed' ? 'Completado' : result.state === 'completed_with_errors' ? 'Completado con errores' : result.state === 'cancelled' ? 'Cancelado' : 'Fallido';
 
-    if (result.failed > 0 && execErrorsEl) {
-      const snap = engine.getSnapshot();
-      const failedJobs = snap?.failed || [];
-      if (Array.isArray(failedJobs)) {
-        for (const fj of failedJobs) {
-          if (fj.error) {
-            execErrorsEl.appendChild(h('div', { style: 'padding:2px 0;font-size:12px' }, fj.error));
-          }
-        }
-      }
-      if (execErrorsEl.children.length > 0) execErrorsEl.parentElement.style.display = 'block';
-    }
+    if (progressBarEl) progressBarEl.style.width = '100%';
 
     currentResults = result.results;
     if (resultsSection && result.results) {
@@ -704,29 +747,69 @@ export function createWorkflowUI(registry, appHelpers) {
       renderResultItems(result.results);
     }
     executeBtn.disabled = false;
+
+    if (_persistence) {
+      const wfId = getWorkflowId();
+      if (wfId) {
+        try {
+          await _persistence.logExecution(wfId, {
+            executionId: engine.getGeneration ? 'gen-' + engine.getGeneration() : undefined,
+            startTime,
+            state: result.state,
+            stepCount,
+            fileCount: inputCount,
+            completed: result.results ? Object.values(result.results).filter(r => r.status === 'completed').length : 0,
+            failed: result.results ? Object.values(result.results).filter(r => r.status === 'failed').length : 0,
+            cancelled: result.results ? Object.values(result.results).filter(r => r.status === 'cancelled').length : 0,
+            executedNodes,
+            failedNodes,
+            cancelledNodes,
+            errors,
+            results: result.results,
+          });
+          if (historySection) { historySection.style.display = 'block'; _loadHistory(); }
+        } catch (_) { /* silent */ }
+      }
+    }
   }
 
   function updateMonitor(event, eng) {
     if (!monitorEl) return;
     const snap = eng.getSnapshot();
-    const parts = [];
-    if (snap.completed > 0) parts.push(snap.completed + ' completados');
-    if (snap.failed > 0) parts.push(snap.failed + ' fallidos');
-    if (snap.cancelled > 0) parts.push(snap.cancelled + ' cancelados');
-    if (event.type === 'step-start') {
-      parts.push('Paso: ' + event.operationName);
+    const total = snap.total || 0;
+    const completed = snap.completed || 0;
+    const failed = snap.failed || 0;
+    const cancelled = snap.cancelled || 0;
+    const pct = total > 0 ? Math.round(((completed + failed + cancelled) / total) * 100) : 0;
+
+    if (progressBarEl) progressBarEl.style.width = pct + '%';
+
+    const textParts = [];
+    textParts.push(completed + '/' + total + ' archivos');
+    if (failed > 0) textParts.push(failed + ' fallidos');
+    if (cancelled > 0) textParts.push(cancelled + ' cancelados');
+    if (event.type === 'step-start' && event.operationName) {
+      textParts.push('Nodo: ' + event.operationName);
     }
     if (event.type === 'progress' && event.percent !== undefined) {
-      parts.push(Math.round(event.percent) + '%');
+      textParts.push(Math.round(event.percent) + '% del paso actual');
     }
-    if (event.type === 'job-status' && event.status === 'failed') {
-      parts.push('Error: ' + (event.error || 'desconocido'));
+    if (event.type === 'message' && event.message) {
+      textParts.push(event.message);
     }
-    monitorEl.replaceChildren();
-    const statusText = parts.length ? parts.join(' - ') : 'Procesando...';
-    monitorEl.appendChild(h('div', { style: 'font-size:12px;padding:4px 0' }, statusText));
+    if (progressTextEl) progressTextEl.textContent = textParts.join(' | ');
 
-    // Cancel button
+    const logParts = [];
+    if (event.type === 'step-start') logParts.push('Paso: ' + event.operationName + ' (' + (event.inputId || '') + ')');
+    if (event.type === 'progress' && event.message) logParts.push(event.message);
+    if (event.type === 'job-status' && event.status === 'completed') logParts.push('Completado: ' + (event.inputId || ''));
+    if (event.type === 'job-status' && event.status === 'failed') logParts.push('Error: ' + (event.error || 'desconocido'));
+
+    monitorEl.replaceChildren();
+    if (logParts.length > 0) {
+      monitorEl.appendChild(h('div', { style: 'font-size:11px;padding:2px 0;color:var(--ws-text-secondary)' }, logParts.join(' - ')));
+    }
+
     const cancelAllBtn = h('button', {
       className: 'ws-btn ws-btn-sm ws-btn-ghost',
       style: 'margin-top:4px',
@@ -875,20 +958,25 @@ export function createWorkflowUI(registry, appHelpers) {
     const resultsSection = document.getElementById('wf-results-section');
     if (resultsSection) resultsSection.style.display = 'none';
     if (execStateEl) execStateEl.textContent = 'Reintentando...';
+    if (progressBarEl) progressBarEl.style.width = '0%';
     engine.retryFailed().then(r => {
       if (resultsSection && r.results) {
         resultsSection.style.display = 'block';
         renderResultItems(r.results);
       }
+      if (progressBarEl) progressBarEl.style.width = '100%';
       if (execStateEl) execStateEl.textContent = r.state === 'completed' ? 'Completado' : 'Fallido';
     });
   }
 
   function clearFlow() {
+    _pushUndo();
     workflow = createWorkflowModel();
     inputs = {};
     inputFiles = [];
     currentResults = null;
+    selectedStepIds.clear();
+    _selectedInspectorStep = null;
     _revokeResultUrls();
     if (engine) { engine.destroy(); engine = null; }
     releaseOcrEngine();
@@ -900,11 +988,15 @@ export function createWorkflowUI(registry, appHelpers) {
     const resultsSection = document.getElementById('wf-results-section');
     if (monitorSection) monitorSection.style.display = 'none';
     if (resultsSection) resultsSection.style.display = 'none';
+    if (progressBarEl) progressBarEl.style.width = '0%';
+    if (progressTextEl) progressTextEl.textContent = '';
     refreshInputDisplay();
     renderStepList();
     updatePlan();
     updateExecuteBtn();
+    renderInspector();
     if (execStateEl) execStateEl.textContent = 'Listo';
+    _markDirty();
   }
 
   function getWorkflowSnapshot() {
@@ -913,11 +1005,16 @@ export function createWorkflowUI(registry, appHelpers) {
 
   function setWorkflowFromSnapshot(snapshot) {
     if (!snapshot) return;
+    _pushUndo();
     workflow = createWorkflowModel();
     workflow.deserializeWorkflow(snapshot);
+    selectedStepIds.clear();
+    _selectedInspectorStep = null;
     renderStepList();
     updatePlan();
     updateExecuteBtn();
+    renderInspector();
+    _notifyStepChange();
   }
 
   function hasWorkflow() {
@@ -934,5 +1031,279 @@ export function createWorkflowUI(registry, appHelpers) {
 
   function getWorkflowName() { return workflow.getName(); }
 
-  return { render, clearFlow, getWorkflowSnapshot, setWorkflowFromSnapshot, hasWorkflow, addFiles, addWorkspaceItems, setAutoExecute, addResultToWorkspace, getModel, setModel, getWorkflowId, setWorkflowName, getWorkflowName };
+  function setOnDirtyChange(fn) { _onDirtyChange = fn; }
+  function setPersistence(p) { _persistence = p; }
+
+  function _pushUndo() {
+    const snap = workflow.serializeWorkflow();
+    undoStack.push(JSON.stringify(snap));
+    if (undoStack.length > MAX_UNDO) undoStack.shift();
+    redoStack = [];
+  }
+
+  function _markDirty() {
+    if (_onDirtyChange) _onDirtyChange();
+  }
+
+  function undo() {
+    if (undoStack.length === 0) return;
+    const current = JSON.stringify(workflow.serializeWorkflow());
+    redoStack.push(current);
+    const prev = JSON.parse(undoStack.pop());
+    workflow = createWorkflowModel();
+    workflow.deserializeWorkflow(prev);
+    renderStepList();
+    updatePlan();
+    updateExecuteBtn();
+    _notifyStepChange();
+  }
+
+  function redo() {
+    if (redoStack.length === 0) return;
+    const current = JSON.stringify(workflow.serializeWorkflow());
+    undoStack.push(current);
+    const next = JSON.parse(redoStack.pop());
+    workflow = createWorkflowModel();
+    workflow.deserializeWorkflow(next);
+    renderStepList();
+    updatePlan();
+    updateExecuteBtn();
+    _notifyStepChange();
+  }
+
+  function _notifyStepChange() {
+    if (_onDirtyChange) _onDirtyChange();
+    renderInspector();
+  }
+
+  function selectStep(stepId, multi) {
+    if (!multi) selectedStepIds.clear();
+    if (selectedStepIds.has(stepId)) selectedStepIds.delete(stepId);
+    else selectedStepIds.add(stepId);
+    _selectedInspectorStep = selectedStepIds.size === 1 ? [...selectedStepIds][0] : null;
+    renderStepList();
+    renderInspector();
+  }
+
+  function clearSelection() {
+    selectedStepIds.clear();
+    _selectedInspectorStep = null;
+    renderStepList();
+    renderInspector();
+  }
+
+  function selectAllSteps() {
+    const steps = workflow.getSteps();
+    for (const s of steps) selectedStepIds.add(s.id);
+    renderStepList();
+  }
+
+  function copySelected() {
+    if (selectedStepIds.size === 0) return;
+    clipboard = [];
+    const steps = workflow.getSteps();
+    for (const s of steps) {
+      if (selectedStepIds.has(s.id)) {
+        clipboard.push({ operationId: s.operationId, options: JSON.parse(JSON.stringify(s.options)), enabled: s.enabled });
+      }
+    }
+    toast(clipboard.length + ' paso(s) copiado(s)', 'info');
+  }
+
+  function pasteSteps() {
+    if (clipboard.length === 0) { toast('Portapapeles vacio', 'info'); return; }
+    _pushUndo();
+    for (const c of clipboard) {
+      workflow.addStep(c.operationId, c.options);
+      if (c.enabled === false) {
+        const allSteps = workflow.getSteps();
+        workflow.disableStep(allSteps[allSteps.length - 1].id);
+      }
+    }
+    renderStepList();
+    updatePlan();
+    updateExecuteBtn();
+    _notifyStepChange();
+    _markDirty();
+    toast(clipboard.length + ' paso(s) pegado(s)', 'success');
+  }
+
+  function duplicateSelected() {
+    if (selectedStepIds.size === 0) return;
+    _pushUndo();
+    const steps = workflow.getSteps();
+    for (const s of steps) {
+      if (selectedStepIds.has(s.id)) {
+        workflow.addStep(s.operationId, s.options);
+        if (s.enabled === false) {
+          const allSteps = workflow.getSteps();
+          workflow.disableStep(allSteps[allSteps.length - 1].id);
+        }
+      }
+    }
+    renderStepList();
+    updatePlan();
+    updateExecuteBtn();
+    _notifyStepChange();
+    _markDirty();
+    toast('Pasos duplicados', 'success');
+  }
+
+  function deleteSelectedSteps() {
+    if (selectedStepIds.size === 0) return;
+    _pushUndo();
+    for (const id of selectedStepIds) workflow.removeStep(id);
+    selectedStepIds.clear();
+    _selectedInspectorStep = null;
+    renderStepList();
+    updatePlan();
+    updateExecuteBtn();
+    _notifyStepChange();
+    _markDirty();
+  }
+
+  function renderInspector() {
+    if (!inspectorEl) return;
+    inspectorEl.replaceChildren();
+    if (!_selectedInspectorStep) {
+      inspectorEl.appendChild(h('div', { style: 'font-size:12px;color:var(--ws-text-tertiary);padding:16px;text-align:center' }, 'Selecciona un paso para ver sus detalles'));
+      return;
+    }
+    const step = workflow.getStep(_selectedInspectorStep);
+    if (!step) { inspectorEl.appendChild(h('div', { style: 'font-size:12px;color:var(--ws-text-tertiary);padding:8px' }, 'Paso no encontrado')); return; }
+    const op = registry.get(step.operationId);
+
+    inspectorEl.appendChild(h('div', { style: 'font-weight:600;font-size:13px;margin-bottom:8px' }, 'Inspector del paso'));
+
+    if (op) {
+      inspectorEl.appendChild(h('div', { style: 'font-size:12px;margin-bottom:4px' }, h('strong', null, 'Nombre: '), op.name));
+      inspectorEl.appendChild(h('div', { style: 'font-size:12px;margin-bottom:4px;color:var(--ws-text-secondary)' }, op.description));
+      inspectorEl.appendChild(h('div', { style: 'font-size:11px;margin-bottom:4px;color:var(--ws-text-tertiary)' },
+        h('strong', null, 'Entrada: '), (op.inputKinds || []).join(', ') || 'cualquiera'));
+      inspectorEl.appendChild(h('div', { style: 'font-size:11px;margin-bottom:4px;color:var(--ws-text-tertiary)' },
+        h('strong', null, 'Salida: '), op.outputKind || 'sin definir'));
+      inspectorEl.appendChild(h('div', { style: 'font-size:11px;margin-bottom:4px;color:var(--ws-text-tertiary)' },
+        h('strong', null, 'Lote: '), op.supportsBatch !== false ? 'si' : 'no',
+        op.batchTerminal ? ' (terminal)' : ''));
+
+      if (op.destructive) {
+        inspectorEl.appendChild(h('div', { style: 'font-size:11px;margin-bottom:4px;color:var(--ws-warning)' }, 'Operacion destructiva'));
+      }
+
+      if (op.optionSchema && Object.keys(op.optionSchema).length > 0) {
+        inspectorEl.appendChild(h('div', { style: 'font-size:11px;font-weight:600;margin-top:8px;margin-bottom:4px' }, 'Parametros:'));
+        for (const [key, schema] of Object.entries(op.optionSchema)) {
+          const val = step.options?.[key] ?? schema.default ?? '';
+          const field = h('div', { style: 'font-size:11px;margin-bottom:4px' });
+          field.appendChild(h('label', { style: 'display:block;font-weight:500;margin-bottom:2px' }, key + (schema.required ? ' *' : '')));
+          if (schema.type === 'select' && schema.options) {
+            const sel = h('select', {
+              style: 'width:100%;padding:2px 4px;border:1px solid var(--ws-border);border-radius:3px;font-size:11px;background:var(--ws-bg);color:var(--ws-text)',
+              onChange: (e) => { _pushUndo(); workflow.updateStep(step.id, { options: { ...step.options, [key]: e.target.value } }); step.options[key] = e.target.value; _markDirty(); _notifyStepChange(); },
+            });
+            for (const opt of schema.options) {
+              const o = h('option', { value: String(opt.value) }, opt.label);
+              if (String(opt.value) === String(val)) o.selected = true;
+              sel.appendChild(o);
+            }
+            field.appendChild(sel);
+          } else if (schema.type === 'range') {
+            const range = h('input', {
+              type: 'range', min: String(schema.min || 0), max: String(schema.max || 100), value: String(val),
+              style: 'width:100%',
+              onInput: (e) => { workflow.updateStep(step.id, { options: { ...step.options, [key]: Number(e.target.value) } }); step.options[key] = Number(e.target.value); _markDirty(); },
+            });
+            field.appendChild(range);
+            field.appendChild(h('span', { style: 'font-size:10px;color:var(--ws-text-tertiary)' }, String(val)));
+          } else if (schema.type === 'checkbox') {
+            const cb = h('input', {
+              type: 'checkbox', checked: val === true || val === 'true' ? '' : undefined,
+              onChange: (e) => { _pushUndo(); workflow.updateStep(step.id, { options: { ...step.options, [key]: e.target.checked } }); step.options[key] = e.target.checked; _markDirty(); _notifyStepChange(); },
+            });
+            field.appendChild(cb);
+          } else {
+            const inp = h('input', {
+              type: schema.type === 'number' ? 'number' : 'text', value: String(val),
+              style: 'width:100%;padding:2px 4px;border:1px solid var(--ws-border);border-radius:3px;font-size:11px;background:var(--ws-bg);color:var(--ws-text)',
+              onChange: (e) => { _pushUndo(); const v = schema.type === 'number' ? Number(e.target.value) : e.target.value; workflow.updateStep(step.id, { options: { ...step.options, [key]: v } }); step.options[key] = v; _markDirty(); _notifyStepChange(); },
+            });
+            field.appendChild(inp);
+          }
+          if (schema.min !== undefined || schema.max !== undefined) {
+            const hint = [];
+            if (schema.min !== undefined) hint.push('min: ' + schema.min);
+            if (schema.max !== undefined) hint.push('max: ' + schema.max);
+            field.appendChild(h('div', { style: 'font-size:9px;color:var(--ws-text-tertiary)' }, hint.join(', ')));
+          }
+          inspectorEl.appendChild(field);
+        }
+      }
+    } else {
+      inspectorEl.appendChild(h('div', { style: 'font-size:12px;color:var(--ws-error)' }, 'Operacion no disponible: ' + step.operationId));
+    }
+  }
+
+  function renderHistoryPanel(parent) {
+    const section = h('div', { style: 'border:1px solid var(--ws-border);border-radius:8px;padding:12px;display:none' });
+    section.id = 'wf-history-section';
+    section.appendChild(h('div', { style: 'font-weight:600;font-size:13px;margin-bottom:8px' }, 'Historial de ejecuciones'));
+    historyEl = h('div', { style: 'font-size:12px;max-height:200px;overflow-y:auto' });
+    section.appendChild(historyEl);
+    parent.appendChild(section);
+  }
+
+  function renderInspectorPanel(parent) {
+    const section = h('div', { style: 'border:1px solid var(--ws-border);border-radius:8px;padding:12px' });
+    inspectorEl = h('div', { style: 'font-size:12px' });
+    inspectorEl.appendChild(h('div', { style: 'font-size:12px;color:var(--ws-text-tertiary);padding:16px;text-align:center' }, 'Selecciona un paso para ver sus detalles'));
+    section.appendChild(inspectorEl);
+    parent.appendChild(section);
+  }
+
+  async function _loadHistory() {
+    if (!_persistence || !historyEl) return;
+    const wfId = getWorkflowId();
+    if (!wfId) return;
+    try {
+      const history = await _persistence.getExecutionHistory(wfId);
+      historyEl.replaceChildren();
+      if (history.length === 0) {
+        historyEl.appendChild(h('div', { style: 'color:var(--ws-text-tertiary);padding:8px;text-align:center' }, 'Sin ejecuciones previas'));
+        return;
+      }
+      for (let i = history.length - 1; i >= Math.max(0, history.length - 10); i--) {
+        const entry = history[i];
+        const row = h('div', { style: 'display:flex;align-items:center;gap:6px;padding:4px;border-bottom:1px solid var(--ws-border);font-size:11px' });
+        const statusColor = entry.success ? 'var(--ws-success)' : entry.status === 'cancelled' ? 'var(--ws-warning)' : 'var(--ws-error)';
+        row.appendChild(h('span', { style: 'color:' + statusColor + ';font-weight:600' }, entry.success ? 'OK' : entry.status === 'cancelled' ? 'CANCEL' : 'FAIL'));
+        row.appendChild(h('span', { style: 'flex:1' }, entry.completed + '/' + entry.fileCount + ' archivos'));
+        row.appendChild(h('span', { style: 'color:var(--ws-text-tertiary)' }, entry.duration ? (entry.duration / 1000).toFixed(1) + 's' : ''));
+        row.appendChild(h('span', { style: 'color:var(--ws-text-tertiary)' }, new Date(entry.completedAt).toLocaleTimeString('es-ES')));
+        historyEl.appendChild(row);
+      }
+    } catch (_) { /* silent */ }
+  }
+
+  function _overrideAddOperation(opId) {
+    const op = registry.get(opId);
+    if (!op) { toast('Operacion no disponible', 'warning'); return; }
+    _pushUndo();
+    const step = workflow.addStep(opId, defaultOptions(op));
+    renderStepList();
+    updatePlan();
+    updateExecuteBtn();
+    _notifyStepChange();
+    _markDirty();
+    toast('Anadido: ' + op.name, 'success');
+  }
+
+  return {
+    render, clearFlow, getWorkflowSnapshot, setWorkflowFromSnapshot, hasWorkflow,
+    addFiles, addWorkspaceItems, setAutoExecute, addResultToWorkspace,
+    getModel, setModel, getWorkflowId, setWorkflowName, getWorkflowName,
+    setOnDirtyChange, setPersistence,
+    undo, redo, copySelected, pasteSteps, duplicateSelected, deleteSelectedSteps,
+    selectStep, clearSelection, selectAllSteps,
+    _overrideAddOperation,
+  };
 }

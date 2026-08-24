@@ -80,6 +80,12 @@ export function createWorkflowValidator(registry) {
             if (schema.enum && !schema.enum.includes(val)) {
               errors.push('Step ' + (i + 1) + ' ("' + op.name + '"): option "' + key + '" value "' + val + '" is not in allowed values: ' + schema.enum.join(', '));
             }
+            if (schema.type === 'select' && Array.isArray(schema.options)) {
+              const allowed = schema.options.map(o => o.value);
+              if (!allowed.includes(val)) {
+                errors.push('Step ' + (i + 1) + ' ("' + op.name + '"): option "' + key + '" value "' + val + '" is not in allowed values: ' + allowed.join(', '));
+              }
+            }
             if (schema.min !== undefined && Number(val) < schema.min) {
               errors.push('Step ' + (i + 1) + ' ("' + op.name + '"): option "' + key + '" must be >= ' + schema.min);
             }

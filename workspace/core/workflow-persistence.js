@@ -142,22 +142,31 @@ export function createWorkflowPersistence(storage, appStore) {
     const projectId = record.projectId || _currentProjectId();
     if (!projectId) return null;
     const history = record.executionHistory || [];
-    history.push({
-      id: 'exec-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6),
+    const entry = {
+      id: result?.executionId || 'exec-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6),
       workflowId,
+      startTime: result?.startTime || Date.now(),
       completedAt: Date.now(),
-      totalSteps: result?.total || 0,
+      duration: result?.startTime ? Date.now() - result.startTime : 0,
+      status: result?.state || (result?.failed > 0 ? 'completed_with_errors' : 'completed'),
+      totalSteps: result?.stepCount || result?.total || 0,
+      fileCount: result?.fileCount || 0,
       completed: result?.completed || 0,
       failed: result?.failed || 0,
       cancelled: result?.cancelled || 0,
       success: result?.failed === 0 && result?.cancelled === 0,
+      executedNodes: result?.executedNodes || [],
+      failedNodes: result?.failedNodes || [],
+      cancelledNodes: result?.cancelledNodes || [],
+      errors: (result?.errors || []).map(e => ({ message: String(e.message || e).slice(0, 200), step: e.step })),
       resultSummary: result?.results ? Object.keys(result.results).length + ' outputs' : '',
-    });
+    };
+    history.push(entry);
     if (history.length > 100) history.splice(0, history.length - 100);
     record.executionHistory = history;
     record.updatedAt = Date.now();
     await storage.saveWorkflow(projectId, record);
-    return history[history.length - 1];
+    return entry;
   }
 
   async function getExecutionHistory(workflowId) {

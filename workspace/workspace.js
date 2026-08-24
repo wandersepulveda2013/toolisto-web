@@ -1081,6 +1081,10 @@ async function initApp() {
 }
 
 function renderView(view) {
+  if (window._workflowKeyHandler && view !== 'flujos') {
+    document.removeEventListener('keydown', window._workflowKeyHandler);
+    window._workflowKeyHandler = null;
+  }
   const main = $('#ws-main-content');
   main.replaceChildren();
   const project = appStore.get('currentProject');
@@ -7252,7 +7256,16 @@ function renderWorkflowView(container) {
     style: 'flex:0 0 200px;padding:4px 8px;border:1px solid var(--ws-border);border-radius:4px;font-size:12px;background:var(--ws-bg);color:var(--ws-text)',
     'aria-label': 'Nombre del flujo',
   });
-  nameInput.addEventListener('change', () => { workflowUI.setWorkflowName(nameInput.value.trim() || 'Sin nombre'); });
+  nameInput.addEventListener('change', async () => {
+    const newName = nameInput.value.trim() || 'Sin nombre';
+    workflowUI.setWorkflowName(newName);
+    if (persistence) {
+      const currentId = appStore.get('currentWorkflowId');
+      if (currentId) {
+        try { await persistence.rename(currentId, newName); } catch (_) { /* silent */ }
+      }
+    }
+  });
   toolbar.appendChild(nameInput);
 
   const saveBtn = h('button', {
@@ -7461,25 +7474,67 @@ function renderWorkflowView(container) {
 
   let _autoSaveTimer = null;
   function scheduleAutoSave() {
+    if (!persistence) return;
+    const currentId = appStore.get('currentWorkflowId');
+    if (!currentId) return;
     if (_autoSaveTimer) clearTimeout(_autoSaveTimer);
     _autoSaveTimer = setTimeout(async () => {
       if (!persistence) return;
-      const currentId = appStore.get('currentWorkflowId');
-      if (!currentId) return;
+      const cid = appStore.get('currentWorkflowId');
+      if (!cid) return;
       try {
         const model = workflowUI.getModel();
-        await persistence.updateDefinition(currentId, model);
-      } catch (e) { /* auto-save silent */ }
+        await persistence.updateDefinition(cid, model);
+        saveStatus.textContent = 'Guardado automatico';
+        setTimeout(() => { if (saveStatus.textContent === 'Guardado automatico') saveStatus.textContent = ''; }, 2000);
+      } catch (e) { saveStatus.textContent = 'Error al guardar'; }
     }, 3000);
   }
 
-  const _workflowKeyHandler = (e) => {
+  workflowUI.setOnDirtyChange(() => {
+    const currentId = appStore.get('currentWorkflowId');
+    if (currentId) scheduleAutoSave();
+  });
+
+  workflowUI.setPersistence(persistence);
+
+  if (window._workflowKeyHandler) {
+    document.removeEventListener('keydown', window._workflowKeyHandler);
+  }
+  window._workflowKeyHandler = (e) => {
+    const tag = (e.target?.tagName || '').toUpperCase();
+    const isInput = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || e.target?.isContentEditable;
     if ((e.ctrlKey || e.metaKey) && e.key === 's') {
       e.preventDefault();
       saveBtn.click();
     }
+    if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
+      if (!isInput) { e.preventDefault(); workflowUI.undo(); }
+    }
+    if (((e.ctrlKey || e.metaKey) && e.key === 'z' && e.shiftKey) || ((e.ctrlKey || e.metaKey) && e.key === 'y')) {
+      if (!isInput) { e.preventDefault(); workflowUI.redo(); }
+    }
+    if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
+      if (!isInput) { e.preventDefault(); workflowUI.copySelected(); }
+    }
+    if ((e.ctrlKey || e.metaKey) && e.key === 'v') {
+      if (!isInput) { e.preventDefault(); workflowUI.pasteSteps(); }
+    }
+    if ((e.ctrlKey || e.metaKey) && e.key === 'd') {
+      if (!isInput) { e.preventDefault(); workflowUI.duplicateSelected(); }
+    }
+    if ((e.ctrlKey || e.metaKey) && e.key === 'a') {
+      if (!isInput) { e.preventDefault(); workflowUI.selectAllSteps(); }
+    }
+    if (e.key === 'Escape') {
+      workflowUI.clearSelection();
+    }
+    if ((e.key === 'Delete' || e.key === 'Backspace') && !isInput) {
+      e.preventDefault();
+      workflowUI.deleteSelectedSteps();
+    }
   };
-  document.addEventListener('keydown', _workflowKeyHandler);
+  document.addEventListener('keydown', window._workflowKeyHandler);
 
   const pendingInputs = appStore.get('pendingWorkflowInputs');
   if (Array.isArray(pendingInputs) && pendingInputs.length > 0) {
