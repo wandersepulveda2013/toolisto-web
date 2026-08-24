@@ -85,6 +85,7 @@ run('dist-workspace-smoke (validación del artefacto desplegado)', 'node', ['tes
   env: { ...process.env, E2E_PORT: '8082' },
 });
 run('autosave-lock (serialization lock, CE-057)', 'node', ['tests/workspace/autosave-lock-test.mjs']);
+run('cross-entity-integrity (per-entity locks, _writeSeq, flush, CE-058)', 'node', ['tests/workspace/cross-entity-integrity-test.mjs']);
 
 // 4. Manifest de evidencia
 const evidence = {

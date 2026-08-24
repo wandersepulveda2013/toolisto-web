@@ -286,17 +286,18 @@ async function saveCurrentWorkspaceItem() {
   const view = appStore.get('currentView');
   if (!project) return;
   if (view === 'doc-editor' && appStore.get('currentDoc')) {
+    const doc = appStore.get('currentDoc');
     clearTimeout(autoSaveDoc._timer);
     await new Promise((resolve, reject) => {
-      _docSaveLock.enqueue(() => saveDoc(project.id, appStore.get('currentDoc')).then(resolve, reject));
+      _docLocks.getLock(doc.id).enqueue(() => saveDoc(project.id, doc).then(resolve, reject));
     });
     appStore.set({ isDirty: false, lastSaved: Date.now() });
     toast('Documento guardado', 'success');
   } else if (view === 'data-table' && appStore.get('currentDataTable')) {
-    clearTimeout(autoSaveTable._timer);
     const table = appStore.get('currentDataTable');
+    clearTimeout(autoSaveTable._timer);
     await new Promise((resolve, reject) => {
-      _tableSaveLock.enqueue(() => saveData(project.id, table).then(resolve, reject));
+      _tableLocks.getLock(table.id).enqueue(() => saveData(project.id, table).then(resolve, reject));
     });
     await syncDerivedCharts(project, table);
     appStore.set({ isDirty: false, lastSaved: Date.now() });
@@ -794,8 +795,21 @@ function _createSaveLock() {
   return { enqueue, cancel };
 }
 
-const _docSaveLock = _createSaveLock();
-const _tableSaveLock = _createSaveLock();
+function _createEntityLockMap() {
+  const _locks = new Map();
+  return {
+    getLock(entityId) {
+      let lock = _locks.get(entityId);
+      if (!lock) { lock = _createSaveLock(); _locks.set(entityId, lock); }
+      return lock;
+    },
+    cancelAll() { for (const lock of _locks.values()) lock.cancel(); },
+    cancel(entityId) { const lock = _locks.get(entityId); if (lock) lock.cancel(); },
+  };
+}
+
+const _docLocks = _createEntityLockMap();
+const _tableLocks = _createEntityLockMap();
 
 function _captureWorkspaceState() {
   const s = appStore.get();
@@ -824,20 +838,20 @@ function _setupAutosave() {
       const doc = appStore.get('currentDoc');
       const table = appStore.get('currentDataTable');
       if (!project) return;
-      if (doc && appStore.get('isDirty')) {
+      if (doc && doc.id && appStore.get('isDirty')) {
         const snapshot = JSON.stringify(doc.blocks);
         if (snapshot !== _lastAutosaveSnapshot) {
           const snap = snapshot;
-          _docSaveLock.enqueue(() => saveDoc(project.id, doc)
+          _docLocks.getLock(doc.id).enqueue(() => saveDoc(project.id, doc)
             .then(() => { _lastAutosaveSnapshot = snap; _appHistory.push(_captureWorkspaceState(), { action: 'doc-edit' }); })
             .catch(error => reportError(error, 'autosave-doc', {})));
         }
       }
-      if (table && appStore.get('isDirty')) {
+      if (table && table.id && appStore.get('isDirty')) {
         const snapshot = JSON.stringify({ headers: table.headers, rows: table.rows, sheets: table.sheets });
         if (snapshot !== _lastAutosaveTableSnapshot) {
           const snap = snapshot;
-          _tableSaveLock.enqueue(() => saveData(project.id, table)
+          _tableLocks.getLock(table.id).enqueue(() => saveData(project.id, table)
             .then(() => syncDerivedCharts(project, table))
             .then(() => { _lastAutosaveTableSnapshot = snap; _appHistory.push(_captureWorkspaceState(), { action: 'table-edit' }); })
             .catch(error => reportError(error, 'autosave-table', {})));
@@ -862,15 +876,15 @@ async function _flushAndSaveSession() {
     const dirty = appStore.get('isDirty');
     clearTimeout(autoSaveDoc._timer);
     clearTimeout(autoSaveTable._timer);
-    if (project && doc && dirty) {
+    if (project && doc && doc.id && dirty) {
       await new Promise((resolve, reject) => {
-        _docSaveLock.enqueue(() => saveDoc(project.id, doc).then(resolve, reject));
+        _docLocks.getLock(doc.id).enqueue(() => saveDoc(project.id, doc).then(resolve, reject));
       });
       _appHistory.push(_captureWorkspaceState(), { action: 'doc-edit' });
     }
-    if (project && table && dirty) {
+    if (project && table && table.id && dirty) {
       await new Promise((resolve, reject) => {
-        _tableSaveLock.enqueue(() => saveData(project.id, table).then(resolve, reject));
+        _tableLocks.getLock(table.id).enqueue(() => saveData(project.id, table).then(resolve, reject));
       });
       await syncDerivedCharts(project, table);
       _appHistory.push(_captureWorkspaceState(), { action: 'table-edit' });
@@ -1129,8 +1143,33 @@ async function initApp() {
   renderView('projects');
 }
 
+function _flushDirtyEntity() {
+  const project = appStore.get('currentProject');
+  const view = appStore.get('currentView');
+  if (!project || !appStore.get('isDirty')) return;
+  if (view === 'doc-editor') {
+    const doc = appStore.get('currentDoc');
+    if (doc && doc.id) {
+      clearTimeout(autoSaveDoc._timer);
+      _docLocks.getLock(doc.id).enqueue(() => saveDoc(project.id, doc)
+        .then(() => { _lastAutosaveSnapshot = JSON.stringify(doc.blocks); appStore.set({ isDirty: false, lastSaved: Date.now() }); })
+        .catch(error => reportError(error, 'flush-doc', {})));
+    }
+  } else if (view === 'data-table') {
+    const table = appStore.get('currentDataTable');
+    if (table && table.id) {
+      clearTimeout(autoSaveTable._timer);
+      _tableLocks.getLock(table.id).enqueue(() => saveData(project.id, table)
+        .then(() => syncDerivedCharts(project, table))
+        .then(() => { _lastAutosaveTableSnapshot = JSON.stringify({ headers: table.headers, rows: table.rows, sheets: table.sheets }); appStore.set({ isDirty: false, lastSaved: Date.now() }); })
+        .catch(error => reportError(error, 'flush-table', {})));
+    }
+  }
+}
+
 function renderView(view) {
   _viewGeneration++;
+  _flushDirtyEntity();
   clearTimeout(autoSaveDoc._timer);
   clearTimeout(autoSaveTable._timer);
   if (window._workflowKeyHandler && view !== 'flujos') {
@@ -3860,11 +3899,11 @@ function showBlockMenu(anchor, doc, renderBlocks) {
 
 function autoSaveDoc(doc) {
   const project = appStore.get('currentProject');
-  if (!project) return;
+  if (!project || !doc || !doc.id) return;
   appStore.set({ isDirty: true });
   clearTimeout(autoSaveDoc._timer);
   autoSaveDoc._timer = setTimeout(() => {
-    _docSaveLock.enqueue(() => saveDoc(project.id, doc)
+    _docLocks.getLock(doc.id).enqueue(() => saveDoc(project.id, doc)
       .then(() => appStore.set({ isDirty: false, lastSaved: Date.now() }))
       .catch(error => reportError(error, 'document-save', {})));
   }, 1000);
@@ -5278,10 +5317,10 @@ function addRow(table, renderFn, container) {
 
 function autoSaveTable(table) {
   const project = appStore.get('currentProject');
-  if (!project) return;
+  if (!project || !table || !table.id) return;
   clearTimeout(autoSaveTable._timer);
   autoSaveTable._timer = setTimeout(() => {
-    _tableSaveLock.enqueue(() => saveData(project.id, table)
+    _tableLocks.getLock(table.id).enqueue(() => saveData(project.id, table)
       .then(() => syncDerivedCharts(project, table))
       .then(() => appStore.set({ isDirty: false, lastSaved: Date.now() }))
       .catch(error => reportError(error, 'table-save', {})));

@@ -115,6 +115,11 @@ async function saveDoc(projectId, doc) {
   if (!doc.createdAt) doc.createdAt = doc.updatedAt;
   if (!doc._version) doc._version = MODEL_VERSION;
   doc = migrateObject(doc);
+  const existing = await dbGet(STORES.documents, doc.id);
+  if (existing && existing._writeSeq != null && existing._writeSeq > (doc._writeSeq || 0)) {
+    return existing;
+  }
+  doc._writeSeq = (existing?._writeSeq || 0) + 1;
   await dbPut(STORES.documents, doc);
   appStore.set({ isDirty: false, lastSaved: Date.now() });
   emit('doc:saved', doc);
@@ -178,6 +183,11 @@ async function saveData(projectId, table) {
   if (!table.createdAt) table.createdAt = table.updatedAt;
   if (!table._version) table._version = MODEL_VERSION;
   table = migrateObject(table);
+  const existing = await dbGet(STORES.data, table.id);
+  if (existing && existing._writeSeq != null && existing._writeSeq > (table._writeSeq || 0)) {
+    return existing;
+  }
+  table._writeSeq = (existing?._writeSeq || 0) + 1;
   await dbPut(STORES.data, table);
   emit('data:saved', table);
   return table;
