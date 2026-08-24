@@ -173,7 +173,7 @@ async function main() {
 
     // ─── 6. Añadir OCR real y ejecutar ──────────────────────────
     console.log('\n--- 6. OCR real sobre la captura ---');
-    await page.getByRole('button', { name: /Anadir operacion/ }).click();
+    await page.getByRole('button', { name: /A[nñ]adir operaci[oó]n/ }).click();
     await page.locator('#wf-op-results').getByText('Extraer texto (OCR)', { exact: true }).click();
     await page.getByRole('button', { name: /Ejecutar flujo/ }).click();
     await page.waitForSelector('#wf-results-section', { state: 'visible', timeout: 120000 });

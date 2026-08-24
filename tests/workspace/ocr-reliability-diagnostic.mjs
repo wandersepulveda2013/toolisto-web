@@ -304,7 +304,7 @@ async function runWorkflowOcr(page, runIndex) {
     await page.waitForSelector('#wf-file-input', { state: 'attached', timeout: 10000 });
     await page.waitForTimeout(500);
 
-    await page.getByRole('button', { name: /Anadir operacion/ }).click();
+    await page.getByRole('button', { name: /Añadir operación/ }).click();
     await page.locator('#wf-op-results').getByText('Extraer texto (OCR)', { exact: true }).click();
     await page.getByRole('button', { name: /Ejecutar flujo/ }).click();
     await page.waitForSelector('#wf-results-section', { state: 'visible', timeout: 130000 });

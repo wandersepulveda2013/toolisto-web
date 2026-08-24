@@ -7,6 +7,7 @@ import vm from 'node:vm';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..', '..');
 
+const schemaCode = readFileSync(join(ROOT, 'workspace', 'core', 'schema-versions.js'), 'utf8');
 const regCode = readFileSync(join(ROOT, 'workspace', 'core', 'operation-registry.js'), 'utf8');
 const modelCode = readFileSync(join(ROOT, 'workspace', 'core', 'workflow-model.js'), 'utf8');
 const valCode = readFileSync(join(ROOT, 'workspace', 'core', 'workflow-validator.js'), 'utf8');
@@ -20,6 +21,7 @@ function stripImports(code) {
 }
 
 const combined = [
+  stripImports(schemaCode),
   stripImports(regCode),
   stripImports(modelCode),
   stripImports(valCode),
@@ -544,8 +546,8 @@ async function testAddTextResultPersists() {
   ui.addFiles([{ name: 'foto.png', size: 100, type: 'image/png' }]);
 
   // Open the operation selector.
-  const addBtn = findByText(container, 'Anadir operacion');
-  check('41. "Anadir operacion" button exists', !!addBtn);
+  const addBtn = findByText(container, 'Añadir operación');
+  check('41. "Añadir operación" button exists', !!addBtn);
   if (addBtn) addBtn.click();
 
   const opRows = [];
@@ -564,7 +566,7 @@ async function testAddTextResultPersists() {
   }
 
   // Category filter buttons track the active category with aria-pressed.
-  const CAT_LABELS = ['Todas', 'Imagen', 'Texto', 'Informe', 'Grafico', 'PDF', 'Salida'];
+  const CAT_LABELS = ['Todas', 'Imagen', 'Texto', 'Informe', 'Gráfico', 'PDF', 'Salida'];
   const catButtons = [];
   walk(container, (el) => {
     if (el.attrs && el.attrs['aria-pressed'] !== undefined) {

@@ -82,7 +82,7 @@ try {
   ok('load.3', 'Flujos view accessible with a chained workspace document');
 
   // 2. Operation picker rows keyboard contract.
-  await page.getByRole('button', { name: /Anadir operacion/ }).click();
+  await page.getByRole('button', { name: /Añadir operación/ }).click();
   await page.waitForSelector('#wf-op-results [role="button"]', { timeout: 10000 });
   const opRowCount = await page.locator('#wf-op-results [role="button"]').count();
   if (opRowCount > 0) ok('op.1', `operation picker renders ${opRowCount} role=button rows`);
@@ -108,7 +108,7 @@ try {
 
   // Space activation works too after cleaning the flow.
   await page.getByRole('button', { name: 'Limpiar', exact: true }).last().click().catch(() => {});
-  await page.getByRole('button', { name: /Anadir operacion/ }).click();
+  await page.getByRole('button', { name: /Añadir operación/ }).click();
   await page.locator('#wf-op-results [role="button"]').first().focus();
   await page.keyboard.press('Space');
   await page.waitForTimeout(300);

@@ -110,7 +110,7 @@ try {
        ok('1.5', 'Dos imágenes reales se cargan en el flujo');
 
       for (const operation of ['Mejorar imagen', 'Comprimir imagen', 'Convertir formato de imagen', 'Empaquetar resultados en ZIP']) {
-        await page.getByRole('button', { name: /Anadir operacion/ }).click();
+        await page.getByRole('button', { name: /Añadir operación/ }).click();
         await page.locator('#wf-op-results').getByText(operation, { exact: true }).click();
       }
        ok('1.6', 'La cadena mejorar, comprimir, convertir y ZIP se configura');
