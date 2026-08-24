@@ -3,7 +3,27 @@
 > Cada ciclo de OpenCode LEE este archivo antes de actuar y lo ACTUALIZA antes de terminar.
 > Registro historico de ciclos de la mision Evolucion Continua.
 > Modo activo SOLO despues de la transicion (cuando `workspace/PRODUCTION_READINESS_DONE` exista).
-> Updated: 2026-08-14
+> Updated: 2026-08-24
+
+---
+
+## Cycle 116 — Execution lifecycle hardening + workspace lifecycle fixes (CE-051→CE-056)
+
+| Field | Value |
+|-------|-------|
+| **Date** | 2026-08-24 |
+| **Branch** | main |
+| **HEAD inicial** | cc9ea94 (FASE 3 closed) → prior commits: 935192e, 3c08c74, 02750fa (baseline test fixes) |
+| **HEAD final** | e850711 |
+| **Task** | CE-051→CE-056 (P1/P2 execution lifecycle + workspace lifecycle hardening) |
+| **Hypothesis** | executeFlow lacks try/catch (UI stuck on error), retryFailed lacks reentrancy guard, engine getSnapshot().total uses settled count instead of planned total, cancelled state unreachable from early return, PDF/file results missing Download/Workspace buttons, monitor recreates cancel button on each event; workspace.js has stale async re-render into detached containers, workflow auto-save timer leak, IO leak in capture cards, detached <a> in export. |
+| **Change** | workflow-ui.js: try/catch/finally in executeFlow + generation guard + cleanupBtn disable during run + clear errors/progress at start; retryFailed reentrancy + catch + stale-generation; updateMonitor accepts plannedTotal; PDF/file Download button fixed (optional chaining); file-kind Add-to-Workspace enabled; monitor appends entries (cap 50) + persistent Cancel button. workflow-engine.js: runTotal tracked for getSnapshot; cancelled state set on generation mismatch; retryFailed guards (reentrancy, state check, _onTerminated records cancelled). workspace.js: _viewGeneration counter incremented in renderView; renderDocumentsView/renderDataView async re-render checks generation; workflow auto-save timer promoted to module scope and cleared on view change; IO in capture cards checks generation; export <a> appended to DOM before click. Baseline test fixes: accented text in workflow-ui-test, capture-flow-chain, builder-a11y, e2e-test, ocr-diagnostic; locale-parser VM import in document-pdf-test and tabular-text-parser-test. |
+| **Tests ejecutados** | Workflow UI 65/65; Document→PDF 66/66; Tabular-parser 7/7; Capture-flow-chain 12/12; Engine 18/18; Release gate 14/14 PASS; all test-workspace-release sub-suites PASS. |
+| **Tests PASS** | 14/14 release gate suites PASS, 0 FAIL. Total ~712 tests passing. |
+| **Tests FAIL** | 0 |
+| **Commits** | 935192e (baseline accent fixes), 3c08c74 (locale-parser VM import for doc-pdf-test), 02750fa (locale-parser for tabular-text-parser), 7243091 (CE-051→055 engine+UI lifecycle), e850711 (CE-056 workspace lifecycle). |
+| **Bloqueos** | Ninguno. |
+| **Proxima prioridad** | Continue CE-057+ audit of remaining core modules (instruction-planner, scanner-ui, etc.); workspace.js audit found issues fixed; CE-011 DISCOVERED gate; promote new opportunities from audit findings. |
 
 ---
 
