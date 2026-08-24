@@ -751,6 +751,8 @@ let _autosaveTimer = null;
 let _lastAutosaveSnapshot = '';
 let _lastAutosaveTableSnapshot = '';
 let _quotaWarned = false;
+let _viewGeneration = 0;
+let _workflowAutoSaveTimer = null;
 
 function _captureWorkspaceState() {
   const s = appStore.get();
@@ -1081,9 +1083,14 @@ async function initApp() {
 }
 
 function renderView(view) {
+  _viewGeneration++;
   if (window._workflowKeyHandler && view !== 'flujos') {
     document.removeEventListener('keydown', window._workflowKeyHandler);
     window._workflowKeyHandler = null;
+  }
+  if (view !== 'flujos' && _workflowAutoSaveTimer) {
+    clearTimeout(_workflowAutoSaveTimer);
+    _workflowAutoSaveTimer = null;
   }
   const main = $('#ws-main-content');
   main.replaceChildren();
@@ -1216,7 +1223,9 @@ async function exportProjectData() {
     const blob = new Blob([JSON.stringify(bundle, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = h('a', { href: url, download: project.name.replace(/[\\/:*?"<>|]/g, '-') + '.toolisto' });
+    document.body.appendChild(a);
     a.click();
+    document.body.removeChild(a);
     URL.revokeObjectURL(url);
     await registerExecution(project.id, 'project-export', 'Exportar proyecto', {
       parameters: { docCount: (bundle.documents || []).length, tableCount: (bundle.dataTables || []).length },
@@ -1890,7 +1899,9 @@ function renderCaptureView(container, project) {
         }).catch(error => reportError(error, 'capture-preview', { captureId: cap.id }));
       };
       if (typeof IntersectionObserver === 'function') {
+        const viewGen = _viewGeneration;
         const io = new IntersectionObserver((entries, observer) => {
+          if (viewGen !== _viewGeneration) { observer.disconnect(); return; }
           if (entries.some(entry => entry.isIntersecting)) {
             observer.disconnect();
             loadThumb();
@@ -2979,7 +2990,9 @@ function renderDocumentsView(container, project) {
     el.appendChild(grid);
   }
   container.appendChild(el);
+  const viewGeneration = _viewGeneration;
   loadDocs(project.id).then(d => {
+    if (viewGeneration !== _viewGeneration) return;
     appStore.set({ documents: d });
     if (docs.length !== d.length) {
       container.replaceChildren();
@@ -4091,7 +4104,9 @@ async function renderDataView(container, project) {
     el.appendChild(grid);
   }
   container.appendChild(el);
+  const viewGeneration = _viewGeneration;
   loadData(project.id).then(t => {
+    if (viewGeneration !== _viewGeneration) return;
     appStore.set({ dataTables: t });
     if (tables.length !== t.length) {
       container.replaceChildren();
@@ -7472,13 +7487,14 @@ function renderWorkflowView(container) {
 
   refreshWorkflowList();
 
-  let _autoSaveTimer = null;
+  let _autoSaveTimer = _workflowAutoSaveTimer;
   function scheduleAutoSave() {
     if (!persistence) return;
     const currentId = appStore.get('currentWorkflowId');
     if (!currentId) return;
     if (_autoSaveTimer) clearTimeout(_autoSaveTimer);
     _autoSaveTimer = setTimeout(async () => {
+      _workflowAutoSaveTimer = null;
       if (!persistence) return;
       const cid = appStore.get('currentWorkflowId');
       if (!cid) return;
@@ -7489,6 +7505,7 @@ function renderWorkflowView(container) {
         setTimeout(() => { if (saveStatus.textContent === 'Guardado automatico') saveStatus.textContent = ''; }, 2000);
       } catch (e) { saveStatus.textContent = 'Error al guardar'; }
     }, 3000);
+    _workflowAutoSaveTimer = _autoSaveTimer;
   }
 
   workflowUI.setOnDirtyChange(() => {
