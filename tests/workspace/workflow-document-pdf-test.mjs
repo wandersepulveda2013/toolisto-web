@@ -10,8 +10,9 @@ const ROOT = join(__dirname, '..', '..');
 const regCode = readFileSync(join(ROOT, 'workspace', 'core', 'operation-registry.js'), 'utf8');
 const pdfCode = readFileSync(join(ROOT, 'workspace', 'core', 'pdf-generator.js'), 'utf8');
 const pdfImagesCode = readFileSync(join(ROOT, 'workspace', 'core', 'pdf-images.js'), 'utf8');
-const opsCode = readFileSync(join(ROOT, 'workspace', 'core', 'workflow-operations.js'), 'utf8');
+const localeParserCode = readFileSync(join(ROOT, 'workspace', 'core', 'locale-parser.js'), 'utf8');
 const parserCode = readFileSync(join(ROOT, 'workspace', 'core', 'tabular-text-parser.js'), 'utf8');
+const opsCode = readFileSync(join(ROOT, 'workspace', 'core', 'workflow-operations.js'), 'utf8');
 
 function stripImports(code) {
   return code.replace(/^import\s.*;?\s*$/gm, '').replace(/^export\s+/gm, '');
@@ -21,6 +22,7 @@ const combined = [
   stripImports(regCode),
   stripImports(pdfCode),
   stripImports(pdfImagesCode),
+  stripImports(localeParserCode),
   stripImports(parserCode),
   stripImports(opsCode),
 ].join('\n');
