@@ -15,6 +15,7 @@ export function createWorkflowEngine(registry, options = {}) {
   let generation = 0;
   let cancelled = false;
   let currentResources = null;
+  let runTotal = 0;
   const cancelledInputs = new Set();
 
   function _notify(event) {
@@ -74,6 +75,7 @@ export function createWorkflowEngine(registry, options = {}) {
     const processingSteps = batchTerminalStep ? steps.slice(0, -1) : steps;
 
     const totalJobs = inputIds.length;
+    runTotal = totalJobs;
     let completedCount = 0;
     let failedCount = 0;
     let cancelledCount = 0;
@@ -194,7 +196,10 @@ export function createWorkflowEngine(registry, options = {}) {
 
     await Promise.all(jobPromises);
 
-    if (runGeneration !== generation) return { success: false, state: 'cancelled', results: copyResults(), validation };
+    if (runGeneration !== generation) {
+      state = 'cancelled';
+      return { success: false, state: 'cancelled', results: copyResults() };
+    }
 
     if (!cancelled && batchTerminalStep) {
       const completedItems = Object.values(results)
@@ -270,6 +275,9 @@ export function createWorkflowEngine(registry, options = {}) {
   }
 
   async function retryFailed() {
+    if (state === 'running' || state === 'queued' || state === 'cancelling') {
+      return Promise.resolve({ success: false, state, results: copyResults() });
+    }
     const failedIds = Object.entries(results)
       .filter(([, r]) => r.status === 'failed')
       .map(([id]) => id);
@@ -311,6 +319,7 @@ export function createWorkflowEngine(registry, options = {}) {
           id: inputId,
           _onTerminated: (termStatus) => {
             if (termStatus === 'cancelled') {
+              results[inputId] = results[inputId] || { status: 'cancelled' };
               cancelledCount++;
               _notify({ type: 'job-status', inputId, status: 'cancelled' });
               resolve();
@@ -446,7 +455,7 @@ export function createWorkflowEngine(registry, options = {}) {
     const completed = Object.values(results).filter(r => r.status === 'completed').length;
     const failed = Object.values(results).filter(r => r.status === 'failed').length;
     const cancelledCount = Object.values(results).filter(r => r.status === 'cancelled').length;
-    return { state, completed, failed, cancelled: cancelledCount, total: completed + failed + cancelledCount, results: copyResults(), executionId, generation };
+    return { state, completed, failed, cancelled: cancelledCount, total: runTotal || (completed + failed + cancelledCount), results: copyResults(), executionId, generation };
   }
 
   function destroy() {

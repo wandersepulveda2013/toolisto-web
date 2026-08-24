@@ -644,6 +644,8 @@ export function createWorkflowUI(registry, appHelpers) {
     return added;
   }
 
+  let _executionGeneration = 0;
+
   async function executeFlow() {
     if (!executeBtn || executeBtn.disabled) return;
     const activeSteps = workflow.getActiveSteps();
@@ -651,7 +653,7 @@ export function createWorkflowUI(registry, appHelpers) {
     if (Object.keys(inputs).length === 0) { toast('No hay archivos de entrada', 'warning'); return; }
 
     if (validationErrorsEl) validationErrorsEl.parentElement.style.display = 'none';
-    if (execErrorsEl) execErrorsEl.parentElement.style.display = 'none';
+    if (execErrorsEl) { execErrorsEl.replaceChildren(); execErrorsEl.parentElement.style.display = 'none'; }
 
     const validatorResult = workflow.validateWorkflow(registry);
     if (!validatorResult.valid && validatorResult.errors.length > 0) {
@@ -667,8 +669,11 @@ export function createWorkflowUI(registry, appHelpers) {
     }
 
     executeBtn.disabled = true;
+    if (cleanupBtn) cleanupBtn.disabled = true;
+    const myGeneration = ++_executionGeneration;
     if (execStateEl) execStateEl.textContent = 'Validando...';
 
+    try {
     const inputsForEngine = {};
     for (const [id, inp] of Object.entries(inputs)) {
       if (inp.file) {
@@ -684,9 +689,13 @@ export function createWorkflowUI(registry, appHelpers) {
         } else if (table) {
           inputsForEngine[id] = { data: table, name: table.name, kind: 'data' };
         } else if (inp.workspaceRef.startsWith('capture-') && appHelpers.resolveCaptureImage) {
-          const image = await appHelpers.resolveCaptureImage(wsId);
-          if (image && image.blob) {
-            inputsForEngine[id] = { data: image.blob, name: image.name || inp.name, kind: 'image' };
+          try {
+            const image = await appHelpers.resolveCaptureImage(wsId);
+            if (image && image.blob) {
+              inputsForEngine[id] = { data: image.blob, name: image.name || inp.name, kind: 'image' };
+            }
+          } catch (_) {
+            toast('No se pudo resolver la captura: ' + inp.name, 'warning');
           }
         }
       }
@@ -701,6 +710,8 @@ export function createWorkflowUI(registry, appHelpers) {
     const historySection = document.getElementById('wf-history-section');
     if (monitorSection) monitorSection.style.display = 'block';
     if (resultsSection) resultsSection.style.display = 'none';
+    if (progressTextEl) progressTextEl.textContent = '';
+    if (monitorEl) monitorEl.replaceChildren();
 
     const startTime = Date.now();
     const inputCount = Object.keys(inputsForEngine).length;
@@ -710,8 +721,11 @@ export function createWorkflowUI(registry, appHelpers) {
     const cancelledNodes = [];
     const errors = [];
 
+    let plannedTotal = inputCount;
     engine.subscribe((event) => {
-      updateMonitor(event, engine);
+      if (myGeneration !== _executionGeneration) return;
+      if (event.type === 'state' && event.total) plannedTotal = event.total;
+      updateMonitor(event, engine, plannedTotal);
       if (event.type === 'job-status' && event.status === 'failed') {
         if (execErrorsEl) {
           const inputName = inputsForEngine[event.inputId]?.name || event.inputId || '';
@@ -737,6 +751,8 @@ export function createWorkflowUI(registry, appHelpers) {
     if (execStateEl) execStateEl.textContent = 'Ejecutando...';
     const result = await engine.run(workflow, inputsForEngine);
 
+    if (myGeneration !== _executionGeneration) return;
+
     if (execStateEl) execStateEl.textContent = result.state === 'completed' ? 'Completado' : result.state === 'completed_with_errors' ? 'Completado con errores' : result.state === 'cancelled' ? 'Cancelado' : 'Fallido';
 
     if (progressBarEl) progressBarEl.style.width = '100%';
@@ -747,6 +763,7 @@ export function createWorkflowUI(registry, appHelpers) {
       renderResultItems(result.results);
     }
     executeBtn.disabled = false;
+    if (cleanupBtn) cleanupBtn.disabled = false;
 
     if (_persistence) {
       const wfId = getWorkflowId();
@@ -771,12 +788,27 @@ export function createWorkflowUI(registry, appHelpers) {
         } catch (_) { /* silent */ }
       }
     }
+    } catch (err) {
+      if (myGeneration === _executionGeneration) {
+        if (execStateEl) execStateEl.textContent = 'Error';
+        toast('Error en la ejecucion: ' + (err.message || err), 'error');
+        if (execErrorsEl) {
+          execErrorsEl.appendChild(h('div', { style: 'padding:2px 0;font-size:12px' }, 'Error inesperado: ' + (err.message || err)));
+          execErrorsEl.parentElement.style.display = 'block';
+        }
+      }
+    } finally {
+      if (myGeneration === _executionGeneration) {
+        executeBtn.disabled = false;
+        if (cleanupBtn) cleanupBtn.disabled = false;
+      }
+    }
   }
 
-  function updateMonitor(event, eng) {
+  function updateMonitor(event, eng, plannedTotal) {
     if (!monitorEl) return;
     const snap = eng.getSnapshot();
-    const total = snap.total || 0;
+    const total = plannedTotal || snap.total || 0;
     const completed = snap.completed || 0;
     const failed = snap.failed || 0;
     const cancelled = snap.cancelled || 0;
@@ -805,17 +837,25 @@ export function createWorkflowUI(registry, appHelpers) {
     if (event.type === 'job-status' && event.status === 'completed') logParts.push('Completado: ' + (event.inputId || ''));
     if (event.type === 'job-status' && event.status === 'failed') logParts.push('Error: ' + (event.error || 'desconocido'));
 
-    monitorEl.replaceChildren();
     if (logParts.length > 0) {
       monitorEl.appendChild(h('div', { style: 'font-size:11px;padding:2px 0;color:var(--ws-text-secondary)' }, logParts.join(' - ')));
     }
 
-    const cancelAllBtn = h('button', {
-      className: 'ws-btn ws-btn-sm ws-btn-ghost',
-      style: 'margin-top:4px',
-      onClick: () => { eng.cancel(); if (execStateEl) execStateEl.textContent = 'Cancelando...'; },
-    }, svgIcon('close', 12), ' Cancelar ejecucion');
-    monitorEl.appendChild(cancelAllBtn);
+    let cancelAllBtn = monitorEl.querySelector('[data-cancel-btn]');
+    if (!cancelAllBtn) {
+      cancelAllBtn = h('button', {
+        className: 'ws-btn ws-btn-sm ws-btn-ghost',
+        style: 'margin-top:4px',
+        'data-cancel-btn': 'true',
+        onClick: () => { eng.cancel(); if (execStateEl) execStateEl.textContent = 'Cancelando...'; },
+      }, svgIcon('close', 12), ' Cancelar ejecucion');
+      monitorEl.appendChild(cancelAllBtn);
+    }
+
+    while (monitorEl.children.length > 51) {
+      const first = monitorEl.querySelector('div');
+      if (first) first.remove();
+    }
   }
 
   function renderResultItems(results) {
@@ -837,25 +877,23 @@ export function createWorkflowUI(registry, appHelpers) {
       item.appendChild(h('span', { style: 'color:var(--ws-success);font-size:11px' }, 'OK'));
       item.appendChild(h('span', { style: 'font-size:11px;flex:1' }, r.name || r.inputId || 'Resultado'));
 
-      if (r.data && (r.data instanceof Blob || r.kind === 'image')) {
-        const blob = r.data instanceof Blob ? r.data : (r.data.data instanceof Blob ? r.data.data : null);
-        if (blob) {
-          const url = URL.createObjectURL(blob);
-          resultUrls.add(url);
-          item.appendChild(h('button', {
-            className: 'ws-btn ws-btn-xs ws-btn-secondary',
-            onClick: () => {
-              const a = h('a', { href: url, download: (r.name || 'output') });
-              // Un enlace desconectado no inicia una descarga de forma fiable en
-              // todos los navegadores. Se monta de forma efímera y no se guarda.
-              document.body?.appendChild(a);
-              a.click();
-              a.remove?.();
-            },
-          }, 'Descargar'));
-        }
+      const blob = r.data instanceof Blob ? r.data : (r.data?.data instanceof Blob ? r.data.data : null);
+      if (blob) {
+        const url = URL.createObjectURL(blob);
+        resultUrls.add(url);
+        item.appendChild(h('button', {
+          className: 'ws-btn ws-btn-xs ws-btn-secondary',
+          onClick: () => {
+            const a = h('a', { href: url, download: (r.name || 'output') });
+            // Un enlace desconectado no inicia una descarga de forma fiable en
+            // todos los navegadores. Se monta de forma efímera y no se guarda.
+            document.body?.appendChild(a);
+            a.click();
+            a.remove?.();
+          },
+        }, 'Descargar'));
       }
-      if (r.kind === 'document' || r.kind === 'data' || r.kind === 'image' || r.kind === 'text') {
+      if (r.kind === 'document' || r.kind === 'data' || r.kind === 'image' || r.kind === 'text' || r.kind === 'file') {
         item.appendChild(h('button', {
           className: 'ws-btn ws-btn-xs ws-btn-ghost',
           onClick: () => addResultToWorkspace(r),
@@ -953,19 +991,37 @@ export function createWorkflowUI(registry, appHelpers) {
 
   function retryFailed() {
     if (!engine) return;
+    if (executeBtn && !executeBtn.disabled) {
+      executeBtn.disabled = true;
+    } else if (executeBtn && executeBtn.disabled) {
+      return;
+    }
+    const myGeneration = ++_executionGeneration;
     const monitorSection = document.getElementById('wf-monitor-section');
     if (monitorSection) monitorSection.style.display = 'block';
     const resultsSection = document.getElementById('wf-results-section');
     if (resultsSection) resultsSection.style.display = 'none';
+    if (execErrorsEl) { execErrorsEl.replaceChildren(); execErrorsEl.parentElement.style.display = 'none'; }
     if (execStateEl) execStateEl.textContent = 'Reintentando...';
     if (progressBarEl) progressBarEl.style.width = '0%';
+    if (progressTextEl) progressTextEl.textContent = '';
+    if (monitorEl) monitorEl.replaceChildren();
     engine.retryFailed().then(r => {
+      if (myGeneration !== _executionGeneration) return;
       if (resultsSection && r.results) {
         resultsSection.style.display = 'block';
         renderResultItems(r.results);
       }
       if (progressBarEl) progressBarEl.style.width = '100%';
-      if (execStateEl) execStateEl.textContent = r.state === 'completed' ? 'Completado' : 'Fallido';
+      if (execStateEl) execStateEl.textContent = r.state === 'completed' ? 'Completado' : r.state === 'cancelled' ? 'Cancelado' : 'Fallido';
+      if (executeBtn) executeBtn.disabled = false;
+      if (cleanupBtn) cleanupBtn.disabled = false;
+    }).catch(err => {
+      if (myGeneration !== _executionGeneration) return;
+      if (execStateEl) execStateEl.textContent = 'Error';
+      toast('Error al reintentar: ' + (err.message || err), 'error');
+      if (executeBtn) executeBtn.disabled = false;
+      if (cleanupBtn) cleanupBtn.disabled = false;
     });
   }
 
