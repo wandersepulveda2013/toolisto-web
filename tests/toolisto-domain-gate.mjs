@@ -44,8 +44,12 @@ check(headers.includes('Permissions-Policy') && headers.includes('geolocation=()
 check(headers.includes("default-src 'self'") && headers.includes("object-src 'none'") && headers.includes("frame-ancestors 'none'") && headers.includes("base-uri 'self'"), '_headers: CSP con default-src self y object/frame/base acotados');
 check(!headers.includes('/workspace/*'), '_headers: la landing pública /workspace/ no hereda noindex');
 check(!headers.includes('/workspace/index.html'), '_headers: el runtime de Workspace se publica sin reglas específicas');
-const withoutAllowedCdn = headers.replace(/https:\/\/cdn\.jsdelivr\.net\b/g, '');
-check(!/https?:\/\/[^\s'"]+/.test(withoutAllowedCdn), '_headers: sin egress de terceros salvo el CDN declarado de scripts');
+const withoutAllowedCdn = headers
+  .replace(/https:\/\/cdn\.jsdelivr\.net\b/g, '')
+  .replace(/https:\/\/pagead2\.googlesyndication\.com\b/g, '')
+  .replace(/https:\/\/googleads\.g\.doubleclick\.net\b/g, '')
+  .replace(/https:\/\/tpc\.googlesyndication\.com\b/g, '');
+check(!/https?:\/\/[^\s'"]+/.test(withoutAllowedCdn), '_headers: sin egress de terceros salvo los CDNs declarados (scripts + AdSense)');
 
 const buildScript = readFileSync(buildScriptPath, 'utf8');
 check(buildScript.includes('cpSync(headersSrc'), 'El build copia _headers a dist (generate-seo-pages.mjs)');

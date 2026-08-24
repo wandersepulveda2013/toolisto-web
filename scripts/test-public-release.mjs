@@ -14,6 +14,7 @@
 import { readFileSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { spawnSync } from 'node:child_process';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
@@ -68,6 +69,9 @@ check(missingRedirectPages.length === 0, 'los aliases de redirects.json se mater
 if (missingRedirectPages.length) console.error(`    Faltan: ${missingRedirectPages.map((r) => r.from).join(', ')}`);
 const sampleRedirect = readFileSync(join(ROOT, 'dist', 'merge-pdf.html'), 'utf8');
 check(sampleRedirect.includes('rel="canonical"') && sampleRedirect.includes('href="https://apluno.com/unir-pdf"') && sampleRedirect.includes('noindex'), 'la página de redirect de /merge-pdf apunta al destino canónico sin indexarse');
+
+const adsenseResult = spawnSync(process.execPath, [join(ROOT, 'tests', 'adsense-integration.mjs')], { cwd: ROOT, stdio: 'inherit' });
+check(adsenseResult.status === 0, 'AdSense integration gate (tests/adsense-integration.mjs) — 21 PASS, 0 FAIL');
 
 console.log(`\n=== Resultado: ${passed} PASS, ${failed} FAIL ===`);
 process.exit(failed ? 1 : 0);
