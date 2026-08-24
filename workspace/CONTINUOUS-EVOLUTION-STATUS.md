@@ -7,6 +7,26 @@
 
 ---
 
+## Cycle 117 — Autosave race hardening (CE-057)
+
+| Field | Value |
+|-------|-------|
+| **Date** | 2026-08-24 |
+| **Branch** | main |
+| **HEAD inicial** | 0e2e14a |
+| **HEAD final** | 726f974 |
+| **Task** | CE-057 (P1, autosave y persistencia: serialización de escrituras) |
+| **Hypothesis** | autoSaveDoc/autoSaveTable debounce (1s) and _setupAutosave interval (5s) both call saveDoc/saveData concurrently on the same entity; saveCurrentWorkspaceItem (manual) and _flushAndSaveSession (visibility change) also race, causing parallel IndexedDB writes on the same doc/table that can lose updates or write stale state. |
+| **Change** | workspace.js: new `_createSaveLock()` utility serializes async writes per entity type with latest-wins coalescing, failsafe timeout (60s), and generation counter to detect stale drains. Two instances (`_docSaveLock`, `_tableSaveLock`) wrap all save paths: autoSaveDoc debounce, autoSaveTable debounce, _setupAutosave interval, saveCurrentWorkspaceItem (manual), _flushAndSaveSession (visibility change). renderView clears debounce timers on navigation. Tests: new `autosave-lock-test.mjs` (18/18) registered in release gate. |
+| **Tests ejecutados** | autosave-lock-test.mjs 18/18; workspace-test 157/157; phase3a-test 80/80; phase3b-test 59/59; phase11-audit 106/106; workflow-ui-test 65/65; operation-registry 26/26. |
+| **Tests PASS** | 18/18 autosave lock (serialization, latest-wins, error handling, cancel, burst, failsafe). Regresión: workspace 157/157, phase3a 80/80, phase3b 59/59, phase11 106/106, UI 65/65, registry 26/26. Total: 511+ passing. |
+| **Tests FAIL** | 0 (concurrency-test and workflow-engine-test failures are pre-existing: `createExecutionResources` missing from VM context, unrelated) |
+| **Commits** | (pending) |
+| **Bloqueos** | Ninguno. |
+| **Proxima prioridad** | CE-058 or next DISCOVERY; audit remaining core modules (instruction-planner, scanner-ui). |
+
+---
+
 ## Cycle 116 — Execution lifecycle hardening + workspace lifecycle fixes (CE-051→CE-056)
 
 | Field | Value |

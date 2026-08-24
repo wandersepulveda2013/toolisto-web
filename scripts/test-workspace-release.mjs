@@ -84,6 +84,7 @@ run('capture-flow-chain E2E (captura -> flujo -> OCR, CE-050)', 'node', ['tests/
 run('dist-workspace-smoke (validación del artefacto desplegado)', 'node', ['tests/dist-workspace-smoke.mjs'], {
   env: { ...process.env, E2E_PORT: '8082' },
 });
+run('autosave-lock (serialization lock, CE-057)', 'node', ['tests/workspace/autosave-lock-test.mjs']);
 
 // 4. Manifest de evidencia
 const evidence = {
