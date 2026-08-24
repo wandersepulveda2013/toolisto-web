@@ -5,8 +5,12 @@ import { fileURLToPath } from 'node:url';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const source = readFileSync(join(root, 'workspace', 'core', 'tabular-text-parser.js'), 'utf8')
+  .replace(/^import\s.*;?\s*$/gm, '')
   .replace(/^export\s+/gm, '');
-const parseTabularText = new Function(`${source}\nreturn parseTabularText;`)();
+const localeSource = readFileSync(join(root, 'workspace', 'core', 'locale-parser.js'), 'utf8')
+  .replace(/^import\s.*;?\s*$/gm, '')
+  .replace(/^export\s+/gm, '');
+const parseTabularText = new Function(`${localeSource}\n${source}\nreturn parseTabularText;`)();
 let pass = 0, fail = 0;
 function check(name, condition) { if (condition) { pass++; console.log(`  PASS: ${name}`); } else { fail++; console.error(`  FAIL: ${name}`); } }
 
