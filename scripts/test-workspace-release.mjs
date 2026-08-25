@@ -88,6 +88,8 @@ run('autosave-lock (serialization lock, CE-057)', 'node', ['tests/workspace/auto
 run('cross-entity-integrity (per-entity locks, _writeSeq, flush, CE-058)', 'node', ['tests/workspace/cross-entity-integrity-test.mjs']);
 run('review-status-persistence (table review status lock-based, CE-058)', 'node', ['tests/workspace/review-status-persistence-test.mjs']);
 run('persistence-sequence-cert (_writeSeq monotonic invariant, CE-058)', 'node', ['tests/workspace/persistence-sequence-cert.mjs']);
+run('persistence-adversarial-audit (concurrency, stale-write, mutation-after-enqueue, CE-058)', 'node', ['tests/workspace/persistence-adversarial-audit.mjs']);
+run('persistence-lifecycle-audit (fire-and-forget, destroy-recreate, nav stress, perf, CE-058)', 'node', ['tests/workspace/persistence-lifecycle-audit.mjs']);
 
 // 4. Manifest de evidencia
 const evidence = {

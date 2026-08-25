@@ -85,8 +85,10 @@ Una tarea solo está completa cuando:
 - Cross-entity integrity: 55/55.
 - Review status persistence: 15/15.
 - Persistence sequence cert: 48/48.
-- Release gate: 18/18 suites PASS.
-- Total: 1171 pass, 0 fail, 1171 tests.
+- Persistence adversarial audit: 66/66.
+- Persistence lifecycle audit: 95/95.
+- Release gate: 20/20 suites PASS.
+- Total: 1332 pass, 0 fail, 1332 tests.
 
 El modelo OCR `spa.traineddata.gz` se sirve localmente (`vendor/tesseract/lang-data`) para tiempos E2E estables.
 La extracción doc-to-table reconstruye columnas por ancla numérica y normaliza el signo negativo del OCR: 15/15 celdas en el Star-Flow.
