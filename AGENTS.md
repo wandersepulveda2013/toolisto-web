@@ -87,8 +87,12 @@ Una tarea solo está completa cuando:
 - Persistence sequence cert: 48/48.
 - Persistence adversarial audit: 66/66.
 - Persistence lifecycle audit: 95/95.
-- Release gate: 20/20 suites PASS.
-- Total: 1332 pass, 0 fail, 1332 tests.
+- Storage failure injection: 52/52.
+- Storage recovery lifecycle: 69/69.
+- Storage multicontext migration: 86/86.
+- Storage rejection & perf: 84/84.
+- Release gate: 24/24 suites PASS.
+- Total: 1623 pass, 0 fail, 1623 tests.
 
 El modelo OCR `spa.traineddata.gz` se sirve localmente (`vendor/tesseract/lang-data`) para tiempos E2E estables.
 La extracción doc-to-table reconstruye columnas por ancla numérica y normaliza el signo negativo del OCR: 15/15 celdas en el Star-Flow.

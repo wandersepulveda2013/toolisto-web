@@ -90,6 +90,10 @@ run('review-status-persistence (table review status lock-based, CE-058)', 'node'
 run('persistence-sequence-cert (_writeSeq monotonic invariant, CE-058)', 'node', ['tests/workspace/persistence-sequence-cert.mjs']);
 run('persistence-adversarial-audit (concurrency, stale-write, mutation-after-enqueue, CE-058)', 'node', ['tests/workspace/persistence-adversarial-audit.mjs']);
 run('persistence-lifecycle-audit (fire-and-forget, destroy-recreate, nav stress, perf, CE-058)', 'node', ['tests/workspace/persistence-lifecycle-audit.mjs']);
+run('storage-failure-injection (IDB write failure, quota, closed DB, CE-059)', 'node', ['tests/workspace/storage-failure-injection.mjs']);
+run('storage-recovery-lifecycle (delete/resurrection, destroy/recreate, CE-059)', 'node', ['tests/workspace/storage-recovery-lifecycle.mjs']);
+run('storage-multicontext-migration (multi-tab _writeSeq, schema, legacy records, CE-059)', 'node', ['tests/workspace/storage-multicontext-migration.mjs']);
+run('storage-rejection-perf (unhandled rejection, atomicity, perf, CE-059)', 'node', ['tests/workspace/storage-rejection-perf.mjs']);
 
 // 4. Manifest de evidencia
 const evidence = {
