@@ -91,8 +91,11 @@ Una tarea solo está completa cuando:
 - Storage recovery lifecycle: 69/69.
 - Storage multicontext migration: 86/86.
 - Storage rejection & perf: 84/84.
-- Release gate: 24/24 suites PASS.
-- Total: 1623 pass, 0 fail, 1623 tests.
+- Multi-tab concurrency: 113/113.
+- Stale-delete-lifecycle: 120/120.
+- Runtime-isolation-review: 110/110.
+- Release gate: 27/27 suites PASS.
+- Total: 1966 pass, 0 fail, 1966 tests.
 
 El modelo OCR `spa.traineddata.gz` se sirve localmente (`vendor/tesseract/lang-data`) para tiempos E2E estables.
 La extracción doc-to-table reconstruye columnas por ancla numérica y normaliza el signo negativo del OCR: 15/15 celdas en el Star-Flow.

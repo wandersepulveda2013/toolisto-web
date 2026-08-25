@@ -94,6 +94,9 @@ run('storage-failure-injection (IDB write failure, quota, closed DB, CE-059)', '
 run('storage-recovery-lifecycle (delete/resurrection, destroy/recreate, CE-059)', 'node', ['tests/workspace/storage-recovery-lifecycle.mjs']);
 run('storage-multicontext-migration (multi-tab _writeSeq, schema, legacy records, CE-059)', 'node', ['tests/workspace/storage-multicontext-migration.mjs']);
 run('storage-rejection-perf (unhandled rejection, atomicity, perf, CE-059)', 'node', ['tests/workspace/storage-rejection-perf.mjs']);
+run('multi-tab-concurrency (different/same entity, _writeSeq, stale overwrite, CE-060)', 'node', ['tests/workspace/multi-tab-concurrency.mjs']);
+run('stale-delete-lifecycle (delete vs stale, recreate, reload, background tab, CE-060)', 'node', ['tests/workspace/stale-delete-lifecycle.mjs']);
+run('runtime-isolation-review (review/chart cross-tab, versionchange, singletons, CE-060)', 'node', ['tests/workspace/runtime-isolation-review.mjs']);
 
 // 4. Manifest de evidencia
 const evidence = {
