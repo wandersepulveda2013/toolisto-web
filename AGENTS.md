@@ -64,18 +64,29 @@ Una tarea solo está completa cuando:
 
 - Phase 3B: COMPLETA.
 - Phase 3C: COMPLETA (fixture difícil medido honestamente; pipeline OCR mejora como TODO).
-- E2E Star-Flow: 83/83.
+- E2E Star-Flow: 85/85.
 - OCR Source Selection: 34/34.
-- Phase 3A: 45/45.
+- Phase 3A: 80/80.
 - Phase 3B tests: 59/59.
 - Phase 11: 106/106.
-- Workspace structure: 156/156.
+- Workspace structure: 157/157.
 - Phase 3 integridad (3a/3b): 52/52.
 - Phase 4a migraciones: 34/34.
 - Phase 4b integridad referencial: 43/43.
 - Phase 5 bundle trust (export/import): 49/49.
 - Phase 6 prueba negativa de red: 51/51 (intercepta fetch/XHR/beacon/WebSocket; marcador secreto nunca sale por red; cero egress externo).
-- Total: 712 pass, 0 fail, 712 tests.
+- CSV BOM E2E: 20/20.
+- Engine idle release: 10/10.
+- Workflow export MD: 30/30.
+- Workflow UI: 65/65.
+- Capture-flow-chain: 12/12.
+- Dist workspace smoke: 28/28.
+- Autosave lock: 18/18.
+- Cross-entity integrity: 55/55.
+- Review status persistence: 15/15.
+- Persistence sequence cert: 48/48.
+- Release gate: 18/18 suites PASS.
+- Total: 1171 pass, 0 fail, 1171 tests.
 
 El modelo OCR `spa.traineddata.gz` se sirve localmente (`vendor/tesseract/lang-data`) para tiempos E2E estables.
 La extracción doc-to-table reconstruye columnas por ancla numérica y normaliza el signo negativo del OCR: 15/15 celdas en el Star-Flow.

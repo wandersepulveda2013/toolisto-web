@@ -14,16 +14,16 @@
 | **Date** | 2026-08-24 |
 | **Branch** | main |
 | **HEAD inicial** | a818300 |
-| **HEAD final** | (pending commit) |
+| **HEAD final** | dbe9c1f |
 | **Task** | CE-058 (P1, per-entity autosave integrity: cross-item lock isolation, flush-before-navigate, stale write protection) |
 | **Hypothesis** | CE-057 per-type locks (_docSaveLock/_tableSaveLock) shared across ALL entities of the same type: latest-wins coalescing loses saves when doc A and doc B are edited alternately. renderView clears debounce timers without flushing dirty entities. saveDoc/saveData have no protection against stale IDB writes. |
 | **Change** | workspace.js: _createEntityLockMap() returns per-entity lock maps (_docLocks, _tableLockMap) with independent per-ID locks, replacing shared per-type locks. _flushDirtyEntity() saves the currently dirty entity before navigation in renderView. autoSaveDoc/autoSaveTable guard: early return if doc/table is missing or has no id. storage.js saveDoc/saveData: _writeSeq monotonic counter; guard `existing._writeSeq > (doc._writeSeq \|\| 0)` discards stale writes. Tests: new cross-entity-integrity-test.mjs (55/55) registered in release gate. |
-| **Tests ejecutados** | cross-entity-integrity-test.mjs 55/55; autosave-lock-test.mjs 18/18; workspace-test 157/157; phase3a-test 80/80; phase3b-test 59/59; phase11-audit 106/106. |
-| **Tests PASS** | 55/55 cross-entity (lock map 16/16, _writeSeq stale guard 17/17, cross-entity concurrency 13/13, flush-before-navigate 2/2, document/table isolation 5/5, failsafe 3/3, cancelAll 2/2). Regresión: autosave 18/18, workspace 157/157, phase3a 80/80, phase3b 59/59, phase11 106/106. |
+| **Tests ejecutados** | cross-entity-integrity-test.mjs 55/55; autosave-lock-test.mjs 18/18; workspace-test 157/157; phase3a-test 80/80; phase3b-test 59/59; phase11-audit 106/106; review-status-persistence-test.mjs 15/15; persistence-sequence-cert.mjs (included). Release gate: 16/16 PASS. |
+| **Tests PASS** | 55/55 cross-entity (lock map 16/16, _writeSeq stale guard 17/17, cross-entity concurrency 13/13, flush-before-navigate 2/2, document/table isolation 5/5, failsafe 3/3, cancelAll 2/2). 15/15 review-status-persistence. Regresión: autosave 18/18, workspace 157/157, phase3a 80/80, phase3b 59/59, phase11 106/106. Release gate: 16/16 PASS. |
 | **Tests FAIL** | 0 |
-| **Commits** | (pending) |
+| **Commits** | dbe9c1f: `fix(workspace): harden entity save sequencing and lock eviction (CE-058)` |
 | **Bloqueos** | Ninguno. |
-| **Bugs found during CE-057 cert** | Per-type lock coalesces across different entity IDs (latest-wins loses saves for different docs/tables); navigation discards pending debounce saves without flushing dirty entity; no stale write protection at IDB boundary. |
+| **Bugs found during CE-057 cert** | Per-type lock coalesces across different entity IDs (latest-wins loses saves for different docs/tables); navigation discards pending debounce saves without flushing dirty entity; no stale write protection at IDB boundary. setTableReviewStatus called autoSaveTable(debounce) then renderView cleared the timer → save never fired → IDB retained reviewStatus='draft'. |
 | **Proxima prioridad** | CE-059 (malformed IndexedDB recovery), CE-060 (storage failure UX), CE-061 (reload/crash recovery), CE-062 (migration resilience), CE-063 (import resilience). |
 
 ---
