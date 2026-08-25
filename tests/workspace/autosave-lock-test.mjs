@@ -19,7 +19,7 @@ function check(name, ok, detail) { if (ok) { pass++; console.log('  PASS: ' + na
 console.log('=== Autosave Lock Tests ===\n');
 
 // Extract just the _createSaveLock function from workspace.js
-const lockMatch = wsCode.match(/function _createSaveLock\(\)\s*\{[\s\S]*?return \{ enqueue, cancel \};\s*\}/);
+const lockMatch = wsCode.match(/function _createSaveLock\([^)]*\)\s*\{[\s\S]*?return \{ enqueue, cancel \};\s*\}/);
 if (!lockMatch) { console.error('FAIL: could not extract _createSaveLock'); process.exit(1); }
 
 const lockSrc = lockMatch[0];

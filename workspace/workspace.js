@@ -759,7 +759,7 @@ let _quotaWarned = false;
 let _viewGeneration = 0;
 let _workflowAutoSaveTimer = null;
 
-function _createSaveLock() {
+function _createSaveLock(onIdle) {
   let _pending = null;
   let _running = false;
   let _failsafe = null;
@@ -791,20 +791,29 @@ function _createSaveLock() {
       if (_gen !== myGen) { _running = false; return; }
     }
     _running = false;
+    if (onIdle) onIdle();
   }
   return { enqueue, cancel };
 }
 
 function _createEntityLockMap() {
   const _locks = new Map();
+  function _maybeEvict(entityId) {
+    if (!_locks.has(entityId)) return;
+    _locks.delete(entityId);
+  }
   return {
     getLock(entityId) {
       let lock = _locks.get(entityId);
-      if (!lock) { lock = _createSaveLock(); _locks.set(entityId, lock); }
+      if (!lock) {
+        lock = _createSaveLock(() => _maybeEvict(entityId));
+        _locks.set(entityId, lock);
+      }
       return lock;
     },
     cancelAll() { for (const lock of _locks.values()) lock.cancel(); },
     cancel(entityId) { const lock = _locks.get(entityId); if (lock) lock.cancel(); },
+    get size() { return _locks.size; },
   };
 }
 
@@ -2221,7 +2230,13 @@ function setTableReviewStatus(table, status) {
   const current = appStore.get('currentDataTable');
   if (current?.id === table.id) appStore.set({ currentDataTable: table });
   appStore.set({ dataTables: (appStore.get('dataTables') || []).map(t => t.id === table.id ? table : t) });
-  autoSaveTable(table);
+  const project = appStore.get('currentProject');
+  if (project && table.id) {
+    _tableLocks.getLock(table.id).enqueue(() => saveData(project.id, table)
+      .then(() => syncDerivedCharts(project, table))
+      .then(() => appStore.set({ isDirty: false, lastSaved: Date.now() }))
+      .catch(error => reportError(error, 'table-review-status', {})));
+  }
   toast('Tabla marcada como ' + formatReviewStatus(status), 'success');
   const view = appStore.get('currentView');
   if (view === 'data' || view === 'data-table') renderView(view);

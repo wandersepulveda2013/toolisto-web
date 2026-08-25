@@ -31,7 +31,7 @@ console.log('=== CE-058: Cross-item Autosave Integrity ===\n');
 // ============================================================
 console.log('--- 1. Per-entity lock map (coalescing isolation) ---');
 
-const lockSrc = wsCode.match(/function _createSaveLock\(\)\s*\{[\s\S]*?return \{ enqueue, cancel \};\s*\}/)[0];
+const lockSrc = wsCode.match(/function _createSaveLock\([^)]*\)\s*\{[\s\S]*?return \{ enqueue, cancel \};\s*\}/)[0];
 const entityMapSrc = wsCode.match(/function _createEntityLockMap\(\)\s*\{[\s\S]*?return \{[\s\S]*?\};\s*\}/)[0];
 
 const combinedLockCode = lockSrc + '\n' + entityMapSrc + '\n'
