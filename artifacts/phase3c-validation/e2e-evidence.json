@@ -1,6 +1,6 @@
 {
   "ocrMode": "ocr",
-  "ocrDuration": 3228,
+  "ocrDuration": 3092,
   "ocrExpected": "Nombre Valor Estado\nVentas Q1 150 Completado\nVentas Q2 80 En progreso\nDevoluciones -30 Pendiente\nCostos fijos -200 Pagado\nGanancia neta 0 Calculado\n",
   "ocrActual": "Nombre Valor Estado\nVentas Q1 150 Completado\nVentas Q2 80 En progreso\nDevoluciones -30 Pendiente\nCostos fijos -200 Pagado\nGanancia neta 0 Calculado",
   "ocrCharAccuracy": {
@@ -146,51 +146,19 @@
     }
   ],
   "svgSafe": true,
-  "pdfSize": 905,
+  "pdfSize": 901,
   "relationCount": 10,
   "executions": [
     {
-      "id": "mshnu1yhfnarvc",
-      "toolId": "perspective-correction",
-      "status": "completed",
-      "toolName": "Corrección de perspectiva",
-      "resultType": "scan-document",
-      "resultAssetId": "mshnu1ydfwqyr8"
-    },
-    {
-      "id": "mshnu1ywdvvf71",
-      "toolId": "image-import",
-      "status": "completed",
-      "toolName": "Importar imagen",
-      "resultType": "image-asset",
-      "resultAssetId": "mshnu1ykc744ng"
-    },
-    {
-      "id": "mshnu6bgx4lkoe",
-      "toolId": "ocr-extract",
-      "status": "completed",
-      "toolName": "Extracción de texto (OCR)",
-      "resultType": "text-document",
-      "resultAssetId": "mshnu6bbm6ij99"
-    },
-    {
-      "id": "mshnu70gi28elu",
+      "id": "775e645f-02dd-40c4-9825-266a6d9af745",
       "toolId": "text-to-table",
       "status": "completed",
       "toolName": "Texto a tabla",
       "resultType": "table-document",
-      "resultAssetId": "mshnu70cev026l"
+      "resultAssetId": "76547f1d-d182-4f8b-9ac7-ac388d6a49c3"
     },
     {
-      "id": "mshnucjs96s55x",
-      "toolId": "chart-create",
-      "status": "completed",
-      "toolName": "Crear grafico",
-      "resultType": "chart",
-      "resultAssetId": "mshnucjqj2yqnj"
-    },
-    {
-      "id": "mshnufm6yxkyqh",
+      "id": "a1daa4c7-ad70-4f7a-97e2-a78cae8c4211",
       "toolId": "pdf-export",
       "status": "completed",
       "toolName": "Exportar PDF",
@@ -198,12 +166,36 @@
       "resultAssetId": null
     },
     {
-      "id": "mshnug0f0nruoe",
+      "id": "a26fc38a-8a9d-46ec-98dc-1ddf8402ed16",
+      "toolId": "perspective-correction",
+      "status": "completed",
+      "toolName": "Corrección de perspectiva",
+      "resultType": "scan-document",
+      "resultAssetId": "665b51f9-52f5-4431-ad3c-2d270c3d0970"
+    },
+    {
+      "id": "a7b23181-aef1-409d-bbfe-75e1a11771af",
       "toolId": "design-create",
       "status": "completed",
       "toolName": "Crear diseno",
       "resultType": "design-document",
-      "resultAssetId": "mshnug0fjxslat"
+      "resultAssetId": "2dea8d14-f12d-4095-bd25-ef34b4c307d0"
+    },
+    {
+      "id": "e7a3e14f-fc56-498c-9992-52e8c131d756",
+      "toolId": "ocr-extract",
+      "status": "completed",
+      "toolName": "Extraccion de texto (OCR)",
+      "resultType": "text-document",
+      "resultAssetId": "ba643b75-a0da-4d93-96d4-e8475a8723c1"
+    },
+    {
+      "id": "f745abc3-85d5-47e2-ab29-909f0601aa80",
+      "toolId": "chart-create",
+      "status": "completed",
+      "toolName": "Crear grafico",
+      "resultType": "chart",
+      "resultAssetId": "317d5892-40c8-4fc8-92db-bf756388e5a8"
     }
   ],
   "bundle": {
@@ -211,7 +203,7 @@
     "documents": 1,
     "dataTables": 1,
     "assets": 5,
-    "executions": 7,
+    "executions": 6,
     "captures": 1
   },
   "importResult": {
@@ -221,16 +213,16 @@
       "data": 2,
       "captures": 2,
       "assets": 10,
-      "executions": 15
+      "executions": 13
     },
-    "newProjectId": "mshnuljg7fzs1zimv",
-    "origProjId": "mshntzoail3qmz",
+    "newProjectId": "cb46efdf-1f4c-4c85-92bb-2b097cbfc8e4",
+    "origProjId": "57175680-f0fb-4028-b852-5754e154f801",
     "projChanged": true,
     "hasOldIds": false,
     "importedDocCount": 1
   },
-  "timestamp": "2026-08-06T15:18:19.295Z",
-  "pass": 83,
+  "timestamp": "2026-08-26T14:19:27.993Z",
+  "pass": 85,
   "fail": 0,
   "failures": [],
   "jsErrors": [],

@@ -2,7 +2,8 @@
 /**
  * test:release — puerta de calidad del build público de APLUNO
  *
- * Se ejecuta sobre el `dist/` ya construido por `npm run build` y comprueba:
+ * Ejecuta el build completo (generate-seo → generate-apluno → inject-adsense)
+ * y comprueba sobre el `dist/` resultante:
  *   1. El service worker llevaba la allowlist de rutas públicas de APLUNO
  *      inyectada (el build la rellena; el placeholder vacío significa fallo).
  *   2. La allowlist cubre la portada, legal, contacto, productos y /apluno-assets/.
@@ -18,6 +19,18 @@ import { spawnSync } from 'node:child_process';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
+
+function run(script, args = []) {
+  const result = spawnSync(process.execPath, [join(ROOT, script), ...args], {
+    cwd: ROOT,
+    stdio: 'inherit'
+  });
+  if (result.status !== 0) process.exit(result.status || 1);
+}
+
+run('scripts/generate-seo-pages.mjs', ['--production']);
+run('scripts/generate-apluno-pages.mjs');
+run('scripts/inject-adsense.mjs');
 
 let passed = 0;
 let failed = 0;
@@ -72,6 +85,12 @@ check(sampleRedirect.includes('rel="canonical"') && sampleRedirect.includes('hre
 
 const adsenseResult = spawnSync(process.execPath, [join(ROOT, 'tests', 'adsense-integration.mjs')], { cwd: ROOT, stdio: 'inherit' });
 check(adsenseResult.status === 0, 'AdSense integration gate (tests/adsense-integration.mjs) — 21 PASS, 0 FAIL');
+
+const seoResult = spawnSync(process.execPath, [join(ROOT, 'tests', 'apluno-production-seo.mjs')], { cwd: ROOT, stdio: 'inherit' });
+check(seoResult.status === 0, 'APLUNO production SEO gate (tests/apluno-production-seo.mjs) — 29 PASS, 0 FAIL');
+
+const monetizationResult = spawnSync(process.execPath, [join(ROOT, 'tests', 'apluno-monetization-readiness.mjs')], { cwd: ROOT, stdio: 'inherit' });
+check(monetizationResult.status === 0, 'APLUNO monetization readiness gate (tests/apluno-monetization-readiness.mjs) — 25 PASS, 0 FAIL');
 
 console.log(`\n=== Resultado: ${passed} PASS, ${failed} FAIL ===`);
 process.exit(failed ? 1 : 0);

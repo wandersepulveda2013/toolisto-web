@@ -43,6 +43,7 @@
     "@ffmpeg/ffmpeg": "^0.12.15",
     "@ffmpeg/util": "^0.12.2",
     "@playwright/test": "^1.62.1",
+    "fake-indexeddb": "^6.2.5",
     "playwright": "^1.62.0",
     "tesseract.js": "^5.1.1"
   }
