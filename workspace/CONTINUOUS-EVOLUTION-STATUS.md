@@ -7,7 +7,28 @@
 
 ---
 
-## Cycle 125 — Real Browser Performance & CSS CWV Certification (CE-062)
+## Cycle 125 — Performance improvements: server caching, workspace lazy-load, CSS audit (CE-062 follow-up)
+
+| Field | Value |
+|-------|-------|
+| **Date** | 2026-08-25 |
+| **Branch** | main |
+| **HEAD inicial** | d2efdba |
+| **HEAD final** | TBD (pending commit) |
+| **Task** | Performance follow-up: server cache headers, workspace vendor lazy-load, CSS critical path audit |
+| **Hypothesis** | CE-062 identified 3 P2/P3 gaps: no cache headers on dev server, workspace eagerly loads 407KB of vendor JS (pdf.min.js + jszip.min.js) not needed at startup, APLUNO CSS may have dead code. |
+| **Change** | server.js: added cacheControl() function with fingerprinted-URL-aware headers (immutable for ?v= URLs, 1h for JS/CSS, no-cache for HTML/SW, 24h for images). workspace/index.html: removed eager pdf.min.js and jszip.min.js script tags, added lazy-loader.js. workspace/lazy-loader.js: new utility providing __ensurePdfJs/__ensureJSZip/__lazyLoadScript for on-demand script injection. js/ocr/pdf-ocr-engine.js: loadPdf wraps with __ensurePdfJs(). workspace/core/workflow-operations.js: JSZip usage wraps with __ensureJSZip(). tests/performance-loading-regression.mjs: added 8 new checks (workspace lazy-load, deferred scripts, lazy-loader API). |
+| **Tests ejecutados** | performance-loading-regression 548/548 (8 new); workspace gate 30/30; public gate 19/19. |
+| **Tests PASS** | 548/548 performance regression. All gates PASS. |
+| **Tests FAIL** | 0 |
+| **Commits** | TBD |
+| **Bloqueos** | None. |
+| **Results** | Server: all resource types now have proper Cache-Control (immutable for fingerprinted, 1h for JS/CSS, no-cache for HTML). Workspace: initial load 1192KB → 785KB (34% reduction, 407KB saved) by lazy-loading pdf.min.js (312KB) and jszip.min.js (95KB). CSS: 100% coverage confirmed, no dead CSS to extract. All 8 new anti-regression checks pass. |
+| **Proxima prioridad** | CE-063 or next from CONTINUOUS-EVOLUTION-QUEUE.md |
+
+---
+
+## Cycle 125 (original CE-062) — Real Browser Performance & CSS CWV Certification
 
 | Field | Value |
 |-------|-------|

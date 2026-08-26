@@ -10,7 +10,9 @@
 window.PdfOcrEngine = (function () {
 
   function loadPdf(arrayBuffer) {
-    return window.pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer.slice(0)) }).promise;
+    return window.__ensurePdfJs().then(function() {
+      return window.pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer.slice(0)) }).promise;
+    });
   }
 
   function ensureLanguage(language) {

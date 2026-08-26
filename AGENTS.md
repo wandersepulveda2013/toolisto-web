@@ -98,8 +98,8 @@ Una tarea solo está completa cuando:
 - Storage surface audit (CE-061): 79/79.
 - ID collision & serialization (CE-061): 103/103.
 - Release gate: 30/30 suites PASS.
-- Performance regression: 540/540 PASS.
-- Total: 2225 workspace + 540 performance = 2765 pass, 0 fail.
+- Performance regression: 548/548 PASS.
+- Total: 2225 workspace + 548 performance = 2773 pass, 0 fail.
 
 El modelo OCR `spa.traineddata.gz` se sirve localmente (`vendor/tesseract/lang-data`) para tiempos E2E estables.
 La extracción doc-to-table reconstruye columnas por ancla numérica y normaliza el signo negativo del OCR: 15/15 celdas en el Star-Flow.

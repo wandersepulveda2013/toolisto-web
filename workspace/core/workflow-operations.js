@@ -226,6 +226,7 @@ export function registerWorkflowOperations(registry) {
         name: { type: 'text', label: 'Nombre del ZIP', default: 'resultados.zip' },
       },
       async execute(ctx) {
+        await window.__ensureJSZip();
         if (typeof JSZip === 'undefined') throw new Error('El empaquetador ZIP no está disponible');
         const items = ctx.input?.items || [];
         if (items.length === 0) throw new Error('No hay resultados para empaquetar');

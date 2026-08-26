@@ -47,6 +47,22 @@ const mime = {
   '.ogg':'audio/ogg'
 };
 
+function cacheControl(file, ext) {
+  if (ext === '.html' || ext === '.htm') return 'no-cache';
+  if (file.includes('service-worker')) return 'no-cache';
+  if (file.includes('manifest.webmanifest')) return 'no-cache';
+  if (['.js', '.mjs', '.css'].includes(ext)) {
+    return file.includes('?v=') ? 'public, max-age=31536000, immutable' : 'public, max-age=3600';
+  }
+  if (['.png', '.jpg', '.jpeg', '.gif', '.webp', '.avif', '.svg', '.ico'].includes(ext)) return 'public, max-age=86400';
+  if (['.woff', '.woff2', '.ttf', '.otf'].includes(ext)) return 'public, max-age=31536000, immutable';
+  if (ext === '.wasm') return 'public, max-age=31536000, immutable';
+  if (['.json', '.xml', '.txt'].includes(ext)) return 'public, max-age=3600';
+  if (['.docx', '.doc', '.odt', '.rtf', '.epub', '.mobi', '.csv', '.xlsx'].includes(ext)) return 'public, max-age=3600';
+  if (['.mp4', '.webm', '.mp3', '.wav', '.ogg'].includes(ext)) return 'public, max-age=86400';
+  return 'public, max-age=3600';
+}
+
 const server = http.createServer((req, res) => {
   let file = req.url.split('?')[0];
   if (file === '/') file = '/index.html';
@@ -64,13 +80,13 @@ const server = http.createServer((req, res) => {
   }
   if (!fs.existsSync(fp) && file.endsWith('.html')) {
     fp = path.join(dir, '404.html');
-    res.writeHead(404, {'Content-Type': 'text/html; charset=utf-8'});
+    res.writeHead(404, {'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-cache'});
     fs.readFile(fp, (err, data) => { res.end(err ? 'Not found' : data); });
     return;
   }
   if (!fs.existsSync(fp) && !path.extname(file)) {
     fp = path.join(dir, '404.html');
-    res.writeHead(404, {'Content-Type': 'text/html; charset=utf-8'});
+    res.writeHead(404, {'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-cache'});
     fs.readFile(fp, (err, data) => { res.end(err ? 'Not found' : data); });
     return;
   }
@@ -79,9 +95,13 @@ const server = http.createServer((req, res) => {
     if (fs.existsSync(srcFp)) fp = srcFp;
   }
   const ext = path.extname(fp).toLowerCase();
+  const cc = cacheControl(req.url, ext);
   fs.readFile(fp, (err, data) => {
     if (err) { res.writeHead(404); res.end('Not found'); return; }
-    res.writeHead(200, {'Content-Type': mime[ext] || 'application/octet-stream'});
+    res.writeHead(200, {
+      'Content-Type': mime[ext] || 'application/octet-stream',
+      'Cache-Control': cc,
+    });
     res.end(data);
   });
 });

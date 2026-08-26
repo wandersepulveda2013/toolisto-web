@@ -208,6 +208,35 @@ for (const p of pages) {
     hasModeCore && !hasAnyMode ? 'mode-core loaded but no modes' : !hasModeCore && hasAnyMode ? 'modes loaded without mode-core' : '');
 }
 
+// ── 9. Workspace lazy-load: vendor libs NOT eagerly loaded ──
+console.log('\n--- 9. Workspace lazy-load (CE-062) ---');
+const wsHtmlPath = join(DIST, 'workspace', 'index.html');
+if (existsSync(wsHtmlPath)) {
+  const wsHtml = read(wsHtmlPath);
+  check('workspace: pdf.min.js NOT eagerly loaded', !wsHtml.includes('pdfjs/pdf.min.js'));
+  check('workspace: jszip.min.js NOT eagerly loaded', !wsHtml.includes('jszip/jszip.min.js'));
+  check('workspace: lazy-loader.js IS present', wsHtml.includes('lazy-loader.js'));
+  check('workspace: engine-loader.js IS present', wsHtml.includes('engine-loader.js'));
+  check('workspace: all external scripts deferred or module', (() => {
+    const scriptTags = [...wsHtml.matchAll(/<script([^>]*)>/gi)];
+    const external = scriptTags.filter(s => s[1].includes('src'));
+    return external.every(s => s[1].includes('defer') || s[1].includes('type="module"') || s[1].includes("type='module'"));
+  })());
+
+  // Verify lazy-loader.js defines expected functions
+  const lazyPath = join(DIST, 'workspace', 'lazy-loader.js');
+  if (existsSync(lazyPath)) {
+    const lazy = read(lazyPath);
+    check('workspace: lazy-loader defines __ensurePdfJs', lazy.includes('__ensurePdfJs'));
+    check('workspace: lazy-loader defines __ensureJSZip', lazy.includes('__ensureJSZip'));
+    check('workspace: lazy-loader defines __lazyLoadScript', lazy.includes('__lazyLoadScript'));
+  } else {
+    check('workspace: lazy-loader.js exists in dist', false, 'file not found');
+  }
+} else {
+  console.log('  SKIPPED: workspace/index.html not found in dist');
+}
+
 // ── Summary ──
 console.log(`\n=== RESULTS: ${pass} PASS, ${fail} FAIL ===`);
 process.exit(fail > 0 ? 1 : 0);
