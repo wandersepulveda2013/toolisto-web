@@ -146,9 +146,9 @@ const splashHTML = `<div id="toolisto-intro" aria-hidden="true"><img class="intr
 
 const splashScript = `<script>(function(){var i=document.getElementById('toolisto-intro');if(!i)return;var h=document.documentElement;var r=false;function c(){if(r)return;r=true;if(i.parentNode)i.remove();h.classList.remove('intro-pending');h.classList.remove('intro-active')}var m=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;if(m){c()}else{i.addEventListener('animationend',function(e){if(e.animationName!=='introMaster')return;i.removeEventListener('animationend',c);c()});setTimeout(c,300)}})()</script>`;
 const pwaHead = `<link rel="manifest" href="./assets/manifest.webmanifest">\n  <link rel="apple-touch-icon" href="./assets/apple-touch-icon.png">`;
-const pwaScript = `<script src="./js/pwa-register.js"></script>`;
+const pwaScript = `<script src="./js/pwa-register.js" defer></script>`;
 const ASSET_VERSION = '20260814-apluno';
-const appJsTag = (rel) => `<script src="${rel}app.js?v=${ASSET_VERSION}"></script>`;
+const appJsTag = (rel) => `<script src="${rel}app.js?v=${ASSET_VERSION}" defer></script>`;
 
 const headerNav = `<header class="site-header"><div class="header-inner"><a class="brand" href="${escAttr(catalogHref)}" aria-label="Ir al catálogo de ${escAttr(productName)}"><img class="brand-mark-img" src="./assets/toolisto-mark.svg" alt="" width="36" height="36" /><span class="brand-text">${escHtml(productShortName)}</span></a><a class="apluno-parent-link" href="${escAttr(brandHref)}" aria-label="Ir al inicio de ${escAttr(brandName)}">by ${escHtml(brandName)}</a><nav class="desktop-nav" aria-label="Categorías de herramientas"><a href="${escAttr(catalogHref)}" data-nav-filter="images">Imágenes</a><a href="${escAttr(catalogHref)}" data-nav-filter="pdf">PDF</a><a href="${escAttr(catalogHref)}" data-nav-filter="signatures">Firmas</a><a href="${escAttr(catalogHref)}" data-nav-filter="documents">Documentos</a><a href="${escAttr(catalogHref)}" data-nav-filter="spreadsheets">Hojas de cálculo</a><a href="${escAttr(catalogHref)}" data-nav-filter="all">Todas</a></nav><div class="header-actions"><a class="header-action-btn" href="${escAttr(catalogHref)}" aria-label="Buscar herramientas"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg></a><button class="header-action-btn" id="themeToggle" type="button" aria-label="Cambiar tema"><svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg><svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button><button class="menu-button" id="menuToggle" type="button" aria-expanded="false" aria-controls="mobileNav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button></div></div></header><nav class="mobile-nav" id="mobileNav" hidden><a href="${escAttr(catalogHref)}" data-nav-filter="images">Imágenes</a><a href="${escAttr(catalogHref)}" data-nav-filter="pdf">PDF</a><a href="${escAttr(catalogHref)}" data-nav-filter="signatures">Firmas</a><a href="${escAttr(catalogHref)}" data-nav-filter="all">Todas las herramientas</a><a href="${escAttr(brandHref)}">${escHtml(brandName)}</a></nav>`;
 
@@ -200,6 +200,50 @@ function buildFAQ(faq) {
     }))
   }, null, 2);
   return `<section class="faq-section"><h2>Preguntas frecuentes</h2>${items}</section>\n<script type="application/ld+json">${faqLD}</script>`;
+}
+
+/* Per-category script maps — only load what each tool type actually needs. */
+const CATEGORY_ADAPTERS = {
+  images: ['./js/metadata/photo-location.js'],
+  pdf: ['./js/ocr/pdf-ocr-engine.js', './js/security/pdf-censor-engine.js', './js/security/pdf-encryptor.js'],
+  text: ['./js/accessibility/braille-es.js'],
+  calculators: ['./js/math/expression-parser.js'],
+  qrcodes: ['./vendor/js/qrcode-gen.js', './vendor/js/barcode-gen.js', './vendor/js/jsqr.js']
+};
+
+const CATEGORY_MODES = {
+  spreadsheets: ['excel'],
+  files: ['file'],
+  qrcodes: ['qr'],
+  calculators: ['calc'],
+  documents: ['structure'],
+  text: ['structure'],
+  ebooks: ['structure']
+};
+
+function buildToolScripts(tool) {
+  const cat = tool.category || '';
+  const parts = [];
+
+  const adapters = CATEGORY_ADAPTERS[cat] || [];
+  adapters.forEach(src => parts.push(`<script src=".${src}" defer></script>`));
+
+  parts.push('<script src="./js/file-limits.js" defer></script>');
+  parts.push('<script src="./js/tool-processors.js" defer></script>');
+  parts.push(appJsTag('./js/'));
+  parts.push(pwaScript);
+
+  ['before-after-viewer', 'pdf-page-navigator', 'pdf-result-viewer'].forEach(name => {
+    parts.push(`<script src="./js/components/${name}.js" defer></script>`);
+  });
+
+  const modes = CATEGORY_MODES[cat] || [];
+  if (modes.length) {
+    parts.push('<script src="./js/modes/mode-core.js" defer></script>');
+    modes.forEach(m => parts.push(`<script src="./js/modes/${m}.js" defer></script>`));
+  }
+
+  return parts.join('\n  ');
 }
 
 function buildToolPage(tool) {
@@ -292,7 +336,7 @@ function buildToolPage(tool) {
   <meta name="theme-color" content="${site.themeColor}">
   <link rel="icon" type="image/svg+xml" href="./assets/toolisto-mark.svg">
   ${pwaHead}
-  <link rel="stylesheet" href="./styles.css?v=${ASSET_VERSION}">
+  <link rel="stylesheet" href="./styles.css?v=${ASSET_VERSION}" fetchpriority="high">
   <link rel="stylesheet" href="./js/modes/modes.css?v=20260803-modes">
   <link rel="stylesheet" href="./js/components/components.css?v=20260817">
   ${splashCSS}
@@ -381,31 +425,7 @@ function buildToolPage(tool) {
     ${footerHTML}
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
   </div>
-  <script src="./vendor/js/qrcode-gen.js"></script>
-  <script src="./vendor/js/barcode-gen.js"></script>
-  <script src="./vendor/js/jsqr.js"></script>
-  <script src="./js/ocr/pdf-ocr-engine.js"></script>
-  <script src="./js/security/pdf-censor-engine.js"></script>
-  <script src="./js/security/pdf-encryptor.js"></script>
-  <script src="./js/math/expression-parser.js"></script>
-  <script src="./js/accessibility/braille-es.js"></script>
-  <script src="./js/metadata/photo-location.js"></script>
-  <script src="./js/file-limits.js"></script>
-  <script src="./js/tool-processors.js"></script>
-  ${appJsTag('./js/')}
-  ${pwaScript}
-  <script src="./js/components/before-after-viewer.js"></script>
-  <script src="./js/components/pdf-page-navigator.js"></script>
-  <script src="./js/components/pdf-result-viewer.js"></script>
-  <script src="./js/components/data-grid.js"></script>
-  <script src="./js/components/live-text-editor.js"></script>
-  <script src="./js/components/generator-preview.js"></script>
-  <script src="./js/modes/mode-core.js"></script>
-  <script src="./js/modes/calc.js"></script>
-  <script src="./js/modes/structure.js"></script>
-  <script src="./js/modes/file.js"></script>
-  <script src="./js/modes/qr.js"></script>
-  <script src="./js/modes/excel.js"></script>
+  ${buildToolScripts(tool)}
   ${splashScript}
 </body>
 </html>`;
@@ -446,7 +466,7 @@ function buildCategoryPage(cat) {
   <meta name="theme-color" content="${site.themeColor}">
   <link rel="icon" type="image/svg+xml" href="./assets/toolisto-mark.svg">
   ${pwaHead}
-  <link rel="stylesheet" href="./styles.css?v=${ASSET_VERSION}">
+  <link rel="stylesheet" href="./styles.css?v=${ASSET_VERSION}" fetchpriority="high">
   ${splashCSS}
   ${buildGoogleAnalyticsTag()}
 </head>
@@ -498,7 +518,7 @@ function build404Page() {
   <meta name="robots" content="noindex, nofollow">
   <link rel="icon" type="image/svg+xml" href="./assets/toolisto-mark.svg">
   ${pwaHead}
-  <link rel="stylesheet" href="./styles.css?v=${ASSET_VERSION}">
+  <link rel="stylesheet" href="./styles.css?v=${ASSET_VERSION}" fetchpriority="high">
   ${splashCSS}
   ${buildGoogleAnalyticsTag()}
 </head>
@@ -569,7 +589,7 @@ function buildLegalPage(slug, title, description, sections) {
   <meta name="theme-color" content="${site.themeColor}">
   <link rel="icon" type="image/svg+xml" href="./assets/toolisto-mark.svg">
   ${pwaHead}
-  <link rel="stylesheet" href="./styles.css?v=${ASSET_VERSION}">
+  <link rel="stylesheet" href="./styles.css?v=${ASSET_VERSION}" fetchpriority="high">
   ${splashCSS}
   ${buildGoogleAnalyticsTag()}
 </head>
@@ -630,7 +650,7 @@ function buildApoyarPage() {
   <meta name="theme-color" content="${site.themeColor}">
   <link rel="icon" type="image/svg+xml" href="./assets/toolisto-mark.svg">
   ${pwaHead}
-  <link rel="stylesheet" href="./styles.css?v=${ASSET_VERSION}">
+  <link rel="stylesheet" href="./styles.css?v=${ASSET_VERSION}" fetchpriority="high">
   ${splashCSS}
   ${buildGoogleAnalyticsTag()}
 </head>
