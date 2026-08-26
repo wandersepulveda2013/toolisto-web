@@ -1,0 +1,332 @@
+{
+  "deferAdversarial": {
+    "no-js-pdf": {
+      "status": 200,
+      "hasContent": true,
+      "hasCSS": true
+    },
+    "no-js-images": {
+      "status": 200,
+      "hasContent": true,
+      "hasCSS": true
+    },
+    "no-js-qr": {
+      "status": 200,
+      "hasContent": true,
+      "hasCSS": true
+    },
+    "no-js-hash": {
+      "status": 200,
+      "hasContent": true,
+      "hasCSS": true
+    },
+    "no-css-pdf": {
+      "status": 200,
+      "elements": 303
+    },
+    "no-css-images": {
+      "status": 200,
+      "elements": 302
+    },
+    "no-css-qr": {
+      "status": 200,
+      "elements": 302
+    },
+    "no-css-hash": {
+      "status": 200,
+      "elements": 299
+    },
+    "delayedJS": {
+      "clsBefore": 0,
+      "clsAfter": 0
+    },
+    "slowCSS": {
+      "loadTime": 123
+    }
+  },
+  "caching": {
+    "/comprimir-pdf.html": {
+      "status": 200,
+      "cacheControl": "NONE",
+      "etag": "NONE",
+      "lastModified": "NONE",
+      "contentEncoding": "NONE",
+      "contentType": "text/html; charset=utf-8"
+    },
+    "/toolisto": {
+      "status": 200,
+      "cacheControl": "NONE",
+      "etag": "NONE",
+      "lastModified": "NONE",
+      "contentEncoding": "NONE",
+      "contentType": "text/html; charset=utf-8"
+    },
+    "/": {
+      "status": 200,
+      "cacheControl": "NONE",
+      "etag": "NONE",
+      "lastModified": "NONE",
+      "contentEncoding": "NONE",
+      "contentType": "text/html; charset=utf-8"
+    },
+    "/workspace/": {
+      "status": 200,
+      "cacheControl": "NONE",
+      "etag": "NONE",
+      "lastModified": "NONE",
+      "contentEncoding": "NONE",
+      "contentType": "text/html; charset=utf-8"
+    },
+    "/js/app.js": {
+      "status": 200,
+      "cacheControl": "NONE",
+      "etag": "NONE",
+      "contentEncoding": "NONE",
+      "size": 383025
+    },
+    "/styles.css": {
+      "status": 200,
+      "cacheControl": "NONE",
+      "etag": "NONE",
+      "contentEncoding": "NONE",
+      "size": 86618
+    },
+    "/js/file-limits.js": {
+      "status": 200,
+      "cacheControl": "NONE",
+      "etag": "NONE",
+      "contentEncoding": "NONE",
+      "size": 18315
+    },
+    "/js/modes/mode-core.js": {
+      "status": 200,
+      "cacheControl": "NONE",
+      "etag": "NONE",
+      "contentEncoding": "NONE",
+      "size": 4378
+    }
+  },
+  "sw": {
+    "scripts": [
+      "http://localhost:8080/service-worker.js"
+    ],
+    "scope": [
+      "http://localhost:8080/"
+    ],
+    "cacheNames": [
+      "toolisto-static-v4"
+    ],
+    "supported": true
+  },
+  "budgets": {
+    "budgets": {
+      "fcp_ms": 1500,
+      "lcp_ms": 2500,
+      "cls": 0.1,
+      "tbt_ms": 200,
+      "totalTransferKB": 1500,
+      "jsTransferKB": 1000,
+      "requests": 30,
+      "domElements": 1500,
+      "renderBlockingScripts": 0,
+      "totalScripts": 20
+    },
+    "results": {
+      "homepage": {
+        "metrics": {
+          "fcp": 64,
+          "totalTransfer": 825701,
+          "jsTransfer": 767674,
+          "imageTransfer": 0,
+          "requests": 12,
+          "domElements": 190,
+          "scripts": 7,
+          "rbScripts": 0,
+          "rbScriptSrcs": []
+        },
+        "violations": [],
+        "pass": true
+      },
+      "catalog": {
+        "metrics": {
+          "fcp": 312,
+          "totalTransfer": 539398,
+          "jsTransfer": 436989,
+          "imageTransfer": 1027,
+          "requests": 15,
+          "domElements": 2005,
+          "scripts": 9,
+          "rbScripts": 0,
+          "rbScriptSrcs": []
+        },
+        "violations": [
+          "DOM 2005 > 1500"
+        ],
+        "pass": false
+      },
+      "pdf-light": {
+        "metrics": {
+          "fcp": 148,
+          "totalTransfer": 0,
+          "jsTransfer": 0,
+          "imageTransfer": 0,
+          "requests": 14,
+          "domElements": 306,
+          "scripts": 14,
+          "rbScripts": 0,
+          "rbScriptSrcs": []
+        },
+        "violations": [],
+        "pass": true
+      },
+      "images": {
+        "metrics": {
+          "fcp": 140,
+          "totalTransfer": 0,
+          "jsTransfer": 0,
+          "imageTransfer": 0,
+          "requests": 12,
+          "domElements": 334,
+          "scripts": 12,
+          "rbScripts": 0,
+          "rbScriptSrcs": []
+        },
+        "violations": [],
+        "pass": true
+      },
+      "qr": {
+        "metrics": {
+          "fcp": 132,
+          "totalTransfer": 0,
+          "jsTransfer": 0,
+          "imageTransfer": 0,
+          "requests": 16,
+          "domElements": 317,
+          "scripts": 16,
+          "rbScripts": 0,
+          "rbScriptSrcs": []
+        },
+        "violations": [],
+        "pass": true
+      },
+      "hash": {
+        "metrics": {
+          "fcp": 160,
+          "totalTransfer": 0,
+          "jsTransfer": 0,
+          "imageTransfer": 0,
+          "requests": 13,
+          "domElements": 296,
+          "scripts": 13,
+          "rbScripts": 0,
+          "rbScriptSrcs": []
+        },
+        "violations": [],
+        "pass": true
+      },
+      "workspace": {
+        "metrics": {
+          "fcp": 64,
+          "totalTransfer": 1156360,
+          "jsTransfer": 931351,
+          "imageTransfer": 0,
+          "requests": 45,
+          "domElements": 471,
+          "scripts": 6,
+          "rbScripts": 5,
+          "rbScriptSrcs": [
+            "pdf.min.js",
+            "jszip.min.js",
+            "engine-loader.js",
+            "pdf-ocr-engine.js",
+            "workspace.js?v=20260823-apluno"
+          ]
+        },
+        "violations": [
+          "Requests 45 > 30",
+          "Render-blocking 5 > 0"
+        ],
+        "pass": false
+      }
+    }
+  },
+  "antiRegression": {
+    "homepage": {
+      "fcp": 52,
+      "load": 1168.2000000178814,
+      "transfer": 418844,
+      "requests": 12,
+      "dom": 190,
+      "scripts": 7,
+      "renderBlocking": 0,
+      "title": "APLUNO — Herramientas online para PDF, imágenes y archivos",
+      "h1": "¿Qué necesitas hacer?"
+    },
+    "catalog": {
+      "fcp": 336,
+      "load": 833.5999999940395,
+      "transfer": 539090,
+      "requests": 14,
+      "dom": 2006,
+      "scripts": 9,
+      "renderBlocking": 0,
+      "title": "Toolisto Herramientas · Utilidades para tus archivos | Apluno",
+      "h1": "Hazle una cosa difícil a tu archivo. Y sigue."
+    },
+    "pdf-light": {
+      "fcp": 140,
+      "load": 126.19999998807907,
+      "transfer": 0,
+      "requests": 14,
+      "dom": 306,
+      "scripts": 14,
+      "renderBlocking": 0,
+      "title": "Comprimir PDF online gratis | Toolisto",
+      "h1": "Comprimir PDF"
+    },
+    "images": {
+      "fcp": 120,
+      "load": 110.80000001192093,
+      "transfer": 0,
+      "requests": 12,
+      "dom": 334,
+      "scripts": 12,
+      "renderBlocking": 0,
+      "title": "Comprimir imagen online gratis | Toolisto",
+      "h1": "Comprimir imagen"
+    },
+    "qr": {
+      "fcp": 156,
+      "load": 145.59999999403954,
+      "transfer": 0,
+      "requests": 16,
+      "dom": 317,
+      "scripts": 16,
+      "renderBlocking": 0,
+      "title": "Generar código QR online gratis | Toolisto",
+      "h1": "Generar código QR"
+    },
+    "hash": {
+      "fcp": 144,
+      "load": 133.5,
+      "transfer": 0,
+      "requests": 13,
+      "dom": 296,
+      "scripts": 13,
+      "renderBlocking": 0,
+      "title": "Calcular hash SHA-256 online gratis | Toolisto",
+      "h1": "Calcular hash o checksum"
+    },
+    "workspace": {
+      "fcp": 108,
+      "load": 151.09999999403954,
+      "transfer": 1156360,
+      "requests": 45,
+      "dom": 471,
+      "scripts": 6,
+      "renderBlocking": 5,
+      "title": "APLUNO Workspace",
+      "h1": "Acceso cerrado durante la implementación"
+    }
+  }
+}

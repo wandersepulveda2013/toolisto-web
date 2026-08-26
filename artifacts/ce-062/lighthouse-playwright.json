@@ -1,0 +1,516 @@
+{
+  "desktop-homepage": {
+    "timing": {
+      "ttfb": 6.0999999940395355,
+      "fcp": 552,
+      "fp": 552,
+      "domContentLoaded": 76.09999999403954,
+      "load": 2007.7000000178814,
+      "domInteractive": 28.5,
+      "transferSize": 10048,
+      "encodedBodySize": 9748,
+      "decodedBodySize": 9748
+    },
+    "lcp": null,
+    "cls": 0,
+    "tbt": 0,
+    "longTaskCount": 0,
+    "resources": {
+      "byType": {
+        "css": {
+          "count": 1,
+          "size": 39362
+        },
+        "js": {
+          "count": 6,
+          "size": 360712
+        },
+        "other": {
+          "count": 6,
+          "size": 19055
+        }
+      },
+      "totalTransfer": 419129,
+      "totalRequests": 13
+    },
+    "domSize": 189,
+    "renderBlockingScripts": [],
+    "thirdPartyOrigins": [
+      "http://localhost:8080",
+      "https://pagead2.googlesyndication.com",
+      "https://googleads.g.doubleclick.net",
+      "https://ep1.adtrafficquality.google",
+      "https://ep2.adtrafficquality.google",
+      "https://www.google.com"
+    ]
+  },
+  "desktop-catalog": {
+    "timing": {
+      "ttfb": 6,
+      "fcp": 316,
+      "fp": 316,
+      "domContentLoaded": 43.70000001788139,
+      "load": 2234.2000000178814,
+      "domInteractive": 35.900000005960464,
+      "transferSize": 146957,
+      "encodedBodySize": 146657,
+      "decodedBodySize": 146657
+    },
+    "lcp": null,
+    "cls": 0,
+    "tbt": 0,
+    "longTaskCount": 0,
+    "resources": {
+      "byType": {
+        "image": {
+          "count": 1,
+          "size": 1027
+        },
+        "css": {
+          "count": 1,
+          "size": 86918
+        },
+        "js": {
+          "count": 7,
+          "size": 1096876
+        },
+        "other": {
+          "count": 5,
+          "size": 18816
+        }
+      },
+      "totalTransfer": 1203637,
+      "totalRequests": 14
+    },
+    "domSize": 2006,
+    "renderBlockingScripts": [],
+    "thirdPartyOrigins": [
+      "http://localhost:8080",
+      "https://pagead2.googlesyndication.com",
+      "https://googleads.g.doubleclick.net",
+      "https://ep1.adtrafficquality.google",
+      "https://ep2.adtrafficquality.google",
+      "https://www.google.com"
+    ]
+  },
+  "desktop-pdf-light": {
+    "timing": {
+      "ttfb": 7.0999999940395355,
+      "fcp": 148,
+      "fp": 148,
+      "domContentLoaded": 141.5,
+      "load": 142,
+      "domInteractive": 137.19999998807907,
+      "transferSize": 20706,
+      "encodedBodySize": 20406,
+      "decodedBodySize": 20406
+    },
+    "lcp": null,
+    "cls": 0,
+    "tbt": 0,
+    "longTaskCount": 0,
+    "resources": {
+      "byType": {
+        "css": {
+          "count": 3,
+          "size": 110657
+        },
+        "image": {
+          "count": 1,
+          "size": 1027
+        },
+        "js": {
+          "count": 10,
+          "size": 906054
+        }
+      },
+      "totalTransfer": 1017738,
+      "totalRequests": 14
+    },
+    "domSize": 306,
+    "renderBlockingScripts": [],
+    "thirdPartyOrigins": [
+      "http://localhost:8080"
+    ]
+  },
+  "desktop-pdf-heavy": {
+    "timing": {
+      "ttfb": 5,
+      "fcp": 168,
+      "fp": 168,
+      "domContentLoaded": 43.19999998807907,
+      "load": 46.19999998807907,
+      "domInteractive": 25.099999994039536,
+      "transferSize": 19382,
+      "encodedBodySize": 19082,
+      "decodedBodySize": 19082
+    },
+    "lcp": null,
+    "cls": 0,
+    "tbt": 0,
+    "longTaskCount": 0,
+    "resources": {
+      "byType": {
+        "css": {
+          "count": 3,
+          "size": 110657
+        },
+        "image": {
+          "count": 1,
+          "size": 1027
+        },
+        "js": {
+          "count": 10,
+          "size": 906054
+        }
+      },
+      "totalTransfer": 1017738,
+      "totalRequests": 14
+    },
+    "domSize": 299,
+    "renderBlockingScripts": [],
+    "thirdPartyOrigins": [
+      "http://localhost:8080"
+    ]
+  },
+  "desktop-images": {
+    "timing": {
+      "ttfb": 34.19999998807907,
+      "fcp": 156,
+      "fp": 156,
+      "domContentLoaded": 142.19999998807907,
+      "load": 142.5,
+      "domInteractive": 138.59999999403954,
+      "transferSize": 21012,
+      "encodedBodySize": 20712,
+      "decodedBodySize": 20712
+    },
+    "lcp": null,
+    "cls": 0,
+    "tbt": 0,
+    "longTaskCount": 0,
+    "resources": {
+      "byType": {
+        "css": {
+          "count": 3,
+          "size": 110657
+        },
+        "image": {
+          "count": 1,
+          "size": 1027
+        },
+        "js": {
+          "count": 8,
+          "size": 868800
+        }
+      },
+      "totalTransfer": 980484,
+      "totalRequests": 12
+    },
+    "domSize": 334,
+    "renderBlockingScripts": [],
+    "thirdPartyOrigins": [
+      "http://localhost:8080"
+    ]
+  },
+  "desktop-text": {
+    "timing": {
+      "ttfb": 6.100000023841858,
+      "fcp": 184,
+      "fp": 184,
+      "domContentLoaded": 163.2000000178814,
+      "load": 163.5,
+      "domInteractive": 159.80000001192093,
+      "transferSize": 19748,
+      "encodedBodySize": 19448,
+      "decodedBodySize": 19448
+    },
+    "lcp": null,
+    "cls": 0,
+    "tbt": 0,
+    "longTaskCount": 0,
+    "resources": {
+      "byType": {
+        "css": {
+          "count": 3,
+          "size": 110657
+        },
+        "image": {
+          "count": 1,
+          "size": 1027
+        },
+        "js": {
+          "count": 10,
+          "size": 882025
+        }
+      },
+      "totalTransfer": 993709,
+      "totalRequests": 14
+    },
+    "domSize": 291,
+    "renderBlockingScripts": [],
+    "thirdPartyOrigins": [
+      "http://localhost:8080"
+    ]
+  },
+  "desktop-qr": {
+    "timing": {
+      "ttfb": 5.100000023841858,
+      "fcp": 152,
+      "fp": 152,
+      "domContentLoaded": 142.2000000178814,
+      "load": 142.5,
+      "domInteractive": 133.30000001192093,
+      "transferSize": 19894,
+      "encodedBodySize": 19594,
+      "decodedBodySize": 19594
+    },
+    "lcp": null,
+    "cls": 0,
+    "tbt": 0,
+    "longTaskCount": 0,
+    "resources": {
+      "byType": {
+        "css": {
+          "count": 3,
+          "size": 110657
+        },
+        "image": {
+          "count": 1,
+          "size": 1027
+        },
+        "js": {
+          "count": 12,
+          "size": 1216292
+        }
+      },
+      "totalTransfer": 1327976,
+      "totalRequests": 16
+    },
+    "domSize": 317,
+    "renderBlockingScripts": [],
+    "thirdPartyOrigins": [
+      "http://localhost:8080"
+    ]
+  },
+  "desktop-audio": {
+    "timing": {
+      "ttfb": 35.400000005960464,
+      "fcp": 184,
+      "fp": 184,
+      "domContentLoaded": 169.60000002384186,
+      "load": 170.10000002384186,
+      "domInteractive": 57.60000002384186,
+      "transferSize": 18831,
+      "encodedBodySize": 18531,
+      "decodedBodySize": 18531
+    },
+    "lcp": null,
+    "cls": 0,
+    "tbt": 0,
+    "longTaskCount": 0,
+    "resources": {
+      "byType": {
+        "css": {
+          "count": 3,
+          "size": 110657
+        },
+        "image": {
+          "count": 1,
+          "size": 1027
+        },
+        "js": {
+          "count": 7,
+          "size": 860528
+        }
+      },
+      "totalTransfer": 972212,
+      "totalRequests": 11
+    },
+    "domSize": 298,
+    "renderBlockingScripts": [],
+    "thirdPartyOrigins": [
+      "http://localhost:8080"
+    ]
+  },
+  "desktop-hash": {
+    "timing": {
+      "ttfb": 5.800000011920929,
+      "fcp": 188,
+      "fp": 188,
+      "domContentLoaded": 179.09999999403954,
+      "load": 179.59999999403954,
+      "domInteractive": 173.30000001192093,
+      "transferSize": 19935,
+      "encodedBodySize": 19635,
+      "decodedBodySize": 19635
+    },
+    "lcp": null,
+    "cls": 0,
+    "tbt": 0,
+    "longTaskCount": 0,
+    "resources": {
+      "byType": {
+        "css": {
+          "count": 3,
+          "size": 110657
+        },
+        "image": {
+          "count": 1,
+          "size": 1027
+        },
+        "js": {
+          "count": 9,
+          "size": 878830
+        }
+      },
+      "totalTransfer": 990514,
+      "totalRequests": 13
+    },
+    "domSize": 296,
+    "renderBlockingScripts": [],
+    "thirdPartyOrigins": [
+      "http://localhost:8080"
+    ]
+  },
+  "desktop-spreadsheet": {
+    "timing": {
+      "ttfb": 27.69999998807907,
+      "fcp": 172,
+      "fp": 172,
+      "domContentLoaded": 157.59999999403954,
+      "load": 158,
+      "domInteractive": 52.900000005960464,
+      "transferSize": 19850,
+      "encodedBodySize": 19550,
+      "decodedBodySize": 19550
+    },
+    "lcp": null,
+    "cls": 0,
+    "tbt": 0,
+    "longTaskCount": 0,
+    "resources": {
+      "byType": {
+        "css": {
+          "count": 3,
+          "size": 110657
+        },
+        "image": {
+          "count": 1,
+          "size": 1027
+        },
+        "js": {
+          "count": 9,
+          "size": 886799
+        }
+      },
+      "totalTransfer": 998483,
+      "totalRequests": 13
+    },
+    "domSize": 290,
+    "renderBlockingScripts": [],
+    "thirdPartyOrigins": [
+      "http://localhost:8080"
+    ]
+  },
+  "desktop-workspace": {
+    "timing": {
+      "ttfb": 28.099999994039536,
+      "fcp": 84,
+      "fp": 84,
+      "domContentLoaded": 181.19999998807907,
+      "load": 181.40000000596046,
+      "domInteractive": 118.69999998807907,
+      "transferSize": 15815,
+      "encodedBodySize": 15515,
+      "decodedBodySize": 15515
+    },
+    "lcp": null,
+    "cls": 0,
+    "tbt": 0,
+    "longTaskCount": 0,
+    "resources": {
+      "byType": {
+        "css": {
+          "count": 1,
+          "size": 225009
+        },
+        "image": {
+          "count": 1,
+          "size": 1027
+        },
+        "js": {
+          "count": 43,
+          "size": 1369681
+        }
+      },
+      "totalTransfer": 1595717,
+      "totalRequests": 45
+    },
+    "domSize": 471,
+    "renderBlockingScripts": [
+      "http://localhost:8080/vendor/pdfjs/pdf.min.js",
+      "http://localhost:8080/vendor/jszip/jszip.min.js",
+      "http://localhost:8080/vendor/js/engine-loader.js",
+      "http://localhost:8080/js/ocr/pdf-ocr-engine.js",
+      "http://localhost:8080/workspace/workspace.js?v=20260823-apluno"
+    ],
+    "thirdPartyOrigins": [
+      "http://localhost:8080"
+    ]
+  },
+  "mobile-homepage": {
+    "fcp": 64,
+    "lcp": null,
+    "cls": 0,
+    "tbt": 0,
+    "requests": 12,
+    "totalTransfer": 389822,
+    "domSize": 190
+  },
+  "mobile-catalog": {
+    "fcp": 272,
+    "lcp": null,
+    "cls": 0,
+    "tbt": 0,
+    "requests": 15,
+    "totalTransfer": 767417,
+    "domSize": 2005
+  },
+  "mobile-pdf-light": {
+    "fcp": 128,
+    "lcp": null,
+    "cls": 0,
+    "tbt": 0,
+    "requests": 14,
+    "totalTransfer": 1017738,
+    "domSize": 306
+  },
+  "mobile-images": {
+    "fcp": 132,
+    "lcp": null,
+    "cls": 0,
+    "tbt": 0,
+    "requests": 12,
+    "totalTransfer": 980484,
+    "domSize": 334
+  },
+  "mobile-qr": {
+    "fcp": 156,
+    "lcp": null,
+    "cls": 0,
+    "tbt": 0,
+    "requests": 16,
+    "totalTransfer": 1327976,
+    "domSize": 317
+  },
+  "mobile-hash": {
+    "fcp": 120,
+    "lcp": null,
+    "cls": 0,
+    "tbt": 0,
+    "requests": 13,
+    "totalTransfer": 990514,
+    "domSize": 296
+  }
+}

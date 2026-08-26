@@ -54,7 +54,7 @@ export function renderSeoMetadata({
   <link rel="icon" type="image/png" sizes="32x32" href="/apluno-assets/favicon-32.png">
   <link rel="apple-touch-icon" href="/apluno-assets/icon-192.png">
   <link rel="manifest" href="/manifest.webmanifest">
-  <link rel="stylesheet" href="/apluno-assets/apluno.css">
+  <link rel="stylesheet" href="/apluno-assets/apluno.css" fetchpriority="high">
   <meta property="og:type" content="${escapeHtml(type)}">
   <meta property="og:site_name" content="APLUNO">
   <meta property="og:locale" content="es_DO">

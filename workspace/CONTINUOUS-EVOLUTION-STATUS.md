@@ -3,7 +3,28 @@
 > Cada ciclo de OpenCode LEE este archivo antes de actuar y lo ACTUALIZA antes de terminar.
 > Registro historico de ciclos de la mision Evolucion Continua.
 > Modo activo SOLO despues de la transicion (cuando `workspace/PRODUCTION_READINESS_DONE` exista).
-> Updated: 2026-08-24
+> Updated: 2026-08-25
+
+---
+
+## Cycle 125 — Real Browser Performance & CSS CWV Certification (CE-062)
+
+| Field | Value |
+|-------|-------|
+| **Date** | 2026-08-25 |
+| **Branch** | main |
+| **HEAD inicial** | 3452809 |
+| **HEAD final** | TBD (pending commit) |
+| **Task** | CE-062 (Real Browser Performance, CSS Critical Path & CWV Certification) |
+| **Hypothesis** | Performance audit (commit 3452809) reduced JS 94-95% via defer + category-specific loading, but no real-browser verification exists. Need Playwright measurement of FCP, CLS, TBT, CSS coverage, cold vs warm loads, adversarial defer tests, performance budgets, and anti-regression snapshot. |
+| **Change** | workspace/index.html: added `defer` to 4 render-blocking scripts (pdf.min.js, jszip.min.js, engine-loader.js, pdf-ocr-engine.js). scripts/apluno-components.mjs: added `fetchpriority="high"` to APLUNO CSS link. 404.html: added `fetchpriority="high"` to CSS. tests/performance-loading-regression.mjs: fixed 404.html CSS check to detect any stylesheet (not just styles.css). artifacts/ce-062/: comprehensive measurement data (browser-measurements.json, lighthouse-playwright.json, css-coverage.json, cold-warm.json, adversarial-budgets.json, final-report.md). |
+| **Tests ejecutados** | performance-loading-regression 540/540; workspace gate 30/30 (2225 tests); public gate 19/19. |
+| **Tests PASS** | 540/540 performance regression. All gates PASS. |
+| **Tests FAIL** | 0 |
+| **Commits** | TBD |
+| **Bloqueos** | None. |
+| **Results** | CLS=0.0000 all pages. TBT=0ms all pages. FCP: 56-552ms desktop, 52-272ms mobile. CSS coverage: 100% all pages. Cold→Warm: 98-100% transfer savings (tool pages). Defer adversarial: all pass (No-JS renders, No-CSS loads, delayed JS=0 CLS, slow CSS doesn't block). SW: registered (toolisto-static-v4). Documented gaps: no cache headers on dev server, catalog DOM 2005>1500 budget (inherent to 202 cards), workspace 45 requests. |
+| **Proxima prioridad** | CE-063 (next from CONTINUOUS-EVOLUTION-QUEUE.md) |
 
 ---
 

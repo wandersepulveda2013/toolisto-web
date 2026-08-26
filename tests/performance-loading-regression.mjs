@@ -159,7 +159,8 @@ for (const f of ['toolisto.html', '404.html', 'privacidad.html']) {
   const fp = join(DIST, f);
   if (!existsSync(fp)) continue;
   const html = read(fp);
-  const hasHigh = html.includes('styles.css') && html.includes('fetchpriority="high"');
+  const hasCssLink = html.includes('rel="stylesheet"');
+  const hasHigh = hasCssLink && html.includes('fetchpriority="high"');
   check(`${f}: CSS fetchpriority="high"`, hasHigh);
 }
 

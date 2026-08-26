@@ -1,0 +1,301 @@
+{
+  "catalog": {
+    "sheets": {
+      "style-sheet-11880-6": {
+        "used": 31120,
+        "unused": 0,
+        "rules": 389,
+        "usedRules": 389,
+        "sheetSize": 86178
+      },
+      "style-sheet-11880-3": {
+        "used": 480,
+        "unused": 0,
+        "rules": 6,
+        "usedRules": 6,
+        "sheetSize": 1556
+      }
+    },
+    "totalUsedChars": 31600,
+    "totalUnusedChars": 0,
+    "totalRules": 395,
+    "usedRules": 395,
+    "cssInfo": {
+      "count": 1,
+      "totalRules": 752,
+      "hrefs": [
+        "styles.css?v=20260814-apluno"
+      ]
+    }
+  },
+  "pdf-light": {
+    "sheets": {
+      "style-sheet-17100-8": {
+        "used": 400,
+        "unused": 0,
+        "rules": 5,
+        "usedRules": 5,
+        "sheetSize": 1176
+      },
+      "style-sheet-17100-9": {
+        "used": 12000,
+        "unused": 0,
+        "rules": 150,
+        "usedRules": 150,
+        "sheetSize": 86178
+      }
+    },
+    "totalUsedChars": 12400,
+    "totalUnusedChars": 0,
+    "totalRules": 155,
+    "usedRules": 155,
+    "cssInfo": {
+      "count": 3,
+      "totalRules": 941,
+      "hrefs": [
+        "styles.css?v=20260814-apluno",
+        "modes.css?v=20260803-modes",
+        "components.css?v=20260817"
+      ]
+    }
+  },
+  "pdf-heavy": {
+    "sheets": {
+      "style-sheet-19836-4": {
+        "used": 400,
+        "unused": 0,
+        "rules": 5,
+        "usedRules": 5,
+        "sheetSize": 1176
+      },
+      "style-sheet-19836-2": {
+        "used": 12000,
+        "unused": 0,
+        "rules": 150,
+        "usedRules": 150,
+        "sheetSize": 86178
+      }
+    },
+    "totalUsedChars": 12400,
+    "totalUnusedChars": 0,
+    "totalRules": 155,
+    "usedRules": 155,
+    "cssInfo": {
+      "count": 3,
+      "totalRules": 941,
+      "hrefs": [
+        "styles.css?v=20260814-apluno",
+        "modes.css?v=20260803-modes",
+        "components.css?v=20260817"
+      ]
+    }
+  },
+  "images": {
+    "sheets": {
+      "style-sheet-15060-4": {
+        "used": 400,
+        "unused": 0,
+        "rules": 5,
+        "usedRules": 5,
+        "sheetSize": 1176
+      },
+      "style-sheet-15060-3": {
+        "used": 12000,
+        "unused": 0,
+        "rules": 150,
+        "usedRules": 150,
+        "sheetSize": 86178
+      }
+    },
+    "totalUsedChars": 12400,
+    "totalUnusedChars": 0,
+    "totalRules": 155,
+    "usedRules": 155,
+    "cssInfo": {
+      "count": 3,
+      "totalRules": 941,
+      "hrefs": [
+        "styles.css?v=20260814-apluno",
+        "modes.css?v=20260803-modes",
+        "components.css?v=20260817"
+      ]
+    }
+  },
+  "qr": {
+    "sheets": {
+      "style-sheet-17860-7": {
+        "used": 400,
+        "unused": 0,
+        "rules": 5,
+        "usedRules": 5,
+        "sheetSize": 1176
+      },
+      "style-sheet-17860-8": {
+        "used": 12000,
+        "unused": 0,
+        "rules": 150,
+        "usedRules": 150,
+        "sheetSize": 86178
+      }
+    },
+    "totalUsedChars": 12400,
+    "totalUnusedChars": 0,
+    "totalRules": 155,
+    "usedRules": 155,
+    "cssInfo": {
+      "count": 3,
+      "totalRules": 941,
+      "hrefs": [
+        "styles.css?v=20260814-apluno",
+        "modes.css?v=20260803-modes",
+        "components.css?v=20260817"
+      ]
+    }
+  },
+  "hash": {
+    "sheets": {
+      "style-sheet-13252-3": {
+        "used": 12000,
+        "unused": 0,
+        "rules": 150,
+        "usedRules": 150,
+        "sheetSize": 86178
+      },
+      "style-sheet-13252-8": {
+        "used": 400,
+        "unused": 0,
+        "rules": 5,
+        "usedRules": 5,
+        "sheetSize": 1176
+      }
+    },
+    "totalUsedChars": 12400,
+    "totalUnusedChars": 0,
+    "totalRules": 155,
+    "usedRules": 155,
+    "cssInfo": {
+      "count": 3,
+      "totalRules": 941,
+      "hrefs": [
+        "styles.css?v=20260814-apluno",
+        "modes.css?v=20260803-modes",
+        "components.css?v=20260817"
+      ]
+    }
+  },
+  "spreadsheet": {
+    "sheets": {
+      "style-sheet-11832-6": {
+        "used": 12000,
+        "unused": 0,
+        "rules": 150,
+        "usedRules": 150,
+        "sheetSize": 86178
+      },
+      "style-sheet-11832-5": {
+        "used": 400,
+        "unused": 0,
+        "rules": 5,
+        "usedRules": 5,
+        "sheetSize": 1176
+      }
+    },
+    "totalUsedChars": 12400,
+    "totalUnusedChars": 0,
+    "totalRules": 155,
+    "usedRules": 155,
+    "cssInfo": {
+      "count": 3,
+      "totalRules": 941,
+      "hrefs": [
+        "styles.css?v=20260814-apluno",
+        "modes.css?v=20260803-modes",
+        "components.css?v=20260817"
+      ]
+    }
+  },
+  "audio": {
+    "sheets": {
+      "style-sheet-24168-3": {
+        "used": 12000,
+        "unused": 0,
+        "rules": 150,
+        "usedRules": 150,
+        "sheetSize": 86178
+      },
+      "style-sheet-24168-7": {
+        "used": 400,
+        "unused": 0,
+        "rules": 5,
+        "usedRules": 5,
+        "sheetSize": 1176
+      }
+    },
+    "totalUsedChars": 12400,
+    "totalUnusedChars": 0,
+    "totalRules": 155,
+    "usedRules": 155,
+    "cssInfo": {
+      "count": 3,
+      "totalRules": 941,
+      "hrefs": [
+        "styles.css?v=20260814-apluno",
+        "modes.css?v=20260803-modes",
+        "components.css?v=20260817"
+      ]
+    }
+  },
+  "text": {
+    "sheets": {
+      "style-sheet-20564-2": {
+        "used": 12000,
+        "unused": 0,
+        "rules": 150,
+        "usedRules": 150,
+        "sheetSize": 86178
+      },
+      "style-sheet-20564-8": {
+        "used": 400,
+        "unused": 0,
+        "rules": 5,
+        "usedRules": 5,
+        "sheetSize": 1176
+      }
+    },
+    "totalUsedChars": 12400,
+    "totalUnusedChars": 0,
+    "totalRules": 155,
+    "usedRules": 155,
+    "cssInfo": {
+      "count": 3,
+      "totalRules": 941,
+      "hrefs": [
+        "styles.css?v=20260814-apluno",
+        "modes.css?v=20260803-modes",
+        "components.css?v=20260817"
+      ]
+    }
+  },
+  "workspace": {
+    "sheets": {
+      "style-sheet-18052-1": {
+        "used": 17360,
+        "unused": 0,
+        "rules": 217,
+        "usedRules": 217,
+        "sheetSize": 224341
+      }
+    },
+    "totalUsedChars": 17360,
+    "totalUnusedChars": 0,
+    "totalRules": 217,
+    "usedRules": 217,
+    "cssInfo": {
+      "count": 1,
+      "totalRules": 1589,
+      "hrefs": [
+        "workspace.css?v=20260822-apluno"
+      ]
+    }
+  }
+}

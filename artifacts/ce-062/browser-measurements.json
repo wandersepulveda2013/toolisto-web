@@ -1,0 +1,1367 @@
+{
+  "desktop-homepage": {
+    "status": 200,
+    "url": "http://localhost:8090/",
+    "timing": {
+      "domContentLoaded": 113,
+      "load": 3624.0999999940395,
+      "ttfb": 20.899999976158142,
+      "domInteractive": 42.5,
+      "transferSize": 10048,
+      "encodedBodySize": 9748,
+      "decodedBodySize": 9748,
+      "firstPaint": 124,
+      "firstContentfulPaint": 124
+    },
+    "resources": {
+      "byType": {
+        "css": {
+          "count": 1,
+          "size": 39362
+        },
+        "js": {
+          "count": 6,
+          "size": 331615
+        },
+        "other": {
+          "count": 5,
+          "size": 18376
+        }
+      },
+      "totalTransfer": 389353,
+      "totalRequests": 12
+    },
+    "dom": {
+      "totalElements": 189,
+      "maxDepth": 8,
+      "hiddenElements": 7,
+      "scripts": 7,
+      "stylesheets": 1,
+      "images": 0,
+      "lazyImages": 0
+    },
+    "longTasks": [],
+    "cls": 0.050421266545834016,
+    "tbt": 0,
+    "memory": {
+      "usedJSHeapSize": 10600000,
+      "totalJSHeapSize": 15200000,
+      "jsHeapSizeLimit": 3760000000
+    }
+  },
+  "desktop-catalog": {
+    "status": 200,
+    "url": "http://localhost:8090/toolisto",
+    "timing": {
+      "domContentLoaded": 358.40000000596046,
+      "load": 805.3000000119209,
+      "ttfb": 5.700000017881393,
+      "domInteractive": 345.80000001192093,
+      "transferSize": 146957,
+      "encodedBodySize": 146657,
+      "decodedBodySize": 146657,
+      "firstPaint": 340,
+      "firstContentfulPaint": 340
+    },
+    "resources": {
+      "byType": {
+        "image": {
+          "count": 1,
+          "size": 1027
+        },
+        "css": {
+          "count": 1,
+          "size": 86918
+        },
+        "js": {
+          "count": 7,
+          "size": 436989
+        },
+        "other": {
+          "count": 5,
+          "size": 14195
+        }
+      },
+      "totalTransfer": 539129,
+      "totalRequests": 14
+    },
+    "dom": {
+      "totalElements": 2005,
+      "maxDepth": 11,
+      "hiddenElements": 8,
+      "scripts": 9,
+      "stylesheets": 1,
+      "images": 2,
+      "lazyImages": 0
+    },
+    "longTasks": [],
+    "cls": 0,
+    "tbt": 0,
+    "memory": {
+      "usedJSHeapSize": 10600000,
+      "totalJSHeapSize": 15200000,
+      "jsHeapSizeLimit": 3760000000
+    }
+  },
+  "desktop-workspace": {
+    "status": 200,
+    "url": "http://localhost:8090/workspace/",
+    "timing": {
+      "domContentLoaded": 450.2000000178814,
+      "load": 450.30000001192093,
+      "ttfb": 5.700000017881393,
+      "domInteractive": 296.2000000178814,
+      "transferSize": 15815,
+      "encodedBodySize": 15515,
+      "decodedBodySize": 15515,
+      "firstPaint": 76,
+      "firstContentfulPaint": 76
+    },
+    "resources": {
+      "byType": {
+        "css": {
+          "count": 1,
+          "size": 225009
+        },
+        "image": {
+          "count": 1,
+          "size": 0
+        },
+        "js": {
+          "count": 43,
+          "size": 931351
+        }
+      },
+      "totalTransfer": 1156360,
+      "totalRequests": 45
+    },
+    "dom": {
+      "totalElements": 471,
+      "maxDepth": 11,
+      "hiddenElements": 1,
+      "scripts": 6,
+      "stylesheets": 1,
+      "images": 2,
+      "lazyImages": 0
+    },
+    "longTasks": [],
+    "cls": 0,
+    "tbt": 0,
+    "memory": {
+      "usedJSHeapSize": 10000000,
+      "totalJSHeapSize": 10000000,
+      "jsHeapSizeLimit": 3760000000
+    }
+  },
+  "desktop-pdf-light": {
+    "status": 200,
+    "url": "http://localhost:8090/comprimir-pdf.html",
+    "timing": {
+      "domContentLoaded": 261.5,
+      "load": 261.80000001192093,
+      "ttfb": 6.700000017881393,
+      "domInteractive": 119.09999999403954,
+      "transferSize": 20706,
+      "encodedBodySize": 20406,
+      "decodedBodySize": 20406,
+      "firstPaint": 144,
+      "firstContentfulPaint": 144
+    },
+    "resources": {
+      "byType": {
+        "css": {
+          "count": 3,
+          "size": 0
+        },
+        "image": {
+          "count": 1,
+          "size": 0
+        },
+        "js": {
+          "count": 10,
+          "size": 0
+        }
+      },
+      "totalTransfer": 0,
+      "totalRequests": 14
+    },
+    "dom": {
+      "totalElements": 306,
+      "maxDepth": 11,
+      "hiddenElements": 10,
+      "scripts": 14,
+      "stylesheets": 3,
+      "images": 2,
+      "lazyImages": 0
+    },
+    "longTasks": [],
+    "cls": 0.001096127533938412,
+    "tbt": 0,
+    "memory": {
+      "usedJSHeapSize": 10000000,
+      "totalJSHeapSize": 10000000,
+      "jsHeapSizeLimit": 3760000000
+    }
+  },
+  "desktop-pdf-heavy": {
+    "status": 200,
+    "url": "http://localhost:8090/extraer-texto-pdf-escaneado.html",
+    "timing": {
+      "domContentLoaded": 122.09999999403954,
+      "load": 122.59999999403954,
+      "ttfb": 5.699999988079071,
+      "domInteractive": 117.19999998807907,
+      "transferSize": 19382,
+      "encodedBodySize": 19082,
+      "decodedBodySize": 19082,
+      "firstPaint": 128,
+      "firstContentfulPaint": 128
+    },
+    "resources": {
+      "byType": {
+        "css": {
+          "count": 3,
+          "size": 0
+        },
+        "image": {
+          "count": 1,
+          "size": 0
+        },
+        "js": {
+          "count": 10,
+          "size": 0
+        }
+      },
+      "totalTransfer": 0,
+      "totalRequests": 14
+    },
+    "dom": {
+      "totalElements": 299,
+      "maxDepth": 11,
+      "hiddenElements": 10,
+      "scripts": 14,
+      "stylesheets": 3,
+      "images": 2,
+      "lazyImages": 0
+    },
+    "longTasks": [],
+    "cls": 0.0010105699244567106,
+    "tbt": 0,
+    "memory": {
+      "usedJSHeapSize": 10000000,
+      "totalJSHeapSize": 10000000,
+      "jsHeapSizeLimit": 3760000000
+    }
+  },
+  "desktop-images": {
+    "status": 200,
+    "url": "http://localhost:8090/comprimir-imagen.html",
+    "timing": {
+      "domContentLoaded": 121.5,
+      "load": 121.90000000596046,
+      "ttfb": 5.0999999940395355,
+      "domInteractive": 25,
+      "transferSize": 21012,
+      "encodedBodySize": 20712,
+      "decodedBodySize": 20712,
+      "firstPaint": 132,
+      "firstContentfulPaint": 132
+    },
+    "resources": {
+      "byType": {
+        "css": {
+          "count": 3,
+          "size": 0
+        },
+        "image": {
+          "count": 1,
+          "size": 0
+        },
+        "js": {
+          "count": 8,
+          "size": 0
+        }
+      },
+      "totalTransfer": 0,
+      "totalRequests": 12
+    },
+    "dom": {
+      "totalElements": 334,
+      "maxDepth": 13,
+      "hiddenElements": 11,
+      "scripts": 12,
+      "stylesheets": 3,
+      "images": 2,
+      "lazyImages": 0
+    },
+    "longTasks": [],
+    "cls": 0.0011758459000430236,
+    "tbt": 0,
+    "memory": {
+      "usedJSHeapSize": 10000000,
+      "totalJSHeapSize": 10000000,
+      "jsHeapSizeLimit": 3760000000
+    }
+  },
+  "desktop-text": {
+    "status": 200,
+    "url": "http://localhost:8090/contar-palabras.html",
+    "timing": {
+      "domContentLoaded": 133.40000000596046,
+      "load": 134,
+      "ttfb": 4.800000011920929,
+      "domInteractive": 26.30000001192093,
+      "transferSize": 19748,
+      "encodedBodySize": 19448,
+      "decodedBodySize": 19448,
+      "firstPaint": 148,
+      "firstContentfulPaint": 148
+    },
+    "resources": {
+      "byType": {
+        "css": {
+          "count": 3,
+          "size": 0
+        },
+        "image": {
+          "count": 1,
+          "size": 0
+        },
+        "js": {
+          "count": 10,
+          "size": 0
+        }
+      },
+      "totalTransfer": 0,
+      "totalRequests": 14
+    },
+    "dom": {
+      "totalElements": 291,
+      "maxDepth": 11,
+      "hiddenElements": 10,
+      "scripts": 14,
+      "stylesheets": 3,
+      "images": 2,
+      "lazyImages": 0
+    },
+    "longTasks": [],
+    "cls": 0.0011758459000430236,
+    "tbt": 0,
+    "memory": {
+      "usedJSHeapSize": 10000000,
+      "totalJSHeapSize": 10000000,
+      "jsHeapSizeLimit": 3760000000
+    }
+  },
+  "desktop-qr": {
+    "status": 200,
+    "url": "http://localhost:8090/generar-qr.html",
+    "timing": {
+      "domContentLoaded": 153.19999998807907,
+      "load": 153.69999998807907,
+      "ttfb": 6.9000000059604645,
+      "domInteractive": 31.400000005960464,
+      "transferSize": 19894,
+      "encodedBodySize": 19594,
+      "decodedBodySize": 19594,
+      "firstPaint": 164,
+      "firstContentfulPaint": 164
+    },
+    "resources": {
+      "byType": {
+        "css": {
+          "count": 3,
+          "size": 0
+        },
+        "image": {
+          "count": 1,
+          "size": 0
+        },
+        "js": {
+          "count": 12,
+          "size": 0
+        }
+      },
+      "totalTransfer": 0,
+      "totalRequests": 16
+    },
+    "dom": {
+      "totalElements": 317,
+      "maxDepth": 11,
+      "hiddenElements": 10,
+      "scripts": 16,
+      "stylesheets": 3,
+      "images": 2,
+      "lazyImages": 0
+    },
+    "longTasks": [],
+    "cls": 0.0011758459000430236,
+    "tbt": 0,
+    "memory": {
+      "usedJSHeapSize": 10000000,
+      "totalJSHeapSize": 10000000,
+      "jsHeapSizeLimit": 3760000000
+    }
+  },
+  "desktop-vendor-heavy": {
+    "status": 200,
+    "url": "http://localhost:8090/convertir-audio.html",
+    "timing": {
+      "domContentLoaded": 133.5,
+      "load": 133.90000000596046,
+      "ttfb": 5.300000011920929,
+      "domInteractive": 128.80000001192093,
+      "transferSize": 18831,
+      "encodedBodySize": 18531,
+      "decodedBodySize": 18531,
+      "firstPaint": 140,
+      "firstContentfulPaint": 140
+    },
+    "resources": {
+      "byType": {
+        "css": {
+          "count": 3,
+          "size": 0
+        },
+        "image": {
+          "count": 1,
+          "size": 0
+        },
+        "js": {
+          "count": 7,
+          "size": 0
+        }
+      },
+      "totalTransfer": 0,
+      "totalRequests": 11
+    },
+    "dom": {
+      "totalElements": 298,
+      "maxDepth": 11,
+      "hiddenElements": 11,
+      "scripts": 11,
+      "stylesheets": 3,
+      "images": 2,
+      "lazyImages": 0
+    },
+    "longTasks": [],
+    "cls": 0.001096127533938412,
+    "tbt": 0,
+    "memory": {
+      "usedJSHeapSize": 10000000,
+      "totalJSHeapSize": 10000000,
+      "jsHeapSizeLimit": 3760000000
+    }
+  },
+  "desktop-simple": {
+    "status": 200,
+    "url": "http://localhost:8090/calcular-hash.html",
+    "timing": {
+      "domContentLoaded": 155.5,
+      "load": 155.7999999821186,
+      "ttfb": 6.4000000059604645,
+      "domInteractive": 151.09999999403954,
+      "transferSize": 19935,
+      "encodedBodySize": 19635,
+      "decodedBodySize": 19635,
+      "firstPaint": 172,
+      "firstContentfulPaint": 172
+    },
+    "resources": {
+      "byType": {
+        "css": {
+          "count": 3,
+          "size": 0
+        },
+        "image": {
+          "count": 1,
+          "size": 0
+        },
+        "js": {
+          "count": 9,
+          "size": 0
+        }
+      },
+      "totalTransfer": 0,
+      "totalRequests": 13
+    },
+    "dom": {
+      "totalElements": 296,
+      "maxDepth": 11,
+      "hiddenElements": 10,
+      "scripts": 13,
+      "stylesheets": 3,
+      "images": 2,
+      "lazyImages": 0
+    },
+    "longTasks": [],
+    "cls": 0.0011758459000430236,
+    "tbt": 0,
+    "memory": {
+      "usedJSHeapSize": 10000000,
+      "totalJSHeapSize": 10000000,
+      "jsHeapSizeLimit": 3760000000
+    }
+  },
+  "desktop-spreadsheet": {
+    "status": 200,
+    "url": "http://localhost:8090/csv-a-excel.html",
+    "timing": {
+      "domContentLoaded": 126,
+      "load": 126.59999999403954,
+      "ttfb": 6.5999999940395355,
+      "domInteractive": 27.5,
+      "transferSize": 19850,
+      "encodedBodySize": 19550,
+      "decodedBodySize": 19550,
+      "firstPaint": 136,
+      "firstContentfulPaint": 136
+    },
+    "resources": {
+      "byType": {
+        "css": {
+          "count": 3,
+          "size": 0
+        },
+        "image": {
+          "count": 1,
+          "size": 0
+        },
+        "js": {
+          "count": 9,
+          "size": 0
+        }
+      },
+      "totalTransfer": 0,
+      "totalRequests": 13
+    },
+    "dom": {
+      "totalElements": 290,
+      "maxDepth": 11,
+      "hiddenElements": 10,
+      "scripts": 13,
+      "stylesheets": 3,
+      "images": 2,
+      "lazyImages": 0
+    },
+    "longTasks": [],
+    "cls": 0.0011758459000430236,
+    "tbt": 0,
+    "memory": {
+      "usedJSHeapSize": 10000000,
+      "totalJSHeapSize": 10000000,
+      "jsHeapSizeLimit": 3760000000
+    }
+  },
+  "desktop-pdf-encrypt": {
+    "status": 200,
+    "url": "http://localhost:8090/encriptar-pdf-avanzado.html",
+    "timing": {
+      "domContentLoaded": 135.5,
+      "load": 136,
+      "ttfb": 5.799999982118607,
+      "domInteractive": 24.19999998807907,
+      "transferSize": 19920,
+      "encodedBodySize": 19620,
+      "decodedBodySize": 19620,
+      "firstPaint": 148,
+      "firstContentfulPaint": 148
+    },
+    "resources": {
+      "byType": {
+        "css": {
+          "count": 3,
+          "size": 0
+        },
+        "image": {
+          "count": 1,
+          "size": 0
+        },
+        "js": {
+          "count": 10,
+          "size": 0
+        }
+      },
+      "totalTransfer": 0,
+      "totalRequests": 14
+    },
+    "dom": {
+      "totalElements": 311,
+      "maxDepth": 11,
+      "hiddenElements": 10,
+      "scripts": 14,
+      "stylesheets": 3,
+      "images": 2,
+      "lazyImages": 0
+    },
+    "longTasks": [],
+    "cls": 0.0011758459000430236,
+    "tbt": 0,
+    "memory": {
+      "usedJSHeapSize": 10000000,
+      "totalJSHeapSize": 10000000,
+      "jsHeapSizeLimit": 3760000000
+    }
+  },
+  "mobile-homepage": {
+    "status": 200,
+    "url": "http://localhost:8090/",
+    "timing": {
+      "domContentLoaded": 48,
+      "load": 3158.699999988079,
+      "ttfb": 4.799999982118607,
+      "domInteractive": 13.699999988079071,
+      "transferSize": 10048,
+      "encodedBodySize": 9748,
+      "decodedBodySize": 9748,
+      "firstPaint": 52,
+      "firstContentfulPaint": 52
+    },
+    "resources": {
+      "byType": {
+        "css": {
+          "count": 1,
+          "size": 39362
+        },
+        "js": {
+          "count": 6,
+          "size": 331618
+        },
+        "other": {
+          "count": 5,
+          "size": 18334
+        }
+      },
+      "totalTransfer": 389314,
+      "totalRequests": 12
+    },
+    "dom": {
+      "totalElements": 189,
+      "maxDepth": 8,
+      "hiddenElements": 7,
+      "scripts": 7,
+      "stylesheets": 1,
+      "images": 0,
+      "lazyImages": 0
+    },
+    "longTasks": [],
+    "cls": 0,
+    "tbt": 0,
+    "memory": {
+      "usedJSHeapSize": 10000000,
+      "totalJSHeapSize": 14300000,
+      "jsHeapSizeLimit": 3760000000
+    }
+  },
+  "mobile-catalog": {
+    "status": 200,
+    "url": "http://localhost:8090/toolisto",
+    "timing": {
+      "domContentLoaded": 241.09999999403954,
+      "load": 412.59999999403954,
+      "ttfb": 3.5,
+      "domInteractive": 233.69999998807907,
+      "transferSize": 146957,
+      "encodedBodySize": 146657,
+      "decodedBodySize": 146657,
+      "firstPaint": 40,
+      "firstContentfulPaint": 268
+    },
+    "resources": {
+      "byType": {
+        "image": {
+          "count": 1,
+          "size": 1027
+        },
+        "css": {
+          "count": 1,
+          "size": 86918
+        },
+        "js": {
+          "count": 7,
+          "size": 436989
+        },
+        "other": {
+          "count": 7,
+          "size": 14718
+        }
+      },
+      "totalTransfer": 539652,
+      "totalRequests": 16
+    },
+    "dom": {
+      "totalElements": 2005,
+      "maxDepth": 11,
+      "hiddenElements": 8,
+      "scripts": 9,
+      "stylesheets": 1,
+      "images": 2,
+      "lazyImages": 0
+    },
+    "longTasks": [],
+    "cls": 0,
+    "tbt": 0,
+    "memory": {
+      "usedJSHeapSize": 11200000,
+      "totalJSHeapSize": 15200000,
+      "jsHeapSizeLimit": 3760000000
+    }
+  },
+  "mobile-pdf-light": {
+    "status": 200,
+    "url": "http://localhost:8090/comprimir-pdf.html",
+    "timing": {
+      "domContentLoaded": 119,
+      "load": 119.40000000596046,
+      "ttfb": 5.200000017881393,
+      "domInteractive": 39.5,
+      "transferSize": 20706,
+      "encodedBodySize": 20406,
+      "decodedBodySize": 20406,
+      "firstPaint": 128,
+      "firstContentfulPaint": 128
+    },
+    "resources": {
+      "byType": {
+        "css": {
+          "count": 3,
+          "size": 0
+        },
+        "image": {
+          "count": 1,
+          "size": 0
+        },
+        "js": {
+          "count": 10,
+          "size": 0
+        }
+      },
+      "totalTransfer": 0,
+      "totalRequests": 14
+    },
+    "dom": {
+      "totalElements": 306,
+      "maxDepth": 11,
+      "hiddenElements": 10,
+      "scripts": 14,
+      "stylesheets": 3,
+      "images": 2,
+      "lazyImages": 0
+    },
+    "longTasks": [],
+    "cls": 0,
+    "tbt": 0,
+    "memory": {
+      "usedJSHeapSize": 10000000,
+      "totalJSHeapSize": 10000000,
+      "jsHeapSizeLimit": 3760000000
+    }
+  },
+  "mobile-images": {
+    "status": 200,
+    "url": "http://localhost:8090/comprimir-imagen.html",
+    "timing": {
+      "domContentLoaded": 144.90000000596046,
+      "load": 145.2999999821186,
+      "ttfb": 5.299999982118607,
+      "domInteractive": 139.5,
+      "transferSize": 21012,
+      "encodedBodySize": 20712,
+      "decodedBodySize": 20712,
+      "firstPaint": 148,
+      "firstContentfulPaint": 148
+    },
+    "resources": {
+      "byType": {
+        "css": {
+          "count": 3,
+          "size": 0
+        },
+        "image": {
+          "count": 1,
+          "size": 0
+        },
+        "js": {
+          "count": 8,
+          "size": 0
+        }
+      },
+      "totalTransfer": 0,
+      "totalRequests": 12
+    },
+    "dom": {
+      "totalElements": 334,
+      "maxDepth": 13,
+      "hiddenElements": 11,
+      "scripts": 12,
+      "stylesheets": 3,
+      "images": 2,
+      "lazyImages": 0
+    },
+    "longTasks": [],
+    "cls": 0,
+    "tbt": 0,
+    "memory": {
+      "usedJSHeapSize": 10000000,
+      "totalJSHeapSize": 10000000,
+      "jsHeapSizeLimit": 3760000000
+    }
+  },
+  "mobile-qr": {
+    "status": 200,
+    "url": "http://localhost:8090/generar-qr.html",
+    "timing": {
+      "domContentLoaded": 141.59999999403954,
+      "load": 141.90000000596046,
+      "ttfb": 7,
+      "domInteractive": 131.69999998807907,
+      "transferSize": 19894,
+      "encodedBodySize": 19594,
+      "decodedBodySize": 19594,
+      "firstPaint": 144,
+      "firstContentfulPaint": 144
+    },
+    "resources": {
+      "byType": {
+        "css": {
+          "count": 3,
+          "size": 0
+        },
+        "image": {
+          "count": 1,
+          "size": 0
+        },
+        "js": {
+          "count": 12,
+          "size": 0
+        }
+      },
+      "totalTransfer": 0,
+      "totalRequests": 16
+    },
+    "dom": {
+      "totalElements": 317,
+      "maxDepth": 11,
+      "hiddenElements": 10,
+      "scripts": 16,
+      "stylesheets": 3,
+      "images": 2,
+      "lazyImages": 0
+    },
+    "longTasks": [],
+    "cls": 0,
+    "tbt": 0,
+    "memory": {
+      "usedJSHeapSize": 10000000,
+      "totalJSHeapSize": 10000000,
+      "jsHeapSizeLimit": 3760000000
+    }
+  },
+  "mobile-simple": {
+    "status": 200,
+    "url": "http://localhost:8090/calcular-hash.html",
+    "timing": {
+      "domContentLoaded": 114.40000000596046,
+      "load": 114.59999999403954,
+      "ttfb": 4.799999982118607,
+      "domInteractive": 110.69999998807907,
+      "transferSize": 19935,
+      "encodedBodySize": 19635,
+      "decodedBodySize": 19635,
+      "firstPaint": 120,
+      "firstContentfulPaint": 120
+    },
+    "resources": {
+      "byType": {
+        "css": {
+          "count": 3,
+          "size": 0
+        },
+        "image": {
+          "count": 1,
+          "size": 0
+        },
+        "js": {
+          "count": 9,
+          "size": 0
+        }
+      },
+      "totalTransfer": 0,
+      "totalRequests": 13
+    },
+    "dom": {
+      "totalElements": 296,
+      "maxDepth": 11,
+      "hiddenElements": 10,
+      "scripts": 13,
+      "stylesheets": 3,
+      "images": 2,
+      "lazyImages": 0
+    },
+    "longTasks": [],
+    "cls": 0,
+    "tbt": 0,
+    "memory": {
+      "usedJSHeapSize": 10000000,
+      "totalJSHeapSize": 10000000,
+      "jsHeapSizeLimit": 3760000000
+    }
+  },
+  "cold-catalog": {
+    "status": 200,
+    "url": "http://localhost:8090/toolisto",
+    "timing": {
+      "domContentLoaded": 243.5,
+      "load": 957.0999999940395,
+      "ttfb": 3.5999999940395355,
+      "domInteractive": 233.7000000178814,
+      "transferSize": 146957,
+      "encodedBodySize": 146657,
+      "decodedBodySize": 146657,
+      "firstPaint": 52,
+      "firstContentfulPaint": 272
+    },
+    "resources": {
+      "byType": {
+        "image": {
+          "count": 1,
+          "size": 1027
+        },
+        "css": {
+          "count": 1,
+          "size": 86918
+        },
+        "js": {
+          "count": 7,
+          "size": 689925
+        },
+        "other": {
+          "count": 5,
+          "size": 18663
+        }
+      },
+      "totalTransfer": 796533,
+      "totalRequests": 14
+    },
+    "dom": {
+      "totalElements": 2005,
+      "maxDepth": 11,
+      "hiddenElements": 8,
+      "scripts": 9,
+      "stylesheets": 1,
+      "images": 2,
+      "lazyImages": 0
+    },
+    "longTasks": [],
+    "cls": 0,
+    "tbt": 0
+  },
+  "warm-catalog": {
+    "status": 200,
+    "url": "http://localhost:8090/toolisto",
+    "timing": {
+      "domContentLoaded": 91.19999998807907,
+      "load": 366.59999999403954,
+      "ttfb": 9.5,
+      "domInteractive": 81.09999999403954,
+      "transferSize": 146957,
+      "encodedBodySize": 146657,
+      "decodedBodySize": 146657,
+      "firstPaint": 52,
+      "firstContentfulPaint": 108
+    },
+    "resources": {
+      "byType": {
+        "image": {
+          "count": 1,
+          "size": 0
+        },
+        "css": {
+          "count": 1,
+          "size": 0
+        },
+        "js": {
+          "count": 7,
+          "size": 0
+        },
+        "other": {
+          "count": 5,
+          "size": 14179
+        }
+      },
+      "totalTransfer": 14179,
+      "totalRequests": 14
+    },
+    "dom": {
+      "totalElements": 2005,
+      "maxDepth": 11,
+      "hiddenElements": 8,
+      "scripts": 9,
+      "stylesheets": 1,
+      "images": 2,
+      "lazyImages": 0
+    },
+    "longTasks": [],
+    "cls": 0,
+    "tbt": 0
+  },
+  "cold-pdf-light": {
+    "status": 200,
+    "url": "http://localhost:8090/comprimir-pdf.html",
+    "timing": {
+      "domContentLoaded": 106.59999999403954,
+      "load": 106.89999997615814,
+      "ttfb": 5.299999982118607,
+      "domInteractive": 26.5,
+      "transferSize": 20706,
+      "encodedBodySize": 20406,
+      "decodedBodySize": 20406,
+      "firstPaint": 128,
+      "firstContentfulPaint": 128
+    },
+    "resources": {
+      "byType": {
+        "css": {
+          "count": 3,
+          "size": 110657
+        },
+        "image": {
+          "count": 1,
+          "size": 1027
+        },
+        "js": {
+          "count": 10,
+          "size": 906054
+        }
+      },
+      "totalTransfer": 1017738,
+      "totalRequests": 14
+    },
+    "dom": {
+      "totalElements": 306,
+      "maxDepth": 11,
+      "hiddenElements": 10,
+      "scripts": 14,
+      "stylesheets": 3,
+      "images": 2,
+      "lazyImages": 0
+    },
+    "longTasks": [],
+    "cls": 0.001096127533938412,
+    "tbt": 0
+  },
+  "warm-pdf-light": {
+    "status": 200,
+    "url": "http://localhost:8090/comprimir-pdf.html",
+    "timing": {
+      "domContentLoaded": 89.69999998807907,
+      "load": 90.19999998807907,
+      "ttfb": 12.099999994039536,
+      "domInteractive": 46.69999998807907,
+      "transferSize": 20706,
+      "encodedBodySize": 20406,
+      "decodedBodySize": 20406,
+      "firstPaint": 88,
+      "firstContentfulPaint": 88
+    },
+    "resources": {
+      "byType": {
+        "css": {
+          "count": 3,
+          "size": 0
+        },
+        "image": {
+          "count": 1,
+          "size": 0
+        },
+        "js": {
+          "count": 10,
+          "size": 0
+        }
+      },
+      "totalTransfer": 0,
+      "totalRequests": 14
+    },
+    "dom": {
+      "totalElements": 306,
+      "maxDepth": 11,
+      "hiddenElements": 10,
+      "scripts": 14,
+      "stylesheets": 3,
+      "images": 2,
+      "lazyImages": 0
+    },
+    "longTasks": [],
+    "cls": 0.001096127533938412,
+    "tbt": 0
+  },
+  "cold-images": {
+    "status": 200,
+    "url": "http://localhost:8090/comprimir-imagen.html",
+    "timing": {
+      "domContentLoaded": 120.2000000178814,
+      "load": 120.59999999403954,
+      "ttfb": 4.700000017881393,
+      "domInteractive": 28.700000017881393,
+      "transferSize": 21012,
+      "encodedBodySize": 20712,
+      "decodedBodySize": 20712,
+      "firstPaint": 132,
+      "firstContentfulPaint": 132
+    },
+    "resources": {
+      "byType": {
+        "css": {
+          "count": 3,
+          "size": 110657
+        },
+        "image": {
+          "count": 1,
+          "size": 1027
+        },
+        "js": {
+          "count": 8,
+          "size": 868800
+        }
+      },
+      "totalTransfer": 980484,
+      "totalRequests": 12
+    },
+    "dom": {
+      "totalElements": 334,
+      "maxDepth": 13,
+      "hiddenElements": 11,
+      "scripts": 12,
+      "stylesheets": 3,
+      "images": 2,
+      "lazyImages": 0
+    },
+    "longTasks": [],
+    "cls": 0.0011758459000430236,
+    "tbt": 0
+  },
+  "warm-images": {
+    "status": 200,
+    "url": "http://localhost:8090/comprimir-imagen.html",
+    "timing": {
+      "domContentLoaded": 79.10000002384186,
+      "load": 79.2000000178814,
+      "ttfb": 8.700000017881393,
+      "domInteractive": 51.20000001788139,
+      "transferSize": 21012,
+      "encodedBodySize": 20712,
+      "decodedBodySize": 20712,
+      "firstPaint": 100,
+      "firstContentfulPaint": 100
+    },
+    "resources": {
+      "byType": {
+        "css": {
+          "count": 3,
+          "size": 0
+        },
+        "image": {
+          "count": 1,
+          "size": 0
+        },
+        "js": {
+          "count": 8,
+          "size": 0
+        }
+      },
+      "totalTransfer": 0,
+      "totalRequests": 12
+    },
+    "dom": {
+      "totalElements": 334,
+      "maxDepth": 13,
+      "hiddenElements": 11,
+      "scripts": 12,
+      "stylesheets": 3,
+      "images": 2,
+      "lazyImages": 0
+    },
+    "longTasks": [],
+    "cls": 0.0011758459000430236,
+    "tbt": 0
+  },
+  "cold-simple": {
+    "status": 200,
+    "url": "http://localhost:8090/calcular-hash.html",
+    "timing": {
+      "domContentLoaded": 115.39999997615814,
+      "load": 115.69999998807907,
+      "ttfb": 3.2999999821186066,
+      "domInteractive": 111.69999998807907,
+      "transferSize": 19935,
+      "encodedBodySize": 19635,
+      "decodedBodySize": 19635,
+      "firstPaint": 124,
+      "firstContentfulPaint": 124
+    },
+    "resources": {
+      "byType": {
+        "css": {
+          "count": 3,
+          "size": 110657
+        },
+        "image": {
+          "count": 1,
+          "size": 1027
+        },
+        "js": {
+          "count": 9,
+          "size": 878830
+        }
+      },
+      "totalTransfer": 990514,
+      "totalRequests": 13
+    },
+    "dom": {
+      "totalElements": 296,
+      "maxDepth": 11,
+      "hiddenElements": 10,
+      "scripts": 13,
+      "stylesheets": 3,
+      "images": 2,
+      "lazyImages": 0
+    },
+    "longTasks": [],
+    "cls": 0.0011758459000430236,
+    "tbt": 0
+  },
+  "warm-simple": {
+    "status": 200,
+    "url": "http://localhost:8090/calcular-hash.html",
+    "timing": {
+      "domContentLoaded": 78,
+      "load": 78.09999999403954,
+      "ttfb": 5.699999988079071,
+      "domInteractive": 42.599999994039536,
+      "transferSize": 19935,
+      "encodedBodySize": 19635,
+      "decodedBodySize": 19635,
+      "firstPaint": 80,
+      "firstContentfulPaint": 80
+    },
+    "resources": {
+      "byType": {
+        "css": {
+          "count": 3,
+          "size": 0
+        },
+        "image": {
+          "count": 1,
+          "size": 0
+        },
+        "js": {
+          "count": 9,
+          "size": 0
+        }
+      },
+      "totalTransfer": 0,
+      "totalRequests": 13
+    },
+    "dom": {
+      "totalElements": 296,
+      "maxDepth": 11,
+      "hiddenElements": 10,
+      "scripts": 13,
+      "stylesheets": 3,
+      "images": 2,
+      "lazyImages": 0
+    },
+    "longTasks": [],
+    "cls": 0.0011758459000430236,
+    "tbt": 0
+  },
+  "dom-homepage": {
+    "elements": 189,
+    "depth": 8,
+    "scripts": 7,
+    "imgs": 0
+  },
+  "dom-catalog": {
+    "elements": 2005,
+    "depth": 11,
+    "scripts": 9,
+    "imgs": 2
+  },
+  "dom-workspace": {
+    "elements": 471,
+    "depth": 11,
+    "scripts": 6,
+    "imgs": 2
+  },
+  "dom-pdf-light": {
+    "elements": 306,
+    "depth": 11,
+    "scripts": 14,
+    "imgs": 2
+  },
+  "dom-pdf-heavy": {
+    "elements": 299,
+    "depth": 11,
+    "scripts": 14,
+    "imgs": 2
+  },
+  "dom-images": {
+    "elements": 334,
+    "depth": 13,
+    "scripts": 12,
+    "imgs": 2
+  },
+  "dom-text": {
+    "elements": 291,
+    "depth": 11,
+    "scripts": 14,
+    "imgs": 2
+  },
+  "dom-qr": {
+    "elements": 317,
+    "depth": 11,
+    "scripts": 16,
+    "imgs": 2
+  },
+  "dom-vendor-heavy": {
+    "elements": 298,
+    "depth": 11,
+    "scripts": 11,
+    "imgs": 2
+  },
+  "dom-simple": {
+    "elements": 296,
+    "depth": 11,
+    "scripts": 13,
+    "imgs": 2
+  },
+  "dom-spreadsheet": {
+    "elements": 290,
+    "depth": 11,
+    "scripts": 13,
+    "imgs": 2
+  },
+  "dom-pdf-encrypt": {
+    "elements": 311,
+    "depth": 11,
+    "scripts": 14,
+    "imgs": 2
+  },
+  "memoryLeakCheck": [
+    {
+      "usedJSHeapSize": 10000000,
+      "totalJSHeapSize": 13400000,
+      "jsHeapSizeLimit": 3760000000
+    },
+    {
+      "usedJSHeapSize": 10000000,
+      "totalJSHeapSize": 13400000,
+      "jsHeapSizeLimit": 3760000000
+    },
+    {
+      "usedJSHeapSize": 10000000,
+      "totalJSHeapSize": 13400000,
+      "jsHeapSizeLimit": 3760000000
+    }
+  ]
+}

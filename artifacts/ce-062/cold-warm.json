@@ -1,0 +1,226 @@
+{
+  "catalog": {
+    "cold": {
+      "fcp": {
+        "median": 312,
+        "p95": 332
+      },
+      "transfer": {
+        "median": 797018
+      },
+      "requests": {
+        "median": 15
+      },
+      "load": {
+        "median": 2211.199999988079
+      }
+    },
+    "warm": {
+      "fcp": {
+        "median": 288,
+        "p95": 292
+      },
+      "transfer": {
+        "median": 14368
+      },
+      "requests": {
+        "median": 15
+      },
+      "load": {
+        "median": 443.5
+      }
+    }
+  },
+  "pdf-light": {
+    "cold": {
+      "fcp": {
+        "median": 152,
+        "p95": 160
+      },
+      "transfer": {
+        "median": 1017738
+      },
+      "requests": {
+        "median": 14
+      },
+      "load": {
+        "median": 115.10000002384186
+      }
+    },
+    "warm": {
+      "fcp": {
+        "median": 132,
+        "p95": 136
+      },
+      "transfer": {
+        "median": 0
+      },
+      "requests": {
+        "median": 14
+      },
+      "load": {
+        "median": 114.40000000596046
+      }
+    }
+  },
+  "images": {
+    "cold": {
+      "fcp": {
+        "median": 144,
+        "p95": 148
+      },
+      "transfer": {
+        "median": 980484
+      },
+      "requests": {
+        "median": 12
+      },
+      "load": {
+        "median": 122
+      }
+    },
+    "warm": {
+      "fcp": {
+        "median": 128,
+        "p95": 132
+      },
+      "transfer": {
+        "median": 0
+      },
+      "requests": {
+        "median": 12
+      },
+      "load": {
+        "median": 113.7000000178814
+      }
+    }
+  },
+  "qr": {
+    "cold": {
+      "fcp": {
+        "median": 152,
+        "p95": 152
+      },
+      "transfer": {
+        "median": 1327976
+      },
+      "requests": {
+        "median": 16
+      },
+      "load": {
+        "median": 138
+      }
+    },
+    "warm": {
+      "fcp": {
+        "median": 148,
+        "p95": 152
+      },
+      "transfer": {
+        "median": 0
+      },
+      "requests": {
+        "median": 16
+      },
+      "load": {
+        "median": 141.19999998807907
+      }
+    }
+  },
+  "hash": {
+    "cold": {
+      "fcp": {
+        "median": 132,
+        "p95": 144
+      },
+      "transfer": {
+        "median": 990514
+      },
+      "requests": {
+        "median": 13
+      },
+      "load": {
+        "median": 117.19999998807907
+      }
+    },
+    "warm": {
+      "fcp": {
+        "median": 136,
+        "p95": 136
+      },
+      "transfer": {
+        "median": 0
+      },
+      "requests": {
+        "median": 13
+      },
+      "load": {
+        "median": 114.5
+      }
+    }
+  },
+  "audio": {
+    "cold": {
+      "fcp": {
+        "median": 132,
+        "p95": 132
+      },
+      "transfer": {
+        "median": 972212
+      },
+      "requests": {
+        "median": 11
+      },
+      "load": {
+        "median": 118.5
+      }
+    },
+    "warm": {
+      "fcp": {
+        "median": 128,
+        "p95": 132
+      },
+      "transfer": {
+        "median": 0
+      },
+      "requests": {
+        "median": 11
+      },
+      "load": {
+        "median": 115.19999998807907
+      }
+    }
+  },
+  "workspace": {
+    "cold": {
+      "fcp": {
+        "median": 56,
+        "p95": 64
+      },
+      "transfer": {
+        "median": 1595717
+      },
+      "requests": {
+        "median": 45
+      },
+      "load": {
+        "median": 134.7999999821186
+      }
+    },
+    "warm": {
+      "fcp": {
+        "median": 72,
+        "p95": 76
+      },
+      "transfer": {
+        "median": 1595717
+      },
+      "requests": {
+        "median": 45
+      },
+      "load": {
+        "median": 119.5
+      }
+    }
+  }
+}
