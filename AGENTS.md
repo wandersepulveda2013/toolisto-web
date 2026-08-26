@@ -94,8 +94,11 @@ Una tarea solo está completa cuando:
 - Multi-tab concurrency: 113/113.
 - Stale-delete-lifecycle: 120/120.
 - Runtime-isolation-review: 110/110.
-- Release gate: 27/27 suites PASS.
-- Total: 1966 pass, 0 fail, 1966 tests.
+- Cross-store integrity (CE-061): 77/77.
+- Storage surface audit (CE-061): 79/79.
+- ID collision & serialization (CE-061): 103/103.
+- Release gate: 30/30 suites PASS.
+- Total: 2225 pass, 0 fail, 2225 tests.
 
 El modelo OCR `spa.traineddata.gz` se sirve localmente (`vendor/tesseract/lang-data`) para tiempos E2E estables.
 La extracción doc-to-table reconstruye columnas por ancla numérica y normaliza el signo negativo del OCR: 15/15 celdas en el Star-Flow.

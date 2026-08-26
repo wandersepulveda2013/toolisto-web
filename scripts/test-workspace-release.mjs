@@ -97,6 +97,9 @@ run('storage-rejection-perf (unhandled rejection, atomicity, perf, CE-059)', 'no
 run('multi-tab-concurrency (different/same entity, _writeSeq, stale overwrite, CE-060)', 'node', ['tests/workspace/multi-tab-concurrency.mjs']);
 run('stale-delete-lifecycle (delete vs stale, recreate, reload, background tab, CE-060)', 'node', ['tests/workspace/stale-delete-lifecycle.mjs']);
 run('runtime-isolation-review (review/chart cross-tab, versionchange, singletons, CE-060)', 'node', ['tests/workspace/runtime-isolation-review.mjs']);
+run('cross-store-integrity (cascade, orphan, import atomicity, CE-061)', 'node', ['tests/workspace/cross-store-integrity.mjs']);
+run('storage-surface-audit (LWW stores without _writeSeq, CE-061)', 'node', ['tests/workspace/storage-surface-audit.mjs']);
+run('id-collision-serialization (ID uniqueness, roundtrip, localStorage, CE-061)', 'node', ['tests/workspace/id-collision-serialization.mjs']);
 
 // 4. Manifest de evidencia
 const evidence = {
