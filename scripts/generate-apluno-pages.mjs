@@ -353,6 +353,7 @@ function renderPrivacy() {
     <section class="apluno-section apluno-legal-copy">
       <article data-reveal><h2>El sitio de Apluno</h2><p>Apluno no requiere una cuenta para visitar sus páginas públicas. En las páginas públicas de navegación y catálogo (portada, catálogo de herramientas y páginas de categorías) Apluno puede usar Google AdSense para mostrar anuncios. Google puede utilizar cookies u otros identificadores para la publicación y medición de anuncios, conforme a las opciones de consentimiento aplicables y a la configuración del navegador.</p></article>
       <article data-reveal><h2>Herramientas de archivos (Toolisto)</h2><p>Las herramientas de Toolisto están diseñadas para procesar los archivos en tu navegador. Apluno no recibe ni almacena el contenido que seleccionas para procesar. Por ahora, el código publicitario de Google AdSense no se incluye en las páginas donde Toolisto procesa archivos, y Apluno no envía a Google el contenido de los archivos que seleccionas para procesar. Algunas funciones pueden descargar librerías necesarias para operar, pero tus archivos no se envían con ese fin.</p></article>
+      <article data-reveal><h2>Almacenamiento local</h2><p>Toolisto y Toolisto Workspace pueden utilizar tecnologías de almacenamiento local del navegador, como IndexedDB y localStorage, para guardar preferencias, configuración y datos de sesión dentro de tu dispositivo. Estos datos permanecen en tu navegador y no se envían a ningún servidor externo.</p></article>
       <article data-reveal><h2>Analítica</h2><p>Google Analytics no está activo en este sitio. Si se habilita en el futuro, se actualizará esta página antes de presentarlo como parte del servicio.</p></article>
       <article data-reveal><h2>Mensajes por correo</h2><p>Si nos escribes, recibiremos la dirección, el contenido y los adjuntos que decidas enviar. Usaremos esa información para responder a tu mensaje.</p></article>
       <article data-reveal><h2>Cambios</h2><p>Si incorporamos medición, cuentas u otro tratamiento de datos, actualizaremos esta página antes de presentarlo como parte del servicio.</p></article>
@@ -373,7 +374,7 @@ function renderTerms() {
 
 function renderNotFound() {
   const content = `<section class="apluno-not-found apluno-section" data-reveal><p class="apluno-eyebrow">Error 404</p><p class="apluno-not-found-code" aria-hidden="true">404</p><h1>Esta página no está aquí.</h1><p>Puede que la dirección haya cambiado o que el enlace esté incompleto.</p><div>${renderCta({ href: '/', label: 'Volver a Apluno', tone: 'dark', arrow: false })}${renderCta({ href: '/toolisto', label: 'Ir a Toolisto', tone: 'text', arrow: false })}</div></section>`;
-  return renderPage(pageOptions({ title: 'Página no encontrada — Apluno', description: 'La página solicitada no existe.', pathname: '/404.html', bodyClass: 'apluno-404', content, robots: 'noindex, nofollow', schemas: [], socialImage: false }));
+  return renderPage(pageOptions({ title: 'Página no encontrada — Apluno', description: 'La página solicitada no existe.', pathname: '/404.html', bodyClass: 'apluno-404', content, robots: 'noindex, nofollow', schemas: [], socialImage: false, noCanonical: true }));
 }
 
 writePage('index.html', renderHome());

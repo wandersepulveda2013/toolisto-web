@@ -83,7 +83,7 @@ function buildAllowedFiles() {
 }
 
 /**
- * Slugs de las 167 herramientas de procesamiento. En estas páginas el loader
+ * Slugs de las herramientas de procesamiento. En estas páginas el loader
  * de AdSense NO debe aparecer jamás (privacidad de archivos / cero egress).
  */
 function buildToolSlugs() {

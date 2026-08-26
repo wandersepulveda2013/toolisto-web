@@ -26,9 +26,11 @@ export function renderSeoMetadata({
   type = 'website',
   robots = 'index, follow',
   schemas = [],
-  socialImage = true
+  socialImage = true,
+  noCanonical = false
 }) {
-  const canonical = absoluteUrl(pathname);
+  const canonical = noCanonical ? '' : absoluteUrl(pathname);
+  const canonicalTag = noCanonical ? '' : `\n  <link rel="canonical" href="${canonical}">`;
   const image = `${SITE_URL}/apluno-assets/og.png`;
   const imageTags = socialImage
     ? `\n  <meta property="og:image" content="${image}">
@@ -48,8 +50,7 @@ export function renderSeoMetadata({
   <meta name="robots" content="${escapeHtml(robots)}">
   <meta name="theme-color" content="#f5f4ef">
   <meta name="color-scheme" content="light">
-  <title>${escapeHtml(title)}</title>
-  <link rel="canonical" href="${canonical}">
+  <title>${escapeHtml(title)}</title>${canonicalTag}
   <link rel="icon" type="image/png" sizes="32x32" href="/apluno-assets/favicon-32.png">
   <link rel="apple-touch-icon" href="/apluno-assets/icon-192.png">
   <link rel="manifest" href="/manifest.webmanifest">
@@ -58,8 +59,7 @@ export function renderSeoMetadata({
   <meta property="og:site_name" content="APLUNO">
   <meta property="og:locale" content="es_DO">
   <meta property="og:title" content="${escapeHtml(title)}">
-  <meta property="og:description" content="${escapeHtml(description)}">
-  <meta property="og:url" content="${canonical}">${imageTags}
+  <meta property="og:description" content="${escapeHtml(description)}">${noCanonical ? '' : `\n  <meta property="og:url" content="${canonical}">`}${imageTags}
   <meta name="twitter:title" content="${escapeHtml(title)}">
   <meta name="twitter:description" content="${escapeHtml(description)}">
 ${schemaTags}`;
@@ -235,7 +235,8 @@ export function renderPage({
   socialImage = true,
   header = 'standard',
   footer = 'full',
-  headScripts = []
+  headScripts = [],
+  noCanonical = false
 }) {
   const headerHtml = header === 'launcher' ? renderAplunoHeader({ active, variant: 'launcher' }) : renderAplunoHeader({ active });
   const footerHtml = footer === 'minimal' ? renderAplunoFooter({ minimal: true }) : renderAplunoFooter();
@@ -243,7 +244,7 @@ export function renderPage({
   return `<!doctype html>
 <html lang="es-419">
 <head>
-  ${renderSeoMetadata({ title, description, pathname, schemas, robots, socialImage })}
+  ${renderSeoMetadata({ title, description, pathname, schemas, robots, socialImage, noCanonical })}
   ${extraScripts ? `${extraScripts}\n  ` : ''}<script src="/apluno-assets/apluno.js" defer></script>
 </head>
 <body class="apluno-page ${escapeHtml(bodyClass)}">
