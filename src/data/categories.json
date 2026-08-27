@@ -104,7 +104,31 @@
     ],
     "icon": "📄",
     "enabled": true,
-    "lastModified": "2026-07-24"
+    "lastModified": "2026-07-24",
+    "intro": [
+      "Los documentos PDF son el formato estándar para compartir información de forma estable: conservan el diseño original en cualquier dispositivo y no se alteran al abrirlos. Pero ese mismo formato que los hace fiables también los vuelve rígidos cuando necesitas dividirlos, unirlos o editarlos, porque no se modifican con un clic como un documento de texto.",
+      "En esta categoría encontrarás las herramientas para trabajar con PDF de principio a fin: unir varios archivos en uno solo, dividir un documento en partes, comprimirlo para que pese menos y resulte más fácil de enviar, girar páginas, numerarlas, añadir marcas de agua o protegerlo con contraseña.",
+      "El procesado se realiza por completo en tu navegador. Tus documentos no se suben a ningún servidor: el archivo se lee y se transforma de forma local. Esto es especialmente útil si manejas facturas, contratos o datos personales que prefieres no compartir con un servicio externo.",
+      "Si tu PDF es un escaneo (imágenes en lugar de texto seleccionable), también tienes herramientas para hacerlo buscable mediante OCR, que reconoce el texto y permite copiarlo o buscar dentro. Esta es la manera de convertir un documento escaneado en un archivo digital utilizable."
+    ],
+    "faq": [
+      {
+        "q": "¿Puedo unir varios PDF en uno solo?",
+        "a": "Sí. Usa la herramienta Unir PDF para combinar varios archivos en el orden que elijas. Todo ocurre en tu navegador, sin subir los documentos."
+      },
+      {
+        "q": "¿Mi documento se comparte con alguien al usar estas herramientas?",
+        "a": "No. Todo el procesado es local: los archivos se gestionan dentro de tu navegador y no se envían a ningún servidor."
+      },
+      {
+        "q": "¿Cómo convierto un PDF escaneado en texto seleccionable?",
+        "a": "Con las herramientas de OCR: PDF escaneado a PDF buscable o Extraer texto de escáner. El reconocimiento de texto se ejecuta localmente."
+      },
+      {
+        "q": "¿Puedo proteger un PDF con contraseña?",
+        "a": "Sí, con la herramienta de encriptación avanzada. También puedes eliminar páginas, añadir marcas de agua o censurar contenido de forma permanente."
+      }
+    ]
   },
   {
     "id": "images",
@@ -181,7 +205,31 @@
     ],
     "icon": "🖼",
     "enabled": true,
-    "lastModified": "2026-07-24"
+    "lastModified": "2026-07-24",
+    "intro": [
+      "Las imágenes son parte de casi cualquier tarea digital: una foto para un documento, un logo que debe pesar poco para una web, una captura que hay que recortar antes de compartir. Cada plataforma pide un tamaño y un formato diferentes, y ajustarlos a mano suele resultar lento.",
+      "Esta categoría reúne todas las herramientas de imagen. Puedes comprimir una foto sin que pierda calidad visible, convertir entre formatos (JPG, PNG, WEBP, AVIF, HEIC) según dónde vayas a usarla, recortar al tamaño de redes sociales, redimensionar o quitar el fondo de forma automática.",
+      "También hay utilidades pensadas para proteger tu privacidad: eliminar los metadatos (dónde se tomó la foto, con qué cámara) antes de publicarla, difuminar caras o censurar áreas concretas de una imagen.",
+      "Como en el resto de herramientas, el procesado es 100% local: tus imágenes no abandonan tu navegador. Esto las hace seguras para manejar documentos de identidad, escaneos o cualquier material que no quieras subir a Internet."
+    ],
+    "faq": [
+      {
+        "q": "¿Cómo reduzco el peso de una imagen sin perder mucha calidad?",
+        "a": "Usa Comprimir imagen. Ajusta la calidad y elige un formato ligero como WEBP para conseguir el mejor equilibrio entre peso y apariencia."
+      },
+      {
+        "q": "¿Qué formato debo elegir para cada caso?",
+        "a": "WEBP o AVIF para web por su buen equilibrio peso-calidad, JPG para fotografías comunes y PNG cuando necesitas transparencia. Con convertir-imagen cambias de formato fácilmente."
+      },
+      {
+        "q": "¿Es posible quitar el fondo de una foto?",
+        "a": "Sí, con Quitar fondo de imagen. La herramienta detecta los bordes del sujeto y deja un PNG con fondo transparente, todo de forma local."
+      },
+      {
+        "q": "¿Se conservan los metadatos de mis fotos?",
+        "a": "Por defecto se eliminan para proteger tu privacidad. También tienes una herramienta específica para eliminar metadatos de imagen antes de compartirlas."
+      }
+    ]
   },
   {
     "id": "signatures",
@@ -198,7 +246,26 @@
     ],
     "icon": "✍",
     "enabled": true,
-    "lastModified": "2026-07-24"
+    "lastModified": "2026-07-24",
+    "intro": [
+      "Firmar un documento debería ser tan sencillo como estamparte en papel, pero muchas veces exige instalar programas o subir el archivo a un servicio en la nube. Las herramientas de esta sección te permiten preparar una firma digital o manuscrita y colocarla en tus documentos sin salir del navegador.",
+      "Puedes crear una firma dibujándola con el ratón o la pantalla táctil, preparar una imagen de tu firma escaneada y limpiarla para que quede con fondo transparente y lista para usar en cualquier PDF.",
+      "Al trabajar de forma local, tu firma y tus documentos nunca se suben a un servidor. Es una opción práctica cuando necesitas firmar contratos, autorizaciones o formularios y prefieres mantener el control total del proceso."
+    ],
+    "faq": [
+      {
+        "q": "¿Necesito instalar algo para firmar un documento?",
+        "a": "No. Todo ocurre en el navegador. Creas tu firma, la limpias si lo necesitas y la colocas en el documento de forma local."
+      },
+      {
+        "q": "¿Cómo hago que mi firma escaneada se vea limpia?",
+        "a": "Usa las herramientas de firma para limpiar la imagen: se elimina el fondo y queda lista para colocarse sobre el documento."
+      },
+      {
+        "q": "¿Se comparte mi firma con un servidor?",
+        "a": "No. La firma y el documento se procesan por completo en tu dispositivo."
+      }
+    ]
   },
   {
     "id": "documents",
@@ -255,7 +322,26 @@
     ],
     "icon": "📝",
     "enabled": true,
-    "lastModified": "2026-07-24"
+    "lastModified": "2026-07-24",
+    "intro": [
+      "Los documentos de Word (DOCX), ODT y RTF se usan para redactar textos, pero no siempre tienen el formato que necesitas para entregarlos. Tal vez tienes un documento antiguo que no se abre, un archivo que debe convertirse a PDF para imprimir, o varios textos que quieres unir en uno solo.",
+      "En esta sección tienes las herramientas para convertir documentos entre formatos (Word a PDF, PDF a Word, ODT a otros), reparar archivos que dan error, dividir o unir documentos, y extraer su contenido para reutilizarlo.",
+      "El procesado es local: no subes tus documentos a ningún servidor. Esto es relevante si trabajas con textos confidenciales, memorandos internos o borradores que aún no quieres publicar."
+    ],
+    "faq": [
+      {
+        "q": "¿Puedo convertir un Word a PDF manteniendo el formato?",
+        "a": "Sí. Las herramientas de conversión de esta sección transforman DOCX a PDF conservando texto, tablas y estructura básica, todo localmente."
+      },
+      {
+        "q": "¿Qué hago si un documento Word no se abre o da error?",
+        "a": "Usa la herramienta de reparación de documentos. Intenta recuperar la estructura del archivo y exportarlo de nuevo en un formato válido."
+      },
+      {
+        "q": "¿Cómo uno varios documentos Word en uno solo?",
+        "a": "Con la herramienta Unir documentos. Puedes combinar varios archivos y ordenarlos según necesites."
+      }
+    ]
   },
   {
     "id": "text",
@@ -306,7 +392,26 @@
     ],
     "icon": "📄",
     "enabled": true,
-    "lastModified": "2026-07-24"
+    "lastModified": "2026-07-24",
+    "intro": [
+      "Los archivos de texto plano (TXT) son los más simples que existen: solo contienen caracteres, sin formato ni estilos. Eso los hace universales y ligeros, pero también significa que herramientas como el procesador de tu equipo no siempre tratan bien ciertos archivos, sobre todo si llegan con una codificación o un salto de línea diferentes.",
+      "Esta categoría agrupa las herramientas para trabajar con texto: convertir entre formatos de texto, cambiar la codificación o los saltos de línea para que un archivo se abra correctamente en cualquier sistema, eliminar líneas o espacios duplicados, y reorganizar el contenido de un documento de texto.",
+      "Todo el procesado es local. Tus archivos de texto se manejan dentro del navegador sin subirse a ningún servidor, lo que resulta útil con listas, guiones o cualquier material que prefieras no compartir."
+    ],
+    "faq": [
+      {
+        "q": "¿Puedo cambiar el formato de salto de línea de un TXT?",
+        "a": "Sí. Las herramientas de texto permiten convertir entre saltos de línea de Windows, Mac y Linux para que el archivo se vea correctamente en cualquier sistema."
+      },
+      {
+        "q": "¿Puedo eliminar líneas en blanco repetidas en un texto?",
+        "a": "Sí, con las herramientas de limpieza de texto puedes quitar líneas o espacios duplicados y dejar el contenido ordenado."
+      },
+      {
+        "q": "¿Mis archivos de texto se suben a algún servidor?",
+        "a": "No. Todo el procesamiento ocurre de forma local en tu navegador."
+      }
+    ]
   },
   {
     "id": "ebooks",
@@ -339,7 +444,26 @@
     ],
     "icon": "📚",
     "enabled": true,
-    "lastModified": "2026-07-24"
+    "lastModified": "2026-07-24",
+    "intro": [
+      "Los libros electrónicos (EPUB y MOBI) tienen una estructura interna que exige herramientas específicas: no basta con renombrar el archivo para corregirlo o convertirlo. Si tienes un libro que no se abre en tu lector, un EPUB que quieres pasar a MOBI para un Kindle, o necesitas ajustar un detalle, esta sección es para ti.",
+      "Estas herramientas permiten convertir entre formatos de libro electrónico, reparar archivos dañados, dividir o unir libros, y validar que la estructura del EPUB sea correcta.",
+      "El trabajo es local: tus libros se procesan en el navegador sin subirse a un servidor. Esto es útil porque los libros electrónicos suelen tener derechos de autor que quieres respetar, y porque prefieres no cargar tu colección en servicios externos."
+    ],
+    "faq": [
+      {
+        "q": "¿Puedo convertir un EPUB a MOBI para Kindle?",
+        "a": "Sí. Las herramientas de libros electrónicos permiten convertir EPUB a MOBI y viceversa, de forma local."
+      },
+      {
+        "q": "Mi libro electrónico no abre, ¿qué puedo hacer?",
+        "a": "Usa la herramienta de reparación de EPUB. Intenta reconstruir la estructura interna del archivo para que vuelva a ser legible."
+      },
+      {
+        "q": "¿Mis libros se suben a un servidor?",
+        "a": "No. El procesado se realiza por completo en tu navegador."
+      }
+    ]
   },
   {
     "id": "spreadsheets",
@@ -428,7 +552,30 @@
     ],
     "icon": "📊",
     "enabled": true,
-    "lastModified": "2026-07-24"
+    "lastModified": "2026-07-24",
+    "intro": [
+      "Los datos llegan en muchos formatos: una tabla de Excel, un archivo CSV que descargaste de un formulario, un JSON de una API o un XML de un sistema de facturación. Cada herramienta los produce de una manera distinta, y casi siempre acabas a mitad de camino entre el programa que los genera y el que los consume.",
+      "Esta categoría reúne las herramientas para trabajar con datos: convertir entre CSV, Excel, JSON y XML, unir o dividir hojas de cálculo, ordenar y limpiar filas, o llevar una tabla de una herramienta a otra sin perder la estructura.",
+      "Al trabajar de forma local, tus datos nunca se suben a un servidor. Esto es especialmente valioso con archivos que contienen información sensible, como bases de clientes, inventarios o listas de correo que prefieres no exponer."
+    ],
+    "faq": [
+      {
+        "q": "¿Puedo convertir un CSV a Excel manteniendo las columnas?",
+        "a": "Sí. Las herramientas de esta sección reconocen las columnas y las llevan de CSV a XLSX conservando la estructura de los datos."
+      },
+      {
+        "q": "¿Cómo uno varias hojas de cálculo en una?",
+        "a": "Con la herramienta para unir/concatenar tablas. Puedes combinar varios archivos en una sola hoja ordenada."
+      },
+      {
+        "q": "¿Mis datos se envían a un servidor?",
+        "a": "No. Todo el procesado es local, así que tus datos no se comparten con ningún servicio externo."
+      },
+      {
+        "q": "¿Puedo convertir Excel a PDF?",
+        "a": "Sí, tienes una herramienta específica que convierte hojas de cálculo a PDF conservando las columnas visibles."
+      }
+    ]
   },
   {
     "id": "files",
@@ -461,7 +608,26 @@
     ],
     "icon": "📁",
     "enabled": true,
-    "lastModified": "2026-07-25"
+    "lastModified": "2026-07-25",
+    "intro": [
+      "Gestionar archivos implica mucho más que moverlos de carpeta: a veces hay que dividir un archivo demasiado grande para enviarlo, unirlo de nuevo al recibirlo, comprobarlo para ver qué contiene o protegerlo antes de compartirlo.",
+      "Esta categoría reúne herramientas generales de archivos y seguridad: dividir y unir archivos, inspeccionar su contenido sin abrirlos, generar verificaciones de integridad (hash) para confirmar que no han sido alterados, y eliminar datos sensibles antes de compartir un documento.",
+      "Como en el resto, todo es local: tus archivos no se suben a ningún servidor. Es la opción segura para mover documentos con información personal o confidencial."
+    ],
+    "faq": [
+      {
+        "q": "¿Puedo dividir un archivo grande para enviarlo por correo?",
+        "a": "Sí, las herramientas de archivos permiten dividir un archivo en partes y unirlas de nuevo en el destino."
+      },
+      {
+        "q": "¿Cómo compruebo que un archivo no ha sido modificado?",
+        "a": "Genera su hash (integridad) con la herramienta de verificación y compáralo con el valor original del archivo."
+      },
+      {
+        "q": "¿Se suben mis archivos a un servidor?",
+        "a": "No. Todo el procesado es local para proteger tu privacidad."
+      }
+    ]
   },
   {
     "id": "qrcodes",
@@ -488,7 +654,26 @@
     ],
     "icon": "📱",
     "enabled": true,
-    "lastModified": "2026-07-25"
+    "lastModified": "2026-07-25",
+    "intro": [
+      "Un código QR es una puerta de acceso: contiene una dirección web, un texto, datos de contacto o información de un evento que cualquier teléfono puede leer apuntando la cámara. Generarlos es fácil, pero hacerlo bien —con el formato, el tamaño y el contenido adecuados— marca la diferencia entre un enlace que funciona y uno que no.",
+      "En esta sección puedes generar códigos QR con distintos contenidos (enlaces, textos, vCards o códigos de barras), elegir el tamaño y los colores, y también leer o decodificar un QR existente para ver qué contiene antes de escanearlo.",
+      "La generación y lectura se hacen de forma local, sin subir el contenido a ningún servidor. Esto te permite crear códigos para enlaces internos o datos personales sin exponerlos."
+    ],
+    "faq": [
+      {
+        "q": "¿Puedo leer un código QR existente?",
+        "a": "Sí, las herramientas de esta sección decodifican el contenido de un QR para que veas qué contiene antes de compartirlo."
+      },
+      {
+        "q": "¿Qué contenido puedo convertir en un código QR?",
+        "a": "Habitualmente enlaces, textos, datos de contacto y otra información corta que la cámara del teléfono pueda leer."
+      },
+      {
+        "q": "¿Mis códigos se generan en un servidor?",
+        "a": "No, la generación es local. El contenido no se envía a ningún servicio externo."
+      }
+    ]
   },
   {
     "id": "video",
@@ -511,7 +696,26 @@
     ],
     "icon": "🎬",
     "enabled": true,
-    "lastModified": "2026-07-25"
+    "lastModified": "2026-07-25",
+    "intro": [
+      "Los archivos de video son pesados y cada plataforma espera un formato distinto: lo que sirve para una diapositiva no siempre se reproduce en una nota de voz, y un video que quieres enviar por correo debe pesar poco aunque pierda algo de calidad.",
+      "Esta categoría reúne herramientas para trabajar con video: comprimir para reducir su peso, recortar los fragmentos que no necesitas, unir varios clips y convertir entre formatos según dónde vayas a usarlo.",
+      "El procesado es local: tus videos se trabajan en el navegador sin subirse a ningún servidor. Esto es cómodo para material personal o de trabajo que no quieres enviar a servicios externos."
+    ],
+    "faq": [
+      {
+        "q": "¿Puedo reducir el peso de un video para enviarlo?",
+        "a": "Sí, la herramienta de compresión de video reduce el tamaño ajustando la resolución y la calidad según lo que necesites."
+      },
+      {
+        "q": "¿Puedo cortar la parte que no me sirve de un video?",
+        "a": "Sí, la herramienta de recorte te permite quedarte con el fragmento que necesitas."
+      },
+      {
+        "q": "¿Se suben mis videos a un servidor?",
+        "a": "No, todos los archivos de video se procesan de forma local en tu navegador."
+      }
+    ]
   },
   {
     "id": "audio",
@@ -532,7 +736,26 @@
     ],
     "icon": "🎵",
     "enabled": true,
-    "lastModified": "2026-07-25"
+    "lastModified": "2026-07-25",
+    "intro": [
+      "Los archivos de audio se usan para notas, música, grabaciones de reuniones o audios de trabajo, y cada programa espera un formato distinto. Un archivo WAV ocupa mucho espacio, un MP3 comprime bien, y a veces solo necesitas un fragmento de una grabación larga.",
+      "Esta categoría reúne las herramientas para trabajar con audio: convertir entre formatos (WAV, MP3, OGG, M4A, etc.), recortar fragmentos y unir varios audios en uno solo.",
+      "Como en el resto de herramientas, el procesado es completamente local. Tus grabaciones nunca se suben a un servidor, algo clave si contienen reuniones o información que no quieres compartir."
+    ],
+    "faq": [
+      {
+        "q": "¿Puedo convertir un WAV a MP3 para que pese menos?",
+        "a": "Sí, las herramientas de conversión de audio transforman el formato y reducen el tamaño del archivo."
+      },
+      {
+        "q": "¿Puedo cortar un fragmento de una grabación?",
+        "a": "Sí, la herramienta de recorte de audio te permite quedarte con la parte que necesitas."
+      },
+      {
+        "q": "¿Se suben mis audios a un servidor?",
+        "a": "No, todo el procesado de audio es local en tu navegador."
+      }
+    ]
   },
   {
     "id": "calculators",
@@ -549,6 +772,25 @@
     ],
     "icon": "🔢",
     "enabled": true,
-    "lastModified": "2026-07-26"
+    "lastModified": "2026-07-26",
+    "intro": [
+      "A veces solo necesitas una calculadora rápida para hacer cuentas sin abrir una app ni escribir fórmulas en un documento. Esta sección ofrece una calculadora simple y una científica para operaciones más avanzadas, ambas disponibles directamente en el navegador.",
+      "La ventaja de estas calculadoras es que funcionan de forma 100% local: no necesitas conexión, no se crea ninguna cuenta y ninguno de los números que introduces sale de tu dispositivo. Es una opción práctica para hacer cálculos con datos que prefieres no compartir.",
+      "Son ideales como herramienta de apoyo mientras trabajas en un documento, una hoja de cálculo o un informe: las tienes a un clic sin cambiar de pestaña."
+    ],
+    "faq": [
+      {
+        "q": "¿Necesito conexión para usar estas calculadoras?",
+        "a": "No, funcionan de forma local en el navegador, sin conexión y sin enviar datos."
+      },
+      {
+        "q": "¿Qué diferencia hay entre la simple y la científica?",
+        "a": "La científica incluye funciones avanzadas como operaciones trigonométricas, potencias o logaritmos; la simple cubre las operaciones básicas."
+      },
+      {
+        "q": "¿Mis números se guardan en algún sitio?",
+        "a": "No. Los cálculos se hacen en tu dispositivo y no se guardan ni se comparten."
+      }
+    ]
   }
 ]

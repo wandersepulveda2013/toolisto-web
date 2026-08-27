@@ -434,6 +434,15 @@ function buildToolPage(tool) {
 function buildCategoryPage(cat) {
   const catTools = cat.slugs.map(slug => tools.find(t => t.slug === slug)).filter(t => t && t.enabled);
 
+  const introHTML = (Array.isArray(cat.intro) && cat.intro.length)
+    ? `<section class="category-about">
+        <h2>Acerca de las herramientas de ${escHtml(cat.name)}</h2>
+        ${cat.intro.map(p => `<p>${escHtml(p)}</p>`).join('\n        ')}
+      </section>`
+    : '';
+
+  const faqHTML = buildFAQ(cat.faq);
+
   const toolListHTML = catTools.map(t => {
     return `<li class="category-tool-item"><a href="./${t.slug}"><strong>${escHtml(t.name)}</strong></a><p>${escHtml(t.summary)}</p></li>`;
   }).join('\n');
@@ -483,8 +492,10 @@ function buildCategoryPage(cat) {
         </div></div>
       </section>
       <section class="category-tools">
+        ${introHTML}
         <h2>Herramientas de ${escHtml(cat.name)}</h2>
         <ul class="category-tool-list">${toolListHTML}</ul>
+        ${faqHTML}
       </section>
     </main>
     ${footerHTML}
