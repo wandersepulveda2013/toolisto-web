@@ -214,6 +214,19 @@ function renderHome() {
         <p class="apluno-launcher-empty" data-launcher-empty hidden>No encontramos una herramienta para esa búsqueda. Prueba con otras palabras, como «unir», «convertir» o «comprimir».</p>
       </div>
       <p class="apluno-launcher-all" data-launcher-all><a href="/toolisto">Ver las ${enabledTools.length} herramientas disponibles</a></p>
+    </section>
+    <section class="apluno-section apluno-home-editorial" aria-label="Qué es Apluno">
+      <div class="apluno-home-editorial-copy">
+        <p class="apluno-eyebrow">Qué es Apluno</p>
+        <h2>Herramientas online gratuitas que procesan tus archivos en tu navegador.</h2>
+        <p>Apluno reúne utilidades para PDF, imágenes, documentos, hojas de cálculo, QR y archivos. El procesado ocurre en tu dispositivo: tus archivos no se suben a un servidor, algo útil cuando manejas facturas, contratos o datos personales.</p>
+        <p>No necesitas cuenta ni registro para usarlas. Busca una herramienta, resuélvela en unos pasos y descarga el resultado, todo desde el navegador.</p>
+      </div>
+      <div class="apluno-home-editorial-links">
+        <a class="apluno-home-link" href="/toolisto"><span>Explorar las herramientas</span><small>El catálogo completo de utilidades disponibles.</small></a>
+        <a class="apluno-home-link" href="/guia/"><span>Guias para hacerlo bien</span><small>Pasos y consejos para tareas comunes con archivos.</small></a>
+        <a class="apluno-home-link" href="/about/"><span>Acerca de Apluno</span><small>Quienes estamos detrás y qué principios siguen los productos.</small></a>
+      </div>
     </section>`;
 
   return renderPage(pageOptions({

@@ -2219,3 +2219,58 @@ svg {
     max-width: none;
   }
 }
+
+
+/* ===== Homepage editorial ===== */
+.apluno-home-editorial {
+  border-top: 1px solid var(--apluno-line);
+  padding-top: 48px;
+  margin-top: 8px;
+}
+.apluno-home-editorial-copy {
+  max-width: 720px;
+}
+.apluno-home-editorial-copy h2 {
+  font-size: clamp(1.3rem, 3vw, 1.9rem);
+  line-height: 1.2;
+  letter-spacing: -.02em;
+  margin: 10px 0 16px;
+}
+.apluno-home-editorial-copy p {
+  color: var(--apluno-muted);
+  font-size: 1.02rem;
+  line-height: 1.6;
+  margin: 0 0 14px;
+}
+.apluno-home-editorial-links {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-top: 28px;
+}
+.apluno-home-link {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 22px 24px;
+  border: 1px solid var(--apluno-line);
+  border-radius: var(--apluno-radius);
+  text-decoration: none;
+  color: inherit;
+  background: var(--apluno-paper);
+  transition: border-color .2s var(--apluno-ease), transform .2s var(--apluno-ease);
+}
+.apluno-home-link:hover {
+  border-color: var(--apluno-accent);
+  transform: translateY(-2px);
+}
+.apluno-home-link span {
+  font-weight: 700;
+  color: var(--apluno-accent-dark);
+  font-size: 1.02rem;
+}
+.apluno-home-link small {
+  color: var(--apluno-muted);
+  font-size: .9rem;
+  line-height: 1.45;
+}
