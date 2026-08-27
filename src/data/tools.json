@@ -214,7 +214,15 @@
     ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-07-24",
-    "keywords": []
+    "keywords": [
+      "formato",
+      "jpg",
+      "png",
+      "webp",
+      "avif",
+      "heic",
+      "cambiar formato"
+    ]
   },
   {
     "id": "batchCompress",
@@ -350,7 +358,14 @@
     ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-07-24",
-    "keywords": []
+    "keywords": [
+      "metadatos",
+      "exif",
+      "privacidad",
+      "limpiar",
+      "datos de la foto",
+      "ubicación"
+    ]
   },
   {
     "id": "socialCrop",
@@ -415,7 +430,14 @@
     ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-07-24",
-    "keywords": []
+    "keywords": [
+      "recortar",
+      "tamaño",
+      "redes sociales",
+      "formato",
+      "perfil",
+      "portada"
+    ]
   },
   {
     "id": "removeObjects",
@@ -482,7 +504,14 @@
     ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-07-24",
-    "keywords": []
+    "keywords": [
+      "borrar",
+      "quitar",
+      "objetos",
+      "elementos",
+      "contenido",
+      "retocar"
+    ]
   },
   {
     "id": "signature",
@@ -828,7 +857,13 @@
     ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-07-24",
-    "keywords": []
+    "keywords": [
+      "organizar",
+      "páginas",
+      "orden",
+      "reordenar",
+      "mover"
+    ]
   },
   {
     "id": "pdfToImages",
@@ -1042,7 +1077,14 @@
     ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-07-24",
-    "keywords": []
+    "keywords": [
+      "foto",
+      "documento",
+      "carnet",
+      "identificación",
+      "tamaño",
+      "recortar"
+    ]
   },
   {
     "id": "censor",
@@ -1108,7 +1150,13 @@
     ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-07-24",
-    "keywords": []
+    "keywords": [
+      "censurar",
+      "ocultar",
+      "pixelar",
+      "privacidad",
+      "difuminar"
+    ]
   },
   {
     "id": "fixFormat",
@@ -1177,7 +1225,13 @@
     ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-07-24",
-    "keywords": []
+    "keywords": [
+      "reparar",
+      "formato",
+      "corrupto",
+      "dañado",
+      "restaurar"
+    ]
   },
   {
     "id": "rescueDoc",
@@ -1243,7 +1297,14 @@
     ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-07-24",
-    "keywords": []
+    "keywords": [
+      "mejorar",
+      "documento",
+      "fotografiado",
+      "escaneo",
+      "contraste",
+      "texto"
+    ]
   },
   {
     "id": "fileCompliance",
@@ -1310,7 +1371,14 @@
     ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-07-24",
-    "keywords": []
+    "keywords": [
+      "requisitos",
+      "tamaño",
+      "formato",
+      "ajustar",
+      "cumplir",
+      "subir"
+    ]
   },
   {
     "id": "workflow",
@@ -1381,7 +1449,13 @@
     ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-07-24",
-    "keywords": []
+    "keywords": [
+      "flujo",
+      "automático",
+      "procesar",
+      "varias imágenes",
+      "lote"
+    ]
   },
   {
     "id": "advancedConvert",
@@ -1448,7 +1522,13 @@
     ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-07-24",
-    "keywords": []
+    "keywords": [
+      "convertir",
+      "formato",
+      "avanzado",
+      "lote",
+      "vecindario"
+    ]
   },
   {
     "id": "jpg-to-png",
@@ -1513,7 +1593,12 @@
     ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-07-24",
-    "keywords": []
+    "keywords": [
+      "jpg",
+      "png",
+      "convertir",
+      "transparencia"
+    ]
   },
   {
     "id": "png-to-jpg",
@@ -1569,7 +1654,8 @@
     "instructions": [
       "Selecciona una o varias imágenes PNG.",
       "Haz clic en Convertir.",
-      "Descarga las imágenes en formato JPG."
+      "Descarga las imágenes en formato JPG.",
+      "Comprueba que la transparencia del PNG se rellena con blanco en el JPG."
     ],
     "limitations": [
       "Solo acepta archivos PNG",
@@ -1578,7 +1664,12 @@
     ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-07-24",
-    "keywords": []
+    "keywords": [
+      "png",
+      "jpg",
+      "convertir",
+      "peso"
+    ]
   },
   {
     "id": "jpg-to-webp",
@@ -1644,7 +1735,13 @@
     ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-07-24",
-    "keywords": []
+    "keywords": [
+      "jpg",
+      "webp",
+      "convertir",
+      "web",
+      "ligero"
+    ]
   },
   {
     "id": "webp-to-jpg",
@@ -1700,7 +1797,8 @@
     "instructions": [
       "Selecciona una o varias imágenes WebP.",
       "Haz clic en Convertir.",
-      "Descarga las imágenes en formato JPG."
+      "Descarga las imágenes en formato JPG.",
+      "Decide solo si mantiene el fondo; el JPG resultante ya no tiene transparencia."
     ],
     "limitations": [
       "Solo acepta archivos WebP",
@@ -1709,7 +1807,12 @@
     ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-07-24",
-    "keywords": []
+    "keywords": [
+      "webp",
+      "jpg",
+      "convertir",
+      "compatibilidad"
+    ]
   },
   {
     "id": "png-to-webp",
@@ -1765,7 +1868,8 @@
     "instructions": [
       "Selecciona una o varias imágenes PNG.",
       "Haz clic en Convertir.",
-      "Descarga las imágenes en formato WebP."
+      "Descarga las imágenes en formato WebP.",
+      "Revisa el peso final, que suele ser menor que el del PNG original."
     ],
     "limitations": [
       "Solo acepta archivos PNG",
@@ -1773,7 +1877,13 @@
     ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-07-24",
-    "keywords": []
+    "keywords": [
+      "png",
+      "webp",
+      "convertir",
+      "web",
+      "ligero"
+    ]
   },
   {
     "id": "webp-to-png",
@@ -1829,7 +1939,8 @@
     "instructions": [
       "Selecciona una o varias imágenes WebP.",
       "Haz clic en Convertir.",
-      "Descarga las imágenes en formato PNG."
+      "Descarga las imágenes en formato PNG.",
+      "Conserva la transparencia del PNG resultante si la necesitas."
     ],
     "limitations": [
       "Solo acepta archivos WebP",
@@ -1837,7 +1948,12 @@
     ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-07-24",
-    "keywords": []
+    "keywords": [
+      "webp",
+      "png",
+      "convertir",
+      "transparencia"
+    ]
   },
   {
     "id": "jpg-to-pdf",
@@ -1901,7 +2017,13 @@
     ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-07-24",
-    "keywords": []
+    "keywords": [
+      "jpg",
+      "pdf",
+      "convertir",
+      "imagen",
+      "documento"
+    ]
   },
   {
     "id": "png-to-pdf",
@@ -1967,7 +2089,13 @@
     ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-07-24",
-    "keywords": []
+    "keywords": [
+      "png",
+      "pdf",
+      "convertir",
+      "imagen",
+      "documento"
+    ]
   },
   {
     "id": "pdf-to-jpg",
@@ -2038,7 +2166,13 @@
     ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-07-24",
-    "keywords": []
+    "keywords": [
+      "pdf",
+      "jpg",
+      "convertir",
+      "página",
+      "imagen"
+    ]
   },
   {
     "id": "pdf-to-png",
@@ -2105,7 +2239,13 @@
     ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-07-24",
-    "keywords": []
+    "keywords": [
+      "pdf",
+      "png",
+      "convertir",
+      "página",
+      "imagen"
+    ]
   },
   {
     "id": "wordToPdf",
@@ -2291,7 +2431,8 @@
     "instructions": [
       "Selecciona uno o varios archivos Word.",
       "Haz clic en Convertir.",
-      "Descarga las imágenes PNG generadas."
+      "Descarga las imágenes PNG generadas.",
+      "Elige el zoom o la resolución de la imagen PNG de salida."
     ],
     "limitations": [
       "PNG produce archivos significativamente más grandes que JPG.",
@@ -2357,7 +2498,8 @@
     "instructions": [
       "Selecciona uno o varios archivos Word.",
       "Haz clic en Convertir.",
-      "Descarga los archivos TXT generados."
+      "Descarga los archivos TXT generados.",
+      "Descarga el documento como texto plano, sin formato ni estilos."
     ],
     "limitations": [
       "Se pierde todo el formato (negritas, cursivas, colores, tamaños).",
@@ -2423,7 +2565,8 @@
     "instructions": [
       "Selecciona uno o varios archivos Word.",
       "Haz clic en Convertir.",
-      "Descarga los archivos HTML generados."
+      "Descarga los archivos HTML generados.",
+      "Descarga el documento como página HTML, lista para la web."
     ],
     "limitations": [
       "Las imágenes embebidas como base64 aumentan el tamaño del archivo HTML.",
@@ -2488,7 +2631,8 @@
     "instructions": [
       "Selecciona uno o varios archivos Word.",
       "Haz clic en Convertir.",
-      "Descarga los archivos Markdown generados."
+      "Descarga los archivos Markdown generados.",
+      "Descarga el contenido convertido a Markdown, listo para documentación."
     ],
     "limitations": [
       "Algunos estilos avanzados de Word no tienen equivalente en Markdown.",
@@ -2620,7 +2764,8 @@
     "instructions": [
       "Selecciona uno o varios archivos Word.",
       "Haz clic en Convertir.",
-      "Descarga los archivos ODT generados."
+      "Descarga los archivos ODT generados.",
+      "Descarga el archivo en formato ODT, compatible con LibreOffice."
     ],
     "limitations": [
       "Algunas funciones específicas de Word no tienen equivalente exacto en ODT.",
@@ -2693,7 +2838,13 @@
     ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-07-24",
-    "keywords": []
+    "keywords": [
+      "odt",
+      "docx",
+      "word",
+      "convertir",
+      "libreoffice"
+    ]
   },
   {
     "id": "rtfToWord",
@@ -2752,7 +2903,12 @@
     ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-07-24",
-    "keywords": []
+    "keywords": [
+      "rtf",
+      "docx",
+      "word",
+      "convertir"
+    ]
   },
   {
     "id": "mergeWord",
@@ -2813,7 +2969,13 @@
     ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-07-24",
-    "keywords": []
+    "keywords": [
+      "unir",
+      "combinar",
+      "word",
+      "documentos",
+      "juntar"
+    ]
   },
   {
     "id": "splitWord",
@@ -2875,7 +3037,13 @@
     ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-07-24",
-    "keywords": []
+    "keywords": [
+      "dividir",
+      "separar",
+      "word",
+      "documento",
+      "partes"
+    ]
   },
   {
     "id": "repairWord",
@@ -3072,7 +3240,13 @@
     ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-07-24",
-    "keywords": []
+    "keywords": [
+      "metadatos",
+      "word",
+      "limpiar",
+      "privacidad",
+      "información"
+    ]
   },
   {
     "id": "formatDocument",
@@ -3133,7 +3307,13 @@
     ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-07-24",
-    "keywords": []
+    "keywords": [
+      "formato",
+      "uniformar",
+      "estilo",
+      "word",
+      "documento"
+    ]
   },
   {
     "id": "tocWord",
@@ -3195,7 +3375,12 @@
     ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-07-24",
-    "keywords": []
+    "keywords": [
+      "tabla de contenido",
+      "índice",
+      "word",
+      "documento"
+    ]
   },
   {
     "id": "extractWord",
@@ -3260,7 +3445,13 @@
     ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-07-24",
-    "keywords": []
+    "keywords": [
+      "extraer",
+      "texto",
+      "word",
+      "documento",
+      "contenido"
+    ]
   },
   {
     "id": "findReplaceWord",
@@ -3321,7 +3512,13 @@
     ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-07-24",
-    "keywords": []
+    "keywords": [
+      "buscar",
+      "reemplazar",
+      "documento",
+      "palabras",
+      "texto"
+    ]
   },
   {
     "id": "tablesWordToExcel",
@@ -3381,7 +3578,13 @@
     ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-07-24",
-    "keywords": []
+    "keywords": [
+      "tablas",
+      "word",
+      "excel",
+      "convertir",
+      "datos"
+    ]
   },
   {
     "id": "removeBlankPagesWord",
@@ -3443,7 +3646,12 @@
     ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-07-24",
-    "keywords": []
+    "keywords": [
+      "páginas en blanco",
+      "eliminar",
+      "word",
+      "documento"
+    ]
   },
   {
     "id": "txtToPdf",
@@ -3771,7 +3979,12 @@
     ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-07-24",
-    "keywords": []
+    "keywords": [
+      "ordenar",
+      "líneas",
+      "texto",
+      "alfabético"
+    ]
   },
   {
     "id": "removeDuplicates",
@@ -3831,7 +4044,13 @@
     ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-07-24",
-    "keywords": []
+    "keywords": [
+      "duplicados",
+      "filas",
+      "eliminar",
+      "datos",
+      "limpiar"
+    ]
   },
   {
     "id": "listToTable",
@@ -3895,7 +4114,12 @@
     ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-07-24",
-    "keywords": []
+    "keywords": [
+      "listas",
+      "tablas",
+      "convertir",
+      "texto"
+    ]
   },
   {
     "id": "epubToTxt",
@@ -4154,7 +4378,12 @@
     ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-07-24",
-    "keywords": []
+    "keywords": [
+      "unir",
+      "epub",
+      "combinar",
+      "libros"
+    ]
   },
   {
     "id": "splitEpub",
@@ -4283,7 +4512,13 @@
     ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-07-24",
-    "keywords": []
+    "keywords": [
+      "metadatos",
+      "epub",
+      "editar",
+      "título",
+      "autor"
+    ]
   },
   {
     "id": "coverEpub",
@@ -4336,7 +4571,8 @@
       "Sube un archivo EPUB.",
       "Selecciona el formato de imagen de salida.",
       "Haz clic en Extraer portada.",
-      "Descarga la imagen de portada."
+      "Descarga la imagen de portada.",
+      "Descarga la imagen de portada del libro con la resolución que aparece en el EPUB."
     ],
     "limitations": [
       "Solo extrae una imagen (la portada). Para todas las imágenes usa Extraer imágenes.",
@@ -4345,7 +4581,12 @@
     ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-07-24",
-    "keywords": []
+    "keywords": [
+      "portada",
+      "epub",
+      "extraer",
+      "imagen"
+    ]
   },
   {
     "id": "imagesEpub",
@@ -4398,7 +4639,8 @@
       "Sube un archivo EPUB.",
       "Selecciona el formato de imagen de salida.",
       "Haz clic en Extraer imágenes.",
-      "Descarga las imágenes o el ZIP generado."
+      "Descarga las imágenes o el ZIP generado.",
+      "Revisa la lista y descarga cada imagen incrustada por separado."
     ],
     "limitations": [
       "No extrae fondos de página ni imágenes de portada como elemento separado.",
@@ -4407,7 +4649,12 @@
     ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-07-24",
-    "keywords": []
+    "keywords": [
+      "imágenes",
+      "epub",
+      "extraer",
+      "libro"
+    ]
   },
   {
     "id": "validateEpub",
@@ -4467,7 +4714,13 @@
     ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-07-24",
-    "keywords": []
+    "keywords": [
+      "validar",
+      "epub",
+      "estructura",
+      "comprobar",
+      "libro"
+    ]
   },
   {
     "id": "repairEpub",
@@ -4583,7 +4836,8 @@
     "instructions": [
       "Selecciona o arrastra un archivo CSV.",
       "Haz clic en Procesar.",
-      "Descarga el archivo Excel (.xlsx) resultante."
+      "Descarga el archivo Excel (.xlsx) resultante.",
+      "Comprueba que las columnas del CSV quedan correctas en la hoja de cálculo."
     ],
     "limitations": [
       "Archivos CSV muy grandes (más de 10 MB) pueden tardar en procesarse",
@@ -4659,7 +4913,12 @@
     ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-07-24",
-    "keywords": []
+    "keywords": [
+      "excel",
+      "csv",
+      "convertir",
+      "hoja de cálculo"
+    ]
   },
   {
     "id": "excelToJson",
@@ -4719,7 +4978,12 @@
     ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-07-24",
-    "keywords": []
+    "keywords": [
+      "excel",
+      "json",
+      "convertir",
+      "datos"
+    ]
   },
   {
     "id": "jsonToExcel",
@@ -4778,7 +5042,12 @@
     ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-07-24",
-    "keywords": []
+    "keywords": [
+      "json",
+      "excel",
+      "convertir",
+      "datos"
+    ]
   },
   {
     "id": "csvToJson",
@@ -4828,7 +5097,8 @@
     "instructions": [
       "Selecciona o arrastra un archivo CSV.",
       "Haz clic en Procesar.",
-      "Descarga el archivo JSON resultante."
+      "Descarga el archivo JSON resultante.",
+      "Revisa que las filas del CSV se convierten correctamente en objetos JSON."
     ],
     "limitations": [
       "CSVs con encoding exótico pueden producir caracteres extraños",
@@ -5234,7 +5504,13 @@
     ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-07-24",
-    "keywords": []
+    "keywords": [
+      "comparar",
+      "excel",
+      "diferencia",
+      "hojas",
+      "revisar"
+    ]
   },
   {
     "id": "xlsToXlsx",
@@ -9188,7 +9464,8 @@
       "Selecciona el idioma del documento.",
       "Opcionalmente, indica páginas específicas.",
       "Haz clic en Procesar y espera a que termine el OCR.",
-      "Descarga el PDF buscable resultante."
+      "Descarga el PDF buscable resultante.",
+      "Verifica que el texto aparece subrayable y seleccionable en el PDF de salida."
     ],
     "limitations": [
       "El tiempo de procesamiento depende del número de páginas y la resolución.",
@@ -9319,7 +9596,8 @@
       "Selecciona el PDF escaneado.",
       "Selecciona el idioma del documento.",
       "Haz clic en Procesar.",
-      "Descarga el archivo de texto."
+      "Descarga el archivo de texto.",
+      "Copia el texto reconocido o descárgalo como archivo de texto."
     ],
     "limitations": [
       "La precisión depende de la calidad del escaneo y la resolución del PDF."
@@ -11072,23 +11350,60 @@
     "description": "Convierte fotos HEIC/HEIF de iPhone al formato que necesites, directamente en tu navegador.",
     "h1": "HEIC a imagen",
     "summary": "Convierte archivos HEIC/HEIF a JPG, PNG o WebP sin enviar nada a internet.",
-    "inputFormats": ["HEIC","HEIF"],
-    "outputFormats": ["JPEG","PNG","WebP"],
+    "inputFormats": [
+      "HEIC",
+      "HEIF"
+    ],
+    "outputFormats": [
+      "JPEG",
+      "PNG",
+      "WebP"
+    ],
     "accepts": "image",
     "toolId": "heicToImage",
     "icon": "Ἠ",
-    "relatedTools": ["avifToImage","svgToImage","convert"],
-    "relatedSlugs": ["avif-a-imagen","svg-a-imagen","convertir-imagen"],
+    "relatedTools": [
+      "avifToImage",
+      "svgToImage",
+      "convert"
+    ],
+    "relatedSlugs": [
+      "avif-a-imagen",
+      "svg-a-imagen",
+      "convertir-imagen"
+    ],
     "enabledInSitemap": true,
     "faq": [
-      {"q":"¿Qué es un archivo HEIC?","a":"HEIC es el formato de imagen por defecto en iPhones y iPads modernos. Es compatible pero no universal."},
-      {"q":"¿Se envía mi foto a un servidor?","a":"No. Todo el procesamiento ocurre en tu navegador, sin conexión a internet."}
+      {
+        "q": "¿Qué es un archivo HEIC?",
+        "a": "HEIC es el formato de imagen por defecto en iPhones y iPads modernos. Es compatible pero no universal."
+      },
+      {
+        "q": "¿Se envía mi foto a un servidor?",
+        "a": "No. Todo el procesamiento ocurre en tu navegador, sin conexión a internet."
+      }
     ],
-    "instructions": ["Selecciona o arrastra uno o varios archivos HEIC/HEIF.","Elige el formato de salida: JPG, PNG o WebP.","Ajusta la calidad si lo necesitas.","Descarga individualmente o en ZIP."],
-    "limitations": ["La conversión HEIC requiere procesamiento en el navegador, puede ser lento con archivos muy grandes.","Los archivos HEIC con Live Photo solo conservan la imagen estática."],
+    "instructions": [
+      "Selecciona o arrastra uno o varios archivos HEIC/HEIF.",
+      "Elige el formato de salida: JPG, PNG o WebP.",
+      "Ajusta la calidad si lo necesitas.",
+      "Descarga individualmente o en ZIP."
+    ],
+    "limitations": [
+      "La conversión HEIC requiere procesamiento en el navegador, puede ser lento con archivos muy grandes.",
+      "Los archivos HEIC con Live Photo solo conservan la imagen estática."
+    ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-08-20",
-    "keywords": ["heic","heif","iphone","convertir","jpg","png","webp"]
+    "keywords": [
+      "heic",
+      "heif",
+      "iphone",
+      "convertir",
+      "jpg",
+      "png",
+      "webp"
+    ]
   },
   {
     "id": "avifToImage",
@@ -11101,23 +11416,58 @@
     "description": "Convierte archivos AVIF a JPG, PNG o WebP al instante en tu navegador.",
     "h1": "AVIF a imagen",
     "summary": "Convierte archivos AVIF a JPG, PNG o WebP sin salir de tu navegador.",
-    "inputFormats": ["AVIF"],
-    "outputFormats": ["JPEG","PNG","WebP"],
+    "inputFormats": [
+      "AVIF"
+    ],
+    "outputFormats": [
+      "JPEG",
+      "PNG",
+      "WebP"
+    ],
     "accepts": "image",
     "toolId": "avifToImage",
     "icon": "Ἂ",
-    "relatedTools": ["heicToImage","svgToImage","convert"],
-    "relatedSlugs": ["heic-a-imagen","svg-a-imagen","convertir-imagen"],
+    "relatedTools": [
+      "heicToImage",
+      "svgToImage",
+      "convert"
+    ],
+    "relatedSlugs": [
+      "heic-a-imagen",
+      "svg-a-imagen",
+      "convertir-imagen"
+    ],
     "enabledInSitemap": true,
     "faq": [
-      {"q":"¿Qué es AVIF?","a":"AVIF es un formato de imagen moderno con excelente compresión. Lo usan Chrome, Firefox y Safari."},
-      {"q":"¿Mantiene la transparencia?","a":"Sí, al convertir a PNG o WebP se conserva la transparencia."}
+      {
+        "q": "¿Qué es AVIF?",
+        "a": "AVIF es un formato de imagen moderno con excelente compresión. Lo usan Chrome, Firefox y Safari."
+      },
+      {
+        "q": "¿Mantiene la transparencia?",
+        "a": "Sí, al convertir a PNG o WebP se conserva la transparencia."
+      }
     ],
-    "instructions": ["Selecciona o arrastra archivos AVIF.","Elige el formato de salida: JPG, PNG o WebP.","Ajusta la calidad si lo necesitas.","Descarga el resultado."],
-    "limitations": ["Algunos navegadores antiguos no pueden decodificar AVIF nativamente.","La herramienta usa decodificación nativa del navegador."],
+    "instructions": [
+      "Selecciona o arrastra archivos AVIF.",
+      "Elige el formato de salida: JPG, PNG o WebP.",
+      "Ajusta la calidad si lo necesitas.",
+      "Descarga el resultado."
+    ],
+    "limitations": [
+      "Algunos navegadores antiguos no pueden decodificar AVIF nativamente.",
+      "La herramienta usa decodificación nativa del navegador."
+    ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-08-20",
-    "keywords": ["avif","convertir","jpg","png","webp","formato moderno"]
+    "keywords": [
+      "avif",
+      "convertir",
+      "jpg",
+      "png",
+      "webp",
+      "formato moderno"
+    ]
   },
   {
     "id": "svgToImage",
@@ -11130,23 +11480,58 @@
     "description": "Convierte archivos SVG vectoriales a imagen rasterizada con calidad configurable.",
     "h1": "SVG a imagen",
     "summary": "Rasteriza archivos SVG a PNG, JPG o WebP con dimensiones y fondo personalizables.",
-    "inputFormats": ["SVG"],
-    "outputFormats": ["PNG","JPEG","WebP"],
+    "inputFormats": [
+      "SVG"
+    ],
+    "outputFormats": [
+      "PNG",
+      "JPEG",
+      "WebP"
+    ],
     "accepts": "image",
     "toolId": "svgToImage",
     "icon": "スタ",
-    "relatedTools": ["heicToImage","avifToImage","convert"],
-    "relatedSlugs": ["heic-a-imagen","avif-a-imagen","convertir-imagen"],
+    "relatedTools": [
+      "heicToImage",
+      "avifToImage",
+      "convert"
+    ],
+    "relatedSlugs": [
+      "heic-a-imagen",
+      "avif-a-imagen",
+      "convertir-imagen"
+    ],
     "enabledInSitemap": true,
     "faq": [
-      {"q":"¿Por qué mi SVG se ve diferente?","a":"SVGs dependen de fuentes y estilos del navegador. Asegúrate de que las fuentes estén embebidas en el SVG."},
-      {"q":"¿Qué resolución puedo elegir?","a":"Puedes configurar el ancho y alto en píxeles. La relación de aspecto se mantiene por defecto."}
+      {
+        "q": "¿Por qué mi SVG se ve diferente?",
+        "a": "SVGs dependen de fuentes y estilos del navegador. Asegúrate de que las fuentes estén embebidas en el SVG."
+      },
+      {
+        "q": "¿Qué resolución puedo elegir?",
+        "a": "Puedes configurar el ancho y alto en píxeles. La relación de aspecto se mantiene por defecto."
+      }
     ],
-    "instructions": ["Selecciona un archivo SVG.","Configura las dimensiones de salida y la escala.","Elige el formato y el color de fondo.","Descarga la imagen rasterizada."],
-    "limitations": ["Los SVGs con scripts o estilos externos pueden no renderizar correctamente.","Los textos no embebidos como paths pueden cambiar de fuente."],
+    "instructions": [
+      "Selecciona un archivo SVG.",
+      "Configura las dimensiones de salida y la escala.",
+      "Elige el formato y el color de fondo.",
+      "Descarga la imagen rasterizada."
+    ],
+    "limitations": [
+      "Los SVGs con scripts o estilos externos pueden no renderizar correctamente.",
+      "Los textos no embebidos como paths pueden cambiar de fuente."
+    ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-08-20",
-    "keywords": ["svg","vectorial","png","rasterizar","convertir","imagen"]
+    "keywords": [
+      "svg",
+      "vectorial",
+      "png",
+      "rasterizar",
+      "convertir",
+      "imagen"
+    ]
   },
   {
     "id": "faviconGenerator",
@@ -11159,23 +11544,59 @@
     "description": "Genera favicons en múltiples tamaños (16×16, 32×32, 48×48) listos para tu web.",
     "h1": "Generador de favicon",
     "summary": "Crea favicons ICO y PNG en todos los tamaños estándar desde una sola imagen.",
-    "inputFormats": ["JPEG","PNG","WebP","SVG"],
-    "outputFormats": ["ICO","PNG"],
+    "inputFormats": [
+      "JPEG",
+      "PNG",
+      "WebP",
+      "SVG"
+    ],
+    "outputFormats": [
+      "ICO",
+      "PNG"
+    ],
     "accepts": "image",
     "toolId": "faviconGenerator",
     "icon": "★",
-    "relatedTools": ["pwaIconGenerator","svgToImage","convert"],
-    "relatedSlugs": ["generar-iconos-pwa","svg-a-imagen","convertir-imagen"],
+    "relatedTools": [
+      "pwaIconGenerator",
+      "svgToImage",
+      "convert"
+    ],
+    "relatedSlugs": [
+      "generar-iconos-pwa",
+      "svg-a-imagen",
+      "convertir-imagen"
+    ],
     "enabledInSitemap": true,
     "faq": [
-      {"q":"¿Qué tamaño debo usar?","a":"El favicon estándar es 32×32. Incluimos 16×16, 32×32, 48×48 y 64×64."},
-      {"q":"¿Qué es el archivo .ico?","a":"Es un formato que contiene múltiples tamaños en un solo archivo, compatible con todos los navegadores."}
+      {
+        "q": "¿Qué tamaño debo usar?",
+        "a": "El favicon estándar es 32×32. Incluimos 16×16, 32×32, 48×48 y 64×64."
+      },
+      {
+        "q": "¿Qué es el archivo .ico?",
+        "a": "Es un formato que contiene múltiples tamaños en un solo archivo, compatible con todos los navegadores."
+      }
     ],
-    "instructions": ["Selecciona una imagen cuadrada para mejor resultado.","Descarga el ZIP con todos los tamaños y el archivo .ico."],
-    "limitations": ["Para mejores resultados usa una imagen cuadrada de al menos 256×256 px.","El fondo transparente se convierte en blanco en formato ICO."],
+    "instructions": [
+      "Selecciona una imagen cuadrada para mejor resultado.",
+      "Descarga el ZIP con todos los tamaños y el archivo .ico."
+    ],
+    "limitations": [
+      "Para mejores resultados usa una imagen cuadrada de al menos 256×256 px.",
+      "El fondo transparente se convierte en blanco en formato ICO."
+    ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-08-20",
-    "keywords": ["favicon","ico","icono","web","generar","16x16","32x32"]
+    "keywords": [
+      "favicon",
+      "ico",
+      "icono",
+      "web",
+      "generar",
+      "16x16",
+      "32x32"
+    ]
   },
   {
     "id": "pwaIconGenerator",
@@ -11188,23 +11609,59 @@
     "description": "Genera todos los iconos necesarios para el manifest de tu Progressive Web App.",
     "h1": "Generador de iconos PWA",
     "summary": "Crea iconos PWA en todos los tamaños requeridos (72 a 512 px) con zona segura maskable.",
-    "inputFormats": ["JPEG","PNG","WebP","SVG"],
-    "outputFormats": ["PNG"],
+    "inputFormats": [
+      "JPEG",
+      "PNG",
+      "WebP",
+      "SVG"
+    ],
+    "outputFormats": [
+      "PNG"
+    ],
     "accepts": "image",
     "toolId": "pwaIconGenerator",
     "icon": "📱",
-    "relatedTools": ["faviconGenerator","svgToImage","convert"],
-    "relatedSlugs": ["generar-favicon","svg-a-imagen","convertir-imagen"],
+    "relatedTools": [
+      "faviconGenerator",
+      "svgToImage",
+      "convert"
+    ],
+    "relatedSlugs": [
+      "generar-favicon",
+      "svg-a-imagen",
+      "convertir-imagen"
+    ],
     "enabledInSitemap": true,
     "faq": [
-      {"q":"¿Qué tamaños genera?","a":"72, 96, 128, 144, 152, 180, 192, 384, 512 px, más 192 y 512 maskable."},
-      {"q":"¿Qué es maskable?","a":"Es una versión con zona segura para que el icono se vea bien en cualquier forma de recorte del sistema."}
+      {
+        "q": "¿Qué tamaños genera?",
+        "a": "72, 96, 128, 144, 152, 180, 192, 384, 512 px, más 192 y 512 maskable."
+      },
+      {
+        "q": "¿Qué es maskable?",
+        "a": "Es una versión con zona segura para que el icono se vea bien en cualquier forma de recorte del sistema."
+      }
     ],
-    "instructions": ["Selecciona una imagen cuadrada de al menos 512×512 px.","Revisa la preview con la zona segura maskable.","Descarga el ZIP con todos los tamaños."],
-    "limitations": ["Para mejor resultado usa imagen cuadrada de fondo sólido.","Los iconos maskable añaden padding para la zona segura."],
+    "instructions": [
+      "Selecciona una imagen cuadrada de al menos 512×512 px.",
+      "Revisa la preview con la zona segura maskable.",
+      "Descarga el ZIP con todos los tamaños."
+    ],
+    "limitations": [
+      "Para mejor resultado usa imagen cuadrada de fondo sólido.",
+      "Los iconos maskable añaden padding para la zona segura."
+    ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-08-20",
-    "keywords": ["pwa","icono","manifest","progressive","web app","android","ios"]
+    "keywords": [
+      "pwa",
+      "icono",
+      "manifest",
+      "progressive",
+      "web app",
+      "android",
+      "ios"
+    ]
   },
   {
     "id": "removeBackground",
@@ -11217,23 +11674,59 @@
     "description": "Elimina el fondo de una imagen y genera transparencia, todo en tu navegador.",
     "h1": "Quitar fondo de imagen",
     "summary": "Detecta el sujeto principal y genera un fondo transparente, blanco o de color personalizado.",
-    "inputFormats": ["JPEG","PNG","WebP"],
-    "outputFormats": ["PNG","WebP"],
+    "inputFormats": [
+      "JPEG",
+      "PNG",
+      "WebP"
+    ],
+    "outputFormats": [
+      "PNG",
+      "WebP"
+    ],
     "accepts": "image",
     "toolId": "removeBackground",
     "icon": "◐",
-    "relatedTools": ["censor","removeObjects","signature"],
-    "relatedSlugs": ["censurar-imagen","borrar-objetos-de-imagen","limpiar-firma"],
+    "relatedTools": [
+      "censor",
+      "removeObjects",
+      "signature"
+    ],
+    "relatedSlugs": [
+      "censurar-imagen",
+      "borrar-objetos-de-imagen",
+      "limpiar-firma"
+    ],
     "enabledInSitemap": true,
     "faq": [
-      {"q":"¿Funciona con cualquier imagen?","a":"Funciona mejor con fotos donde el sujeto está claramente diferenciado del fondo."},
-      {"q":"¿Puedo elegir un fondo de color?","a":"Sí, puedes dejar transparente, blanco o cualquier color personalizado."}
+      {
+        "q": "¿Funciona con cualquier imagen?",
+        "a": "Funciona mejor con fotos donde el sujeto está claramente diferenciado del fondo."
+      },
+      {
+        "q": "¿Puedo elegir un fondo de color?",
+        "a": "Sí, puedes dejar transparente, blanco o cualquier color personalizado."
+      }
     ],
-    "instructions": ["Selecciona una imagen con un sujeto claro.","La herramienta detecta el sujeto automáticamente.","Elige el fondo: transparente, blanco o color.","Descarga el resultado."],
-    "limitations": ["Usa un algoritmo de distancia de color, no inteligencia artificial. Funciona mejor con fondos uniformes.","Imágenes muy pequeñas o borrosas pueden dar resultados imprecisos.","El color de referencia se toma del píxel superior izquierdo o se configura manualmente."],
+    "instructions": [
+      "Selecciona una imagen con un sujeto claro.",
+      "La herramienta detecta el sujeto automáticamente.",
+      "Elige el fondo: transparente, blanco o color.",
+      "Descarga el resultado."
+    ],
+    "limitations": [
+      "Usa un algoritmo de distancia de color, no inteligencia artificial. Funciona mejor con fondos uniformes.",
+      "Imágenes muy pequeñas o borrosas pueden dar resultados imprecisos.",
+      "El color de referencia se toma del píxel superior izquierdo o se configura manualmente."
+    ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-08-20",
-    "keywords": ["quitar fondo","fondo transparente","remove background","png","transparencia"]
+    "keywords": [
+      "quitar fondo",
+      "fondo transparente",
+      "remove background",
+      "png",
+      "transparencia"
+    ]
   },
   {
     "id": "upscaleImage",
@@ -11246,23 +11739,59 @@
     "description": "Amplía la resolución de una imagen con 2× o 4× manteniendo la mejor calidad posible.",
     "h1": "Aumentar resolución de imagen",
     "summary": "Escala imágenes a 2× o 4× usando interpolación bicúbica directamente en el navegador.",
-    "inputFormats": ["JPEG","PNG","WebP"],
-    "outputFormats": ["PNG","WebP"],
+    "inputFormats": [
+      "JPEG",
+      "PNG",
+      "WebP"
+    ],
+    "outputFormats": [
+      "PNG",
+      "WebP"
+    ],
     "accepts": "image",
     "toolId": "upscaleImage",
     "icon": "⊕",
-    "relatedTools": ["compress","crop","convert"],
-    "relatedSlugs": ["comprimir-imagen","redimensionar-imagen","convertir-imagen"],
+    "relatedTools": [
+      "compress",
+      "crop",
+      "convert"
+    ],
+    "relatedSlugs": [
+      "comprimir-imagen",
+      "redimensionar-imagen",
+      "convertir-imagen"
+    ],
     "enabledInSitemap": true,
     "faq": [
-      {"q":"¿Mejora la calidad real?","a":"Aumenta los píxeles usando interpolación bicúbica. No añade detalle real que no exista en la original."},
-      {"q":"¿Qué escala debo elegir?","a":"2× para duplicar, 4× para cuadruplicar. Mantén la proporción original."}
+      {
+        "q": "¿Mejora la calidad real?",
+        "a": "Aumenta los píxeles usando interpolación bicúbica. No añade detalle real que no exista en la original."
+      },
+      {
+        "q": "¿Qué escala debo elegir?",
+        "a": "2× para duplicar, 4× para cuadruplicar. Mantén la proporción original."
+      }
     ],
-    "instructions": ["Selecciona una imagen.","Elige la escala: 2× o 4×.","Descarga la imagen ampliada."],
-    "limitations": ["No es un upscaler con IA: usa interpolación matemática.","La calidad percibida depende de la resolución original."],
+    "instructions": [
+      "Selecciona una imagen.",
+      "Elige la escala: 2× o 4×.",
+      "Descarga la imagen ampliada."
+    ],
+    "limitations": [
+      "No es un upscaler con IA: usa interpolación matemática.",
+      "La calidad percibida depende de la resolución original."
+    ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-08-20",
-    "keywords": ["ampliar","resolucion","escalar","upscaler","2x","4x","imagen"]
+    "keywords": [
+      "ampliar",
+      "resolucion",
+      "escalar",
+      "upscaler",
+      "2x",
+      "4x",
+      "imagen"
+    ]
   },
   {
     "id": "faceBlur",
@@ -11275,23 +11804,60 @@
     "description": "Detecta caras en una imagen y las difumina o pixela automáticamente.",
     "h1": "Detectar y difuminar caras",
     "summary": "Marca y difumina caras detectadas con intensidad configurable, sin salir del navegador.",
-    "inputFormats": ["JPEG","PNG","WebP"],
-    "outputFormats": ["PNG","WebP"],
+    "inputFormats": [
+      "JPEG",
+      "PNG",
+      "WebP"
+    ],
+    "outputFormats": [
+      "PNG",
+      "WebP"
+    ],
     "accepts": "image",
     "toolId": "faceBlur",
     "icon": "faces",
-    "relatedTools": ["censor","removeBackground","removeObjects"],
-    "relatedSlugs": ["censurar-imagen","quitar-fondo-imagen","borrar-objetos-de-imagen"],
+    "relatedTools": [
+      "censor",
+      "removeBackground",
+      "removeObjects"
+    ],
+    "relatedSlugs": [
+      "censurar-imagen",
+      "quitar-fondo-imagen",
+      "borrar-objetos-de-imagen"
+    ],
     "enabledInSitemap": true,
     "faq": [
-      {"q":"¿Qué tan precisa es la detección?","a":"Usa el detector facial nativo del navegador (FaceDetector API). Funciona bien con caras frontales y semiprofiladas."},
-      {"q":"¿Puedo ajustar la intensidad?","a":"Sí, puedes regular el nivel de desenfoque o pixelado de cada cara detectada."}
+      {
+        "q": "¿Qué tan precisa es la detección?",
+        "a": "Usa el detector facial nativo del navegador (FaceDetector API). Funciona bien con caras frontales y semiprofiladas."
+      },
+      {
+        "q": "¿Puedo ajustar la intensidad?",
+        "a": "Sí, puedes regular el nivel de desenfoque o pixelado de cada cara detectada."
+      }
     ],
-    "instructions": ["Selecciona una imagen con personas.","La herramienta detecta las caras con el detector facial nativo.","Ajusta la intensidad del difuminado.","Descarga el resultado."],
-    "limitations": ["Requiere Chrome 87+, Edge 87+ o Safari 15.4+ para detección facial nativa.","La detección es automática, no permite selección manual.","Funciona mejor con caras frontales bien iluminadas."],
+    "instructions": [
+      "Selecciona una imagen con personas.",
+      "La herramienta detecta las caras con el detector facial nativo.",
+      "Ajusta la intensidad del difuminado.",
+      "Descarga el resultado."
+    ],
+    "limitations": [
+      "Requiere Chrome 87+, Edge 87+ o Safari 15.4+ para detección facial nativa.",
+      "La detección es automática, no permite selección manual.",
+      "Funciona mejor con caras frontales bien iluminadas."
+    ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-08-20",
-    "keywords": ["difuminar","caras","blur","pixelar","privacidad","rostron"]
+    "keywords": [
+      "difuminar",
+      "caras",
+      "blur",
+      "pixelar",
+      "privacidad",
+      "rostron"
+    ]
   },
   {
     "id": "colorPalette",
@@ -11304,23 +11870,61 @@
     "description": "Detecta los colores dominantes de una imagen con valores HEX, RGB y HSL.",
     "h1": "Extraer paleta de colores",
     "summary": "Obtén la paleta de colores dominantes con porcentajes, copia un clic y exporta TXT/JSON/CSS.",
-    "inputFormats": ["JPEG","PNG","WebP"],
-    "outputFormats": ["TXT","JSON","CSS"],
+    "inputFormats": [
+      "JPEG",
+      "PNG",
+      "WebP"
+    ],
+    "outputFormats": [
+      "TXT",
+      "JSON",
+      "CSS"
+    ],
     "accepts": "image",
     "toolId": "colorPalette",
     "icon": "🎨",
-    "relatedTools": ["colorPicker","imageCompare","convert"],
-    "relatedSlugs": ["selector-color","comparar-imagenes","convertir-imagen"],
+    "relatedTools": [
+      "colorPicker",
+      "imageCompare",
+      "convert"
+    ],
+    "relatedSlugs": [
+      "selector-color",
+      "comparar-imagenes",
+      "convertir-imagen"
+    ],
     "enabledInSitemap": true,
     "faq": [
-      {"q":"¿Cuántos colores detecta?","a":"Detecta los 8 colores más dominantes y su porcentaje de presencia en la imagen."},
-      {"q":"¿Puedo copiar un color?","a":"Sí, haz clic en cualquier color para copiar su valor HEX al portapapeles."}
+      {
+        "q": "¿Cuántos colores detecta?",
+        "a": "Detecta los 8 colores más dominantes y su porcentaje de presencia en la imagen."
+      },
+      {
+        "q": "¿Puedo copiar un color?",
+        "a": "Sí, haz clic en cualquier color para copiar su valor HEX al portapapeles."
+      }
     ],
-    "instructions": ["Selecciona una imagen.","Revisa la paleta extraída con HEX, RGB y HSL.","Copia cualquier color con un clic.","Exporta la paleta completa si lo necesitas."],
-    "limitations": ["Usa k-means simplificado, no una librería de percepción cromática.","Los gradientes grandes pueden sesgar los colores dominantes."],
+    "instructions": [
+      "Selecciona una imagen.",
+      "Revisa la paleta extraída con HEX, RGB y HSL.",
+      "Copia cualquier color con un clic.",
+      "Exporta la paleta completa si lo necesitas."
+    ],
+    "limitations": [
+      "Usa k-means simplificado, no una librería de percepción cromática.",
+      "Los gradientes grandes pueden sesgar los colores dominantes."
+    ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-08-20",
-    "keywords": ["paleta","colores","dominantes","hex","rgb","hsl","extraer"]
+    "keywords": [
+      "paleta",
+      "colores",
+      "dominantes",
+      "hex",
+      "rgb",
+      "hsl",
+      "extraer"
+    ]
   },
   {
     "id": "htmlToImage",
@@ -11333,23 +11937,59 @@
     "description": "Captura código HTML como imagen con viewport, escala y fondo personalizables.",
     "h1": "HTML a imagen",
     "summary": "Renderiza HTML a PNG, JPG o WebP con dimensiones, escala y color de fondo configurables.",
-    "inputFormats": ["HTML"],
-    "outputFormats": ["PNG","JPEG","WebP"],
+    "inputFormats": [
+      "HTML"
+    ],
+    "outputFormats": [
+      "PNG",
+      "JPEG",
+      "WebP"
+    ],
     "accepts": "html",
     "toolId": "htmlToImage",
     "icon": "⬒",
-    "relatedTools": ["htmlToMarkdown","htmlToText","svgToImage"],
-    "relatedSlugs": ["html-a-markdown","html-a-texto","svg-a-imagen"],
+    "relatedTools": [
+      "htmlToMarkdown",
+      "htmlToText",
+      "svgToImage"
+    ],
+    "relatedSlugs": [
+      "html-a-markdown",
+      "html-a-texto",
+      "svg-a-imagen"
+    ],
     "enabledInSitemap": true,
     "faq": [
-      {"q":"¿Puedo incluir CSS?","a":"Sí, puedes pegar HTML con CSS inline o en bloque <style>."},
-      {"q":"¿Qué formato debo elegir?","a":"PNG para transparencia, JPG para fotos, WebP para mejor compresión."}
+      {
+        "q": "¿Puedo incluir CSS?",
+        "a": "Sí, puedes pegar HTML con CSS inline o en bloque <style>."
+      },
+      {
+        "q": "¿Qué formato debo elegir?",
+        "a": "PNG para transparencia, JPG para fotos, WebP para mejor compresión."
+      }
     ],
-    "instructions": ["Pega tu código HTML con CSS opcional.","Configura viewport, escala y color de fondo.","Elige el formato de salida.","Descarga la imagen renderizada."],
-    "limitations": ["No carga recursos externos (CDN, fuentes Google).","El renderizado depende del motor del navegador."],
+    "instructions": [
+      "Pega tu código HTML con CSS opcional.",
+      "Configura viewport, escala y color de fondo.",
+      "Elige el formato de salida.",
+      "Descarga la imagen renderizada."
+    ],
+    "limitations": [
+      "No carga recursos externos (CDN, fuentes Google).",
+      "El renderizado depende del motor del navegador."
+    ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-08-20",
-    "keywords": ["html","imagen","captura","screenshot","render","png","css"]
+    "keywords": [
+      "html",
+      "imagen",
+      "captura",
+      "screenshot",
+      "render",
+      "png",
+      "css"
+    ]
   },
   {
     "id": "extractTextPdf",
@@ -11362,23 +12002,58 @@
     "description": "Extrae el texto seleccionable de un PDF sin usar OCR, directo en tu navegador.",
     "h1": "Extraer texto de PDF",
     "summary": "Copia el texto completo de un PDF con texto real a TXT, Markdown o JSON estructurado.",
-    "inputFormats": ["PDF"],
-    "outputFormats": ["TXT","Markdown","JSON"],
+    "inputFormats": [
+      "PDF"
+    ],
+    "outputFormats": [
+      "TXT",
+      "Markdown",
+      "JSON"
+    ],
     "accepts": "pdf",
     "toolId": "extractTextPdf",
     "icon": "📝",
-    "relatedTools": ["extractTextFromScannedPdf","pdfToMarkdown","pdfPageCounter"],
-    "relatedSlugs": ["extraer-texto-pdf-escaneado","pdf-a-markdown","contar-paginas-pdf"],
+    "relatedTools": [
+      "extractTextFromScannedPdf",
+      "pdfToMarkdown",
+      "pdfPageCounter"
+    ],
+    "relatedSlugs": [
+      "extraer-texto-pdf-escaneado",
+      "pdf-a-markdown",
+      "contar-paginas-pdf"
+    ],
     "enabledInSitemap": true,
     "faq": [
-      {"q":"¿Usa OCR?","a":"No. Solo extrae el texto real incrustado en el PDF. Para PDFs escaneados usa la herramienta de OCR."},
-      {"q":"¿Puedo elegir páginas?","a":"Sí, puedes extraer todo el PDF o rangos de páginas específicas."}
+      {
+        "q": "¿Usa OCR?",
+        "a": "No. Solo extrae el texto real incrustado en el PDF. Para PDFs escaneados usa la herramienta de OCR."
+      },
+      {
+        "q": "¿Puedo elegir páginas?",
+        "a": "Sí, puedes extraer todo el PDF o rangos de páginas específicas."
+      }
     ],
-    "instructions": ["Selecciona un PDF con texto seleccionable.","Elige el formato de salida: TXT, Markdown o JSON.","Selecciona las páginas a extraer.","Descarga el texto."],
-    "limitations": ["Solo funciona con PDFs que contengan texto real (no escaneados).","Los PDFs protegidos contra copia no podrán extraer texto."],
+    "instructions": [
+      "Selecciona un PDF con texto seleccionable.",
+      "Elige el formato de salida: TXT, Markdown o JSON.",
+      "Selecciona las páginas a extraer.",
+      "Descarga el texto."
+    ],
+    "limitations": [
+      "Solo funciona con PDFs que contengan texto real (no escaneados).",
+      "Los PDFs protegidos contra copia no podrán extraer texto."
+    ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-08-20",
-    "keywords": ["pdf","texto","extraer","copiar","txt","markdown"]
+    "keywords": [
+      "pdf",
+      "texto",
+      "extraer",
+      "copiar",
+      "txt",
+      "markdown"
+    ]
   },
   {
     "id": "extractImagesPdf",
@@ -11391,23 +12066,57 @@
     "description": "Extrae las imágenes incrustadas en un PDF sin renderizar la página completa.",
     "h1": "Extraer imágenes de PDF",
     "summary": "Obtén las imágenes originales de un PDF con su formato, dimensiones y página de origen.",
-    "inputFormats": ["PDF"],
-    "outputFormats": ["PNG","JPEG","ZIP"],
+    "inputFormats": [
+      "PDF"
+    ],
+    "outputFormats": [
+      "PNG",
+      "JPEG",
+      "ZIP"
+    ],
     "accepts": "pdf",
     "toolId": "extractImagesPdf",
     "icon": "⬒",
-    "relatedTools": ["pdfToImages","extractTextPdf","pdfTablesToExcel"],
-    "relatedSlugs": ["pdf-a-imagenes","extraer-texto-pdf","extraer-tablas-pdf-excel"],
+    "relatedTools": [
+      "pdfToImages",
+      "extractTextPdf",
+      "pdfTablesToExcel"
+    ],
+    "relatedSlugs": [
+      "pdf-a-imagenes",
+      "extraer-texto-pdf",
+      "extraer-tablas-pdf-excel"
+    ],
     "enabledInSitemap": true,
     "faq": [
-      {"q":"¿Extrae todas las imágenes?","a":"Sí, incluye imágenes incrustadas, logos, gráficos y cualquier recurso gráfico embebido."},
-      {"q":"¿Mantiene la calidad original?","a":"Sí, extrae los recursos en su formato original sin re-renderizar."}
+      {
+        "q": "¿Extrae todas las imágenes?",
+        "a": "Sí, incluye imágenes incrustadas, logos, gráficos y cualquier recurso gráfico embebido."
+      },
+      {
+        "q": "¿Mantiene la calidad original?",
+        "a": "Sí, extrae los recursos en su formato original sin re-renderizar."
+      }
     ],
-    "instructions": ["Selecciona un PDF.","Revisa el inventario de imágenes detectadas.","Descarga individualmente o todas en ZIP."],
-    "limitations": ["Algunos PDFs usan patrones de fondo que se detectan como imágenes.","Las imágenes en capas de watermark pueden extraerse por separado."],
+    "instructions": [
+      "Selecciona un PDF.",
+      "Revisa el inventario de imágenes detectadas.",
+      "Descarga individualmente o todas en ZIP.",
+      "Descarga cada imagen extraída del documento en su resolución original."
+    ],
+    "limitations": [
+      "Algunos PDFs usan patrones de fondo que se detectan como imágenes.",
+      "Las imágenes en capas de watermark pueden extraerse por separado."
+    ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-08-20",
-    "keywords": ["pdf","imagenes","extraer","recursos","originales"]
+    "keywords": [
+      "pdf",
+      "imagenes",
+      "extraer",
+      "recursos",
+      "originales"
+    ]
   },
   {
     "id": "pdfToPptx",
@@ -11420,23 +12129,55 @@
     "description": "Convierte cada página de un PDF en una diapositiva de PowerPoint.",
     "h1": "PDF a PowerPoint",
     "summary": "Transforma PDFs a presentaciones PPTX conservando el layout visual de cada página.",
-    "inputFormats": ["PDF"],
-    "outputFormats": ["PPTX"],
+    "inputFormats": [
+      "PDF"
+    ],
+    "outputFormats": [
+      "PPTX"
+    ],
     "accepts": "pdf",
     "toolId": "pdfToPptx",
     "icon": "▣",
-    "relatedTools": ["pptxToPdf","excelToPdf","htmlToPdf"],
-    "relatedSlugs": ["powerpoint-a-pdf","excel-a-pdf","html-a-pdf"],
+    "relatedTools": [
+      "pptxToPdf",
+      "excelToPdf",
+      "htmlToPdf"
+    ],
+    "relatedSlugs": [
+      "powerpoint-a-pdf",
+      "excel-a-pdf",
+      "html-a-pdf"
+    ],
     "enabledInSitemap": true,
     "faq": [
-      {"q":"¿Conserva el formato exacto?","a":"Cada página se convierte en una diapositiva con la imagen renderizada para máxima fidelidad visual."},
-      {"q":"¿Puedo editar el resultado?","a":"Las diapositivas se crean como imágenes de página completa para preservar el layout."}
+      {
+        "q": "¿Conserva el formato exacto?",
+        "a": "Cada página se convierte en una diapositiva con la imagen renderizada para máxima fidelidad visual."
+      },
+      {
+        "q": "¿Puedo editar el resultado?",
+        "a": "Las diapositivas se crean como imágenes de página completa para preservar el layout."
+      }
     ],
-    "instructions": ["Selecciona un PDF.","Cada página se convierte en una diapositiva.","Descarga el archivo PPTX."],
-    "limitations": ["El contenido se renderiza como imagen por página, no como objetos editables.","El texto no será seleccionable en la presentación."],
+    "instructions": [
+      "Selecciona un PDF.",
+      "Cada página se convierte en una diapositiva.",
+      "Descarga el archivo PPTX."
+    ],
+    "limitations": [
+      "El contenido se renderiza como imagen por página, no como objetos editables.",
+      "El texto no será seleccionable en la presentación."
+    ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-08-20",
-    "keywords": ["pdf","powerpoint","pptx","presentacion","convertir","diapositiva"]
+    "keywords": [
+      "pdf",
+      "powerpoint",
+      "pptx",
+      "presentacion",
+      "convertir",
+      "diapositiva"
+    ]
   },
   {
     "id": "pptxToPdf",
@@ -11449,23 +12190,54 @@
     "description": "Convierte presentaciones PPTX a PDF con tamaño de diapositiva correcto.",
     "h1": "PowerPoint a PDF",
     "summary": "Exporta presentaciones PowerPoint a PDF con imágenes, texto y elementos preservados.",
-    "inputFormats": ["PPTX"],
-    "outputFormats": ["PDF"],
+    "inputFormats": [
+      "PPTX"
+    ],
+    "outputFormats": [
+      "PDF"
+    ],
     "accepts": "docs",
     "toolId": "pptxToPdf",
     "icon": "📄",
-    "relatedTools": ["pdfToPptx","wordToPdf","excelToPdf"],
-    "relatedSlugs": ["pdf-a-powerpoint","word-a-pdf","excel-a-pdf"],
+    "relatedTools": [
+      "pdfToPptx",
+      "wordToPdf",
+      "excelToPdf"
+    ],
+    "relatedSlugs": [
+      "pdf-a-powerpoint",
+      "word-a-pdf",
+      "excel-a-pdf"
+    ],
     "enabledInSitemap": true,
     "faq": [
-      {"q":"¿Conserva las imágenes?","a":"Sí, todas las imágenes y elementos visuales se incluyen en el PDF."},
-      {"q":"¿Puedo convertir varias presentaciones?","a":"Sí, selecciona múltiples archivos PPTX y se convierten por separado."}
+      {
+        "q": "¿Conserva las imágenes?",
+        "a": "Sí, todas las imágenes y elementos visuales se incluyen en el PDF."
+      },
+      {
+        "q": "¿Puedo convertir varias presentaciones?",
+        "a": "Sí, selecciona múltiples archivos PPTX y se convierten por separado."
+      }
     ],
-    "instructions": ["Selecciona uno o varios archivos PPTX.","Cada presentación se convierte en un PDF.","Descarga el resultado."],
-    "limitations": ["Las animaciones y transiciones de PowerPoint no se conservan.","El contenido se renderiza como imagen estática por diapositiva."],
+    "instructions": [
+      "Selecciona uno o varios archivos PPTX.",
+      "Cada presentación se convierte en un PDF.",
+      "Descarga el resultado."
+    ],
+    "limitations": [
+      "Las animaciones y transiciones de PowerPoint no se conservan.",
+      "El contenido se renderiza como imagen estática por diapositiva."
+    ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-08-20",
-    "keywords": ["powerpoint","pptx","pdf","convertir","presentacion"]
+    "keywords": [
+      "powerpoint",
+      "pptx",
+      "pdf",
+      "convertir",
+      "presentacion"
+    ]
   },
   {
     "id": "excelToPdf",
@@ -11478,23 +12250,56 @@
     "description": "Convierte hojas de cálculo Excel a PDF con orientación, márgenes y ajuste configurables.",
     "h1": "Excel a PDF",
     "summary": "Exporta hojas Excel a PDF con opciones de página, orientación y ajuste a hoja.",
-    "inputFormats": ["XLSX","XLS"],
-    "outputFormats": ["PDF"],
+    "inputFormats": [
+      "XLSX",
+      "XLS"
+    ],
+    "outputFormats": [
+      "PDF"
+    ],
     "accepts": "excels",
     "toolId": "excelToPdf",
     "icon": "📊",
-    "relatedTools": ["csvToPdf","pdfToPptx","wordToPdf"],
-    "relatedSlugs": ["csv-a-pdf","pdf-a-powerpoint","word-a-pdf"],
+    "relatedTools": [
+      "csvToPdf",
+      "pdfToPptx",
+      "wordToPdf"
+    ],
+    "relatedSlugs": [
+      "csv-a-pdf",
+      "pdf-a-powerpoint",
+      "word-a-pdf"
+    ],
     "enabledInSitemap": true,
     "faq": [
-      {"q":"¿Puedo elegir qué hojas convertir?","a":"Sí, puedes seleccionar una hoja específica o todas las hojas del libro."},
-      {"q":"¿Qué orientación puedo usar?","a":"Horizontal o vertical, con tamaño A4 o Carta configurable."}
+      {
+        "q": "¿Puedo elegir qué hojas convertir?",
+        "a": "Sí, puedes seleccionar una hoja específica o todas las hojas del libro."
+      },
+      {
+        "q": "¿Qué orientación puedo usar?",
+        "a": "Horizontal o vertical, con tamaño A4 o Carta configurable."
+      }
     ],
-    "instructions": ["Selecciona un archivo Excel.","Elige las hojas, orientación y tamaño de página.","Ajusta márgenes y opciones de impresión.","Descarga el PDF."],
-    "limitations": ["Las fórmulas se convierten en sus valores calculados.","El ajuste a página puede reducir el tamaño del texto en hojas muy anchas."],
+    "instructions": [
+      "Selecciona un archivo Excel.",
+      "Elige las hojas, orientación y tamaño de página.",
+      "Ajusta márgenes y opciones de impresión.",
+      "Descarga el PDF."
+    ],
+    "limitations": [
+      "Las fórmulas se convierten en sus valores calculados.",
+      "El ajuste a página puede reducir el tamaño del texto en hojas muy anchas."
+    ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-08-20",
-    "keywords": ["excel","xlsx","pdf","convertir","hoja de calculo"]
+    "keywords": [
+      "excel",
+      "xlsx",
+      "pdf",
+      "convertir",
+      "hoja de calculo"
+    ]
   },
   {
     "id": "htmlToPdf",
@@ -11507,23 +12312,55 @@
     "description": "Convierte código HTML a PDF con tamaño de página, orientación y márgenes configurables.",
     "h1": "HTML a PDF",
     "summary": "Renderiza HTML a PDF profesional con opciones de página, escala y saltos de página.",
-    "inputFormats": ["HTML"],
-    "outputFormats": ["PDF"],
+    "inputFormats": [
+      "HTML"
+    ],
+    "outputFormats": [
+      "PDF"
+    ],
     "accepts": "html",
     "toolId": "htmlToPdf",
     "icon": "⬒",
-    "relatedTools": ["excelToPdf","wordToPdf","htmlToMarkdown"],
-    "relatedSlugs": ["excel-a-pdf","word-a-pdf","html-a-markdown"],
+    "relatedTools": [
+      "excelToPdf",
+      "wordToPdf",
+      "htmlToMarkdown"
+    ],
+    "relatedSlugs": [
+      "excel-a-pdf",
+      "word-a-pdf",
+      "html-a-markdown"
+    ],
     "enabledInSitemap": true,
     "faq": [
-      {"q":"¿Puedo incluir CSS?","a":"Sí, acepta HTML con CSS inline o en <style>. Puedes usar @page para saltos."},
-      {"q":"¿Qué tamaño de página puedo elegir?","a":"A4, Carta, orientación horizontal o vertical."}
+      {
+        "q": "¿Puedo incluir CSS?",
+        "a": "Sí, acepta HTML con CSS inline o en <style>. Puedes usar @page para saltos."
+      },
+      {
+        "q": "¿Qué tamaño de página puedo elegir?",
+        "a": "A4, Carta, orientación horizontal o vertical."
+      }
     ],
-    "instructions": ["Pega tu código HTML con CSS.","Configura tamaño de página, orientación y márgenes.","Descarga el PDF generado."],
-    "limitations": ["No carga recursos externos (CDN, fuentes, imágenes por URL).","El renderizado depende del motor del navegador."],
+    "instructions": [
+      "Pega tu código HTML con CSS.",
+      "Configura tamaño de página, orientación y márgenes.",
+      "Descarga el PDF generado."
+    ],
+    "limitations": [
+      "No carga recursos externos (CDN, fuentes, imágenes por URL).",
+      "El renderizado depende del motor del navegador."
+    ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-08-20",
-    "keywords": ["html","pdf","convertir","render","css","documento"]
+    "keywords": [
+      "html",
+      "pdf",
+      "convertir",
+      "render",
+      "css",
+      "documento"
+    ]
   },
   {
     "id": "pdfToPdfa",
@@ -11536,23 +12373,56 @@
     "description": "Convierte un PDF al formato PDF/A para archivado a largo plazo.",
     "h1": "PDF a PDF/A",
     "summary": "Aplica metadatos PDF/A-1b (ISO 19005-1) a un PDF existente.",
-    "inputFormats": ["PDF"],
-    "outputFormats": ["PDF"],
+    "inputFormats": [
+      "PDF"
+    ],
+    "outputFormats": [
+      "PDF"
+    ],
     "accepts": "pdf",
     "toolId": "pdfToPdfa",
     "icon": "📦",
-    "relatedTools": ["compressPdf","editMetadataPdf","pdfEncryptAdvanced"],
-    "relatedSlugs": ["comprimir-pdf","editar-metadatos-pdf","encriptar-pdf-avanzado"],
+    "relatedTools": [
+      "compressPdf",
+      "editMetadataPdf",
+      "pdfEncryptAdvanced"
+    ],
+    "relatedSlugs": [
+      "comprimir-pdf",
+      "editar-metadatos-pdf",
+      "encriptar-pdf-avanzado"
+    ],
     "enabledInSitemap": true,
     "faq": [
-      {"q":"¿Qué es PDF/A?","a":"Es un formato ISO diseñado para el archivado digital a largo plazo, garantizando reproducción fiel."},
-      {"q":"¿Garantiza cumplimiento total?","a":"No. Solo aplica metadatos XMP con identificación PDF/A-1b. No embebe perfil ICC, no valida fuentes, no convierte colores. Se requiere validación con veraPDF."}
+      {
+        "q": "¿Qué es PDF/A?",
+        "a": "Es un formato ISO diseñado para el archivado digital a largo plazo, garantizando reproducción fiel."
+      },
+      {
+        "q": "¿Garantiza cumplimiento total?",
+        "a": "No. Solo aplica metadatos XMP con identificación PDF/A-1b. No embebe perfil ICC, no valida fuentes, no convierte colores. Se requiere validación con veraPDF."
+      }
     ],
-    "instructions": ["Selecciona un PDF.","La herramienta aplica metadatos PDF/A-1b al documento.","Descarga el resultado y revisa el informe de limitaciones."],
-    "limitations": ["Solo aplica metadatos XMP, NO embebe perfil ICC ni valida fuentes.","No puede certificar cumplimiento PDF/A-1b completo.","Se requiere validación externa con veraPDF o prefli de Adobe Acrobat."],
+    "instructions": [
+      "Selecciona un PDF.",
+      "La herramienta aplica metadatos PDF/A-1b al documento.",
+      "Descarga el resultado y revisa el informe de limitaciones."
+    ],
+    "limitations": [
+      "Solo aplica metadatos XMP, NO embebe perfil ICC ni valida fuentes.",
+      "No puede certificar cumplimiento PDF/A-1b completo.",
+      "Se requiere validación externa con veraPDF o prefli de Adobe Acrobat."
+    ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-08-20",
-    "keywords": ["pdf","pdfa","archivado","iso","preservacion","conversion"]
+    "keywords": [
+      "pdf",
+      "pdfa",
+      "archivado",
+      "iso",
+      "preservacion",
+      "conversion"
+    ]
   },
   {
     "id": "pdfToMarkdown",
@@ -11565,23 +12435,53 @@
     "description": "Convierte PDF a Markdown preservando títulos, listas, tablas y enlaces.",
     "h1": "PDF a Markdown",
     "summary": "Extrae texto de PDF y lo formatea como Markdown estructurado con párrafos y títulos.",
-    "inputFormats": ["PDF"],
-    "outputFormats": ["Markdown"],
+    "inputFormats": [
+      "PDF"
+    ],
+    "outputFormats": [
+      "Markdown"
+    ],
     "accepts": "pdf",
     "toolId": "pdfToMarkdown",
     "icon": "📋",
-    "relatedTools": ["extractTextPdf","htmlToMarkdown","wordToMarkdown"],
-    "relatedSlugs": ["extraer-texto-pdf","html-a-markdown","word-a-markdown"],
+    "relatedTools": [
+      "extractTextPdf",
+      "htmlToMarkdown",
+      "wordToMarkdown"
+    ],
+    "relatedSlugs": [
+      "extraer-texto-pdf",
+      "html-a-markdown",
+      "word-a-markdown"
+    ],
     "enabledInSitemap": true,
     "faq": [
-      {"q":"¿Detecta tablas?","a":"Intenta preservar la estructura de tablas cuando el layout es claro."},
-      {"q":"¿Conserva los enlaces?","a":"Sí, los enlaces clickeables del PDF se conservan en el Markdown."}
+      {
+        "q": "¿Detecta tablas?",
+        "a": "Intenta preservar la estructura de tablas cuando el layout es claro."
+      },
+      {
+        "q": "¿Conserva los enlaces?",
+        "a": "Sí, los enlaces clickeables del PDF se conservan en el Markdown."
+      }
     ],
-    "instructions": ["Selecciona un PDF con texto real.","Descarga el archivo Markdown resultante."],
-    "limitations": ["Solo funciona con PDFs que contengan texto real (no escaneados).","La detección de tablas complejas puede no ser perfecta."],
+    "instructions": [
+      "Selecciona un PDF con texto real.",
+      "Descarga el archivo Markdown resultante."
+    ],
+    "limitations": [
+      "Solo funciona con PDFs que contengan texto real (no escaneados).",
+      "La detección de tablas complejas puede no ser perfecta."
+    ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-08-20",
-    "keywords": ["pdf","markdown","convertir","texto","estructura"]
+    "keywords": [
+      "pdf",
+      "markdown",
+      "convertir",
+      "texto",
+      "estructura"
+    ]
   },
   {
     "id": "pdfFormFiller",
@@ -11594,23 +12494,56 @@
     "description": "Completa campos de formulario en PDF: texto, checkboxes, radios y selects.",
     "h1": "Rellenar formularios PDF",
     "summary": "Interactúa con campos de formulario PDF y rellena valores directamente en el navegador.",
-    "inputFormats": ["PDF"],
-    "outputFormats": ["PDF"],
+    "inputFormats": [
+      "PDF"
+    ],
+    "outputFormats": [
+      "PDF"
+    ],
     "accepts": "pdf",
     "toolId": "pdfFormFiller",
     "icon": "✎",
-    "relatedTools": ["signPdf","editMetadataPdf","flattenPdf"],
-    "relatedSlugs": ["firmar-pdf","editar-metadatos-pdf","aplanar-pdf"],
+    "relatedTools": [
+      "signPdf",
+      "editMetadataPdf",
+      "flattenPdf"
+    ],
+    "relatedSlugs": [
+      "firmar-pdf",
+      "editar-metadatos-pdf",
+      "aplanar-pdf"
+    ],
     "enabledInSitemap": true,
     "faq": [
-      {"q":"¿Qué tipos de campo soporta?","a":"Texto, checkbox, radio buttons, selects, fecha y campos de firma."},
-      {"q":"¿Puedo modificar valores existentes?","a":"Sí, puedes editar campos que ya tengan contenido."}
+      {
+        "q": "¿Qué tipos de campo soporta?",
+        "a": "Texto, checkbox, radio buttons, selects, fecha y campos de firma."
+      },
+      {
+        "q": "¿Puedo modificar valores existentes?",
+        "a": "Sí, puedes editar campos que ya tengan contenido."
+      }
     ],
-    "instructions": ["Selecciona un PDF con formularios.","La herramienta detecta los campos automáticamente.","Rellena cada campo con su valor.","Descarga el PDF completado."],
-    "limitations": ["Solo detecta campos de formulario estándar (AcroForms).","No procesa campos de formulario dinámicos o de JavaScript."],
+    "instructions": [
+      "Selecciona un PDF con formularios.",
+      "La herramienta detecta los campos automáticamente.",
+      "Rellena cada campo con su valor.",
+      "Descarga el PDF completado."
+    ],
+    "limitations": [
+      "Solo detecta campos de formulario estándar (AcroForms).",
+      "No procesa campos de formulario dinámicos o de JavaScript."
+    ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-08-20",
-    "keywords": ["pdf","formulario","rellenar","campos","checkbox","texto"]
+    "keywords": [
+      "pdf",
+      "formulario",
+      "rellenar",
+      "campos",
+      "checkbox",
+      "texto"
+    ]
   },
   {
     "id": "flattenPdf",
@@ -11623,23 +12556,55 @@
     "description": "Fusiona campos de formulario en el contenido permanente del PDF y elimina anotaciones interactivas.",
     "h1": "Aplanar PDF",
     "summary": "Fusiona campos de formulario y elimina anotaciones interactivas del PDF.",
-    "inputFormats": ["PDF"],
-    "outputFormats": ["PDF"],
+    "inputFormats": [
+      "PDF"
+    ],
+    "outputFormats": [
+      "PDF"
+    ],
     "accepts": "pdf",
     "toolId": "flattenPdf",
     "icon": "⊟",
-    "relatedTools": ["pdfFormFiller","signPdf","compressPdf"],
-    "relatedSlugs": ["rellenar-formulario-pdf","firmar-pdf","comprimir-pdf"],
+    "relatedTools": [
+      "pdfFormFiller",
+      "signPdf",
+      "compressPdf"
+    ],
+    "relatedSlugs": [
+      "rellenar-formulario-pdf",
+      "firmar-pdf",
+      "comprimir-pdf"
+    ],
     "enabledInSitemap": true,
     "faq": [
-      {"q":"¿Qué se aplana?","a":"Los campos de formulario se fusionan visualmente en el contenido de la página. Las anotaciones se eliminan del PDF."},
-      {"q":"¿Se puede deshacer?","a":"No, una vez aplanado el contenido es permanente. Guarda una copia original."}
+      {
+        "q": "¿Qué se aplana?",
+        "a": "Los campos de formulario se fusionan visualmente en el contenido de la página. Las anotaciones se eliminan del PDF."
+      },
+      {
+        "q": "¿Se puede deshacer?",
+        "a": "No, una vez aplanado el contenido es permanente. Guarda una copia original."
+      }
     ],
-    "instructions": ["Selecciona un PDF.","La herramienta fusiona campos de formulario y elimina anotaciones.","Descarga el PDF aplanado."],
-    "limitations": ["No revierte campos protegidos por contraseña.","El resultado final no tiene campos editables.","Las anotaciones se eliminan, no se fusionan visualmente en la página."],
+    "instructions": [
+      "Selecciona un PDF.",
+      "La herramienta fusiona campos de formulario y elimina anotaciones.",
+      "Descarga el PDF aplanado."
+    ],
+    "limitations": [
+      "No revierte campos protegidos por contraseña.",
+      "El resultado final no tiene campos editables.",
+      "Las anotaciones se eliminan, no se fusionan visualmente en la página."
+    ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-08-20",
-    "keywords": ["pdf","aplanar","formularios","anotaciones","permanente"]
+    "keywords": [
+      "pdf",
+      "aplanar",
+      "formularios",
+      "anotaciones",
+      "permanente"
+    ]
   },
   {
     "id": "imagesToPdfAdvanced",
@@ -11652,23 +12617,58 @@
     "description": "Combina múltiples imágenes en un PDF con compresión, DPI y márgenes configurables.",
     "h1": "Imágenes a PDF optimizado",
     "summary": "Crea PDFs optimizados desde imágenes con reordenación, compresión y ajuste de página.",
-    "inputFormats": ["JPEG","PNG","WebP"],
-    "outputFormats": ["PDF"],
+    "inputFormats": [
+      "JPEG",
+      "PNG",
+      "WebP"
+    ],
+    "outputFormats": [
+      "PDF"
+    ],
     "accepts": "images",
     "toolId": "imagesToPdfAdvanced",
     "icon": "▤",
-    "relatedTools": ["imagesPdf","jpgToPdf","pngToPdf"],
-    "relatedSlugs": ["imagenes-a-pdf","jpg-a-pdf","png-a-pdf"],
+    "relatedTools": [
+      "imagesPdf",
+      "jpgToPdf",
+      "pngToPdf"
+    ],
+    "relatedSlugs": [
+      "imagenes-a-pdf",
+      "jpg-a-pdf",
+      "png-a-pdf"
+    ],
     "enabledInSitemap": true,
     "faq": [
-      {"q":"¿Qué diferencia tiene con la herramienta básica?","a":"Esta incluye reordenación visual, compresión, orientación, DPI, márgenes y ajuste fit/fill."},
-      {"q":"¿Puedo reordenar las imágenes?","a":"Sí, arrastra para cambiar el orden antes de generar el PDF."}
+      {
+        "q": "¿Qué diferencia tiene con la herramienta básica?",
+        "a": "Esta incluye reordenación visual, compresión, orientación, DPI, márgenes y ajuste fit/fill."
+      },
+      {
+        "q": "¿Puedo reordenar las imágenes?",
+        "a": "Sí, arrastra para cambiar el orden antes de generar el PDF."
+      }
     ],
-    "instructions": ["Selecciona varias imágenes.","Reordena si es necesario.","Configura DPI, márgenes, orientación y compresión.","Descarga el PDF optimizado."],
-    "limitations": ["La compresión puede reducir calidad visual con valores bajos.","El DPI alto aumenta el tamaño del archivo significativamente."],
+    "instructions": [
+      "Selecciona varias imágenes.",
+      "Reordena si es necesario.",
+      "Configura DPI, márgenes, orientación y compresión.",
+      "Descarga el PDF optimizado."
+    ],
+    "limitations": [
+      "La compresión puede reducir calidad visual con valores bajos.",
+      "El DPI alto aumenta el tamaño del archivo significativamente."
+    ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-08-20",
-    "keywords": ["imagenes","pdf","optimizado","comprimir","dpi","margenes"]
+    "keywords": [
+      "imagenes",
+      "pdf",
+      "optimizado",
+      "comprimir",
+      "dpi",
+      "margenes"
+    ]
   },
   {
     "id": "pdfExtractResources",
@@ -11681,23 +12681,56 @@
     "description": "Extrae imágenes incrustadas de un PDF en su formato original.",
     "h1": "Extraer imágenes incrustadas de PDF",
     "summary": "Extrae imágenes incrustadas de un PDF sin renderizar la página completa.",
-    "inputFormats": ["PDF"],
-    "outputFormats": ["ZIP"],
+    "inputFormats": [
+      "PDF"
+    ],
+    "outputFormats": [
+      "ZIP"
+    ],
     "accepts": "pdf",
     "toolId": "pdfExtractResources",
     "icon": "📂",
-    "relatedTools": ["extractImagesPdf","extractTextPdf","pdfPageCounter"],
-    "relatedSlugs": ["extraer-imagenes-pdf","extraer-texto-pdf","contar-paginas-pdf"],
+    "relatedTools": [
+      "extractImagesPdf",
+      "extractTextPdf",
+      "pdfPageCounter"
+    ],
+    "relatedSlugs": [
+      "extraer-imagenes-pdf",
+      "extraer-texto-pdf",
+      "contar-paginas-pdf"
+    ],
     "enabledInSitemap": true,
     "faq": [
-      {"q":"¿Qué tipo de imágenes extrae?","a":"Imágenes incrustadas vía el operador PaintImageXObject del PDF (logos, fotos, gráficos embebidos)."},
-      {"q":"¿Extrae también fuentes o adjuntos?","a":"No, solo imágenes. No extrae fuentes, archivos adjuntos ni metadatos del PDF."}
+      {
+        "q": "¿Qué tipo de imágenes extrae?",
+        "a": "Imágenes incrustadas vía el operador PaintImageXObject del PDF (logos, fotos, gráficos embebidos)."
+      },
+      {
+        "q": "¿Extrae también fuentes o adjuntos?",
+        "a": "No, solo imágenes. No extrae fuentes, archivos adjuntos ni metadatos del PDF."
+      }
     ],
-    "instructions": ["Selecciona un PDF.","Revisa el inventario de imágenes detectadas.","Descarga las imágenes extraídas en ZIP."],
-    "limitations": ["Solo extrae imágenes incrustadas, no fuentes ni archivos adjuntos.","Imágenes renderizadas como parte del contenido de la página no se detectan.","El informe detalla las limitaciones de cada recurso."],
+    "instructions": [
+      "Selecciona un PDF.",
+      "Revisa el inventario de imágenes detectadas.",
+      "Descarga las imágenes extraídas en ZIP.",
+      "Descarga las fuentes y recursos incrustados que detecta en el PDF."
+    ],
+    "limitations": [
+      "Solo extrae imágenes incrustadas, no fuentes ni archivos adjuntos.",
+      "Imágenes renderizadas como parte del contenido de la página no se detectan.",
+      "El informe detalla las limitaciones de cada recurso."
+    ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-08-20",
-    "keywords": ["pdf","imagenes","recursos","extraer","imagenes incrustadas"]
+    "keywords": [
+      "pdf",
+      "imagenes",
+      "recursos",
+      "extraer",
+      "imagenes incrustadas"
+    ]
   },
   {
     "id": "cleanExcel",
@@ -11710,23 +12743,57 @@
     "description": "Detecta y corrige filas vacías, espacios, caracteres invisibles y valores inconsistentes.",
     "h1": "Limpiar Excel",
     "summary": "Depura hojas Excel eliminando vacíos, espacios extra, caracteres invisibles y más.",
-    "inputFormats": ["XLSX","XLS"],
-    "outputFormats": ["XLSX"],
+    "inputFormats": [
+      "XLSX",
+      "XLS"
+    ],
+    "outputFormats": [
+      "XLSX"
+    ],
     "accepts": "excels",
     "toolId": "cleanExcel",
     "icon": "🧹",
-    "relatedTools": ["removeDuplicatesExcel","normalizeCsv","cleanTabularData"],
-    "relatedSlugs": ["eliminar-duplicados-excel","normalizar-csv","limpiar-datos-tabulares"],
+    "relatedTools": [
+      "removeDuplicatesExcel",
+      "normalizeCsv",
+      "cleanTabularData"
+    ],
+    "relatedSlugs": [
+      "eliminar-duplicados-excel",
+      "normalizar-csv",
+      "limpiar-datos-tabulares"
+    ],
     "enabledInSitemap": true,
     "faq": [
-      {"q":"¿Qué limpia exactamente?","a":"Filas vacías, columnas vacías, espacios extra, caracteres invisibles, números como texto y más."},
-      {"q":"¿Puedo ver antes/después?","a":"Sí, la herramienta muestra un preview con los cambios que aplicará."}
+      {
+        "q": "¿Qué limpia exactamente?",
+        "a": "Filas vacías, columnas vacías, espacios extra, caracteres invisibles, números como texto y más."
+      },
+      {
+        "q": "¿Puedo ver antes/después?",
+        "a": "Sí, la herramienta muestra un preview con los cambios que aplicará."
+      }
     ],
-    "instructions": ["Selecciona un archivo Excel.","Revisa las opciones de limpieza disponibles.","Vista previa antes/después.","Descarga el archivo limpio."],
-    "limitations": ["No corrige errores ortográficos ni de contenido.","Los formatos de celda (colores, fuentes) se conservan."],
+    "instructions": [
+      "Selecciona un archivo Excel.",
+      "Revisa las opciones de limpieza disponibles.",
+      "Vista previa antes/después.",
+      "Descarga el archivo limpio."
+    ],
+    "limitations": [
+      "No corrige errores ortográficos ni de contenido.",
+      "Los formatos de celda (colores, fuentes) se conservan."
+    ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-08-20",
-    "keywords": ["excel","limpiar","depurar","vacias","espacios","invisibles"]
+    "keywords": [
+      "excel",
+      "limpiar",
+      "depurar",
+      "vacias",
+      "espacios",
+      "invisibles"
+    ]
   },
   {
     "id": "removeDuplicatesExcel",
@@ -11739,23 +12806,56 @@
     "description": "Detecta y elimina filas duplicadas de Excel con selección de columnas clave.",
     "h1": "Eliminar duplicados de Excel",
     "summary": "Elimina duplicados configurando columnas clave, caso sensible y orden de preferencia.",
-    "inputFormats": ["XLSX","XLS"],
-    "outputFormats": ["XLSX"],
+    "inputFormats": [
+      "XLSX",
+      "XLS"
+    ],
+    "outputFormats": [
+      "XLSX"
+    ],
     "accepts": "excels",
     "toolId": "removeDuplicatesExcel",
     "icon": "🗑",
-    "relatedTools": ["cleanExcel","csvSort","removeDuplicates"],
-    "relatedSlugs": ["limpiar-excel","ordenar-csv","eliminar-filas-duplicadas"],
+    "relatedTools": [
+      "cleanExcel",
+      "csvSort",
+      "removeDuplicates"
+    ],
+    "relatedSlugs": [
+      "limpiar-excel",
+      "ordenar-csv",
+      "eliminar-filas-duplicadas"
+    ],
     "enabledInSitemap": true,
     "faq": [
-      {"q":"¿Puedo elegir por qué columna buscar duplicados?","a":"Sí, selecciona una o varias columnas clave o compara todas."},
-      {"q":"¿Conserva la primera o última coincidencia?","a":"Configurable: puedes elegir conservar la primera o la última aparición."}
+      {
+        "q": "¿Puedo elegir por qué columna buscar duplicados?",
+        "a": "Sí, selecciona una o varias columnas clave o compara todas."
+      },
+      {
+        "q": "¿Conserva la primera o última coincidencia?",
+        "a": "Configurable: puedes elegir conservar la primera o la última aparición."
+      }
     ],
-    "instructions": ["Selecciona un archivo Excel.","Elige las columnas clave para detectar duplicados.","Configura caso sensible y orden de preferencia.","Descarga el resultado y el reporte de filas eliminadas."],
-    "limitations": ["La comparación es de texto exacto, no fuzzy matching.","Los duplicados parciales no se detectan."],
+    "instructions": [
+      "Selecciona un archivo Excel.",
+      "Elige las columnas clave para detectar duplicados.",
+      "Configura caso sensible y orden de preferencia.",
+      "Descarga el resultado y el reporte de filas eliminadas."
+    ],
+    "limitations": [
+      "La comparación es de texto exacto, no fuzzy matching.",
+      "Los duplicados parciales no se detectan."
+    ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-08-20",
-    "keywords": ["excel","duplicados","eliminar","filas","deduplicar"]
+    "keywords": [
+      "excel",
+      "duplicados",
+      "eliminar",
+      "filas",
+      "deduplicar"
+    ]
   },
   {
     "id": "csvChangeDelimiter",
@@ -11768,23 +12868,59 @@
     "description": "Convierte CSVs entre diferentes delimitadores: coma, punto y coma, tab, pipe.",
     "h1": "Cambiar delimitador CSV",
     "summary": "Cambia el delimitador de un CSV preservando el quoting correctamente.",
-    "inputFormats": ["CSV","TSV"],
-    "outputFormats": ["CSV","TSV"],
+    "inputFormats": [
+      "CSV",
+      "TSV"
+    ],
+    "outputFormats": [
+      "CSV",
+      "TSV"
+    ],
     "accepts": "csvs",
     "toolId": "csvChangeDelimiter",
     "icon": "⇄",
-    "relatedTools": ["csvToExcel","csvFilter","normalizeCsv"],
-    "relatedSlugs": ["csv-a-excel","filtrar-csv","normalizar-csv"],
+    "relatedTools": [
+      "csvToExcel",
+      "csvFilter",
+      "normalizeCsv"
+    ],
+    "relatedSlugs": [
+      "csv-a-excel",
+      "filtrar-csv",
+      "normalizar-csv"
+    ],
     "enabledInSitemap": true,
     "faq": [
-      {"q":"¿Detecta el delimitador actual?","a":"Sí, analiza el archivo y detecta automáticamente si usa coma, punto y coma, tab o pipe."},
-      {"q":"¿Conserva las comillas?","a":"Sí, respeta el quoting original y aplica quoting nuevo si es necesario."}
+      {
+        "q": "¿Detecta el delimitador actual?",
+        "a": "Sí, analiza el archivo y detecta automáticamente si usa coma, punto y coma, tab o pipe."
+      },
+      {
+        "q": "¿Conserva las comillas?",
+        "a": "Sí, respeta el quoting original y aplica quoting nuevo si es necesario."
+      }
     ],
-    "instructions": ["Selecciona un CSV.","El delimitador actual se detecta automáticamente.","Elige el delimitador de salida.","Descarga el CSV convertido."],
-    "limitations": ["No maneja delimitadores multibyte.","Los campos con saltos de línea internos requieren quoting."],
+    "instructions": [
+      "Selecciona un CSV.",
+      "El delimitador actual se detecta automáticamente.",
+      "Elige el delimitador de salida.",
+      "Descarga el CSV convertido."
+    ],
+    "limitations": [
+      "No maneja delimitadores multibyte.",
+      "Los campos con saltos de línea internos requieren quoting."
+    ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-08-20",
-    "keywords": ["csv","delimitador","coma","punto y coma","tab","pipe","cambiar"]
+    "keywords": [
+      "csv",
+      "delimitador",
+      "coma",
+      "punto y coma",
+      "tab",
+      "pipe",
+      "cambiar"
+    ]
   },
   {
     "id": "csvChangeEncoding",
@@ -11797,23 +12933,58 @@
     "description": "Convierte archivos de texto entre UTF-8, Windows-1252, ISO-8859-1 y más.",
     "h1": "Cambiar codificación CSV/TXT",
     "summary": "Detecta la codificación actual y convierte entre UTF-8, UTF-16, Windows-1252 e ISO-8859-1.",
-    "inputFormats": ["CSV","TXT"],
-    "outputFormats": ["CSV","TXT"],
+    "inputFormats": [
+      "CSV",
+      "TXT"
+    ],
+    "outputFormats": [
+      "CSV",
+      "TXT"
+    ],
     "accepts": "txts",
     "toolId": "csvChangeEncoding",
     "icon": "⟳",
-    "relatedTools": ["textEncodingConverter","csvChangeDelimiter","normalizeCsv"],
-    "relatedSlugs": ["convertir-codificacion-texto","cambiar-delimitador-csv","normalizar-csv"],
+    "relatedTools": [
+      "textEncodingConverter",
+      "csvChangeDelimiter",
+      "normalizeCsv"
+    ],
+    "relatedSlugs": [
+      "convertir-codificacion-texto",
+      "cambiar-delimitador-csv",
+      "normalizar-csv"
+    ],
     "enabledInSitemap": true,
     "faq": [
-      {"q":"¿Detecta la codificación actual?","a":"Sí, analiza los bytes del archivo para detectar la codificación de origen."},
-      {"q":"¿Qué formatos soporta?","a":"UTF-8, UTF-8 BOM, UTF-16 LE, Windows-1252, ISO-8859-1."}
+      {
+        "q": "¿Detecta la codificación actual?",
+        "a": "Sí, analiza los bytes del archivo para detectar la codificación de origen."
+      },
+      {
+        "q": "¿Qué formatos soporta?",
+        "a": "UTF-8, UTF-8 BOM, UTF-16 LE, Windows-1252, ISO-8859-1."
+      }
     ],
-    "instructions": ["Selecciona un archivo CSV o TXT.","Revisa la codificación detectada.","Elige la codificación de salida.","Descarga el archivo convertido."],
-    "limitations": ["La detección automática puede fallar con archivos muy pequeños.","Algunas codificaciones no son 100% compatibles entre sí."],
+    "instructions": [
+      "Selecciona un archivo CSV o TXT.",
+      "Revisa la codificación detectada.",
+      "Elige la codificación de salida.",
+      "Descarga el archivo convertido."
+    ],
+    "limitations": [
+      "La detección automática puede fallar con archivos muy pequeños.",
+      "Algunas codificaciones no son 100% compatibles entre sí."
+    ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-08-20",
-    "keywords": ["csv","txt","codificacion","utf-8","encoding","windows-1252"]
+    "keywords": [
+      "csv",
+      "txt",
+      "codificacion",
+      "utf-8",
+      "encoding",
+      "windows-1252"
+    ]
   },
   {
     "id": "flattenJson",
@@ -11826,23 +12997,56 @@
     "description": "Convierte JSON anidado a formato plano y viceversa con separador configurable.",
     "h1": "Aplanar / desanidar JSON",
     "summary": "Transforma JSON jerárquico a estructura plana o reconstruye jerarquía desde claves planas.",
-    "inputFormats": ["JSON"],
-    "outputFormats": ["JSON"],
+    "inputFormats": [
+      "JSON"
+    ],
+    "outputFormats": [
+      "JSON"
+    ],
     "accepts": "jsons",
     "toolId": "flattenJson",
     "icon": "⊞",
-    "relatedTools": ["jsonFormatter","jsonToExcel","jsonToXml"],
-    "relatedSlugs": ["formatear-json","json-a-excel","json-a-xml"],
+    "relatedTools": [
+      "jsonFormatter",
+      "jsonToExcel",
+      "jsonToXml"
+    ],
+    "relatedSlugs": [
+      "formatear-json",
+      "json-a-excel",
+      "json-a-xml"
+    ],
     "enabledInSitemap": true,
     "faq": [
-      {"q":"¿Qué separador puedo usar?","a":"Punto (.), barra (/), guión bajo (_) o personalizado."},
-      {"q":"¿Maneja arrays?","a":"Sí, los arrays se expanden con índices numéricos en las claves aplanadas."}
+      {
+        "q": "¿Qué separador puedo usar?",
+        "a": "Punto (.), barra (/), guión bajo (_) o personalizado."
+      },
+      {
+        "q": "¿Maneja arrays?",
+        "a": "Sí, los arrays se expanden con índices numéricos en las claves aplanadas."
+      }
     ],
-    "instructions": ["Selecciona un JSON anidado.","Elige dirección: anidado→plano o plano→anidado.","Configura el separador de claves.","Descarga el resultado."],
-    "limitations": ["La reconstrucción jerárquica funciona mejor con claves que siguen un patrón consistente.","Los arrays muy anidados pueden producir claves largas."],
+    "instructions": [
+      "Selecciona un JSON anidado.",
+      "Elige dirección: anidado→plano o plano→anidado.",
+      "Configura el separador de claves.",
+      "Descarga el resultado."
+    ],
+    "limitations": [
+      "La reconstrucción jerárquica funciona mejor con claves que siguen un patrón consistente.",
+      "Los arrays muy anidados pueden producir claves largas."
+    ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-08-20",
-    "keywords": ["json","aplanar","desanidar","flatten","nested","estructura"]
+    "keywords": [
+      "json",
+      "aplanar",
+      "desanidar",
+      "flatten",
+      "nested",
+      "estructura"
+    ]
   },
   {
     "id": "jsonToExcelAdvanced",
@@ -11855,23 +13059,56 @@
     "description": "Convierte JSON complejo con arrays y objetos anidados a hojas de cálculo Excel.",
     "h1": "JSON a Excel avanzado",
     "summary": "Normaliza JSON anidado, selecciona campos y genera hojas Excel con preview de estructura.",
-    "inputFormats": ["JSON"],
-    "outputFormats": ["XLSX"],
+    "inputFormats": [
+      "JSON"
+    ],
+    "outputFormats": [
+      "XLSX"
+    ],
     "accepts": "jsons",
     "toolId": "jsonToExcelAdvanced",
     "icon": "📊",
-    "relatedTools": ["jsonToExcel","jsonToCsv","flattenJson"],
-    "relatedSlugs": ["json-a-excel","json-a-csv","aplanar-json"],
+    "relatedTools": [
+      "jsonToExcel",
+      "jsonToCsv",
+      "flattenJson"
+    ],
+    "relatedSlugs": [
+      "json-a-excel",
+      "json-a-csv",
+      "aplanar-json"
+    ],
     "enabledInSitemap": true,
     "faq": [
-      {"q":"¿Qué diferencia tiene con JSON a Excel básico?","a":"Esta versión normaliza arrays anidados, permite seleccionar campos y genera múltiples hojas."},
-      {"q":"¿Puedo configurar los nombres de columna?","a":"Sí, puedes renombrar columnas antes de exportar."}
+      {
+        "q": "¿Qué diferencia tiene con JSON a Excel básico?",
+        "a": "Esta versión normaliza arrays anidados, permite seleccionar campos y genera múltiples hojas."
+      },
+      {
+        "q": "¿Puedo configurar los nombres de columna?",
+        "a": "Sí, puedes renombrar columnas antes de exportar."
+      }
     ],
-    "instructions": ["Selecciona un JSON.","Revisa la preview de la estructura detectada.","Selecciona campos y configura nombres de columna.","Descarga el Excel con una hoja por nivel."],
-    "limitations": ["JSONs con estructura muy irregular pueden producir hojas dispersas.","La normalización de arrays anidados profundamente puede perder relaciones."],
+    "instructions": [
+      "Selecciona un JSON.",
+      "Revisa la preview de la estructura detectada.",
+      "Selecciona campos y configura nombres de columna.",
+      "Descarga el Excel con una hoja por nivel."
+    ],
+    "limitations": [
+      "JSONs con estructura muy irregular pueden producir hojas dispersas.",
+      "La normalización de arrays anidados profundamente puede perder relaciones."
+    ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-08-20",
-    "keywords": ["json","excel","avanzado","anidado","arrays","normalizar"]
+    "keywords": [
+      "json",
+      "excel",
+      "avanzado",
+      "anidado",
+      "arrays",
+      "normalizar"
+    ]
   },
   {
     "id": "normalizeCsv",
@@ -11884,23 +13121,57 @@
     "description": "Detecta y corrige problemas comunes en CSVs: delimitador, encoding, columnas, saltos.",
     "h1": "Normalizar CSV",
     "summary": "Unifica delimitador, encoding, columnas, whitespace y saltos de línea en un solo paso.",
-    "inputFormats": ["CSV","TSV"],
-    "outputFormats": ["CSV"],
+    "inputFormats": [
+      "CSV",
+      "TSV"
+    ],
+    "outputFormats": [
+      "CSV"
+    ],
     "accepts": "csvs",
     "toolId": "normalizeCsv",
     "icon": "🔧",
-    "relatedTools": ["csvChangeDelimiter","csvChangeEncoding","cleanExcel"],
-    "relatedSlugs": ["cambiar-delimitador-csv","cambiar-codificacion-csv","limpiar-excel"],
+    "relatedTools": [
+      "csvChangeDelimiter",
+      "csvChangeEncoding",
+      "cleanExcel"
+    ],
+    "relatedSlugs": [
+      "cambiar-delimitador-csv",
+      "cambiar-codificacion-csv",
+      "limpiar-excel"
+    ],
     "enabledInSitemap": true,
     "faq": [
-      {"q":"¿Qué normaliza exactamente?","a":"Delimitador, encoding, número de columnas, whitespace, saltos de línea y filas problemáticas."},
-      {"q":"¿Genera un reporte?","a":"Sí, produce un informe con las correcciones aplicadas y filas con problemas detectadas."}
+      {
+        "q": "¿Qué normaliza exactamente?",
+        "a": "Delimitador, encoding, número de columnas, whitespace, saltos de línea y filas problemáticas."
+      },
+      {
+        "q": "¿Genera un reporte?",
+        "a": "Sí, produce un informe con las correcciones aplicadas y filas con problemas detectadas."
+      }
     ],
-    "instructions": ["Selecciona un CSV.","La herramienta detecta problemas automáticamente.","Revisa el reporte de normalización.","Descarga el CSV normalizado."],
-    "limitations": ["No corrige contenido semántico (nombres mal escritos, etc.).","Los delimitadores dentro de campos citados se respetan."],
+    "instructions": [
+      "Selecciona un CSV.",
+      "La herramienta detecta problemas automáticamente.",
+      "Revisa el reporte de normalización.",
+      "Descarga el CSV normalizado."
+    ],
+    "limitations": [
+      "No corrige contenido semántico (nombres mal escritos, etc.).",
+      "Los delimitadores dentro de campos citados se respetan."
+    ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-08-20",
-    "keywords": ["csv","normalizar","delimitador","encoding","columnas","whitespace"]
+    "keywords": [
+      "csv",
+      "normalizar",
+      "delimitador",
+      "encoding",
+      "columnas",
+      "whitespace"
+    ]
   },
   {
     "id": "compareCsv",
@@ -11913,23 +13184,58 @@
     "description": "Compara dos archivos CSV y muestra filas añadidas, eliminadas y modificadas.",
     "h1": "Comparar versiones de CSV",
     "summary": "Detecta diferencias entre dos CSVs con columna clave configurable y exporta reporte.",
-    "inputFormats": ["CSV","TSV"],
-    "outputFormats": ["CSV","XLSX"],
+    "inputFormats": [
+      "CSV",
+      "TSV"
+    ],
+    "outputFormats": [
+      "CSV",
+      "XLSX"
+    ],
     "accepts": "csvs",
     "toolId": "compareCsv",
     "icon": "≟",
-    "relatedTools": ["compareExcel","csvFilter","csvSort"],
-    "relatedSlugs": ["comparar-excel","filtrar-csv","ordenar-csv"],
+    "relatedTools": [
+      "compareExcel",
+      "csvFilter",
+      "csvSort"
+    ],
+    "relatedSlugs": [
+      "comparar-excel",
+      "filtrar-csv",
+      "ordenar-csv"
+    ],
     "enabledInSitemap": true,
     "faq": [
-      {"q":"¿Cómo compara las filas?","a":"Puede usar una columna clave o comparar por posición de fila."},
-      {"q":"¿Qué muestra el reporte?","a":"Filas añadidas, eliminadas, modificadas, columnas nuevas y columnas eliminadas."}
+      {
+        "q": "¿Cómo compara las filas?",
+        "a": "Puede usar una columna clave o comparar por posición de fila."
+      },
+      {
+        "q": "¿Qué muestra el reporte?",
+        "a": "Filas añadidas, eliminadas, modificadas, columnas nuevas y columnas eliminadas."
+      }
     ],
-    "instructions": ["Selecciona dos archivos CSV.","Elige la columna clave para la comparación.","Revisa las diferencias detectadas.","Descarga el reporte."],
-    "limitations": ["La comparación por posición no detecta filas reordenadas.","Los campos multilínea pueden afectar la alineación."],
+    "instructions": [
+      "Selecciona dos archivos CSV.",
+      "Elige la columna clave para la comparación.",
+      "Revisa las diferencias detectadas.",
+      "Descarga el reporte."
+    ],
+    "limitations": [
+      "La comparación por posición no detecta filas reordenadas.",
+      "Los campos multilínea pueden afectar la alineación."
+    ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-08-20",
-    "keywords": ["csv","comparar","diferencias","diff","versiones","columnas"]
+    "keywords": [
+      "csv",
+      "comparar",
+      "diferencias",
+      "diff",
+      "versiones",
+      "columnas"
+    ]
   },
   {
     "id": "cleanTabularData",
@@ -11942,23 +13248,60 @@
     "description": "Herramienta general para limpiar datos de CSV, TSV y Excel con cadena de operaciones.",
     "h1": "Limpiar datos tabulares",
     "summary": "Aplica trim, reemplazo, normalización de caso, eliminación de duplicados y más en cadena.",
-    "inputFormats": ["CSV","TSV","XLSX"],
-    "outputFormats": ["CSV","XLSX"],
+    "inputFormats": [
+      "CSV",
+      "TSV",
+      "XLSX"
+    ],
+    "outputFormats": [
+      "CSV",
+      "XLSX"
+    ],
     "accepts": "csvs",
     "toolId": "cleanTabularData",
     "icon": "🧹",
-    "relatedTools": ["cleanExcel","normalizeCsv","csvFilter"],
-    "relatedSlugs": ["limpiar-excel","normalizar-csv","filtrar-csv"],
+    "relatedTools": [
+      "cleanExcel",
+      "normalizeCsv",
+      "csvFilter"
+    ],
+    "relatedSlugs": [
+      "limpiar-excel",
+      "normalizar-csv",
+      "filtrar-csv"
+    ],
     "enabledInSitemap": true,
     "faq": [
-      {"q":"¿Qué operaciones puedo encadenar?","a":"Trim, reemplazo de texto, manejo de nulos, mayúsculas/minúsculas, formato, duplicados, columnas vacías."},
-      {"q":"¿Puedo ver el resultado antes de aplicar?","a":"Sí, cada operación muestra preview antes/después."}
+      {
+        "q": "¿Qué operaciones puedo encadenar?",
+        "a": "Trim, reemplazo de texto, manejo de nulos, mayúsculas/minúsculas, formato, duplicados, columnas vacías."
+      },
+      {
+        "q": "¿Puedo ver el resultado antes de aplicar?",
+        "a": "Sí, cada operación muestra preview antes/después."
+      }
     ],
-    "instructions": ["Selecciona un archivo CSV, TSV o Excel.","Añade operaciones de limpieza en cadena.","Revisa el preview de cada paso.","Descarga el resultado final."],
-    "limitations": ["Las operaciones se aplican en orden secuencial.","No realiza operaciones condicionales (if/then)."],
+    "instructions": [
+      "Selecciona un archivo CSV, TSV o Excel.",
+      "Añade operaciones de limpieza en cadena.",
+      "Revisa el preview de cada paso.",
+      "Descarga el resultado final."
+    ],
+    "limitations": [
+      "Las operaciones se aplican en orden secuencial.",
+      "No realiza operaciones condicionales (if/then)."
+    ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-08-20",
-    "keywords": ["datos","tabulares","limpiar","csv","excel","cadena","operaciones"]
+    "keywords": [
+      "datos",
+      "tabulares",
+      "limpiar",
+      "csv",
+      "excel",
+      "cadena",
+      "operaciones"
+    ]
   },
   {
     "id": "htmlTableToExcel",
@@ -11971,23 +13314,56 @@
     "description": "Detecta tablas en HTML y las exporta a Excel conservando headers y estructura.",
     "h1": "Tablas HTML a Excel",
     "summary": "Extrae tablas HTML con colspan/rowspan y exporta a XLSX con una hoja por tabla.",
-    "inputFormats": ["HTML"],
-    "outputFormats": ["XLSX"],
+    "inputFormats": [
+      "HTML"
+    ],
+    "outputFormats": [
+      "XLSX"
+    ],
     "accepts": "html",
     "toolId": "htmlTableToExcel",
     "icon": "≣",
-    "relatedTools": ["htmlToMarkdown","excelToHtml","xmlToExcel"],
-    "relatedSlugs": ["html-a-markdown","excel-a-html","xml-a-excel"],
+    "relatedTools": [
+      "htmlToMarkdown",
+      "excelToHtml",
+      "xmlToExcel"
+    ],
+    "relatedSlugs": [
+      "html-a-markdown",
+      "excel-a-html",
+      "xml-a-excel"
+    ],
     "enabledInSitemap": true,
     "faq": [
-      {"q":"¿Detecta varias tablas?","a":"Sí, detecta todas las tablas del HTML y te permite seleccionar cuáles exportar."},
-      {"q":"¿Conserva colspan/rowspan?","a":"Sí, cuando es posible se preservan en la hoja de cálculo."}
+      {
+        "q": "¿Detecta varias tablas?",
+        "a": "Sí, detecta todas las tablas del HTML y te permite seleccionar cuáles exportar."
+      },
+      {
+        "q": "¿Conserva colspan/rowspan?",
+        "a": "Sí, cuando es posible se preservan en la hoja de cálculo."
+      }
     ],
-    "instructions": ["Pega o sube un archivo HTML.","Selecciona las tablas a exportar.","Descarga el Excel con una hoja por tabla."],
-    "limitations": ["Tablas muy complejas con anidación profunda pueden perder estructura.","Los estilos CSS no se conservan en Excel."],
+    "instructions": [
+      "Pega o sube un archivo HTML.",
+      "Selecciona las tablas a exportar.",
+      "Descarga el Excel con una hoja por tabla."
+    ],
+    "limitations": [
+      "Tablas muy complejas con anidación profunda pueden perder estructura.",
+      "Los estilos CSS no se conservan en Excel."
+    ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-08-20",
-    "keywords": ["html","tablas","excel","xlsx","colspan","rowspan","extraer"]
+    "keywords": [
+      "html",
+      "tablas",
+      "excel",
+      "xlsx",
+      "colspan",
+      "rowspan",
+      "extraer"
+    ]
   },
   {
     "id": "csvToPdf",
@@ -12000,23 +13376,57 @@
     "description": "Convierte CSV a PDF con orientación, márgenes, fuente y encabezado repetido.",
     "h1": "CSV a PDF",
     "summary": "Genera PDFs profesionales desde CSV con ajuste de columnas y múltiples páginas.",
-    "inputFormats": ["CSV","TSV"],
-    "outputFormats": ["PDF"],
+    "inputFormats": [
+      "CSV",
+      "TSV"
+    ],
+    "outputFormats": [
+      "PDF"
+    ],
     "accepts": "csvs",
     "toolId": "csvToPdf",
     "icon": "📄",
-    "relatedTools": ["excelToPdf","htmlToPdf","csvToHtml"],
-    "relatedSlugs": ["excel-a-pdf","html-a-pdf","csv-a-html"],
+    "relatedTools": [
+      "excelToPdf",
+      "htmlToPdf",
+      "csvToHtml"
+    ],
+    "relatedSlugs": [
+      "excel-a-pdf",
+      "html-a-pdf",
+      "csv-a-html"
+    ],
     "enabledInSitemap": true,
     "faq": [
-      {"q":"¿Puedo elegir orientación?","a":"Sí, horizontal o vertical, con tamaño A4 o Carta."},
-      {"q":"¿El encabezado se repite en cada página?","a":"Sí, puedes activar encabezado de tabla repetido en cada página."}
+      {
+        "q": "¿Puedo elegir orientación?",
+        "a": "Sí, horizontal o vertical, con tamaño A4 o Carta."
+      },
+      {
+        "q": "¿El encabezado se repite en cada página?",
+        "a": "Sí, puedes activar encabezado de tabla repetido en cada página."
+      }
     ],
-    "instructions": ["Selecciona un CSV.","Configura orientación, tamaño de página y márgenes.","Ajusta el tamaño de fuente y ajuste de columnas.","Descarga el PDF."],
-    "limitations": ["CSVs con muy pocas columnas pueden verse mejor en vertical.","El ajuste automático puede comprimir columnas en CSVs muy anchos."],
+    "instructions": [
+      "Selecciona un CSV.",
+      "Configura orientación, tamaño de página y márgenes.",
+      "Ajusta el tamaño de fuente y ajuste de columnas.",
+      "Descarga el PDF."
+    ],
+    "limitations": [
+      "CSVs con muy pocas columnas pueden verse mejor en vertical.",
+      "El ajuste automático puede comprimir columnas en CSVs muy anchos."
+    ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-08-20",
-    "keywords": ["csv","pdf","convertir","tabla","orientacion","margenes"]
+    "keywords": [
+      "csv",
+      "pdf",
+      "convertir",
+      "tabla",
+      "orientacion",
+      "margenes"
+    ]
   },
   {
     "id": "textEncodingConverter",
@@ -12029,23 +13439,70 @@
     "description": "Convierte archivos de texto entre múltiples codificaciones con preview y diagnóstico.",
     "h1": "Convertir encoding de texto",
     "summary": "Detecta la codificación actual, muestra caracteres problemáticos y convierte entre formatos.",
-    "inputFormats": ["TXT","MD","HTML","CSS","JS","JSON","XML","CSV"],
-    "outputFormats": ["TXT","MD","HTML","CSS","JS","JSON","XML","CSV"],
+    "inputFormats": [
+      "TXT",
+      "MD",
+      "HTML",
+      "CSS",
+      "JS",
+      "JSON",
+      "XML",
+      "CSV"
+    ],
+    "outputFormats": [
+      "TXT",
+      "MD",
+      "HTML",
+      "CSS",
+      "JS",
+      "JSON",
+      "XML",
+      "CSV"
+    ],
     "accepts": "text",
     "toolId": "textEncodingConverter",
     "icon": "⟳",
-    "relatedTools": ["csvChangeEncoding","base64Encode","htmlToText"],
-    "relatedSlugs": ["cambiar-codificacion-csv","codificar-base64","html-a-texto"],
+    "relatedTools": [
+      "csvChangeEncoding",
+      "base64Encode",
+      "htmlToText"
+    ],
+    "relatedSlugs": [
+      "cambiar-codificacion-csv",
+      "codificar-base64",
+      "html-a-texto"
+    ],
     "enabledInSitemap": true,
     "faq": [
-      {"q":"¿Qué archivos acepta?","a":"TXT, MD, HTML, CSS, JS, JSON, XML y CSV."},
-      {"q":"¿Muestra caracteres problemáticos?","a":"Sí, identifica caracteres que pueden perderse o corromperse en la conversión."}
+      {
+        "q": "¿Qué archivos acepta?",
+        "a": "TXT, MD, HTML, CSS, JS, JSON, XML y CSV."
+      },
+      {
+        "q": "¿Muestra caracteres problemáticos?",
+        "a": "Sí, identifica caracteres que pueden perderse o corromperse en la conversión."
+      }
     ],
-    "instructions": ["Selecciona un archivo de texto.","Revisa la codificación detectada.","Elige la codificación de destino.","Descarga el archivo convertido."],
-    "limitations": ["Algunas conversiones pueden perder caracteres que no existen en la codificación destino.","La detección automática es una mejor estimación, no garantía."],
+    "instructions": [
+      "Selecciona un archivo de texto.",
+      "Revisa la codificación detectada.",
+      "Elige la codificación de destino.",
+      "Descarga el archivo convertido."
+    ],
+    "limitations": [
+      "Algunas conversiones pueden perder caracteres que no existen en la codificación destino.",
+      "La detección automática es una mejor estimación, no garantía."
+    ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-08-20",
-    "keywords": ["encoding","codificacion","texto","utf-8","convertir","charset"]
+    "keywords": [
+      "encoding",
+      "codificacion",
+      "texto",
+      "utf-8",
+      "convertir",
+      "charset"
+    ]
   },
   {
     "id": "detectFileType",
@@ -12063,17 +13520,45 @@
     "accepts": "any",
     "toolId": "detectFileType",
     "icon": "🔍",
-    "relatedTools": ["fileInspector","inspectFileMetadata","checksumFile"],
-    "relatedSlugs": ["inspeccionar-archivo","inspeccionar-metadatos-archivo","calcular-hash"],
+    "relatedTools": [
+      "fileInspector",
+      "inspectFileMetadata",
+      "checksumFile"
+    ],
+    "relatedSlugs": [
+      "inspeccionar-archivo",
+      "inspeccionar-metadatos-archivo",
+      "calcular-hash"
+    ],
     "enabledInSitemap": true,
     "faq": [
-      {"q":"¿Es seguro?","a":"Sí, solo lee los primeros bytes del archivo. No ejecuta ni renderiza contenido."},
-      {"q":"¿Qué tan preciso es?","a":"Detecta los formatos más comunes: PDF, PNG, JPEG, GIF, WebP, ZIP, Office, etc."}
+      {
+        "q": "¿Es seguro?",
+        "a": "Sí, solo lee los primeros bytes del archivo. No ejecuta ni renderiza contenido."
+      },
+      {
+        "q": "¿Qué tan preciso es?",
+        "a": "Detecta los formatos más comunes: PDF, PNG, JPEG, GIF, WebP, ZIP, Office, etc."
+      }
     ],
-    "instructions": ["Arrastra o selecciona un archivo.","La herramienta analiza los magic bytes automáticamente.","Compara la extensión declarada con el tipo real detectado."],
-    "limitations": ["No reconoce todos los formatos del mundo, solo los más comunes.","Algunos formatos comparten magic bytes similares."],
+    "instructions": [
+      "Arrastra o selecciona un archivo.",
+      "La herramienta analiza los magic bytes automáticamente.",
+      "Compara la extensión declarada con el tipo real detectado."
+    ],
+    "limitations": [
+      "No reconoce todos los formatos del mundo, solo los más comunes.",
+      "Algunos formatos comparten magic bytes similares."
+    ],
     "ogImage": "/assets/icon-512.png",
     "lastModified": "2026-08-20",
-    "keywords": ["archivo","tipo","magic bytes","detectar","extension","firma"]
+    "keywords": [
+      "archivo",
+      "tipo",
+      "magic bytes",
+      "detectar",
+      "extension",
+      "firma"
+    ]
   }
 ]
