@@ -14,7 +14,8 @@ import {
   renderCta,
   renderPage,
   renderProductHero,
-  renderProductStatus
+  renderProductStatus,
+  safeJson
 } from './apluno-components.mjs';
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
@@ -39,6 +40,8 @@ const apluno = loadJson(join(DATA, 'apluno.products.json'));
 const tools = loadJson(join(DATA, 'tools.json'));
 const categories = loadJson(join(DATA, 'categories.json'));
 const redirects = loadJson(join(DATA, 'redirects.json'));
+const guidesDef = loadJson(join(DATA, 'guides.json'));
+const guides = guidesDef.guides;
 const enabledTools = tools.filter((tool) => tool.enabled);
 const indexableTools = tools.filter((tool) => tool.enabled && tool.indexable && tool.enabledInSitemap);
 const enabledCategories = categories.filter((category) => category.enabled);
@@ -377,7 +380,173 @@ function renderNotFound() {
   return renderPage(pageOptions({ title: 'Página no encontrada — Apluno', description: 'La página solicitada no existe.', pathname: '/404.html', bodyClass: 'apluno-404', content, robots: 'noindex, nofollow', schemas: [], socialImage: false, noCanonical: true }));
 }
 
+// ---------------------------------------------------------------------------
+// FASE 5 — Sección editorial "Guías" de APLUNO
+// Guías originales y útiles que enlazan a las herramientas reales de Toolisto.
+// ---------------------------------------------------------------------------
+const guidesSection = guidesDef.section || 'guia';
+const guidesTitle = guidesDef.title || 'Guías de Toolisto';
+const guidesDescription = guidesDef.description || '';
+
+const toolBySlug = Object.fromEntries(indexableTools.map((tool) => [tool.slug, tool]));
+
+function buildGuideBreadcrumb(guide) {
+  return `<nav class="apluno-guide-breadcrumb" aria-label="Ruta de navegación">
+    <span><a href="/">Apluno</a></span>
+    <span aria-hidden="true">/</span>
+    <span><a href="/guia/">Guías</a></span>
+    <span aria-hidden="true">/</span>
+    <span aria-current="page">${escapeHtml(guide.title)}</span>
+  </nav>`;
+}
+
+function buildRelatedToolChips(guide) {
+  const rel = (guide.relatedToolSlugs || [])
+    .map((slug) => toolBySlug[slug])
+    .filter(Boolean)
+    .map((tool) => `<a class="apluno-guide-chip" href="/${tool.slug}">${escapeHtml(tool.name)}</a>`);
+  if (!rel.length) return '';
+  return `<section class="apluno-guide-section">
+    <h2>Herramientas útiles para esta guía</h2>
+    <div class="apluno-guide-chips">${rel.join('\n      ')}</div>
+  </section>`;
+}
+
+function buildRelatedGuides(guide) {
+  const rel = (guide.relatedGuideSlugs || [])
+    .map((slug) => guides.find((g) => g.slug === slug))
+    .filter(Boolean);
+  if (!rel.length) return '';
+  return `<section class="apluno-guide-section">
+    <h2>Guías relacionadas</h2>
+    <div class="apluno-guide-related-grid">
+      ${rel.map((g) => `<a class="apluno-guide-related-card" href="/guia/${g.slug}/">
+        <h3>${escapeHtml(g.title)}</h3>
+        <p>${escapeHtml(g.description)}</p>
+      </a>`).join('\n      ')}
+    </div>
+  </section>`;
+}
+
+function buildGuideFaq(guide) {
+  const faq = guide.faq || [];
+  if (!faq.length) return '';
+  const faqSchema = safeJson({
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faq.map((item) => ({
+      '@type': 'Question',
+      name: item.q,
+      acceptedAnswer: { '@type': 'Answer', text: item.a }
+    }))
+  });
+  return `<section class="apluno-guide-section apluno-guide-faq">
+    <h2>Preguntas frecuentes</h2>
+    <div class="apluno-guide-faq-list">
+      ${faq.map((item) => `<details class="apluno-guide-faq-item"><summary>${escapeHtml(item.q)}</summary><p>${escapeHtml(item.a)}</p></details>`).join('\n      ')}
+    </div>
+  </section>
+  <script type="application/ld+json">${faqSchema}</script>`;
+}
+
+function renderGuideIndex() {
+  const cards = guides.map((guide) => {
+    const catLabel = LAUNCHER_CATEGORY_LABELS[guide.category] || guide.category;
+    return `<a class="apluno-guide-card" href="/guia/${escapeHtml(guide.slug)}/">
+      <span class="apluno-guide-cat">${escapeHtml(catLabel)}</span>
+      <h2>${escapeHtml(guide.title)}</h2>
+      <p>${escapeHtml(guide.description)}</p>
+      <span class="apluno-guide-read">Leer la guía <span aria-hidden="true">→</span></span>
+    </a>`;
+  }).join('\n      ');
+
+  const content = `<section class="apluno-page-hero apluno-section" data-reveal>
+      <p class="apluno-eyebrow">Guías de Apluno</p>
+      <h1>${escapeHtml(guidesTitle)}</h1>
+      <p>${escapeHtml(guidesDescription)}</p>
+    </section>
+    <section class="apluno-section apluno-guide-index" data-reveal>
+      <div class="apluno-guide-grid">${cards}</div>
+    </section>`;
+
+  const schema = {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: guidesTitle,
+    url: absoluteUrl('/guia/'),
+    description: guidesDescription
+  };
+
+  return renderPage(pageOptions({
+    title: `${guidesTitle} — Apluno`,
+    description: guidesDescription,
+    pathname: '/guia/',
+    active: 'guia',
+    bodyClass: 'apluno-guide-index-page',
+    content,
+    schemas: [schema]
+  }));
+}
+
+function renderGuide(guide) {
+  const sectionsHTML = (guide.sections || []).map((section) =>
+    `<section class="apluno-guide-section"><h2>${escapeHtml(section.heading)}</h2><div class="apluno-guide-body">${section.body}</div></section>`
+  ).join('\n    ');
+
+  const content = `<section class="apluno-page-hero apluno-guide-hero apluno-section" data-reveal>
+      ${buildGuideBreadcrumb(guide)}
+      <p class="apluno-eyebrow">Guía de ${escapeHtml(LAUNCHER_CATEGORY_LABELS[guide.category] || guide.category)}</p>
+      <h1>${escapeHtml(guide.title)}</h1>
+      <p>${escapeHtml(guide.description)}</p>
+    </section>
+    <article class="apluno-section apluno-guide-article" data-reveal>
+      <p class="apluno-guide-lead">${escapeHtml(guide.lead)}</p>
+      ${sectionsHTML}
+      ${buildRelatedToolChips(guide)}
+      ${buildGuideFaq(guide)}
+      ${buildRelatedGuides(guide)}
+    </article>
+    <section class="apluno-section apluno-guide-cta" data-reveal>
+      <h2>¿Necesitas hacerlo ahora?</h2>
+      <p>Usa la herramienta directamente y resuelve tarea en tu navegador.</p>
+      <div>
+        ${(guide.relatedToolSlugs || []).slice(0, 1).map((slug) => {
+          const tool = toolBySlug[slug];
+          return tool ? renderCta({ href: `/${tool.slug}`, label: `Usar ${tool.name}`, tone: 'dark' }) : '';
+        }).join('')}
+        ${renderCta({ href: '/toolisto', label: 'Ver todas las herramientas', tone: 'text', arrow: false })}
+      </div>
+    </section>`;
+
+  const articleSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: guide.title,
+    description: guide.description,
+    url: absoluteUrl(`/guia/${guide.slug}/`),
+    inLanguage: 'es-419',
+    dateModified: guide.lastModified,
+    author: { '@type': 'Organization', name: 'Apluno', url: absoluteUrl('/about/') },
+    publisher: { '@type': 'Organization', name: 'Apluno', url: absoluteUrl('/about/') },
+    mainEntityOfPage: absoluteUrl(`/guia/${guide.slug}/`)
+  };
+
+  return renderPage(pageOptions({
+    title: `${guide.title} — Guía de Apluno`,
+    description: guide.description,
+    pathname: `/guia/${guide.slug}/`,
+    active: 'guia',
+    bodyClass: 'apluno-guide-page',
+    content,
+    schemas: [articleSchema]
+  }));
+}
+
 writePage('index.html', renderHome());
+writePage(join('guia', 'index.html'), renderGuideIndex());
+for (const guide of guides) {
+  writePage(join('guia', guide.slug, 'index.html'), renderGuide(guide));
+}
 writePage(join('about', 'index.html'), renderAbout());
 writePage(join('ordia', 'index.html'), renderOrdia());
 writePage(join('workspace-about', 'index.html'), renderWorkspace());
@@ -402,6 +571,8 @@ const sitemapUrls = [
   { path: '/privacidad', priority: '0.2', changefreq: 'yearly' },
   { path: '/condiciones', priority: '0.2', changefreq: 'yearly' },
   { path: '/apoyar', priority: '0.3', changefreq: 'monthly' },
+  { path: '/guia/', priority: '0.8', changefreq: 'weekly' },
+  ...guides.map((guide) => ({ path: `/guia/${guide.slug}/`, priority: '0.7', changefreq: 'monthly', lastmod: guide.lastModified })),
   ...enabledCategories.map((category) => ({ path: `/${category.slug}`, priority: '0.7', changefreq: 'weekly' })),
   ...indexableTools.map((tool) => ({ path: `/${tool.slug}`, priority: '0.7', changefreq: 'monthly', lastmod: tool.lastModified }))
 ];
@@ -459,6 +630,8 @@ const required = [
   join('about', 'index.html'),
   join('ordia', 'index.html'),
   join('workspace', 'index.html'),
+  join('guia', 'index.html'),
+  join('guia', guides[0].slug, 'index.html'),
   'sitemap.xml',
   'robots.txt',
   '_redirects',

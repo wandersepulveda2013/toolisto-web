@@ -1997,3 +1997,225 @@ svg {
     margin-top: 12px;
   }
 }
+
+
+/* ===== Sección editorial: Guías de Apluno ===== */
+
+/* Breadcrumb */
+.apluno-guide-breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-size: .82rem;
+  color: var(--apluno-muted);
+  margin-bottom: 20px;
+}
+.apluno-guide-breadcrumb a {
+  color: var(--apluno-accent);
+  text-decoration: none;
+}
+.apluno-guide-breadcrumb a:hover {
+  text-decoration: underline;
+}
+.apluno-guide-breadcrumb [aria-current="page"] {
+  color: var(--apluno-ink);
+  font-weight: 600;
+}
+
+/* Guide hero */
+.apluno-guide-hero .apluno-eyebrow {
+  text-transform: uppercase;
+}
+.apluno-guide-hero p:last-child {
+  max-width: 60ch;
+}
+
+/* Index grid */
+.apluno-guide-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--apluno-pad);
+}
+.apluno-guide-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 28px;
+  background: var(--apluno-paper);
+  border: 1px solid var(--apluno-line);
+  border-radius: var(--apluno-radius);
+  text-decoration: none;
+  color: inherit;
+  transition: border-color .2s var(--apluno-ease), transform .2s var(--apluno-ease);
+}
+.apluno-guide-card:hover {
+  border-color: var(--apluno-accent);
+  transform: translateY(-2px);
+}
+.apluno-guide-cat {
+  font-size: .78rem;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: var(--apluno-accent);
+  font-weight: 600;
+}
+.apluno-guide-card h2 {
+  font-size: 1.25rem;
+  line-height: 1.3;
+  margin: 0;
+  letter-spacing: -.01em;
+}
+.apluno-guide-card p {
+  color: var(--apluno-muted);
+  font-size: .95rem;
+  line-height: 1.5;
+  margin: 0;
+}
+.apluno-guide-read {
+  margin-top: auto;
+  font-weight: 600;
+  color: var(--apluno-accent);
+  font-size: .92rem;
+}
+
+/* Guide article */
+.apluno-guide-article {
+  max-width: 760px;
+}
+.apluno-guide-lead {
+  font-size: 1.15rem;
+  line-height: 1.6;
+  color: var(--apluno-ink);
+  font-weight: 500;
+  margin-bottom: 32px;
+}
+.apluno-guide-section {
+  margin-top: 32px;
+}
+.apluno-guide-section h2 {
+  font-size: 1.4rem;
+  letter-spacing: -.01em;
+  margin: 0 0 14px;
+}
+.apluno-guide-body {
+  color: var(--apluno-ink);
+  font-size: 1.02rem;
+  line-height: 1.65;
+}
+.apluno-guide-body p {
+  margin: 0 0 14px;
+}
+.apluno-guide-body a {
+  color: var(--apluno-accent);
+}
+.apluno-guide-body ol,
+.apluno-guide-body ul {
+  padding-left: 22px;
+  margin: 0 0 14px;
+}
+.apluno-guide-body li {
+  margin-bottom: 8px;
+}
+
+/* Related tool chips */
+.apluno-guide-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 8px;
+}
+.apluno-guide-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 14px;
+  background: var(--apluno-accent-soft);
+  color: var(--apluno-accent-dark);
+  border-radius: 999px;
+  font-size: .9rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+.apluno-guide-chip:hover {
+  background: var(--apluno-accent);
+  color: #fff;
+}
+
+/* FAQ */
+.apluno-guide-faq-list {
+  display: grid;
+  gap: 12px;
+}
+.apluno-guide-faq-item {
+  border: 1px solid var(--apluno-line);
+  border-radius: var(--apluno-radius);
+  padding: 16px 18px;
+  background: var(--apluno-paper);
+}
+.apluno-guide-faq-item summary {
+  cursor: pointer;
+  font-weight: 600;
+  font-size: .98rem;
+}
+.apluno-guide-faq-item p {
+  color: var(--apluno-muted);
+  line-height: 1.55;
+  margin: 10px 0 0;
+}
+
+/* Related guides */
+.apluno-guide-related-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 14px;
+  margin-top: 8px;
+}
+.apluno-guide-related-card {
+  padding: 20px;
+  border: 1px solid var(--apluno-line);
+  border-radius: var(--apluno-radius);
+  text-decoration: none;
+  color: inherit;
+  background: var(--apluno-paper);
+  transition: border-color .2s var(--apluno-ease);
+}
+.apluno-guide-related-card:hover {
+  border-color: var(--apluno-accent);
+}
+.apluno-guide-related-card h3 {
+  font-size: 1rem;
+  margin: 0 0 6px;
+  line-height: 1.3;
+}
+.apluno-guide-related-card p {
+  color: var(--apluno-muted);
+  font-size: .88rem;
+  line-height: 1.45;
+  margin: 0;
+}
+
+/* Guide CTA */
+.apluno-guide-cta {
+  padding-top: 16px;
+}
+.apluno-guide-cta h2 {
+  margin: 0 0 8px;
+}
+.apluno-guide-cta p {
+  color: var(--apluno-muted);
+  margin: 0 0 20px;
+}
+.apluno-guide-cta .apluno-button {
+  margin-right: 12px;
+  margin-bottom: 8px;
+}
+
+@media (max-width: 640px) {
+  .apluno-guide-grid {
+    grid-template-columns: 1fr;
+  }
+  .apluno-guide-article,
+  .apluno-guide-hero p:last-child {
+    max-width: none;
+  }
+}

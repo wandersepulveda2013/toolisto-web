@@ -84,6 +84,7 @@ export function renderAplunoHeader({ active = '', variant = '' } = {}) {
     </div>
     <nav class="apluno-mobile-nav apluno-launcher-nav" id="apluno-launcher-nav" aria-label="Menú de Apluno" hidden data-mobile-nav>
       <p class="apluno-launcher-nav-label">Sitio</p>
+      <a href="/guia/">Guías</a>
       <a href="/about/">Acerca de</a>
       <a href="/contact/">Contacto</a>
       <a href="/privacy/">Privacidad</a>
@@ -101,6 +102,7 @@ export function renderAplunoHeader({ active = '', variant = '' } = {}) {
       <a class="apluno-brand-link" href="/" aria-label="Ir al inicio de Apluno">${renderAplunoWordmark({ compact: true })}</a>
       <nav class="apluno-desktop-nav" aria-label="Navegación principal">
         <a href="/toolisto"${current('toolisto')}>Herramientas</a>
+        <a href="/guia/"${current('guia')}>Guías</a>
         <a href="/about/"${current('about')}>Acerca de</a>
       </nav>
       <div class="apluno-header-actions">
@@ -112,6 +114,7 @@ export function renderAplunoHeader({ active = '', variant = '' } = {}) {
     </div>
     <nav class="apluno-mobile-nav" id="apluno-mobile-nav" aria-label="Navegación móvil" hidden data-mobile-nav>
       <a href="/toolisto">Herramientas</a>
+      <a href="/guia/">Guías</a>
       <a href="/about/">Acerca de</a>
       <a href="/contact/">Contacto</a>
       <a href="/privacy/">Privacidad</a>
@@ -128,6 +131,7 @@ export function renderAplunoFooter({ minimal = false } = {}) {
     <div class="apluno-footer-inner apluno-footer-minimal-inner">
       <a class="apluno-brand-link" href="/" aria-label="Ir al inicio de Apluno">${renderAplunoWordmark({ compact: true })}</a>
       <nav class="apluno-footer-minimal-links" aria-label="Navegación del pie de página">
+        <a href="/guia/">Guías</a>
         <a href="/about/">Acerca de</a>
         <a href="/contact/">Contacto</a>
         <a href="/privacy/">Privacidad</a>
@@ -156,7 +160,8 @@ export function renderAplunoFooter({ minimal = false } = {}) {
           <a href="/ordia/">Ordía</a>
         </div>
         <div>
-          <h2>Empresa</h2>
+          <h2>Recursos</h2>
+          <a href="/guia/">Guías</a>
           <a href="/about/">Acerca de</a>
           <a href="/contact/">Contacto</a>
         </div>

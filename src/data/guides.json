@@ -1,0 +1,274 @@
+{
+  "section": "guia",
+  "title": "Guías de Toolisto",
+  "description": "Guías prácticas, originales y verificadas sobre el trabajo con PDF, imágenes, documentos, datos y privacidad. Explicamos qué hace cada formato, cuándo conviene cada herramienta y cómo obtener buenos resultados sin subir tus archivos a ningún servidor.",
+  "guides": [
+    {
+      "slug": "reducir-tamano-pdf",
+      "title": "Cómo reducir el tamaño de un PDF sin arruinar la legibilidad",
+      "description": "Guía práctica para comprimir PDF manteniendo calidad: qué afecta el peso, cómo comprimir y cuándo otra solución es mejor.",
+      "category": "pdf",
+      "lastModified": "2026-08-27",
+      "lead": "Un PDF pesado es molesto de enviar por correo y lento de abrir. Antes de empezar a comprimir conviene entender por qué un PDF pesa mucho: casi siempre es porque contiene imágenes de gran tamaño o muchos elementos vectoriales. Reducir el peso sin arruinar la legibilidad es cuestión de técnica, no de suerte.",
+      "sections": [
+        {
+          "heading": "Qué hace que un PDF pese",
+          "body": "<p>El peso de un PDF depende sobre todo de sus imágenes: un escaneado a 300 dpi de una página puede ocupar varios megabytes. El texto y los vectores pesan poco en comparación. Por eso, cuando un PDF es enorme, normalmente la solución pasa por tratar sus imágenes.</p><p>Comprimir un PDF recién creado con texto plano puede ahorrar muy poco. Si tu objetivo real es que el documento sea liviano, lo primero es saber si el peso viene de imágenes fotográficas, escaneados o gráficos vectoriales.</p>"
+        },
+        {
+          "heading": "Cómo comprimir el PDF",
+          "body": "<p>En Toolisto puedes usar la herramienta <a href=\"/comprimir-pdf\">Comprimir PDF</a>. El proceso es así:</p><ol><li>Selecciona el archivo PDF.</li><li>Elige el nivel de compresión. A mayor compresión, menor tamaño pero también menor nitidez en las imágenes.</li><li>Descarga el resultado y compáralo con el original.</li></ol><p>La clave está en encontrar el punto justo: que el PDF siga siendo legible tanto en pantalla como impreso. No hace falta comprimir al máximo si no lo necesitas.</p>"
+        },
+        {
+          "heading": "Otras situaciones y alternativas",
+          "body": "<p>Si el PDF es sobre todo texto que no vas a imprimir, convertirlo a otro formato o reducir la resolución de páginas puede ayudar. En cambio, si necesitas mantener máxima calidad para imprenta, busca comprimir solo las imágenes y conservar el resto intacto.</p><p>Para documentos de varias páginas también puedes revisar si contiene páginas repetidas o escaneos duplicados, y eliminarlas antes de comprimir.</p>"
+        }
+      ],
+      "relatedToolSlugs": ["comprimir-pdf", "imagenes-a-pdf-optimizado", "pdf-a-imagenes"],
+      "faq": [
+        { "q": "¿Cuánto se puede reducir un PDF?", "a": "Depende del contenido. Un PDF lleno de fotografías puede bajar un 60-80% con compresión media sin pérdida visible. Un PDF de solo texto apenas se reduce." },
+        { "q": "¿Comprimir un PDF daña el texto?", "a": "El texto y los elementos vectoriales no se degradan con la compresión, solo las imágenes. Si alguien copia texto del PDF, seguirá siendo correcto." }
+      ]
+    },
+    {
+      "slug": "jpg-png-webp-avif",
+      "title": "Diferencias entre JPG, PNG, WebP y AVIF (y cuándo usar cada uno)",
+      "description": "Explicamos en qué se diferencian los formatos de imagen más comunes y cómo elegir el adecuado según qué quieras lograr.",
+      "category": "images",
+      "lastModified": "2026-08-27",
+      "lead": "Elegir el formato de imagen correcto ahorra peso, mejora la nitidez y evita sorpresas. Cada formato resuelve un problema distinto, y el mejor para una fotografía no es el mismo que para un logo o una captura de pantalla.",
+      "sections": [
+        {
+          "heading": "Los formatos y sus usos",
+          "body": "<p><strong>JPG</strong> es ideal para fotografías: comprime con pérdida y produce archivos pequeños, pero no admite transparencia. <strong>PNG</strong> usa compresión sin pérdida y admite transparencia, pero los archivos pesan más. <strong>WebP</strong> combina buena compresión con transparencia y animación, y lo soportan todos los navegadores modernos. <strong>AVIF</strong> logra compresión aún mayor que WebP manteniendo muy buena calidad, aunque con coste de procesamiento.</p><p>Como regla general: fotografías → JPG o WebP; gráficos con transparencia o texto nítido → PNG o WebP.</p>"
+        },
+        {
+          "heading": "Cómo convertir entre formatos",
+          "body": "<p>En Toolisto puedes usar <a href=\"/convertir-imagen\">Convertir imagen</a> para cambiar el formato de una imagen, o las herramientas dedicadas como <a href=\"/jpg-a-png\">JPG a PNG</a>, <a href=\"/png-a-webp\">PNG a WebP</a> y <a href=\"/webp-a-jpg\">WebP a JPG</a>. Elige la que coincida con tu par de formatos.</p>"
+        },
+        {
+          "heading": "¿Cuál elegir para una página web?",
+          "body": "<p>Para una web, el peso importa mucho. WebP suele ofrecer el mejor equilibrio entre calidad, peso y soporte. AVIF puede pesar incluso menos, pero su codificación es lenta, lo que importa si procesas muchas imágenes a la vez. Guarda siempre una copia en el formato original por si necesitas volver a editar.</p>"
+        }
+      ],
+      "relatedToolSlugs": ["convertir-imagen", "jpg-a-png", "png-a-webp", "comprimir-imagen"],
+      "relatedGuideSlugs": ["reducir-tamano-pdf"],
+      "faq": [
+        { "q": "¿JPG pierde calidad al guardar varias veces?", "a": "Sí. Cada vez que guardas un JPG vuelves a aplicar compresión con pérdida, lo que acumula degradación. Por eso conviene editar siempre desde el original y exportar el JPG solo al final." },
+        { "q": "¿PNG admite animación?", "a": "No de forma práctica. Para animación se usa GIF o WebP." }
+      ]
+    },
+    {
+      "slug": "convertir-documentos-sin-perder-formato",
+      "title": "Cómo convertir documentos (Word, PDF, ODT) sin perder el formato",
+      "description": "Guía para convertir entre Word, PDF y otros formatos conservando estructura, tablas y estilo, con las herramientas adecuadas.",
+      "category": "documents",
+      "lastModified": "2026-08-27",
+      "lead": "Convertir un documento suele esconder un miedo real: que el formato se desordene, que las tablas se rompan o que las fuentes cambien. Con las herramientas y el orden adecuados, la mayoría de esas pérdidas se pueden evitar.",
+      "sections": [
+        {
+          "heading": "Qué conversión necesitas",
+          "body": "<p>No todas las conversiones son iguales. Pasar de Word a PDF suele ser muy fiel, porque el PDF fija el diseño. Pasar de PDF a Word es más delicado: el resultado depende de la estructura original del PDF.</p><p>Si tu prioridad es compartir un documento sin que se desordene, <a href=\"/word-a-pdf\">Word a PDF</a> es la opción más segura. Si necesitas editar algo que solo tienes en PDF, entonces sí necesitas una conversión a formato editable.</p>"
+        },
+        {
+          "heading": "Pasos para una conversión limpia",
+          "body": "<ol><li>Revisa que el documento original no tenga errores de estructura (títulos usando estilos, no texto en negrita).</li><li>Convierte con la herramienta que coincida con el par de formatos (por ejemplo <a href=\"/word-a-odt\">Word a ODT</a> o <a href=\"/odt-a-word\">ODT a Word</a>).</li><li>Abre el resultado y verifica tablas, imágenes y márgenes antes de compartirlo.</li></ol>"
+        },
+        {
+          "heading": "Cuándo no conviene convertir",
+          "body": "<p>Si el documento tiene elementos muy complejos (formularios con campos, macros, tipografías poco comunes), conversiones entre formatos editales pueden no conservar todo. En esos casos, considera compartir en PDF (fijo) y conservar el original editable para ti.</p>"
+        }
+      ],
+      "relatedToolSlugs": ["word-a-pdf", "word-a-odt", "odt-a-word", "reparar-word"],
+      "relatedGuideSlugs": ["reducir-tamano-pdf"],
+      "faq": [
+        { "q": "¿Por qué cambia la fuente al convertir?", "a": "Porque el formato de destino usa tipografías distintas o el original emplea fuentes no incrustadas. Al pasar a PDF, las fuentes se pueden incrustar para que se vean igual en cualquier dispositivo." }
+      ]
+    },
+    {
+      "slug": "proteger-documentos-antes-de-compartir",
+      "title": "Cómo proteger documentos antes de compartirlos",
+      "description": "Consejos para compartir PDF y archivos con seguridad: quitar datos ocultos, censurar información sensible y controlar quién puede editarlos.",
+      "category": "files",
+      "lastModified": "2026-08-27",
+      "lead": "Compartir un archivo es tan fácil como enviar un mensaje. Pero muchos documentos contienen más información de la que parece: metadatos, historial de edición, capas ocultas o texto sobre el que se dibujó un rectángulo negro que no lo oculta del todo. Proteger no es solo poner contraseña.",
+      "sections": [
+        {
+          "heading": "Antes de enviar, revisa qué contiene",
+          "body": "<p>Muchos formatos guardan metadatos (autor, fecha, programa usado) y versiones anteriores. Puedes limpiarlos antes de compartir. En imágenes puedes eliminar datos de ubicación con herramientas de metadatos.</p><p>Si el archivo es un PDF, revisa si contiene texto oculto o capas de datos. Un simple rectángulo negro sobre un dato no lo borra: el texto puede seguir en el documento aunque no se vea.</p>"
+        },
+        {
+          "heading": "Censurar y proteger de verdad",
+          "body": "<p>Para proteger datos personales usa una herramienta de <a href=\"/censurar-pdf-permanente\">censura permanente de PDF</a>, que elimina el contenido real y no solo lo tapa. Para impedir que modifiquen el documento, <a href=\"/encriptar-pdf-avanzado\">cifra el PDF</a> con contraseña.</p><p>Recuerda: censurar y cifrar no son lo mismo. Censurar quita contenido; cifrar limita quién puede abrir o editar. Dependiendo del caso puede que necesites ambos.</p>"
+        }
+      ],
+      "relatedToolSlugs": ["eliminar-metadatos-de-imagen", "censurar-pdf-permanente", "encriptar-pdf-avanzado", "verificar-censura-pdf"],
+      "faq": [
+        { "q": "¿Cómo sé si mi censura de verdad ocultó la información?", "a": "Después de censurar, revisa que no quede texto seleccionable ni capas ocultas. Herramientas de verificación o abrir el PDF y buscar el texto pueden confirmarlo." }
+      ]
+    },
+    {
+      "slug": "unir-pdfs-correctamente",
+      "title": "Cómo unir varios PDF de forma correcta",
+      "description": "Pasos para combinar archivos PDF manteniendo el orden, la calidad y la estructura, y errores comunes al unir documentos.",
+      "category": "pdf",
+      "lastModified": "2026-08-27",
+      "lead": "Unir varios PDF en uno solo parece trivial, pero el orden y la calidad final dependen de cómo lo hagas. Con el procedimiento adecuado obtienes un documento limpio, sin duplicados ni páginas fuera de lugar.",
+      "sections": [
+        {
+          "heading": "El orden importa",
+          "body": "<p>La mayoría de herramientas unen los archivos en el orden en que se añaden. Por eso, revisa la lista antes de ejecutar. En <a href=\"/unir-pdf\">Unir PDF</a> puedes añadir varios archivos, comprobar el orden y reordenarlos si hace falta.</p>"
+        },
+        {
+          "heading": "Reúne antes de unir",
+          "body": "<p>Si además de unir necesitas ajustar páginas, intercalar o eliminar duplicados, conviene hacerlo en este orden: primero prepara cada PDF (recorta, gira, reordena) y después únelos. Así evitas rehacer el trabajo sobre el documento combinado.</p>"
+        },
+        {
+          "heading": "Revisa el resultado",
+          "body": "<p>Tras unir, abre el documento final y comprueba saltos de página, numeración y que las páginas estén en orden. Si el PDF unido quedó pesado, puedes <a href=\"/reducir-tamano-pdf\">comprimirlo</a> después.</p>"
+        }
+      ],
+      "relatedToolSlugs": ["unir-pdf", "organizar-pdf", "intercalar-pdf"],
+      "relatedGuideSlugs": ["reducir-tamano-pdf"],
+      "faq": [
+        { "q": "¿Unir PDF reduce la calidad?", "a": "No. Unir documentos no comprime ni degrada el contenido; solo combina los archivos. La calidad depende del PDF original." },
+        { "q": "¿Puedo unir más de dos archivos?", "a": "Sí. La herramienta acepta varios PDF a la vez, y se unen en el orden de la lista." }
+      ]
+    },
+    {
+      "slug": "preparar-documentos-para-correo",
+      "title": "Cómo preparar documentos para enviar por correo",
+      "description": "Qué formato elegir, cómo comprimir adjuntos y qué revisar antes de enviar archivos por email para evitar rechazos y errores.",
+      "category": "files",
+      "lastModified": "2026-08-27",
+      "lead": "Un correo con adjunto mal preparado puede no llegar, no abrirse o llegar con un tamaño imposible. Prepararlo bien es rápido: elegir el formato correcto, ajustar el peso y revisar el contenido.",
+      "sections": [
+        {
+          "heading": "Elige el formato según el destinatario",
+          "body": "<p>Para documentos que el receptor debe abrir y firmar, PDF es la opción más segura porque se ve igual en casi cualquier dispositivo. Si necesitas que lo editen, usa el formato del programa que usan, como Word o una hoja de cálculo.</p>"
+        },
+        {
+          "heading": "Controla el tamaño del adjunto",
+          "body": "<p>Muchos servidores de correo rechazan adjuntos grandes (a menudo sobre 20-25 MB). Si tu PDF u hoja de cálculo pesa demasiado, <a href=\"/comprimir-pdf\">comprímelo</a> o reduce las imágenes antes de adjuntar. Para varios archivos sueltos, considera agruparlos.</p>"
+        },
+        {
+          "heading": "Revisa antes de enviar",
+          "body": "<p>Verifica que el adjunto abre correctamente y que no incluye datos que no querías compartir. Una revisión de un minuto evita reenvíos y malentendidos.</p>"
+        }
+      ],
+      "relatedToolSlugs": ["comprimir-pdf", "comprimir-imagen", "crear-zip-avanzado", "word-a-pdf"],
+      "relatedGuideSlugs": ["reducir-tamano-pdf", "proteger-documentos-antes-de-compartir"],
+      "faq": [
+        { "q": "¿Qué tamaño máximo de archivo se puede enviar por correo?", "a": "Depende del proveedor, pero 20-25 MB es un límite habitual. Para estar seguro, mantén los adjuntos por debajo de ese tamaño." }
+      ]
+    },
+    {
+      "slug": "trabajar-privado-sin-subir-archivos",
+      "title": "Cómo trabajar con archivos sin subirlos a servicios externos",
+      "description": "La privacidad del procesamiento local dentro del navegador: cómo funciona, qué herramientas de Toolisto lo hacen y qué significa para tus datos.",
+      "category": "files",
+      "lastModified": "2026-08-27",
+      "lead": "No todos los conversores y editores de archivos suben tus documentos a un servidor. Toolisto procesa los archivos directamente en tu navegador: el documento que seleccionas no sale de tu dispositivo. Entender esta diferencia te ayuda a elegir dónde procesar lo que prefieres mantener privado.",
+      "sections": [
+        {
+          "heading": "Qué significa procesar en el navegador",
+          "body": "<p>Cuando arrastras un archivo a una herramienta de Toolisto, el procesamiento ocurre en tu equipo mediante código que se ejecuta en el navegador. El archivo no se envía a un servidor de APLUNO, así que no se almacena ni se usa en ningún lugar externo.</p><p>Esto hace que Toolisto sea una opción útil para documentos personales, contratos o archivos que no quieres que salgan de tu control.</p>"
+        },
+        {
+          "heading": "Qué se guarda y qué no",
+          "body": "<p>Algunas funciones guardan preferencias y datos de sesión en el almacenamiento local de tu navegador (como IndexedDB o localStorage). Esos datos permanecen en tu dispositivo. Puedes borrarlos desde la configuración del navegador en cualquier momento.</p>"
+        },
+        {
+          "heading": "Límites del procesamiento local",
+          "body": "<p>El procesamiento local depende de la capacidad de tu ordenador y de tu navegador. Por eso algunos formatos o archivos muy grandes tienen límites. Además, por ahora Toolisto no ofrece trabajo en equipo ni sincronización entre dispositivos.</p>"
+        }
+      ],
+      "relatedToolSlugs": ["inspeccionar-archivo", "calcular-hash", "cifrar-descifrar-archivo"],
+      "relatedGuideSlugs": ["proteger-documentos-antes-de-compartir"],
+      "faq": [
+        { "q": "¿Toolisto guarda mis archivos?", "a": "No. Tus archivos se procesan en tu navegador y no se envían ni se guardan en servidores externos. Solo algunas preferencias pueden guardarse localmente en tu dispositivo." }
+      ]
+    },
+    {
+      "slug": "firma-electronica-digital-imagen",
+      "title": "Firma electrónica, firma digital e imagen de firma: diferencias",
+      "description": "Aclaramos qué es cada tipo de firma, cuándo basta con una firma en imagen y cuándo necesitas una firma digital certificada.",
+      "category": "signatures",
+      "lastModified": "2026-08-27",
+      "lead": "Firma electrónica, firma digital e imagen de firma se usan como sinónimos, pero no lo son. Entender la diferencia evita usar una solución cuando necesitas otra, sobre todo en trámites que exigen validez legal o verificación de identidad.",
+      "sections": [
+        {
+          "heading": "Las tres ideas, en claro",
+          "body": "<p><strong>Imagen de firma</strong> es la representación gráfica de tu rúbrica, normalmente una imagen con transparencia. Sirve para firmar visualmente un documento, pero no verifica quién lo firmó. <strong>Firma electrónica</strong> es un concepto amplio que abarca cualquier medio de acreditar conformidad. <strong>Firma digital</strong> es una firma electrónica avanzada que usa criptografía para garantizar autenticidad e integridad.</p>"
+        },
+        {
+          "heading": "Cuándo usar cada una",
+          "body": "<p>Para firmar un documento informal o interno, una firma en imagen puede bastar. Si necesitas que el receptor confíe en quién lo firmó y en que nada cambió, necesitas firma digital con certificado. Las firmas digitales válidas se emiten en entornos específicos y se verifican de forma independiente.</p>"
+        },
+        {
+          "heading": "Cómo preparar una firma en imagen",
+          "body": "<p>Puedes limpiar y preparar una firma escaneada con la herramienta de <a href=\"/limpiar-firma\">limpiar firma</a> para obtener una imagen nítida con fondo transparente, lista para colocar en documentos.</p>"
+        }
+      ],
+      "relatedToolSlugs": ["limpiar-firma", "firmar-pdf"],
+      "faq": [
+        { "q": "¿Una firma en imagen es válida para trámites oficiales?", "a": "No siempre. Muchos trámites exigen firma digital certificada o métodos específicos. Verifica los requisitos de la entidad antes de enviar un documento firmado con una imagen." },
+        { "q": "¿Colocar una imagen de firma en PDF lo convierte en firma digital?", "a": "No. Solo añade un elemento gráfico; no aporta verificación criptográfica de identidad ni de integridad." }
+      ]
+    },
+    {
+      "slug": "que-contiene-un-codigo-qr",
+      "title": "Qué información contiene un código QR y cómo leerlo",
+      "description": "Qué puede guardar un QR, cómo leerlo desde una imagen y qué opciones ofrece Toolisto para generarlos y usarlos en distintos casos.",
+      "category": "qrcodes",
+      "lastModified": "2026-08-27",
+      "lead": "Un código QR no es más que una matriz que almacena información legible por una cámara. Puede contener texto, una URL, datos de contacto, credenciales de una red WiFi o casi cualquier cadena de texto. Entender qué guarda te ayuda a crear el QR correcto y a leer otros con seguridad.",
+      "sections": [
+        {
+          "heading": "Qué puede contener un QR",
+          "body": "<p>Un QR codifica texto. Esa cadena puede ser un enlace web, un correo, información de contacto (<a href=\"/generar-qr-contacto\">QR de contacto</a>) o datos de una red <a href=\"/generar-qr-wifi\">WiFi</a>. La cantidad de información es limitada: cuantos más datos, más denso se vuelve el patrón.</p>"
+        },
+        {
+          "heading": "Cómo leer un QR desde una imagen",
+          "body": "<p>Si tienes un código QR en una imagen (por ejemplo una captura), puedes leerlo con la herramienta <a href=\"/leer-qr-imagen\">Leer QR de imagen</a>. Envía la foto y extrae el texto o el enlace que contiene.</p>"
+        },
+        {
+          "heading": "Seguridad al escanear",
+          "body": "<p>Un QR puede apuntar a un sitio fraudulento igual que un enlace. Antes de abrir lo que hay detrás de un QR desconocido, revisa de qué trata. Si es un pago o un inicio de sesión, verifica que venga de una fuente confiable.</p>"
+        }
+      ],
+      "relatedToolSlugs": ["generar-qr", "generar-qr-wifi", "generar-qr-contacto", "leer-qr-imagen"],
+      "faq": [
+        { "q": "¿Un QR pierde información si lo imprimo pequeño?", "a": "Cuanto más denso y pequeño sea el patrón, más difícil de escanear. Imprime el QR a un tamaño razonable y con el contraste suficiente para que sea legible." },
+        { "q": "¿Puedo actualizar un QR ya creado?", "a": "No directamente. Un QR contiene una información fija. Si cambias el destino, genéralo de nuevo. Por eso es útil que el QR apunte a una URL cuyo contenido puedas actualizar." }
+      ]
+    },
+    {
+      "slug": "hojas-calculo-datos-ordenados",
+      "title": "Cómo preparar hojas de cálculo y datos antes de usarlos",
+      "description": "Pasos para limpiar y organizar CSV, Excel y otros datos: quitar duplicados, normalizar, ordenar y convertir antes de trabajar con ellos.",
+      "category": "spreadsheets",
+      "lastModified": "2026-08-27",
+      "lead": "Los datos llegan con sorpresas: filas duplicadas, formatos mezclados, delimitadores distintos o celdas que no encajan. Antes de analizar o exportar, conviene dejar la tabla limpia y estructurada. Esos primeros minutos de limpieza ahorran errores después.",
+      "sections": [
+        {
+          "heading": "Limpia y normaliza",
+          "body": "<p>Empieza por quitar <a href=\"/eliminar-duplicados-excel\">duplicados</a> y revisar la coherencia de los datos. Si los valores vienen con espacios, formas inconsistentes o códigos de formato diferentes, normalízalos antes de continuar.</p>"
+        },
+        {
+          "heading": "Ajusta el formato a tu objetivo",
+          "body": "<p>Según qué vayas a hacer, elige el formato: para intercambio entre programas, CSV; para tablas con muchas filas y análisis, Excel. Puedes convertir entre ellos con las herramientas de conversión, por ejemplo <a href=\"/excel-a-csv\">Excel a CSV</a> o <a href=\"/csv-a-excel\">CSV a Excel</a>.</p>"
+        },
+        {
+          "heading": "Ordena y filtra",
+          "body": "<p>Una vez limpia la tabla, <a href=\"/ordenar-csv\">ordénala</a> o <a href=\"/filtrar-csv\">fíltrala</a> para centrarte en lo relevante. Revisa que el orden no rompa relaciones entre celdas ni agrupe mal los datos.</p>"
+        }
+      ],
+      "relatedToolSlugs": ["eliminar-duplicados-excel", "excel-a-csv", "csv-a-excel", "ordenar-csv", "filtrar-csv"],
+      "relatedGuideSlugs": ["convertir-documentos-sin-perder-formato"],
+      "faq": [
+        { "q": "¿Por qué mi CSV se abre mal en Excel?", "a": "Suele ser por la codificación o el delimitador. Verifica que el archivo use UTF-8 y el separador correcto (coma o punto y coma), o normaliza el archivo antes de abrirlo." }
+      ]
+    }
+  ]
+}
