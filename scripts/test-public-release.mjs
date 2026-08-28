@@ -92,5 +92,8 @@ check(seoResult.status === 0, 'APLUNO production SEO gate (tests/apluno-producti
 const monetizationResult = spawnSync(process.execPath, [join(ROOT, 'tests', 'apluno-monetization-readiness.mjs')], { cwd: ROOT, stdio: 'inherit' });
 check(monetizationResult.status === 0, 'APLUNO monetization readiness gate (tests/apluno-monetization-readiness.mjs) — 25 PASS, 0 FAIL');
 
+const strictEditorialResult = spawnSync(process.execPath, [join(ROOT, 'tests', 'strict-editorial-regression.mjs')], { cwd: ROOT, stdio: 'inherit' });
+check(strictEditorialResult.status === 0, 'Strict editorial regression (tests/strict-editorial-regression.mjs) — 3 PASS, 0 FAIL');
+
 console.log(`\n=== Resultado: ${passed} PASS, ${failed} FAIL ===`);
 process.exit(failed ? 1 : 0);
