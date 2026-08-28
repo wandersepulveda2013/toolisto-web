@@ -7,6 +7,30 @@
 
 ---
 
+## Cycle 126 — Cloudflare WebMCP edge-injection investigation (external, read-only)
+
+| Field | Value |
+|-------|-------|
+| **Date** | 2026-08-28 |
+| **Branch** | main |
+| **HEAD inicial** | 2cb96d1 |
+| **HEAD final** | 2cb96d1 (no commit de codigo; solo evidencia + trackers) |
+| **Task** | CE-063 (DISCOVERED, investigacion dirigida desde ACTIVE-MISSION.md item 2) |
+| **Hypothesis** | El `<head>` del sitio live `apluno.com` incluye `/.webmcp/bridge.js`. Habia que confirmar si es inyeccion del borde de Cloudflare o artefacto del build, y si podria vulnerar la garantia local-first / cero-egress de Toolisto (acceso a IndexedDB o intercepcion de fetch/XHR/WebSocket del usuario). |
+| **Change** | Ninguno en el repo. Investigacion read-only: HTTP contra el sitio publico + analisis estatico del script (47 616 bytes) + grep del repo. Se anade `artifacts/cloudflare-webmcp/investigation.md` y `evidence.json` (determinista, sin timestamps). |
+| **Hallazgos** | El script es el puente WebMCP de Cloudflare (`webmcp` ×18, `// src/tool-pack.ts`, `// src/bridge/registry.ts`, `DEFAULT_MCP_URL="/mcp"`). Repo: 0 referencias a `webmcp|bridge.js|WebMCP|/mcp`. El script NO usa `XMLHttpRequest` (0), `WebSocket`/`EventSource`/`sendBeacon` (0), ni URL externas literales (0); sus 3 `fetch()` van a mismo origen (`/mcp`, `<img>` src, pack dinamico). No inyecta UI (`document.write`/`createElement` = 0) y no lee IndexedDB. Requiere `document.modelContext` (Chrome M146+) y un servidor en `/mcp` (actualmente 404 → 0 site tools → inerte). |
+| **Bugs encontrados** | Ninguno en el repo. |
+| **Bugs corregidos** | N/A (investigacion externa). |
+| **Tests ejecutados** | Grep determinista del repo (0 coincidencias); HTTP HEAD/GET contra `https://apluno.com/` y `/toolisto` (bridge presente), `/privacidad/` (404, gap de deploy aparte) y `/mcp` (404); descarga y analisis estatico de `bridge.js`. |
+| **Tests PASS** | Atribucion y ausencia de riesgo egress confirmadas por analisis. |
+| **Tests FAIL** | 0 |
+| **Commits** | (solo trackers + evidencia; ver diff) |
+| **Bloqueos** | Accion del dueno/host: divulgar o quitar la ruta `/.webmcp/*` en Cloudflare. No es bloqueo de codigo. El despliegue del HEAD certificado sigue bloqueado por separado (`HARD_RUNTIME_BLOCK_CONFIRMED` del harness, `git push*` denegado). |
+| **Limitaciones** | La investigacion es contra el build live antiguo (`0e2e14a`); el HEAD certificado `2cb96d1` no esta desplegado, pero la inyeccion es del borde y afectaria a cualquier build por igual. No se modifica Cloudflare ni el repo. |
+| **Proxima prioridad** | CE-063 queda DISCOVERED (decision del dueno/host). Sin TODO en la cola → siguiente ciclo de DISCOVERY de producto o promover oportunidad DISCOVERED. El despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`. |
+
+---
+
 ## Cycle 125 — Performance improvements: server caching, workspace lazy-load, CSS audit (CE-062 follow-up)
 
 | Field | Value |

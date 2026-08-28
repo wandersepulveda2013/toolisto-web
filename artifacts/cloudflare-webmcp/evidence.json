@@ -1,0 +1,40 @@
+{
+  "investigation": "cloudflare-webmcp-edge-injection",
+  "liveSite": "https://apluno.com",
+  "pagesChecked": [
+    { "url": "https://apluno.com/", "webmcpInHead": true, "status": 200 },
+    { "url": "https://apluno.com/toolisto", "webmcpInHead": true, "status": 200 },
+    { "url": "https://apluno.com/privacidad/", "status": 404, "note": "live path differs or removed (deploy gap, separate)" },
+    { "url": "https://apluno.com/mcp", "status": 404 }
+  ],
+  "bridgeScript": {
+    "url": "https://apluno.com/.webmcp/bridge.js",
+    "status": 200,
+    "bytes": 47616,
+    "attributionTokens": ["webmcp", "tool-pack.ts", "bridge/registry.ts", "DEFAULT_MCP_URL=/mcp"],
+    "sourceReferencesInRepo": false,
+    "repoGrep": "no matches for webmcp|bridge.js|WebMCP|/mcp across *.js,*.mjs,*.html,*.json,*.md,*.yml,*.yaml"
+  },
+  "networkInterception": {
+    "xmlHttpRequest": 0,
+    "webSocket": 0,
+    "eventSource": 0,
+    "sendBeacon": 0,
+    "externalUrlLiterals": 0,
+    "fetchCalls": 3,
+    "fetchTargets": "same-origin (/mcp, img src, dynamic pack url)",
+    "appTrafficWrapped": false
+  },
+  "dom": {
+    "documentWrite": 0,
+    "createElementInject": 0,
+    "querySelector": 3,
+    "readsIndexedDB": false
+  },
+  "activationRequirement": "Chrome M146+ document.modelContext (chrome://flags/#enable-experimental-web-platform-features) + MCP server at /mcp",
+  "currentState": "INERT (no /mcp server -> 0 site tools registered)",
+  "zeroEgressImpact": "NONE_OBSERVED",
+  "classification": "CONFIRMED_CLOUDFLARE_EDGE_INJECTION_BENIGN_TO_ZERO_EGRESS",
+  "repoChangeNeeded": false,
+  "actionRequired": "OWNER_DISCLOSURE / OPTIONAL_REMOVE_CLOUDFLARE_WEBMCP_ROUTE"
+}

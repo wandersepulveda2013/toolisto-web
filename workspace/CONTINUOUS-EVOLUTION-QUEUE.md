@@ -6,7 +6,7 @@
 > Regla: la siguiente tarea ejecutable es la de mayor prioridad con estado `TODO`.
 > Regla de salud: si >50% de los ultimos 10 ciclos fueron AUDIT_ONLY, el siguiente ciclo (salvo
 > P0/P1) debe ser una mejora de producto.
-> Updated: 2026-08-24
+> Updated: 2026-08-28
 
 ## Tabla
 >
@@ -77,6 +77,8 @@
 | CE-057 | P1 | DONE | Fiabilidad/Workspace | autoSaveDoc/autoSaveTable debounce (1s) y _setupAutosave interval (5s) llaman saveDoc/saveData concurrentemente sobre la misma entidad; saveCurrentWorkspaceItem (guardado manual) y _flushAndSaveSession (visibility change) también compiten, causando escrituras paralelas en IndexedDB sobre el mismo documento/tabla | Cycle 117: _createSaveLock() serializa escrituras por tipo (doc/table) con latest-wins, failsafe 60s y generation counter para stale drains. autoSaveDoc, autoSaveTable, _setupAutosave, saveCurrentWorkspaceItem y _flushAndSaveSession usan el lock. renderView cancela debounce timers y cleans lock pending. Test autosave-lock-test.mjs 18/18. Regresión: workspace 157/157, phase3a 80/80, phase3b 59/59, phase11 106/106, UI 65/65, registry 26/26. |
 | CE-058 | P1 | DONE | Fiabilidad/Workspace | _createSaveLock usa locks per-tipo (_docSaveLock/_tableSaveLock): dos documentos diferentes comparten el mismo lock, así que latest-wins coalescing pierde writes de A al guardar B. renderView cancela timers pero no hace flush de la entidad dirty antes de navegar, causando pérdida de datos al cambiar de vista. saveDoc/saveData no protegen contra stale writes de IDB con _writeSeq | Cycle 118: _createEntityLockMap() genera locks per-entidad (_docLocks/_tableLocks con Map), aislamiento completo entre documentos y tablas diferentes. _flushDirtyEntity() preserva dirty entity antes de navigation. storage.js saveDoc/saveData con guard _writeSeq monotonico: existing._writeSeq > (doc._writeSeq\|\|0) descarta stale writes. setTableReviewStatus persiste via _tableLocks en lugar de autoSaveTable (debounce cancelado por renderView). Lock memory bounded via onIdle/_maybeEvict. Test cross-entity-integrity-test.mjs 55/55; review-status-persistence-test.mjs 15/15; persistence-sequence-cert.mjs included. Regresión: workspace 157/157, phase3a 80/80, phase3b 59/59, phase11 106/106. Release gate 16/16 PASS. Commit dbe9c1f. |
 
+
+| CE-063 | P3 | DISCOVERED | Privacidad/Externo | Inyeccion edge de Cloudflare WebMCP (`/.webmcp/bridge.js`) en `apluno.com`: confirmada como puente MCP de Cloudflare, inerte (sin `/mcp`), NO intercepta el trafico de la app ni accede a IndexedDB, NO vulnera cero-egress. Accion = decision del dueno/host (divulgacion o quitar la ruta), no cambio de repo | Cycle 126: investigacion read-only + analisis estatico; evidencia en `artifacts/cloudflare-webmcp/investigation.md` + `evidence.json`; 0 refs en repo; clasificacion `CONFIRMED_CLOUDFLARE_EDGE_INJECTION_BENIGN_TO_ZERO_EGRESS` |
 
 ## Guia de seleccion
 
