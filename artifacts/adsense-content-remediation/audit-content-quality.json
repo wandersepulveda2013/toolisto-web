@@ -1,0 +1,752 @@
+{
+  "audit": "APLUNO Content Quality Audit",
+  "boilerplate": {
+    "byClass": {
+      "CTA": 1,
+      "PRIVACY_TRUST": 6,
+      "UI_INSTRUCTION": 7
+    },
+    "concerning": [],
+    "reused6plus": 14
+  },
+  "categories": {
+    "enriched": 12,
+    "total": 12
+  },
+  "duplicateContent": {
+    "HIGH_DUP": 0.7,
+    "highValuePairs": [],
+    "maxSimilarity": 0.296,
+    "pairCountAbove005": 20318,
+    "reviewBandPairs": []
+  },
+  "final": "PASS",
+  "guides": {
+    "total": 10,
+    "valid": 10
+  },
+  "indexabilityCoherence": {
+    "sitemapBroken": 0,
+    "sitemapNoindex": 0
+  },
+  "indexable": 235,
+  "links": {
+    "externalLinks": 225,
+    "internalBroken": 0,
+    "internalChecked": 10462,
+    "internalRedirectTargets": 4200,
+    "samples": []
+  },
+  "metadata": {
+    "dupDesc": 0,
+    "dupTitle": 0,
+    "emptyDesc": 0,
+    "emptyTitle": 0,
+    "multiH1": 0
+  },
+  "noindex": 56,
+  "orphans": [],
+  "pagesDiscovered": 291,
+  "placeholders": 0,
+  "sitemapUrls": 236,
+  "strictEditorial": {
+    "b100_139": 95,
+    "b70_99": 69,
+    "ge140": 11,
+    "lt70": 27,
+    "max": 176,
+    "metric": "instructions + limitations + faq (sin chrome: capability strip, formatos, privacidad, related-tools)",
+    "min": 63,
+    "p10": 68,
+    "p25": 79,
+    "p50": 103,
+    "p75": 121,
+    "p90": 132,
+    "tierLT": 96,
+    "tierT1": 4,
+    "tierT2": 102,
+    "totalTools": 202
+  },
+  "structuredData": {
+    "invalid": 0,
+    "valid": 443
+  },
+  "thinContent": {
+    "flagged": [],
+    "metric": "strict editorial (sin chrome)",
+    "reviewableShort": [
+      {
+        "mainWords": 63,
+        "mainWordsTotal": 134,
+        "page": "/decodificar-url",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 63,
+        "mainWordsTotal": 134,
+        "page": "/ordenar-csv",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 64,
+        "mainWordsTotal": 123,
+        "page": "/calculadora-cientifica",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 64,
+        "mainWordsTotal": 136,
+        "page": "/comparar-csv",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 64,
+        "mainWordsTotal": 137,
+        "page": "/csv-a-html",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 65,
+        "mainWordsTotal": 139,
+        "page": "/cambiar-codificacion-csv",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 65,
+        "mainWordsTotal": 137,
+        "page": "/html-a-pdf",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 65,
+        "mainWordsTotal": 138,
+        "page": "/limpiar-excel",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 65,
+        "mainWordsTotal": 136,
+        "page": "/validar-json",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 66,
+        "mainWordsTotal": 138,
+        "page": "/powerpoint-a-pdf",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 66,
+        "mainWordsTotal": 136,
+        "page": "/unir-videos",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 67,
+        "mainWordsTotal": 138,
+        "page": "/aplanar-json",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 67,
+        "mainWordsTotal": 141,
+        "page": "/aumentar-resolucion-imagen",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 67,
+        "mainWordsTotal": 141,
+        "page": "/excel-a-xml",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 67,
+        "mainWordsTotal": 139,
+        "page": "/limpiar-datos-tabulares",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 67,
+        "mainWordsTotal": 139,
+        "page": "/normalizar-csv",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 67,
+        "mainWordsTotal": 137,
+        "page": "/rellenar-formulario-pdf",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 68,
+        "mainWordsTotal": 155,
+        "page": "/convertir-codificacion-texto",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 68,
+        "mainWordsTotal": 139,
+        "page": "/escanear-documento-camara",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 68,
+        "mainWordsTotal": 141,
+        "page": "/excel-a-html",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 68,
+        "mainWordsTotal": 143,
+        "page": "/html-a-imagen",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 68,
+        "mainWordsTotal": 138,
+        "page": "/recortar-video",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 68,
+        "mainWordsTotal": 140,
+        "page": "/tablas-html-a-excel",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 69,
+        "mainWordsTotal": 141,
+        "page": "/cambiar-delimitador-csv",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 69,
+        "mainWordsTotal": 139,
+        "page": "/comprimir-video",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 69,
+        "mainWordsTotal": 140,
+        "page": "/estadisticas-csv",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 69,
+        "mainWordsTotal": 137,
+        "page": "/texto-a-braille-unicode",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 70,
+        "mainWordsTotal": 141,
+        "page": "/formatear-json",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 70,
+        "mainWordsTotal": 142,
+        "page": "/recortar-audio",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 71,
+        "mainWordsTotal": 143,
+        "page": "/convertir-audio",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 71,
+        "mainWordsTotal": 145,
+        "page": "/csv-a-yaml",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 71,
+        "mainWordsTotal": 136,
+        "page": "/extraer-ubicacion-foto",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 71,
+        "mainWordsTotal": 151,
+        "page": "/generar-qr-wifi",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 71,
+        "mainWordsTotal": 145,
+        "page": "/imagenes-a-pdf-optimizado",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 73,
+        "mainWordsTotal": 147,
+        "page": "/csv-a-sql",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 73,
+        "mainWordsTotal": 144,
+        "page": "/detectar-tipo-archivo",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 73,
+        "mainWordsTotal": 145,
+        "page": "/pdf-a-powerpoint",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 73,
+        "mainWordsTotal": 142,
+        "page": "/video-a-gif",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 74,
+        "mainWordsTotal": 147,
+        "page": "/avif-a-imagen",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 74,
+        "mainWordsTotal": 147,
+        "page": "/csv-a-pdf",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 76,
+        "mainWordsTotal": 149,
+        "page": "/excel-a-pdf",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 76,
+        "mainWordsTotal": 150,
+        "page": "/verificar-censura-pdf",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 77,
+        "mainWordsTotal": 154,
+        "page": "/detectar-ocr-pdf",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 77,
+        "mainWordsTotal": 150,
+        "page": "/xml-a-excel",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 78,
+        "mainWordsTotal": 149,
+        "page": "/eliminar-duplicados-excel",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 78,
+        "mainWordsTotal": 154,
+        "page": "/extraer-imagenes-pdf",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 78,
+        "mainWordsTotal": 149,
+        "page": "/mejorar-documento-escaneado",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 79,
+        "mainWordsTotal": 156,
+        "page": "/extraer-paleta-colores",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 79,
+        "mainWordsTotal": 156,
+        "page": "/extraer-texto-pdf",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 79,
+        "mainWordsTotal": 150,
+        "page": "/filtrar-csv",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 79,
+        "mainWordsTotal": 159,
+        "page": "/generar-codigo-barras",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 79,
+        "mainWordsTotal": 155,
+        "page": "/generar-favicon",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 79,
+        "mainWordsTotal": 144,
+        "page": "/html-a-markdown",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 79,
+        "mainWordsTotal": 152,
+        "page": "/json-a-excel-avanzado",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 80,
+        "mainWordsTotal": 150,
+        "page": "/aplanar-pdf",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 80,
+        "mainWordsTotal": 155,
+        "page": "/contar-paginas-pdf",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 81,
+        "mainWordsTotal": 163,
+        "page": "/comparar-imagenes",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 81,
+        "mainWordsTotal": 146,
+        "page": "/formato-apa-7",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 83,
+        "mainWordsTotal": 158,
+        "page": "/codificar-base64",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 84,
+        "mainWordsTotal": 159,
+        "page": "/codificar-url",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 85,
+        "mainWordsTotal": 151,
+        "page": "/extraer-tabla-imagen-excel",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 85,
+        "mainWordsTotal": 161,
+        "page": "/extraer-texto-pdf-escaneado",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 85,
+        "mainWordsTotal": 158,
+        "page": "/html-a-texto",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 86,
+        "mainWordsTotal": 160,
+        "page": "/generar-iconos-pwa",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 86,
+        "mainWordsTotal": 165,
+        "page": "/imagen-a-pdf-buscable",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 86,
+        "mainWordsTotal": 160,
+        "page": "/organizar-pdf",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 87,
+        "mainWordsTotal": 167,
+        "page": "/selector-color",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 88,
+        "mainWordsTotal": 165,
+        "page": "/dividir-archivo",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 88,
+        "mainWordsTotal": 168,
+        "page": "/generar-qr-contacto",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 88,
+        "mainWordsTotal": 169,
+        "page": "/leer-codigo-barras-imagen",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 89,
+        "mainWordsTotal": 157,
+        "page": "/cifrar-descifrar-archivo",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 89,
+        "mainWordsTotal": 163,
+        "page": "/excel-a-json",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 89,
+        "mainWordsTotal": 160,
+        "page": "/extraer-tablas-pdf-excel",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 90,
+        "mainWordsTotal": 172,
+        "page": "/generar-qr",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 90,
+        "mainWordsTotal": 162,
+        "page": "/ods-a-xlsx",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 91,
+        "mainWordsTotal": 170,
+        "page": "/censurar-imagen",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 91,
+        "mainWordsTotal": 164,
+        "page": "/decodificar-base64",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 91,
+        "mainWordsTotal": 167,
+        "page": "/extraer-fuentes-recursos-pdf",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 92,
+        "mainWordsTotal": 168,
+        "page": "/difuminar-caras-imagen",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 92,
+        "mainWordsTotal": 178,
+        "page": "/leer-qr-imagen",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 93,
+        "mainWordsTotal": 165,
+        "page": "/minificar-css",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 93,
+        "mainWordsTotal": 166,
+        "page": "/svg-a-imagen",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 93,
+        "mainWordsTotal": 165,
+        "page": "/xlsx-a-ods",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 94,
+        "mainWordsTotal": 169,
+        "page": "/contar-palabras",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 94,
+        "mainWordsTotal": 166,
+        "page": "/pdf-a-pdfa",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 94,
+        "mainWordsTotal": 170,
+        "page": "/unir-archivos-divididos",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 94,
+        "mainWordsTotal": 167,
+        "page": "/xml-a-json",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 95,
+        "mainWordsTotal": 173,
+        "page": "/encriptar-pdf-avanzado",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 95,
+        "mainWordsTotal": 163,
+        "page": "/inspeccionar-metadatos-archivo",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 95,
+        "mainWordsTotal": 169,
+        "page": "/quitar-fondo-imagen",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 96,
+        "mainWordsTotal": 171,
+        "page": "/jpg-a-pdf",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 96,
+        "mainWordsTotal": 168,
+        "page": "/xls-a-xlsx",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 97,
+        "mainWordsTotal": 173,
+        "page": "/calcular-hash",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 97,
+        "mainWordsTotal": 170,
+        "page": "/comparar-excel",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 97,
+        "mainWordsTotal": 178,
+        "page": "/generar-qr-por-lote",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 99,
+        "mainWordsTotal": 173,
+        "page": "/heic-a-imagen",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      }
+    ]
+  }
+}
