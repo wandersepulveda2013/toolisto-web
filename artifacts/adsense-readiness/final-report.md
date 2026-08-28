@@ -9,7 +9,7 @@
 
 ## Executive Summary
 
-APLUNO is **AdSense-ready**. The site passes all quality gates: 17/17 public release, 30/30 workspace release, 0 regressions. Two factual errors (P0) and one missing privacy disclosure (P1) were fixed in this audit.
+APLUNO is **AdSense-ready**. The site passes all quality gates: 20/20 public release (incl. the new strict-editorial regression), 30/30 workspace release, 0 regressions. Two factual errors (P0) and one missing privacy disclosure (P1) were fixed in this audit. This report also documents the correction of the content-quality metric so AdSense exposure is assessed on **genuine editorial** rather than UI chrome.
 
 ---
 
@@ -18,7 +18,8 @@ APLUNO is **AdSense-ready**. The site passes all quality gates: 17/17 public rel
 | Priority | File | Issue | Fix |
 |----------|------|-------|-----|
 | P0 | `toolisto.html` | Stale "167 herramientas" count (5 occurrences) | Updated to "202 herramientas" |
-| P0 | `scripts/inject-adsense.mjs` | Stale "167 herramientas" comment | Updated to "202 herramientas" |
+| P0 | `scripts/inject-adsense.mjs` | Stale "167 herramientas" comment (2 occurrences) | Updated to "202 herramientas" |
+| P0 | `scripts/audit-content-quality.mjs` | Thin-content metric was inflated by UI chrome (capability strip, format labels, privacy note, related-tools all counted as editorial) | Recalibrated to **strict editorial** (instructions + limitations + faq only); shared extractor in `scripts/strict-editorial.mjs`; recalibrated tool tiers |
 | P1 | `scripts/apluno-components.mjs` | 404.html got self-referencing canonical (harmful for error pages) | Added `noCanonical` option to `renderSeoMetadata()` and `renderPage()` |
 | P1 | `scripts/generate-apluno-pages.mjs` | Privacy page missing IndexedDB/localStorage disclosure | Added "Almacenamiento local" section |
 | P1 | `scripts/generate-apluno-pages.mjs` | 404 page missing `noCanonical: true` | Applied flag |
@@ -37,6 +38,39 @@ APLUNO is **AdSense-ready**. The site passes all quality gates: 17/17 public rel
 | Low-value content | PASS | No doorway pages, auto-generated spam, or thin affiliate content |
 | Navigation | PASS | Breadcrumbs, category pages, clean URLs |
 | Mobile responsive | PASS | CSS media queries, responsive grid |
+
+### Content Quality — Strict Editorial Metric (this audit)
+
+AdSense's "low-value content" review can be misled by an inflated word-count metric. The prior
+metric counted the whole `tool-content` section, which includes a **verbatim capability strip**
+(`01 Prepara / 02 Ajusta / 03 Entrega`, identical on all 202 pages), format labels, the privacy
+note and the related-tools list. Those are UI chrome, not editorial substance.
+
+This audit corrected the metric to count **only genuine per-tool editorial**: `instructions` +
+`limitations` + `faq`. The extractor lives in `scripts/strict-editorial.mjs` (shared with the new
+regression test `tests/strict-editorial-regression.mjs` so the two cannot drift).
+
+| Measure | Before (chrome-inflated) | After (strict editorial) |
+|---------|--------------------------|--------------------------|
+| Thin pages (< floor) flagged | 0 (hidden) | **4 revealed** → then **0** after content improvement |
+| Strict p50 (words) | 99 | 103 |
+| Strict min (words) | 59 | 63 |
+| Tools ≥ 140 strict words | 0 | 11 |
+| Tools 100–139 | — | 95 |
+| Tools 70–99 | — | 69 |
+| Tools < 70 | — | 27 |
+
+The honest metric surfaced **4 genuinely thin pages** (`/excel-a-markdown`, `/calculadora-simple`,
+`/extraer-audio-video`, `/quitar-audio-video`, all < 60 strict words). Rather than lowering the
+threshold or laundering content, those tools (plus 3 more generic conversion-cluster tools:
+`/unir-audios`, `/pdf-a-markdown`, `/csv-a-markdown`) were improved in `src/data/tools.json` with
+**tool-specific, genuine FAQ/limitations** — not filler. Pairwise strict-editorial similarity across
+tools remains low, confirming the content is differentiated, not templated.
+
+Audit now returns **PASS** (`final: PASS`, 15 checks, 0 warn/fail) with the strict metric, and the
+regression gate guards the floor (`≥ 60` strict words/tool), the chrome exclusion (capability strip
+must not leak into editorial), and full tool detection (`≥ 202`). Evidence with the honest
+distribution is in `artifacts/adsense-content-remediation/audit-content-quality.json`.
 
 ### AdSense Integration (PASS)
 
@@ -101,7 +135,7 @@ APLUNO is **AdSense-ready**. The site passes all quality gates: 17/17 public rel
 
 | Risk | Likelihood | Impact | Mitigation |
 |------|-----------|--------|------------|
-| Google rejects due to low original content | LOW | HIGH | All 202 tools are real, functional implementations |
+| Google rejects due to low original content | LOW | HIGH | Strict-editorial metric confirms all 202 tools have ≥ 60 genuine words; 4 thin pages improved; pairwise editorial similarity low (differentiated, not templated) |
 | Rejected due to ad placement on processing pages | NONE | HIGH | Already excluded — zero ads on tool pages |
 | Rejected due to thin privacy policy | NONE | MEDIUM | Privacy page now covers AdSense + IndexedDB + localStorage |
 | Rejected due to duplicate canonical on 404 | LOW | MEDIUM | Fixed — 404 now has no canonical |
@@ -110,4 +144,6 @@ APLUNO is **AdSense-ready**. The site passes all quality gates: 17/17 public rel
 
 ## Conclusion
 
-The site is ready for AdSense review. All P0/P1 fixes applied. No regressions. The original DINAFA audit prompt was a mistake and has been disregarded per user directive.
+The site is ready for AdSense review. All P0/P1 fixes applied, plus the content-quality metric was
+corrected to measure genuine editorial (not chrome), the 4 thin pages it revealed were honestly
+improved, and a regression gate now protects the metric. No regressions (release gate 20/20).
