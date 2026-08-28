@@ -3,7 +3,8 @@
 **Date:** 2026-08-28  
 **Publisher:** ca-pub-2644615452393440  
 **Site:** https://apluno.com  
-**Status:** READY (under Google review)  
+**Status (repo/certificado):** READY (under Google review)  
+**Status LIVE (Layer 4):** NOT_READY_LIVE — artefacto certificado NO desplegado (ver abajo)  
 **External AdSense status:** PENDIENTE_REVIEW_GOOGLE (aprobación y configuración de consentimiento quedan en Google/host)
 
 
@@ -105,8 +106,39 @@ All navigation links on home + catalog resolve (local audit: 0 broken); 202/202 
 
 ---
 
+# Layer 4 — LIVE PRODUCTION VERIFICATION (https://apluno.com)
+
+**Layer 4 classification: NOT_READY_LIVE** — the certified Layer 1/2/3 artifact is **NOT DEPLOYED**.
+The live site reflects `origin/main = 0e2e14a` (25 commits behind local HEAD `95aac07`), which still
+has the Layer 3 workspace leak, lacks the `/guia/*` guides, and lacks the privacy IndexedDB disclosure.
+Additionally, a **non-repo Cloudflare-edge WebMCP bridge script** is injected on every live page.
+Deployment is `BLOCKED_EXTERNAL` (git push is prohibited from this environment; a human/owner action).
+See `artifacts/adsense-readiness/live-production-audit.json` + `evidencia-live-production.md`.
+
+## FASE summary (Layer 4, live authority)
+
+| FASE | Result (live) |
+|------|---------------|
+| 1 Deployment | **NOT DEPLOYED** — `0e2e14a` desplegado; `95aac07` ahead 25; guías ausentes, fuga de workspace vigente |
+| 2 Live URL inventory | 202 tools / 12 cats; `/guia/*` 404; `/workspace/*.md` 200 (leak) |
+| 3 Canonicalization | Todo converge a `https://apluno.com/` (301 apex/www/http) |
+| 4 ads.txt live | Coincide byte a byte con dist certificado |
+| 5 Publisher live | `ca-pub-2644615452393440` en home/toolisto/about; sin placeholders |
+| 6 Policy pages live | Privacy sin IndexedDB (gap deploy); terms/about/contact OK; email real |
+| 7 Crawler surface | robots OK + sitemap; sitemap live 225 (faltan 11 guías); muestra 5/5 200+canonical |
+| 8 Internal links live | 230 enlaces, 0 rotos reales |
+| 9 Cloudflare interference | ⚠️ `.webmcp/bridge.js` (WebMCP) inyectado en `<head>` de todas las páginas; backend `/mcp` 404; **ajeno al repo** |
+| 10 Source/Dist/Live | Triángulo con divergencias por no-despliegue |
+| 11 AdSense isolation live | Estático OK; render dinámico fuera de alcance (sin headless browser) |
+| 12 Indexability spot check | 5/5 → 200, index/follow, es-419, canonical coherente |
+| 13 External requirements | Acciones externas (deploy + consentimiento) pendientes |
+| 14 Consent/CMP | Configuración en Google/host — externa |
+
+**Layer 4 classification: NOT_READY_LIVE** (deployment + `.webmcp` cleanup required before submit).
+**Google AdSense account status: UNKNOWN** (no visibility; never infer APPROVED from tests).
 
 ---
+
 
 ## Fixes Applied
 

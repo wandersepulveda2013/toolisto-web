@@ -1,0 +1,123 @@
+{
+  "adsTxtLive": {
+    "content": "google.com, pub-2644615452393440, DIRECT, f08c47fec0942fa0",
+    "matchesCertifiedDist": true
+  },
+  "adsenseFailureIsolation": {
+    "adsTxtMatches": true,
+    "dynamicRender": "OUT_OF_SCOPE (no headless browser in this environment); owner to confirm via AdSense preview / Search Console",
+    "loaderOnExpectedPages": true,
+    "noAdsOnProcessingPages": true,
+    "singleLoaderPerPage": true,
+    "staticIsolated": true
+  },
+  "auditDate": "2026-08-28",
+  "classifications": {
+    "googleAdSenseAccountStatus": "UNKNOWN",
+    "reason": "Deploy origin/main to HEAD (95aac07) to publish the certified Layer 1/2/3 artifact, then re-run live verification; investigate/remove the non-repo WebMCP edge injection; then submit to Google AdSense.",
+    "submissionReadiness": "ACTION_REQUIRED",
+    "technicalLiveSiteStatus": "NOT_READY_LIVE"
+  },
+  "cloudflareInterference": {
+    "cacheHeaders": "present (cf-cache-status, Cache-Control)",
+    "emailProtection": "present on contact (benign Cloudflare feature)",
+    "htmlInjection": {
+      "inRepoBuild": false,
+      "inRepoSource": false,
+      "location": "top of <head>",
+      "mcpEndpoint": "https://apluno.com/mcp -> 404",
+      "nature": "WebMCP client bridge (references /mcp MCP endpoint)",
+      "present": true,
+      "risk": "Non-repo 3rd-party-ish script injected on every page via Cloudflare edge; integrity/supply-chain concern; not part of certified build",
+      "script": "<script type=\"module\" src=\"https://apluno.com/.webmcp/bridge.js\">",
+      "servedFrom": "https://apluno.com/.webmcp/bridge.js (200, text/javascript, 47KB, CF-cached, CORS *)"
+    }
+  },
+  "crawlerSurface": {
+    "robots_allowsAll": true,
+    "robots_declaresSitemap": true,
+    "sitemapDomain": "https://apluno.com",
+    "sitemapLiveUrls": 225,
+    "sitemapSample200canonical": "5/5"
+  },
+  "deployment": {
+    "classification": "NOT_DEPLOYED",
+    "commitsAheadOfOrigin": 25,
+    "deployGapEvidence": {
+      "certifiedDistSitemapUrlCount": 236,
+      "liveGuides404": true,
+      "liveLastModified": "Mon, 24 Aug 2026 15:07:04 GMT",
+      "liveSitemapUrlCount": 225,
+      "liveWorkspaceLeak": [
+        "README.md",
+        "AUTONOMOUS-CONTEXT.md",
+        "CONTINUOUS-EVOLUTION-MISSION.md",
+        "PRODUCTION-READINESS-MISSION.md",
+        "AUTONOMOUS_MODE",
+        "PRODUCTION_READINESS_DONE"
+      ],
+      "missingSitemapUrls": "11 all /guia/*"
+    },
+    "deployMechanism": "GitHub Pages workflow .github/workflows/deploy-pages.yml on push to main",
+    "deployedIsAncestorOfHead": true,
+    "headIsOnOrigin": false,
+    "headLocal": "95aac07",
+    "isDeployed": false,
+    "originMainDeployed": "0e2e14a"
+  },
+  "indexabilitySpotCheck": {
+    "all": {
+      "canonical": "coherent",
+      "lang": "es-419",
+      "robots": "index, follow",
+      "status": 200
+    },
+    "sampleCount": 5
+  },
+  "internalLinksLive": {
+    "linksChecked": 230,
+    "noted": "The single detected 404 (/cdn-cgi/l/email-protection) is a benign Cloudflare email-protection artifact, not a user-facing broken link.",
+    "realBroken": 0
+  },
+  "layer": 4,
+  "mission": "LIVE_PRODUCTION_VERIFICATION",
+  "policyPagesLive": {
+    "about_brandConsistent": true,
+    "contact_email": "toolistoweb@gmail.com (via Cloudflare email-protection)",
+    "contact_placeholder": false,
+    "privacy_adsenseCookieConsent": "present",
+    "privacy_indexedDbLocalStorage": "MISSING_IN_LIVE (fix 79c54db not deployed)",
+    "terms_consistent": true
+  },
+  "publisherConsistency": {
+    "id": "ca-pub-2644615452393440",
+    "noPlaceholderFound": true,
+    "onPages": [
+      "home",
+      "toolisto",
+      "about"
+    ],
+    "onlyLoader": true
+  },
+  "redirects": {
+    "http://apluno.com": "301 -> https://apluno.com/",
+    "http://www.apluno.com": "301 -> https://www.apluno.com/ -> 301 -> https://apluno.com/",
+    "https://apluno.com": "200 canonical",
+    "https://www.apluno.com": "301 -> https://apluno.com/"
+  },
+  "site": "https://apluno.com",
+  "sourceDistLiveTriangle": {
+    "categoriesDist": 12,
+    "categoriesLive": 12,
+    "divergences": [
+      "guides absent live",
+      "workspace .md leak live",
+      "fetchpriority=high missing live home",
+      "webmcp bridge only live"
+    ],
+    "rootCause": "Layer 1/2/3 certified commits not pushed to origin/main (deploy blocked, BLOCKED_EXTERNAL)",
+    "toolsDist": 202,
+    "toolsLive": 202
+  },
+  "sourceGate": "origin/main"
+}
