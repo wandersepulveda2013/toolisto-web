@@ -92,7 +92,7 @@ Ver **MANUAL ACTIONS REMAINING** más abajo.
 
 ```
 npm run build               # build completo (incluye inject-adsense.mjs)
-npm test                    # audit-count: 167 herramientas
+npm test                    # audit-count: 202 herramientas
 npm run test:apluno         # contrato APLUNO: 45/45
 npm run test:release        # public release gate: 13/13
 node tests/adsense-integration.mjs   # 21/21

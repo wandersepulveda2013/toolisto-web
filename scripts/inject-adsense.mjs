@@ -12,7 +12,7 @@
  *   - Inserta el loader de AdSense EXACTAMENTE UNA vez, dentro de <head>,
  *     solo en las páginas permitidas (portada, catálogo, categorías y páginas
  *     institucionales con contenido suficiente como /about/).
- *   - NUNCA inyecta el loader en las 167 páginas de procesamiento de Toolisto,
+ *   - NUNCA inyecta el loader en las 202 páginas de procesamiento de Toolisto,
  *     ni en páginas de redirect, 404, privacidad, condiciones o contacto.
  *   - Es idempotente: si el loader ya existe, no lo duplica.
  *   - Genera dist/ads.txt con el publisher correcto.
@@ -63,7 +63,7 @@ function loadJson(path) {
  * - Institucional con contenido: dist/about/index.html
  *
  * NO se incluye:
- *   - 167 páginas de procesamiento de herramientas (dist/<tool-slug>.html)
+ *   - 202 páginas de procesamiento de herramientas (dist/<tool-slug>.html)
  *   - 404.html, redirects (aliases), privacidad/privacy, condiciones/terms,
  *     contacto, ordia, workspace, apoyar.
  */
