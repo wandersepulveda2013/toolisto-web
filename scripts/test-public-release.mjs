@@ -12,7 +12,7 @@
  *
  * Cualquier FAIL devuelve exit 1. Prohibido `|| true` y thresholds relajados.
  */
-import { readFileSync, existsSync } from 'node:fs';
+import { readFileSync, existsSync, readdirSync, statSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
@@ -61,6 +61,15 @@ check(existsSync(join(ROOT, 'dist', 'workspace', 'workspace.js')), 'el runtime f
 check(existsSync(join(ROOT, 'dist', 'workspace', 'workspace.css')), 'el CSS funcional del Workspace SÍ se publica en el build público');
 check(existsSync(join(ROOT, 'dist', 'workspace', 'core')), 'los módulos core del Workspace SÍ se publican en el build público');
 check(existsSync(join(ROOT, 'dist', 'workspace', 'index.html')), 'el index.html funcional del Workspace SÍ se publica en el build público');
+const wsPrivate = [];
+(function scanWs(dir) {
+  for (const e of readdirSync(dir, { withFileTypes: true })) {
+    const p = join(dir, e.name);
+    if (e.isDirectory()) { scanWs(p); continue; }
+    if (e.name.endsWith('.md') || e.name === 'AUTONOMOUS_MODE' || e.name === 'PRODUCTION_READINESS_DONE') wsPrivate.push(p.slice((join(ROOT, 'dist') + '\\').length));
+  }
+})(join(ROOT, 'dist', 'workspace'));
+check(wsPrivate.length === 0, `el build NO publica documentación interna ni marcadores del agente en /workspace/ (${wsPrivate.length} excluidos: ${wsPrivate.join(', ') || 'ninguno'})`);
 check(toolSlugs.includes('comprimir-imagen') && !toolSlugs.includes('recortar-imagen'), 'el catálogo de herramientas coincide con el fixture esperado');
 
 check(home.includes('<title>APLUNO — Herramientas online para PDF, imágenes y archivos</title>') && home.includes('apluno-launcher-search') && !home.includes('product-card'), 'la portada pública es el launcher de herramientas, sin promos de productos');

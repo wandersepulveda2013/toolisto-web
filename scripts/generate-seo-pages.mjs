@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { readFileSync, writeFileSync, mkdirSync, cpSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, cpSync, existsSync, readdirSync, statSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -106,6 +106,7 @@ const aplunoPublicRoutes = [
   '/manifest.webmanifest',
   '/sitemap.xml',
   '/robots.txt',
+  '/ads.txt',
   '/_redirects',
   '/_headers',
   '/.nojekyll',
@@ -123,11 +124,34 @@ writeFileSync(join(DIST, 'service-worker.js'), generatedSw, 'utf8');
 // Copy Workspace runtime to dist/workspace/. The functional workspace IS the
 // production artifact at /workspace/. generate-apluno-pages.mjs writes the
 // promotional landing to /workspace-about/ so there is no collision.
+//
+// Only the runnable Workspace runtime is published. Internal development
+// documentation and agent state markers (.md, AUTONOMOUS_MODE,
+// PRODUCTION_READINESS_DONE) are EXCLUDED so they never reach the public
+// deployment at /workspace/.
 const WS_SRC = join(ROOT, 'workspace');
 const WS_DIST = join(DIST, 'workspace');
+const WS_PRIVATE_NAMES = new Set([
+  'AUTONOMOUS_MODE',
+  'PRODUCTION_READINESS_DONE',
+]);
+function isWorkspacePrivate(name) {
+  if (name.endsWith('.md')) return true;
+  return WS_PRIVATE_NAMES.has(name);
+}
+function copyWorkspaceFiltered(from, to) {
+  mkdirSync(to, { recursive: true });
+  for (const entry of readdirSync(from, { withFileTypes: true })) {
+    if (entry.isDirectory()) {
+      copyWorkspaceFiltered(join(from, entry.name), join(to, entry.name));
+      continue;
+    }
+    if (isWorkspacePrivate(entry.name)) continue;
+    cpSync(join(from, entry.name), join(to, entry.name), { force: true });
+  }
+}
 if (existsSync(WS_SRC)) {
-  mkdirSync(WS_DIST, { recursive: true });
-  cpSync(WS_SRC, WS_DIST, { recursive: true });
+  copyWorkspaceFiltered(WS_SRC, WS_DIST);
 }
 
 const splashCSS = `<style>

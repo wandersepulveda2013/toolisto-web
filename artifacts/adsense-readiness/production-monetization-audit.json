@@ -1,0 +1,159 @@
+{
+  "adsTxt": {
+    "content": "google.com, pub-2644615452393440, DIRECT, f08c47fec0942fa0",
+    "root": true,
+    "singleLine": true,
+    "valid": true
+  },
+  "audit": "Layer 3 - Produccion Monetizacion & Policy Delivery",
+  "classification": "READY",
+  "crawlability": {
+    "broken": [],
+    "indexablePages": 236,
+    "navLinksBroken": 0,
+    "navLinksOk": 261,
+    "sitemapUrls": 236
+  },
+  "externalAdsenseStatus": "PENDIENTE_REVIEW_GOOGLE",
+  "failureIsolation": {
+    "loaderSingleGlobalAsync": true,
+    "noInlineAdsbygoogle": true,
+    "siteNotDependentOnAdsense": true
+  },
+  "headers": {
+    "cspAllowsAdsense": true,
+    "cspAllowsDoubleclick": true,
+    "note": "GitHub Pages no aplica _headers; Cloudflare no inyecta CSP real. Externo/config, no defecto de codigo."
+  },
+  "pipeline": {
+    "canonical": [
+      "npm run build",
+      "node scripts/build-public-site.mjs"
+    ],
+    "cleanBuild": "rmSync(dist) luego generate-seo-pages --production, generate-apluno-pages, inject-adsense",
+    "verified": true
+  },
+  "policyDelivery": {
+    "aboutBrandConsistent": true,
+    "consentAddressed": true,
+    "contactReachable": true,
+    "privacyAdsenseOnlyOnBrowsingPages": true,
+    "privacyDisclosesAdsense": true,
+    "privacyDisclosesIndexedDbLocalStorage": true,
+    "privacyNoFileContentSentToGoogle": true,
+    "termsConsistent": true
+  },
+  "publisher": "ca-pub-2644615452393440",
+  "publisherConsistency": {
+    "noPlaceholders": true,
+    "occurrences": {
+      "DIST": 15,
+      "SOURCE": 2
+    }
+  },
+  "robots": {
+    "allowsAll": true,
+    "blocksMonetized": false,
+    "sitemapDeclared": true
+  },
+  "serviceWorker": {
+    "hasAdDomains": false,
+    "monetizedRoutesNetworkFirst": true
+  },
+  "surface": {
+    "anomaliesMultiLoader": 0,
+    "architecture": "Auto Ads (sin data-ad-slot ni adsbygoogle inline)",
+    "byType": {
+      "ABOUT": {
+        "conAd": 1,
+        "multiLoader": 0,
+        "n": 1
+      },
+      "APOYAR": {
+        "conAd": 0,
+        "multiLoader": 0,
+        "n": 1
+      },
+      "CATEGORY": {
+        "conAd": 12,
+        "multiLoader": 0,
+        "n": 12
+      },
+      "CONTACT": {
+        "conAd": 0,
+        "multiLoader": 0,
+        "n": 1
+      },
+      "ERROR_404": {
+        "conAd": 0,
+        "multiLoader": 0,
+        "n": 1
+      },
+      "GUIDE": {
+        "conAd": 0,
+        "multiLoader": 0,
+        "n": 10
+      },
+      "ORDIA": {
+        "conAd": 0,
+        "multiLoader": 0,
+        "n": 1
+      },
+      "OTHER": {
+        "conAd": 1,
+        "multiLoader": 0,
+        "n": 3
+      },
+      "PRIVACY": {
+        "conAd": 0,
+        "multiLoader": 0,
+        "n": 1
+      },
+      "PRIVACY_LEGACY": {
+        "conAd": 0,
+        "multiLoader": 0,
+        "n": 1
+      },
+      "REDIRECT": {
+        "conAd": 0,
+        "multiLoader": 0,
+        "n": 52
+      },
+      "TERMS": {
+        "conAd": 0,
+        "multiLoader": 0,
+        "n": 1
+      },
+      "TERMS_LEGACY": {
+        "conAd": 0,
+        "multiLoader": 0,
+        "n": 1
+      },
+      "TOOL": {
+        "conAd": 0,
+        "multiLoader": 0,
+        "n": 202
+      },
+      "TOOLISTO_CATALOG": {
+        "conAd": 1,
+        "multiLoader": 0,
+        "n": 1
+      },
+      "WORKSPACE": {
+        "conAd": 0,
+        "multiLoader": 0,
+        "n": 2
+      }
+    },
+    "missingAdsOnMonetized": [],
+    "noManualSlots": true,
+    "totalHtml": 291,
+    "wrongAdsOnNonMonetized": []
+  },
+  "urlRoot": "https://apluno.com",
+  "workspaceLeak": {
+    "agentMarkersPublished": 0,
+    "fixed": true,
+    "internalMdPublished": 0
+  }
+}

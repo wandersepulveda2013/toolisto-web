@@ -1,0 +1,1751 @@
+{
+  "perFile": {
+    "404.html": {
+      "canonical": false,
+      "loader": 0,
+      "noindex": true,
+      "type": "ERROR_404"
+    },
+    "about/index.html": {
+      "canonical": true,
+      "loader": 1,
+      "noindex": false,
+      "type": "ABOUT"
+    },
+    "advanced-convert.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": true,
+      "type": "REDIRECT"
+    },
+    "agregar-marca-de-agua-pdf.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "aplanar-json.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "aplanar-pdf.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "apoyar.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "APOYAR"
+    },
+    "archivos.html": {
+      "canonical": true,
+      "loader": 1,
+      "noindex": false,
+      "type": "CATEGORY"
+    },
+    "audio.html": {
+      "canonical": true,
+      "loader": 1,
+      "noindex": false,
+      "type": "CATEGORY"
+    },
+    "aumentar-resolucion-imagen.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "avif-a-imagen.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "borrar-objetos-de-imagen.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "buscar-reemplazar-documentos.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "calculadora-cientifica.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "calculadora-simple.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "calculadoras.html": {
+      "canonical": true,
+      "loader": 1,
+      "noindex": false,
+      "type": "CATEGORY"
+    },
+    "calcular-hash.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "cambiar-codificacion-csv.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "cambiar-delimitador-csv.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "cambiar-tamano-paginas-pdf.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "censor-image.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": true,
+      "type": "REDIRECT"
+    },
+    "censurar-imagen.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "censurar-pdf-permanente.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "cifrar-descifrar-archivo.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "clean-signature.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": true,
+      "type": "REDIRECT"
+    },
+    "codificar-base64.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "codificar-url.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "comparar-csv.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "comparar-dos-pdf.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "comparar-excel.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "comparar-imagenes.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "comparar-textos.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "compare-excel.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": true,
+      "type": "REDIRECT"
+    },
+    "compliance.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": true,
+      "type": "REDIRECT"
+    },
+    "compress-image.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": true,
+      "type": "REDIRECT"
+    },
+    "compress-images.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": true,
+      "type": "REDIRECT"
+    },
+    "comprimir-imagen.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "comprimir-imagenes.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "comprimir-pdf.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "comprimir-video.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "comprimir-word.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "condiciones.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TERMS_LEGACY"
+    },
+    "contact/index.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "CONTACT"
+    },
+    "contar-paginas-pdf.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "contar-palabras.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "conversor-avanzado-de-imagenes.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "convert-csv-to-excel.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": true,
+      "type": "REDIRECT"
+    },
+    "convert-csv-to-json.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": true,
+      "type": "REDIRECT"
+    },
+    "convert-excel-to-csv.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": true,
+      "type": "REDIRECT"
+    },
+    "convert-excel-to-json.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": true,
+      "type": "REDIRECT"
+    },
+    "convert-image.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": true,
+      "type": "REDIRECT"
+    },
+    "convert-jpg-to-png.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": true,
+      "type": "REDIRECT"
+    },
+    "convert-jpg-to-webp.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": true,
+      "type": "REDIRECT"
+    },
+    "convert-json-to-csv.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": true,
+      "type": "REDIRECT"
+    },
+    "convert-json-to-excel.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": true,
+      "type": "REDIRECT"
+    },
+    "convert-json-to-xml.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": true,
+      "type": "REDIRECT"
+    },
+    "convert-ods-to-xlsx.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": true,
+      "type": "REDIRECT"
+    },
+    "convert-png-to-jpg.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": true,
+      "type": "REDIRECT"
+    },
+    "convert-png-to-webp.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": true,
+      "type": "REDIRECT"
+    },
+    "convert-webp-to-jpg.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": true,
+      "type": "REDIRECT"
+    },
+    "convert-webp-to-png.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": true,
+      "type": "REDIRECT"
+    },
+    "convert-xls-to-xlsx.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": true,
+      "type": "REDIRECT"
+    },
+    "convert-xlsx-to-ods.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": true,
+      "type": "REDIRECT"
+    },
+    "convert-xml-to-json.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": true,
+      "type": "REDIRECT"
+    },
+    "convertir-audio.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "convertir-codificacion-texto.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "convertir-imagen.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "convertir-listas-en-tablas.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "crear-cuadernillo-pdf.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "crear-tabla-de-contenido.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "crear-zip-avanzado.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "crop-image.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": true,
+      "type": "REDIRECT"
+    },
+    "csv-a-excel.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "csv-a-html.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "csv-a-json.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "csv-a-markdown.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "csv-a-pdf.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "csv-a-sql.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "csv-a-yaml.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "csv-to-xlsx.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": true,
+      "type": "REDIRECT"
+    },
+    "cumplir-requisitos-de-archivo.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "decodificar-base64.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "decodificar-url.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "detectar-ocr-pdf.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "detectar-tipo-archivo.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "difuminar-caras-imagen.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "dividir-archivo-txt.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "dividir-archivo.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "dividir-documento-word.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "dividir-epub-por-capitulos.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "dividir-excel.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "dividir-paginas-dobles-pdf.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "dividir-pdf.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "doc-photo.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": true,
+      "type": "REDIRECT"
+    },
+    "documentos-word.html": {
+      "canonical": true,
+      "loader": 1,
+      "noindex": false,
+      "type": "CATEGORY"
+    },
+    "duplicar-paginas-pdf.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "editar-metadatos-epub.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "editar-metadatos-pdf.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "eliminar-duplicados-excel.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "eliminar-filas-duplicadas.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "eliminar-metadatos-de-imagen.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "eliminar-metadatos-word.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "eliminar-paginas-en-blanco-word.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "eliminar-paginas-pdf.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "encabezado-pie-pdf.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "encriptar-pdf-avanzado.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "epub-a-html.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "epub-a-markdown.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "epub-a-txt.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "epub-mobi.html": {
+      "canonical": true,
+      "loader": 1,
+      "noindex": false,
+      "type": "CATEGORY"
+    },
+    "escanear-documento-camara.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "estadisticas-csv.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "estadisticas-texto.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "excel-a-csv.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "excel-a-html.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "excel-a-json.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "excel-a-markdown.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "excel-a-pdf.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "excel-a-xml.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "extraer-audio-video.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "extraer-contenido-word.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "extraer-fuentes-recursos-pdf.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "extraer-imagenes-epub.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "extraer-imagenes-pdf.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "extraer-paleta-colores.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "extraer-portada-epub.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "extraer-tabla-imagen-excel.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "extraer-tablas-pdf-excel.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "extraer-texto-pdf-escaneado.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "extraer-texto-pdf.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "extraer-ubicacion-foto.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "extraer-zip.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "filtrar-csv.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "firmar-pdf.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "firmas.html": {
+      "canonical": true,
+      "loader": 1,
+      "noindex": false,
+      "type": "CATEGORY"
+    },
+    "fix-format.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": true,
+      "type": "REDIRECT"
+    },
+    "flujo-de-imagenes.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "formatear-json.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "formato-apa-7.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "foto-para-documentos.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "generar-codigo-barras.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "generar-favicon.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "generar-iconos-pwa.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "generar-qr-contacto.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "generar-qr-por-lote.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "generar-qr-wifi.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "generar-qr.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "girar-pdf.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "guia/convertir-documentos-sin-perder-formato/index.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "GUIDE"
+    },
+    "guia/firma-electronica-digital-imagen/index.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "GUIDE"
+    },
+    "guia/hojas-calculo-datos-ordenados/index.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "GUIDE"
+    },
+    "guia/index.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "OTHER"
+    },
+    "guia/jpg-png-webp-avif/index.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "GUIDE"
+    },
+    "guia/preparar-documentos-para-correo/index.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "GUIDE"
+    },
+    "guia/proteger-documentos-antes-de-compartir/index.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "GUIDE"
+    },
+    "guia/que-contiene-un-codigo-qr/index.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "GUIDE"
+    },
+    "guia/reducir-tamano-pdf/index.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "GUIDE"
+    },
+    "guia/trabajar-privado-sin-subir-archivos/index.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "GUIDE"
+    },
+    "guia/unir-pdfs-correctamente/index.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "GUIDE"
+    },
+    "heic-a-imagen.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "hojas-de-calculo.html": {
+      "canonical": true,
+      "loader": 1,
+      "noindex": false,
+      "type": "CATEGORY"
+    },
+    "html-a-imagen.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "html-a-markdown.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "html-a-pdf.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "html-a-texto.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "imagen-a-pdf-buscable.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "imagenes-a-pdf-optimizado.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "imagenes-a-pdf.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "imagenes.html": {
+      "canonical": true,
+      "loader": 1,
+      "noindex": false,
+      "type": "CATEGORY"
+    },
+    "images-to-pdf.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": true,
+      "type": "REDIRECT"
+    },
+    "index.html": {
+      "canonical": true,
+      "loader": 1,
+      "noindex": false,
+      "type": "OTHER"
+    },
+    "insertar-paginas-en-blanco-pdf.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "inspeccionar-archivo.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "inspeccionar-metadatos-archivo.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "intercalar-pdf.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "invertir-orden-pdf.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "jpg-a-pdf.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "jpg-a-png.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "jpg-a-webp.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "jpg-to-pdf.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": true,
+      "type": "REDIRECT"
+    },
+    "json-a-csv.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "json-a-excel-avanzado.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "json-a-excel.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "json-a-xml.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "json-to-xlsx.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": true,
+      "type": "REDIRECT"
+    },
+    "leer-codigo-barras-imagen.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "leer-qr-imagen.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "limpiar-datos-tabulares.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "limpiar-excel.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "limpiar-firma.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "mejorar-documento-escaneado.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "mejorar-documento-fotografiado.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "merge-excel.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": true,
+      "type": "REDIRECT"
+    },
+    "merge-pdf.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": true,
+      "type": "REDIRECT"
+    },
+    "minificar-css.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "normalizar-csv.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "numerar-paginas-pdf.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "ods-a-xlsx.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "odt-a-word.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "offline.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": true,
+      "type": "OTHER"
+    },
+    "ordenar-csv.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "ordenar-lineas-texto.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "ordia/index.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "ORDIA"
+    },
+    "organizar-pdf.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "pdf-a-imagenes.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "pdf-a-jpg.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "pdf-a-markdown.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "pdf-a-pdfa.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "pdf-a-png.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "pdf-a-powerpoint.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "pdf-escaneado-a-pdf-buscable.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "pdf-merge.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": true,
+      "type": "REDIRECT"
+    },
+    "pdf-split.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": true,
+      "type": "REDIRECT"
+    },
+    "pdf-to-images.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": true,
+      "type": "REDIRECT"
+    },
+    "pdf-to-jpg.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": true,
+      "type": "REDIRECT"
+    },
+    "pdf-to-png.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": true,
+      "type": "REDIRECT"
+    },
+    "pdf.html": {
+      "canonical": true,
+      "loader": 1,
+      "noindex": false,
+      "type": "CATEGORY"
+    },
+    "png-a-jpg.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "png-a-pdf.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "png-a-webp.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "png-to-pdf.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": true,
+      "type": "REDIRECT"
+    },
+    "powerpoint-a-pdf.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "privacidad.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "PRIVACY_LEGACY"
+    },
+    "privacy/index.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "PRIVACY"
+    },
+    "qr-codigos.html": {
+      "canonical": true,
+      "loader": 1,
+      "noindex": false,
+      "type": "CATEGORY"
+    },
+    "quitar-audio-video.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "quitar-fondo-imagen.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "recortar-audio.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "recortar-imagen-para-redes-sociales.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "recortar-pdf.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "recortar-video.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "redimensionar-imagen.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "rellenar-formulario-pdf.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "remove-metadata.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": true,
+      "type": "REDIRECT"
+    },
+    "remove-objects.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": true,
+      "type": "REDIRECT"
+    },
+    "reorder-pdf.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": true,
+      "type": "REDIRECT"
+    },
+    "reparar-epub.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "reparar-formato-de-imagen.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "reparar-word.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "reparar-zip.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "rescue-document.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": true,
+      "type": "REDIRECT"
+    },
+    "resize-image.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": true,
+      "type": "REDIRECT"
+    },
+    "rtf-a-word.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "selector-color.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "sign-pdf.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": true,
+      "type": "REDIRECT"
+    },
+    "social-crop.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": true,
+      "type": "REDIRECT"
+    },
+    "split-excel.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": true,
+      "type": "REDIRECT"
+    },
+    "split-pdf.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": true,
+      "type": "REDIRECT"
+    },
+    "svg-a-imagen.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "tablas-html-a-excel.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "tablas-word-a-excel.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "terms/index.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TERMS"
+    },
+    "texto-a-braille-unicode.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "texto.html": {
+      "canonical": true,
+      "loader": 1,
+      "noindex": false,
+      "type": "CATEGORY"
+    },
+    "toolisto.html": {
+      "canonical": true,
+      "loader": 1,
+      "noindex": false,
+      "type": "TOOLISTO_CATALOG"
+    },
+    "txt-a-epub.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "txt-a-pdf.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "uniformar-formato-documento.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "unir-archivos-divididos.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "unir-archivos-txt.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "unir-audios.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "unir-documentos-word.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "unir-epub.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "unir-excel.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "unir-pdf.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "unir-videos.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "validar-epub.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "validar-json.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "varias-paginas-por-hoja-pdf.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "verificar-censura-pdf.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "video-a-gif.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "video.html": {
+      "canonical": true,
+      "loader": 1,
+      "noindex": false,
+      "type": "CATEGORY"
+    },
+    "webp-a-jpg.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "webp-a-png.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "word-a-epub.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "word-a-html.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "word-a-jpg.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "word-a-markdown.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "word-a-odt.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "word-a-pdf.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "word-a-png.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "word-a-txt.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "workflow.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": true,
+      "type": "REDIRECT"
+    },
+    "workspace-about/index.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "WORKSPACE"
+    },
+    "workspace/index.html": {
+      "canonical": false,
+      "loader": 0,
+      "noindex": true,
+      "type": "WORKSPACE"
+    },
+    "xls-a-xlsx.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "xlsx-a-ods.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "xlsx-to-csv.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": true,
+      "type": "REDIRECT"
+    },
+    "xlsx-to-json.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": true,
+      "type": "REDIRECT"
+    },
+    "xml-a-excel.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    },
+    "xml-a-json.html": {
+      "canonical": true,
+      "loader": 0,
+      "noindex": false,
+      "type": "TOOL"
+    }
+  },
+  "totalHtml": 291
+}
