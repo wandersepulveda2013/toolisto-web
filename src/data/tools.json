@@ -5761,7 +5761,7 @@
             },
             {
                 "q": "¿Funciona con PDF protegidos?",
-                "a": "Si el PDF tiene contraseña de edición, necesitarás提供arla antes de girar las páginas."
+                "a": "Si el PDF tiene contraseña de edición, necesitarás proporcionarla antes de girar las páginas."
             },
             {
                 "q": "¿Mis archivos se suben a un servidor?",
@@ -9305,7 +9305,7 @@
         "faq": [
             {
                 "q": "¿Qué funciones tiene?",
-                "a": "Trigonométricas (sin, cos, tan), logarítmicas (log, ln), raíces, factoriales,常数 (π, e) y más."
+                "a": "Trigonométricas (sin, cos, tan), logarítmicas (log, ln), raíces, factoriales, constantes (π, e) y más."
             },
             {
                 "q": "¿Funciona sin conexión?",
@@ -9892,7 +9892,7 @@
         "faq": [
             {
                 "q": "¿Qué tipo de comparación hace?",
-                "a": "Comparación textual (detecta cambios en el texto) y visual (resalta diferencias像素 a píxel en imágenes de las páginas)."
+                "a": "Comparación textual (detecta cambios en el texto) y visual (resalta diferencias píxel a píxel en imágenes de las páginas)."
             },
             {
                 "q": "¿Detecta páginas movidas?",

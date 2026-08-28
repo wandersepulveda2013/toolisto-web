@@ -95,5 +95,8 @@ check(monetizationResult.status === 0, 'APLUNO monetization readiness gate (test
 const strictEditorialResult = spawnSync(process.execPath, [join(ROOT, 'tests', 'strict-editorial-regression.mjs')], { cwd: ROOT, stdio: 'inherit' });
 check(strictEditorialResult.status === 0, 'Strict editorial regression (tests/strict-editorial-regression.mjs) — 3 PASS, 0 FAIL');
 
+const contentSimilarityScopedResult = spawnSync(process.execPath, [join(ROOT, 'tests', 'content-similarity-scoped-regression.mjs')], { cwd: ROOT, stdio: 'inherit' });
+check(contentSimilarityScopedResult.status === 0, 'Content similarity/originality regression (tests/content-similarity-scoped-regression.mjs) — 5 PASS, 0 FAIL');
+
 console.log(`\n=== Resultado: ${passed} PASS, ${failed} FAIL ===`);
 process.exit(failed ? 1 : 0);

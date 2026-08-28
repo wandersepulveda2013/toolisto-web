@@ -91,13 +91,6 @@
       },
       {
         "mainWords": 64,
-        "mainWordsTotal": 123,
-        "page": "/calculadora-cientifica",
-        "sections": 4,
-        "tier": "TOOL_LT"
-      },
-      {
-        "mainWords": 64,
         "mainWordsTotal": 136,
         "page": "/comparar-csv",
         "sections": 4,
@@ -107,6 +100,13 @@
         "mainWords": 64,
         "mainWordsTotal": 137,
         "page": "/csv-a-html",
+        "sections": 4,
+        "tier": "TOOL_LT"
+      },
+      {
+        "mainWords": 65,
+        "mainWordsTotal": 124,
+        "page": "/calculadora-cientifica",
         "sections": 4,
         "tier": "TOOL_LT"
       },
