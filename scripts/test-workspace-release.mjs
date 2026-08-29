@@ -74,6 +74,14 @@ run('engine-idle-release (memoria Tesseract)', 'node', ['tests/workspace/engine-
 });
 run('workflow-export-md (Markdown/texto plano)', 'node', ['tests/workspace/workflow-export-md-test.mjs']);
 run('text-to-document (Markdown -> bloques, CE-064)', 'node', ['tests/workspace/text-to-document-test.mjs']);
+// Suites del motor de flujos / parser / planificador (CE-065): antes solo
+// pasaban quitando los imports por VM pero crasheaban en aislamiento por
+// dependencias sin resolver (WORKFLOW_DEFINITION_VERSION, createExecutionResources).
+// Ahora incluyen schema-versions.js y execution-resources.js y se registran en el
+// gate para que queden protegidas contra regresion en vez de ser deuda oculta.
+run('instruction-parser (intenciones de texto libre)', 'node', ['tests/workspace/instruction-parser-test.mjs']);
+run('workflow-engine (motor de flujos, recursos de ejecución)', 'node', ['tests/workspace/workflow-engine-test.mjs']);
+run('instruction-planner (planificador de flujos)', 'node', ['tests/workspace/instruction-planner-test.mjs']);
 run('workflow-ui (resultados al Workspace, CE-047/048/049)', 'node', ['tests/workspace/workflow-ui-test.mjs'], {
   env: { ...process.env, E2E_PORT: '8082' },
 });

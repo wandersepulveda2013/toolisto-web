@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..', '..');
 
+const schemaCode = readFileSync(join(ROOT, 'workspace', 'core', 'schema-versions.js'), 'utf8');
 const modelCode = readFileSync(join(ROOT, 'workspace', 'core', 'workflow-model.js'), 'utf8');
 const plannerCode = readFileSync(join(ROOT, 'workspace', 'core', 'instruction-planner.js'), 'utf8');
 
@@ -14,6 +15,7 @@ function stripImports(code) {
 }
 
 const combined = [
+  stripImports(schemaCode),
   stripImports(modelCode),
   stripImports(plannerCode),
 ].join('\n');

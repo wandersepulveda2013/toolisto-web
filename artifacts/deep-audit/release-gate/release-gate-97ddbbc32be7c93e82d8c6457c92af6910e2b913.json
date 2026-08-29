@@ -1,0 +1,180 @@
+{
+  "sha": "97ddbbc32be7c93e82d8c6457c92af6910e2b913",
+  "fecha": "2026-08-29T23:01:55.243Z",
+  "build": {
+    "ok": true,
+    "exit": 0
+  },
+  "sync": {
+    "ok": true,
+    "exit": 0
+  },
+  "suites": [
+    {
+      "label": "workspace-test",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "phase3a-test",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "phase3b-test",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "phase11-audit",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "ocr-source-selection",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "phase3c-star-flow E2E (OCR real)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "csv-export-bom E2E (UTF-8 BOM)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "engine-idle-release (memoria Tesseract)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "workflow-export-md (Markdown/texto plano)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "text-to-document (Markdown -> bloques, CE-064)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "instruction-parser (intenciones de texto libre)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "workflow-engine (motor de flujos, recursos de ejecución)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "instruction-planner (planificador de flujos)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "workflow-ui (resultados al Workspace, CE-047/048/049)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "capture-flow-chain E2E (captura -> flujo -> OCR, CE-050)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "dist-workspace-smoke (validación del artefacto desplegado)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "autosave-lock (serialization lock, CE-057)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "cross-entity-integrity (per-entity locks, _writeSeq, flush, CE-058)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "review-status-persistence (table review status lock-based, CE-058)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "persistence-sequence-cert (_writeSeq monotonic invariant, CE-058)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "persistence-adversarial-audit (concurrency, stale-write, mutation-after-enqueue, CE-058)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "persistence-lifecycle-audit (fire-and-forget, destroy-recreate, nav stress, perf, CE-058)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "storage-failure-injection (IDB write failure, quota, closed DB, CE-059)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "storage-recovery-lifecycle (delete/resurrection, destroy/recreate, CE-059)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "storage-multicontext-migration (multi-tab _writeSeq, schema, legacy records, CE-059)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "storage-rejection-perf (unhandled rejection, atomicity, perf, CE-059)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "multi-tab-concurrency (different/same entity, _writeSeq, stale overwrite, CE-060)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "stale-delete-lifecycle (delete vs stale, recreate, reload, background tab, CE-060)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "runtime-isolation-review (review/chart cross-tab, versionchange, singletons, CE-060)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "cross-store-integrity (cascade, orphan, import atomicity, CE-061)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "storage-surface-audit (LWW stores without _writeSeq, CE-061)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "id-collision-serialization (ID uniqueness, roundtrip, localStorage, CE-061)",
+      "ok": true,
+      "exit": 0
+    }
+  ],
+  "hashes": {
+    "workspace/workspace.js": "f499c597c636aef37bfcd383fdab06d925216c43af2ee210a6508dc923409c89",
+    "dist/workspace/workspace.js": "f499c597c636aef37bfcd383fdab06d925216c43af2ee210a6508dc923409c89"
+  },
+  "total": 32,
+  "fail": 0
+}

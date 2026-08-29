@@ -10,10 +10,11 @@ const ROOT = join(__dirname, '..', '..');
 const regCode = readFileSync(join(ROOT, 'workspace', 'core', 'operation-registry.js'), 'utf8');
 const jqCode = readFileSync(join(ROOT, 'workspace', 'core', 'job-queue.js'), 'utf8');
 const valCode = readFileSync(join(ROOT, 'workspace', 'core', 'workflow-validator.js'), 'utf8');
+const resCode = readFileSync(join(ROOT, 'workspace', 'core', 'execution-resources.js'), 'utf8');
 const engCode = readFileSync(join(ROOT, 'workspace', 'core', 'workflow-engine.js'), 'utf8');
 
 const combined = [
-  regCode, jqCode, valCode, engCode,
+  regCode, jqCode, valCode, resCode, engCode,
 ].map(c => c.replace(/^import\s.*;?\s*$/gm, '').replace(/^export\s+/gm, '')).join('\n');
 
 const sandbox = {
