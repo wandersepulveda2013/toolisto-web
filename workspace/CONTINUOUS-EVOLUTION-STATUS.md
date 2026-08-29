@@ -7,6 +7,29 @@
 
 ---
 
+## Cycle 128 — Fix test-debt in engine/parser/planner suites + register them in the gate (CE-065)
+
+| Field | Value |
+|-------|-------|
+| **Date** | 2026-08-29 |
+| **Branch** | main |
+| **HEAD inicial** | 97ddbbc |
+| **HEAD final** | 8e47034 |
+| **Task** | CE-065 (MEANINGFUL_TEST_COVERAGE): deuda preexistente de pruebas — `workflow-engine-test.mjs` y `instruction-planner-test.mjs` crasheaban al ejecutarse en aislamiento (ReferenceError por dependencias sin resolver en el harness de VM) y no estaban en el release gate, por lo que nadie las ejecutaba (deuda oculta). |
+| **Hypothesis** | Ambos harnesses quitaban los `import` con regex pero no incluian los modulos que resolvian las dependencias: `workflow-engine.js` importa `createExecutionResources` de `execution-resources.js`, y `workflow-model.js` importa `WORKFLOW_DEFINITION_VERSION` de `schema-versions.js`. Incluir esos modulos los haria pasables en aislamiento; registrarlos en el gate los protegeria contra regresion. |
+| **Change** | `workflow-engine-test.mjs` anade `execution-resources.js` al codigo combinado del sandbox (18/18 en aislamiento; antes `ReferenceError: createExecutionResources`). `instruction-planner-test.mjs` anade `schema-versions.js` (73/73; antes `ReferenceError: WORKFLOW_DEFINITION_VERSION`). Se registran `instruction-parser` (116/116), `workflow-engine` (18/18) y `instruction-planner` (73/73) en `test-workspace-release.mjs` tras `text-to-document`. |
+| **Bugs encontrados** | Referencias sin resolver en los harnesses de VM de dos suites (deuda documentada desde Cycle 117). |
+| **Bugs corregidos** | Ambos harnesses incluyen ahora sus modulos de dependencias; las 3 suites quedan registradas en el release gate. |
+| **Tests ejecutados** | `instruction-planner-test` 73/73 en aislamiento; `workflow-engine-test` 18/18 en aislamiento; `instruction-parser-test` 116/116; release gate completo 34 suites PASS (build 214 paginas, sync OK, OCR E2E real, star-flow, capture-flow-chain, persistence). |
+| **Tests PASS** | Release gate 34/34 PASS; manifest `release-gate-97ddbbc...json` (determinista). |
+| **Tests FAIL** | 0. |
+| **Commits** | 8e47034 (fix test-debt + registro en gate + evidencia). |
+| **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL` (harness niega `git push*`; `gh` sin autenticar). |
+| **Limitaciones** | Puramente test-only; 0 cambios de producto. Las suites quedan protegidas contra regresion en el gate. |
+| **Proxima prioridad** | Sin TODO en la cola -> DISCOVERY de producto o promover proxima oportunidad DISCOVERED (CE-011 gate red negativa, CE-063 decision del dueno/host). El despliegue del HEAD certificado depende del canal autorizado de GitHub. |
+
+---
+
 ## Cycle 127 — Markdown tables in text.to-document (CE-064) + release-gate sync fix
 
 | Field | Value |

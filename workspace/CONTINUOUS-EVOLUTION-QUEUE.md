@@ -82,6 +82,9 @@
 
 | CE-064 | P3 | DONE | Producto/Workspace | `text.to-document` y el editor de documentos pierden las tablas Markdown (limitacion de CE-046): la conversion `archivo -> ... -> OCR -> documento` no puede continuar el encadenado hacia `tabla` si el texto fuente usa tablas GFM | Cycle 127: `blocksFromText` puro (sin DOM) detecta tablas GFM (separador `:?-+:?`), fences con lang, citas `>`, headings, bullets y parrafos (escapa `\|` -> `|`); `text.to-document` lo usa. `renderBlock` anade rama `table` (tabla real thead/tbody) y `exportDocument` emite tabla GFM. Suite nueva `text-to-document-test` 15/15 registrada en el gate. De paso se corrigio `verify-workspace-sync.mjs` (bug heredado de la capa 3, commit 95aac07): ya refleja la exclusion intencional de docs privados de `dist`, con lo que el release gate volvio a pasar 32/32. Commit e0eb3d1. |
 
+| CE-065 | P3 | DONE | Fiabilidad de pruebas | Deuda preexistente (documentada desde Cycle 117): `workflow-engine-test.mjs` y `instruction-planner-test.mjs` crasheaban al ejecutarse en aislamiento por dependencias sin resolver en el harness de VM (`createExecutionResources` de `execution-resources.js` y `WORKFLOW_DEFINITION_VERSION` de `schema-versions.js`), y no estaban registradas en el release gate (deuda oculta que nadie ejecutaba) | Cycle 128: `workflow-engine-test` incluye `execution-resources.js` en el codigo combinado (18/18 en aislamiento) y `instruction-planner-test` incluye `schema-versions.js` (73/73); ambos + `instruction-parser` (116/116) se registran en `test-workspace-release.mjs` para que queden protegidos contra regresion. Release gate completo 34 suites PASS (build 214 paginas, sync OK, OCR E2E real). Resultado: MEANINGFUL_TEST_COVERAGE. Commit 8e47034. |
+
+
 
 ## Guia de seleccion
 
