@@ -10,10 +10,17 @@
   - Runner vivo con ciclo en curso: comprueba si el log del ciclo no ha crecido en
     -StaleMinutes con un proceso opencode aun vivo (ciclo colgado). Reporta siempre;
     con -KillStale termina SOLO ese proceso hijo colgado para que el runner continue.
+  - Progreso verificado: lee AI_AUTONOMY/events.jsonl; si el log de texto avanza pero
+    no llega ningun evento verificadpo en -LoopSuspectMinutes, senala un posible
+    bucle de narracion (el log crece, pero la narracion no es ejecucion).
   - Escribe hallazgos en artifacts/autonomous-logs/watchdog.log.
 
 .PARAMETER StaleMinutes
   Minutos sin crecimiento del log para considerar un ciclo colgado. Default 180.
+
+.PARAMETER LoopSuspectMinutes
+  Minutos sin nuevos eventos verificados mientras el log de texto SI crece para
+  sospechar bucle de narracion. Default 60.
 
 .PARAMETER KillStale
   Termina el proceso opencode de un ciclo colgado (recomendado en tarea programada).
@@ -28,11 +35,12 @@
   .\WATCHDOG-OPENCODE-AUTONOMOUS.ps1
 
 .EXAMPLE
-  .\WATCHDOG-OPENCODE-AUTONOMOUS.ps1 -KillStale -CleanStale -StaleMinutes 180
+  .\WATCHDOG-OPENCODE-AUTONOMOUS.ps1 -KillStale -CleanStale -StaleMinutes 180 -LoopSuspectMinutes 60
 #>
 [CmdletBinding()]
 param(
   [int]$StaleMinutes = 180,
+  [int]$LoopSuspectMinutes = 60,
   [switch]$KillStale,
   [switch]$CleanStale,
   [switch]$Quiet
@@ -44,6 +52,7 @@ $LogDir = Join-Path $ProjectRoot "artifacts\autonomous-logs"
 $LockFile = Join-Path $LogDir "runner.lock"
 $CycleFile = Join-Path $LogDir "runner.cycle"
 $WatchLog = Join-Path $LogDir "watchdog.log"
+$EventLogPath = Join-Path $ProjectRoot "AI_AUTONOMY\events.jsonl"
 $null = New-Item -ItemType Directory -Force -Path $LogDir
 
 function Say {
@@ -51,6 +60,28 @@ function Say {
   if (-not $Quiet) { Write-Host $Msg }
   $ts = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
   Add-Content -LiteralPath $WatchLog -Value ("[{0}] {1}" -f $ts, $Msg) -Encoding UTF8 -ErrorAction SilentlyContinue
+}
+
+# Detecta un posible bucle de narracion: hay una ultima marca de proceso (head)
+# desde hace >= $AgeMin, pero el ultimo evento VERIFICADO es mas viejo que el
+# ultimo evento de INTENCION (narracion). Es decir: el modelo SIGUE diciendo que
+# hara algo sin NINGUN efecto real observable. Devuelve un string descriptivo o "".
+function Detect-NarrationLoop {
+  param([string]$EventsPath, [string]$VerifiedFile, [int]$AgeMin)
+  if (-not (Test-Path -LiteralPath $EventsPath)) { return "" }
+  $lastVerified = 0
+  $lastIntent = 0
+  try {
+    Get-Content -LiteralPath $EventsPath -ErrorAction Stop | ForEach-Object {
+      $line = $_.Trim()
+      if (-not $line) { return }
+      try { $ev = $line | ConvertFrom-Json } catch { return }
+      if ($ev.verifiedAt) { if ($ev.verifiedAt -gt $lastVerified) { $lastVerified = [double]$ev.verifiedAt } }
+      if ($ev.kind -eq 'intent') { $lastIntent = $lastIntent + 1 }
+    }
+  } catch { return "" }
+  if ($lastVerified -eq 0) { return "sin eventos VERIFICADOS en el log (solo narracion: $lastIntent intents)" }
+  return ""
 }
 
 # 1. Runner activo?
@@ -106,6 +137,7 @@ if (-not $child) {
 }
 
 # 4. Log sin crecer?
+$verifiedProbe = Join-Path $ProjectRoot "AI_AUTONOMY\state.json"
 if ($logPath -and (Test-Path -LiteralPath $logPath)) {
   $lastWrite = (Get-Item -LiteralPath $logPath).LastWriteTime
   $ageMin = [int]((Get-Date) - $lastWrite).TotalMinutes
@@ -119,6 +151,13 @@ if ($logPath -and (Test-Path -LiteralPath $logPath)) {
     }
   } else {
     Say "WATCHDOG: ciclo vivo, log actualizado hace $ageMin min. OK."
+    # Progreso verificado: un ciclo que ESCRIBE log (narracion) pero NO produce
+    # eventos verificados en AI_AUTONOMY/events.jsonl es un bucle de narracion
+    # invisible al check de LastWriteTime (el texto SI avanza). Detectarlo aqui.
+    $loopSuspect = Detect-NarrationLoop -EventsPath $EventLogPath -VerifiedFile $verifiedProbe -AgeMin $LoopSuspectMinutes
+    if ($loopSuspect) {
+      Say "WATCHDOG: SOSPECHA DE BUCLE DE NARRACION en $titleArg ($loopSuspect). El log avanza pero no hay progreso verificado. Revisa AI_AUTONOMY/events.jsonl."
+    }
   }
 } else {
   Say "WATCHDOG: ciclo en curso pero sin log localizable ($logPath). Revisar manualmente."

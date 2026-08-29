@@ -29,6 +29,8 @@ const tests = [
   { name: 'Deployment Guide Audit', cmd: 'node tests/deployment-guide-audit.mjs' },
   { name: 'Toolisto Domain Gate', cmd: 'node tests/toolisto-domain-gate.mjs' },
   { name: 'Evidence Determinism', cmd: 'node tests/evidence-determinism.mjs' },
+  { name: 'AI Autonomy Orchestrator', cmd: 'node tests/ai-autonomy-orchestrator-test.mjs' },
+  { name: 'AI Autonomy Resilience', cmd: 'node tests/ai-autonomy-resilience-simulation.mjs' },
   { name: 'Image Interactive', cmd: 'node tests/gate-e2e-image-tools.mjs' },
   { name: 'Enhance Scanned Document', cmd: 'node tests/gate-e2e-enhance-scanned-document.mjs' },
   { name: 'Word Family', cmd: 'node tests/gate-e2e-word-tools.mjs' },
