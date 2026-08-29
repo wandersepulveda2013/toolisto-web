@@ -731,6 +731,60 @@ function blocksToMarkdown(blocks) {
   return lines.join('\n').trim() + '\n';
 }
 
+// Renderiza los bloques de un documento a fragmentos HTML para la exportacion
+// .html del editor. Es pura (sin DOM) para poder testearla en VM: recibe el
+// escaping por inyeccion. Preserva los datos de todos los tipos de bloque,
+// incluidos `table` y `chart` (que antes se perdian en la exportacion HTML).
+export function documentBlocksToHtml(blocks, opts = {}) {
+  const esc = typeof opts.esc === 'function' ? opts.esc : String;
+  const safeUrl = typeof opts.safeImageUrl === 'function' ? opts.safeImageUrl : null;
+  const sanitizeHtml = typeof opts.sanitizeHtml === 'function' ? opts.sanitizeHtml : null;
+  const list = Array.isArray(blocks) ? blocks : [];
+  const out = [];
+  for (const block of list) {
+    if (!block) continue;
+    const content = String(block.content || '').trim();
+    switch (block.type) {
+      case 'divider': out.push('<hr>'); break;
+      case 'image-block': {
+        const dataUrl = String(block.content || block.dataUrl || '').trim();
+        const src = /^data:image\//i.test(dataUrl) ? dataUrl : (safeUrl ? safeUrl(block.content) : (dataUrl || ''));
+        if (src) out.push(`<img src="${esc(src)}" alt="Imagen del documento">`);
+        else out.push('');
+        break;
+      }
+      case 'table': {
+        const headersT = Array.isArray(block.headers) ? block.headers : [];
+        const rowsT = Array.isArray(block.rows) ? block.rows : [];
+        if (!headersT.length && !rowsT.length) { out.push(''); break; }
+        const thead = headersT.length ? '<thead><tr>' + headersT.map(cell => `<th>${esc(String(cell ?? ''))}</th>`).join('') + '</tr></thead>' : '';
+        const tbody = '<tbody>' + rowsT.map(row => '<tr>' + (Array.isArray(row) ? row.map(cell => `<td>${esc(String(cell ?? ''))}</td>`).join('') : `<td>${esc(String(row))}</td>`) + '</tr>').join('') + '</tbody>';
+        out.push(`<table>${thead}${tbody}</table>`);
+        break;
+      }
+      case 'chart': {
+        const title = content ? `<h2>${esc(content)}</h2>` : '';
+        const rowsC = Array.isArray(block.series) ? block.series : [];
+        if (rowsC.length) {
+          out.push(title + '<table><thead><tr><th>Etiqueta</th><th>Valor</th></tr></thead><tbody>' +
+            rowsC.map(item => `<tr><td>${esc(String(item?.label ?? ''))}</td><td>${esc(String(item?.value ?? ''))}</td></tr>`).join('') +
+            '</tbody></table>');
+        } else {
+          out.push(title);
+        }
+        break;
+      }
+      default: {
+        const tag = block.type.startsWith('heading') ? block.type.replace('heading', 'h') : block.type === 'quote' ? 'blockquote' : block.type === 'code' ? 'pre' : 'p';
+        const inner = (block.html && sanitizeHtml) ? sanitizeHtml(block.html) : esc(content);
+        out.push(`<${tag}>${inner}</${tag}>`);
+        break;
+      }
+    }
+  }
+  return out.join('\n');
+}
+
 // Versión en texto plano: preserva la estructura de forma legible para .txt.
 function blocksToPlainText(blocks) {
   const list = Array.isArray(blocks) ? blocks : [];

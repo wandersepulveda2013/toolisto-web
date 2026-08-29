@@ -25,7 +25,7 @@ import { createHistoryManager } from './core/history-manager.js';
 import { saveWorkspaceSession, hasRecoverableSession, loadWorkspaceSession, deleteWorkspaceSession, getWorkspaceSessionInfo } from './core/workspace-storage.js';
 import { setToastHandler, showUserError, showWarning, showSuccess, setupGlobalErrorHandling, withErrorHandling, reportError, classifyError } from './core/error-manager.js';
 import { createOperationRegistry } from './core/operation-registry.js';
-import { registerWorkflowOperations } from './core/workflow-operations.js';
+import { registerWorkflowOperations, documentBlocksToHtml } from './core/workflow-operations.js';
 import { createWorkflowUI } from './core/workflow-ui.js';
 import { createWorkflowPersistence, WORKFLOW_SCHEMA_VERSION } from './core/workflow-persistence.js';
 import { WORKFLOW_TEMPLATES, getTemplateById } from './core/workflow-templates.js';
@@ -3339,12 +3339,11 @@ function openDocumentFind() {
 function exportDocumentHtml() {
   const doc = appStore.get('currentDoc');
   if (!doc) return;
-  const blocks = (doc.blocks || []).map(block => {
-    if (block.type === 'divider') return '<hr>';
-    if (block.type === 'image-block') return block.content ? `<img src="${esc(safeDocUrl(block.content))}" alt="Imagen del documento">` : '';
-    const tag = block.type.startsWith('heading') ? block.type.replace('heading', 'h') : block.type === 'quote' ? 'blockquote' : block.type === 'code' ? 'pre' : 'p';
-    return `<${tag}>${sanitizeDocHtml(block.html || esc(block.content || ''))}</${tag}>`;
-  }).join('\n');
+  const blocks = documentBlocksToHtml(doc.blocks, {
+    esc,
+    safeImageUrl: (src) => safeDocUrl(src),
+    sanitizeHtml: (html) => sanitizeDocHtml(html),
+  });
   const html = `<!doctype html><html lang="es"><head><meta charset="utf-8"><title>${esc(doc.title || 'Documento')}</title><style>body{font:16px/1.7 Arial,sans-serif;max-width:820px;margin:48px auto;padding:0 24px;color:#202020}table{width:100%;border-collapse:collapse}td,th{border:1px solid #ccc;padding:8px;text-align:left}blockquote{border-left:4px solid #111;padding-left:16px;color:#555}pre{background:#f4f1ea;padding:16px;overflow:auto}[data-page-break]{break-before:page;page-break-before:always;height:1px;margin:24px 0;border-top:1px dashed #aaa}</style></head><body><h1>${esc(doc.title || 'Documento')}</h1>${blocks}</body></html>`;
   const url = URL.createObjectURL(new Blob([html], { type: 'text/html;charset=utf-8' }));
   const anchor = h('a', { href: url, download: (doc.title || 'documento') + '.html' });
@@ -3835,6 +3834,7 @@ function renderBlock(block, index, doc, renderBlocks, updateMetrics = () => {}) 
                   if (['heading1', 'heading2'].includes(item.type)) block.content = '';
                   hideSlashMenu();
                   renderBlocks();
+                  autoSaveDoc(doc);
                 });
                 list.appendChild(btn);
               });
@@ -3864,6 +3864,7 @@ function renderBlock(block, index, doc, renderBlocks, updateMetrics = () => {}) 
           const newBlock = { id: generateId(), type: block.type, content: '' };
           doc.blocks.splice(index + 1, 0, newBlock);
           renderBlocks();
+          autoSaveDoc(doc);
           const newEls = $$('.ws-doc-block [contenteditable]', wrapper.parentNode);
           if (newEls[index + 1]) newEls[index + 1].focus();
         }
@@ -3871,6 +3872,7 @@ function renderBlock(block, index, doc, renderBlocks, updateMetrics = () => {}) 
           e.preventDefault();
           doc.blocks.splice(index, 1);
           renderBlocks();
+          autoSaveDoc(doc);
         }
       }
     });

@@ -109,6 +109,7 @@ run('runtime-isolation-review (review/chart cross-tab, versionchange, singletons
 run('cross-store-integrity (cascade, orphan, import atomicity, CE-061)', 'node', ['tests/workspace/cross-store-integrity.mjs']);
 run('storage-surface-audit (LWW stores without _writeSeq, CE-061)', 'node', ['tests/workspace/storage-surface-audit.mjs']);
 run('id-collision-serialization (ID uniqueness, roundtrip, localStorage, CE-061)', 'node', ['tests/workspace/id-collision-serialization.mjs']);
+run('document-editor-data-loss (HTML export table/chart + autosave estructural, CE-066)', 'node', ['tests/workspace/document-editor-data-loss-test.mjs']);
 
 // 4. Manifest de evidencia
 const evidence = {
