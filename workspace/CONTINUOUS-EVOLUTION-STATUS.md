@@ -14,7 +14,7 @@
 | **Date** | 2026-08-29 |
 | **Branch** | main |
 | **HEAD inicial** | 9830ddf |
-| **HEAD final** | (commit CE-067 de este ciclo) |
+| **HEAD final** | 7d0f2cd (commit CE-067 de este ciclo) |
 | **Task** | CE-067 (ARCHITECTURE_IMPROVEMENT, P0, sistema autonomo): el bucle "Let me read the QUEUE" es estructuralmente invisible — el launcher solo ve exit code y el watchdog solo LastWriteTime, y como la narracion tambien escribe el log, el log AVANZA aunque el modelo no ejecute nada. Convertir la supervision en un runtime con estado persistente y progreso verificado. |
 | **Hypothesis** | Anadir una senal maquina-comprobable (eventos `verified` que SOLO se escriben cuando una herramienta real corre) + un checkpoint persistente por ciclo, y consumirla desde el watchdog, detecta y recupera el bucle de narracion y la perdida por crash, sin depender de mejorar el prompt. |
 | **Change** | Nuevo `AI_AUTONOMY/`: `guard.mjs` (deteccion de bucle: REPETITION/CONSECUTIVE_INTENTS/RATIO_ZERO_VERIFIED + scoring P0>P1>P2>P3), `state.mjs` (checkpoint `state.json` + `events.jsonl`, maquina de estados PENDING->RUNNING->IMPLEMENTED->TRACKERS->FINISHED/FAILED, escritura atomica), `runner.mjs` (planCycle -> FRESH/RESUME/COMPLETE_TRACKERS/RECOVERY/FRESH-bump, orchestrator, supervisor verify/finish/fail/safeCommit), `lock.mjs` (instancia unica por PID con stale), `commit-guard.mjs` (propiedad de ficheros + bloqueo de `git add .`), `queue.mjs` (espejo JSON + scoring + reconciliacion). `WATCHDOG-OPENCODE-AUTONOMOUS.ps1` ampliado: lee `AI_AUTONOMY/events.jsonl` y senala `SOSPECHA DE BUCLE DE NARRACION` (nuevo `-LoopSuspectMinutes`, default 60) — log que crece sin eventos verificados. |
