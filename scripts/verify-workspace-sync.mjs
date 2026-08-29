@@ -43,6 +43,17 @@ function walk(dir, base, out = []) {
   return out;
 }
 
+// Los archivos privados internos (.md, AUTONOMOUS_MODE, PRODUCTION_READINESS_DONE)
+// se excluyen DELIBERADAMENTE del artefacto publicado en dist/workspace/ (capa 3,
+// commit 95aac07: nunca deben llegar al deployment público). El verificador debe
+// reflejar esa exclusión intencional: no se exigen en dist ni cuentan como falta.
+const PRIVATE_NAMES = new Set(['AUTONOMOUS_MODE', 'PRODUCTION_READINESS_DONE']);
+function isPrivateRel(rel) {
+  const name = rel.split('/').pop();
+  if (name.endsWith('.md')) return true;
+  return PRIVATE_NAMES.has(name);
+}
+
 let fail = 0;
 
 console.log('=== Verificación source -> dist (workspace) ===\n');
@@ -76,14 +87,16 @@ if (existsSync(distIndex)) {
 
 const srcFiles = walk(SRC, '');
 const distFiles = walk(DIST, '');
-const missingInDist = srcFiles.filter(rel => !distFiles.includes(rel));
+const expectedInDist = srcFiles.filter(rel => !isPrivateRel(rel));
+const missingInDist = expectedInDist.filter(rel => !distFiles.includes(rel));
 
 if (missingInDist.length) {
   console.log(`\n  FAIL: ${missingInDist.length} archivo(s) del source faltan en dist:`);
   for (const f of missingInDist) console.log(`    - ${f}`);
   fail += missingInDist.length;
 } else {
-  console.log(`  PASS: todos los ${srcFiles.length} archivos del source están en dist`);
+  const privateCount = srcFiles.length - expectedInDist.length;
+  console.log(`\n  PASS: todos los ${expectedInDist.length} archivos públicos del source están en dist${privateCount ? ` (${privateCount} archivos privados excluidos intencionalmente)` : ''}`);
 }
 
 console.log(`\n=== Resultado: ${fail === 0 ? 'SYNC OK' : fail + ' DESINCRONIZADO(S)'} ===`);

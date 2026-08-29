@@ -73,6 +73,7 @@ run('engine-idle-release (memoria Tesseract)', 'node', ['tests/workspace/engine-
   env: { ...process.env, E2E_PORT: '8082' },
 });
 run('workflow-export-md (Markdown/texto plano)', 'node', ['tests/workspace/workflow-export-md-test.mjs']);
+run('text-to-document (Markdown -> bloques, CE-064)', 'node', ['tests/workspace/text-to-document-test.mjs']);
 run('workflow-ui (resultados al Workspace, CE-047/048/049)', 'node', ['tests/workspace/workflow-ui-test.mjs'], {
   env: { ...process.env, E2E_PORT: '8082' },
 });

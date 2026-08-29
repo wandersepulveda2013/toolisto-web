@@ -416,14 +416,7 @@ export function registerWorkflowOperations(registry) {
         const input = ctx.input.data || ctx.input;
         const text = typeof input === 'string' ? input : (input.text || '');
         const title = ctx.options.title || 'Documento';
-        const blocks = text.split('\n').map((line, i) => {
-          const v = line.trim();
-          if (/^###\s+/.test(v)) return { type: 'heading3', content: v.replace(/^###\s+/, ''), id: 'b-' + i };
-          if (/^##\s+/.test(v)) return { type: 'heading2', content: v.replace(/^##\s+/, ''), id: 'b-' + i };
-          if (/^#\s+/.test(v)) return { type: 'heading1', content: v.replace(/^#\s+/, ''), id: 'b-' + i };
-          if (/^[-*]\s+/.test(v)) return { type: 'bullet-list', content: v.replace(/^[-*]\s+/, ''), id: 'b-' + i };
-          return { type: 'paragraph', content: line, id: 'b-' + i };
-        });
+        const blocks = blocksFromText(text, 'b');
         return { blocks, name: title, title, type: 'document' };
       },
     },
@@ -530,6 +523,63 @@ export function registerWorkflowOperations(registry) {
       },
     },
   ];
+
+  // Convierte texto Markdown-plano a bloques de documento Toolisto.
+  // Detecta tablas GFM, bloques de codigo entre comillas invertidas, citas (>),
+  // encabezados, listas y parrafos. Puro (sin DOM) para poder testearse en VM.
+  function blocksFromText(text, idPrefix = 'b') {
+    const lines = (Array.isArray(text) ? text : String(text || '')).split(/\r?\n/);
+    const blocks = [];
+    const nextId = () => idPrefix + '-' + blocks.length;
+    const SEP = /^\s*\|?\s*:?-+:?\s*(\|\s*:?-+:?\s*)+\|?\s*$/;
+    let i = 0;
+    while (i < lines.length) {
+      const line = lines[i];
+      const trimmed = line.trim();
+      if (trimmed === '') { i++; continue; }
+      if (/^```/.test(trimmed)) {
+        const lang = trimmed.replace(/^```/, '').trim() || undefined;
+        const codeLines = [];
+        i++;
+        while (i < lines.length && !/^```/.test(lines[i].trim())) { codeLines.push(lines[i]); i++; }
+        i++;
+        blocks.push({ type: 'code', content: codeLines.join('\n'), lang, id: nextId() });
+        continue;
+      }
+      if (/^\|/.test(trimmed) && i + 1 < lines.length && SEP.test(lines[i + 1].trim())) {
+        const cells = (row) => {
+          const s = row.trim().replace(/^\|/, '').replace(/\|$/, '');
+          const out = [];
+          let cur = '';
+          for (let k = 0; k < s.length; k++) {
+            if (s[k] === '\\' && s[k + 1] === '|') { cur += '|'; k++; }
+            else if (s[k] === '|') { out.push(cur.trim()); cur = ''; }
+            else cur += s[k];
+          }
+          out.push(cur.trim());
+          return out;
+        };
+        const headers = cells(lines[i]);
+        let r = i + 2;
+        const rows = [];
+        while (r < lines.length && /^\|/.test(lines[r].trim())) { rows.push(cells(lines[r])); r++; }
+        blocks.push({ type: 'table', content: '', headers, rows, id: nextId() });
+        i = r;
+        continue;
+      }
+      let block;
+      if (/^###\s+/.test(trimmed)) block = { type: 'heading3', content: trimmed.replace(/^###\s+/, '') };
+      else if (/^##\s+/.test(trimmed)) block = { type: 'heading2', content: trimmed.replace(/^##\s+/, '') };
+      else if (/^#\s+/.test(trimmed)) block = { type: 'heading1', content: trimmed.replace(/^#\s+/, '') };
+      else if (/^>\s?/.test(trimmed)) block = { type: 'quote', content: trimmed.replace(/^>\s?/, '') };
+      else if (/^[-*]\s+/.test(trimmed)) block = { type: 'bullet-list', content: trimmed.replace(/^[-*]\s+/, '') };
+      else block = { type: 'paragraph', content: line };
+      block.id = nextId();
+      blocks.push(block);
+      i++;
+    }
+    return blocks;
+  }
 
   let registered = 0;
   for (const op of ops) {

@@ -3711,6 +3711,26 @@ function renderBlock(block, index, doc, renderBlocks, updateMetrics = () => {}) 
       } }, svgIcon('imageBlock'), ' Seleccionar imagen');
       contentEl.appendChild(imgBtn);
     }
+  } else if (block.type === 'table') {
+    contentEl = h('div', { style: 'flex:1;overflow-x:auto' });
+    const headersA = Array.isArray(block.headers) ? block.headers : [];
+    const rowsA = Array.isArray(block.rows) ? block.rows : [];
+    const table = h('table', { style: 'width:100%;border-collapse:collapse;font-size:13px;line-height:1.4' });
+    if (headersA.length) {
+      const thead = h('thead', null);
+      const tr = h('tr', null);
+      headersA.forEach(hdr => tr.appendChild(h('th', { style: 'padding:6px 10px;background:var(--ws-bg-subtle,#f2f2f5);border:1px solid var(--ws-border,#e2e2e8);text-align:left;font-weight:600' }, String(hdr))));
+      thead.appendChild(tr);
+      table.appendChild(thead);
+    }
+    const tbody = h('tbody', null);
+    rowsA.forEach(row => {
+      const tr = h('tr', null);
+      (Array.isArray(row) ? row : []).forEach(cell => tr.appendChild(h('td', { style: 'padding:6px 10px;border:1px solid var(--ws-border,#e2e2e8)' }, String(cell != null ? cell : ''))));
+      tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+    contentEl.appendChild(table);
   } else {
     const placeholder = {
       paragraph: 'Escribe algo...',
@@ -3938,6 +3958,19 @@ async function exportDocument() {
     if (block.type === 'quote') { md += '> ' + (block.content || '') + '\n\n'; return; }
     if (block.type === 'code') { md += bt + bt + bt + '\n' + (block.content || '') + '\n' + bt + bt + bt + '\n\n'; return; }
     if (block.type === 'callout') { md += '> **Nota:** ' + (block.content || '') + '\n\n'; return; }
+    if (block.type === 'table') {
+      const headersT = Array.isArray(block.headers) ? block.headers : [];
+      const rowsT = Array.isArray(block.rows) ? block.rows : [];
+      if (headersT.length) {
+        md += '| ' + headersT.map(String).join(' | ') + ' |\n';
+        md += '| ' + headersT.map(() => '---').join(' | ') + ' |\n';
+      }
+      rowsT.forEach(row => {
+        md += '| ' + (Array.isArray(row) ? row.map(v => String(v ?? '').replace(/\|/g, '\\|')).join(' | ') : String(row)) + ' |\n';
+      });
+      md += '\n';
+      return;
+    }
     md += (block.content || '') + '\n\n';
   });
   const blob = new Blob([md], { type: 'text/markdown' });
