@@ -80,6 +80,9 @@
 
 | CE-063 | P3 | DISCOVERED | Privacidad/Externo | Inyeccion edge de Cloudflare WebMCP (`/.webmcp/bridge.js`) en `apluno.com`: confirmada como puente MCP de Cloudflare, inerte (sin `/mcp`), NO intercepta el trafico de la app ni accede a IndexedDB, NO vulnera cero-egress. Accion = decision del dueno/host (divulgacion o quitar la ruta), no cambio de repo | Cycle 126: investigacion read-only + analisis estatico; evidencia en `artifacts/cloudflare-webmcp/investigation.md` + `evidence.json`; 0 refs en repo; clasificacion `CONFIRMED_CLOUDFLARE_EDGE_INJECTION_BENIGN_TO_ZERO_EGRESS` |
 
+| CE-064 | P3 | DONE | Producto/Workspace | `text.to-document` y el editor de documentos pierden las tablas Markdown (limitacion de CE-046): la conversion `archivo -> ... -> OCR -> documento` no puede continuar el encadenado hacia `tabla` si el texto fuente usa tablas GFM | Cycle 127: `blocksFromText` puro (sin DOM) detecta tablas GFM (separador `:?-+:?`), fences con lang, citas `>`, headings, bullets y parrafos (escapa `\|` -> `|`); `text.to-document` lo usa. `renderBlock` anade rama `table` (tabla real thead/tbody) y `exportDocument` emite tabla GFM. Suite nueva `text-to-document-test` 15/15 registrada en el gate. De paso se corrigio `verify-workspace-sync.mjs` (bug heredado de la capa 3, commit 95aac07): ya refleja la exclusion intencional de docs privados de `dist`, con lo que el release gate volvio a pasar 32/32. Commit e0eb3d1. |
+
+
 ## Guia de seleccion
 
 1. Tomar el primer `TODO` ordenado por prioridad (P0 primero, luego P1, P2, P3).

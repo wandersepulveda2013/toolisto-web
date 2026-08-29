@@ -3,7 +3,30 @@
 > Cada ciclo de OpenCode LEE este archivo antes de actuar y lo ACTUALIZA antes de terminar.
 > Registro historico de ciclos de la mision Evolucion Continua.
 > Modo activo SOLO despues de la transicion (cuando `workspace/PRODUCTION_READINESS_DONE` exista).
-> Updated: 2026-08-25
+> Updated: 2026-08-29
+
+---
+
+## Cycle 127 — Markdown tables in text.to-document (CE-064) + release-gate sync fix
+
+| Field | Value |
+|-------|-------|
+| **Date** | 2026-08-29 |
+| **Branch** | main |
+| **HEAD inicial** | 03aef33 |
+| **HEAD final** | e0eb3d1 |
+| **Task** | CE-064 (FEATURE): `text.to-document` y el editor de documentos pierden las tablas Markdown (limitacion documentada de CE-046). |
+| **Hypothesis** | `text.to-document` solo dividia por saltos de linea en headings/lists/parrafos y descartaba tablas GFM. Se podia ensenar a detectar tablas/bloques de codigo/citas y volverlos editables y exportables, cerrando el hueco del flujo estrella `archivo -> ... -> documento -> tabla`. |
+| **Change** | `blocksFromText(text, idPrefix)` puro (sin DOM, testeable en VM) en `workflow-operations.js`, usado por `text.to-document`: detecta tablas GFM (separador `:?-+:?`), fences ` ``` ` con lang, citas `>`, headings, bullets y parrafos; maneja tuberias escapadas `\|` -> `|`. `renderBlock` de `workspace.js` anade rama `table` (tabla real con thead/tbody, bordes por CSS vars) que le faltaba -> cae en el placeholder de parrafo generando bloques vacios. `exportDocument` anade caso `table` que emite GFM (fila header + separador `---` + filas con `\|` escapado). Nueva suite `tests/workspace/text-to-document-test.mjs` 15/15, registrada en el release gate. |
+| **Bugs encontrados** | `verify-workspace-sync.mjs` seguia exigiendo que `dist/workspace/` fuera espejo completo, pero la capa 3 (commit 95aac07) excluye DELIBERADAMENTE los docs internos (`.md`, `AUTONOMOUS_MODE`, `PRODUCTION_READINESS_DONE`) del artefacto publicado. Desde esa capa el gate quedaba colgado como DESINCRONIZADO (21 archivos) y no se habia vuelto a correr, dejando el resultado 30/30 obsoleto. |
+| **Bugs corregidos** | `verify-workspace-sync.mjs` refleja la exclusion intencional de archivos privados (helper `isPrivateRel` igual al `isWorkspacePrivate` del build); ahora SYNC OK (42 publicos presentes, 21 privados excluidos). Esto restaura la integridad del release gate. |
+| **Tests ejecutados** | `text-to-document` 15/15; `workflow-export-md` 30/30; `instruction-parser` 116/116 (los fallos aislados de `workflow-engine`/`instruction-planner` por VM globals son PREEXISTENTES y no forman parte del gate); `workspace-test` 157/157; build 214 paginas; `verify-workspace-sync` SYNC OK; release gate completo 32/32 PASS (incluye OCR E2E real, star-flow, capture-flow-chain, persistence). |
+| **Tests PASS** | Release gate 32/32 PASS; manifest `release-gate-03aef33...json` (determinista). |
+| **Tests FAIL** | 0 (en el gate). |
+| **Commits** | e0eb3d1 (CE-064 + sync fix + evidencia). |
+| **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL` (harness niega `git push*`; `gh` sin autenticar). |
+| **Limitaciones** | `blocksFromText` detecta tablas compactas (fila header + separador contiguos) y filas consecutivas que empiecen por `|`; no parsea tablas separadas por lineas en blanco. Los fallos aislados de `workflow-engine-test`/`instruction-planner-test` (VM globals) siguen pendientes como deuda de pruebas independiente del gate. |
+| **Proxima prioridad** | Sin TODO en la cola -> DISCOVERY de producto o promover proxima oportunidad DISCOVERED. El despliegue del HEAD certificado depende del canal autorizado de GitHub. |
 
 ---
 
