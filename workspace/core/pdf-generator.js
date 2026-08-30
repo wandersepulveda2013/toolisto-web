@@ -78,7 +78,14 @@ function generatePDF(config) {
     if (section.type === 'date') return 20;
     if (section.type === 'divider') return 20;
     if (section.type === 'footer') return 24;
-    if (section.type === 'image') return section.height || 150;
+    if (section.type === 'image') {
+      const sectionW = Number(section.width);
+      const sectionH = Number(section.height);
+      // Coherente con renderImagePDF: si el ancho (px) se recorta a contentW,
+      // el alto estimado se re-escala proporcional (evita paginas casi vacias).
+      if (sectionW && sectionH && sectionW > contentW) return sectionH * (contentW / sectionW);
+      return sectionH || 150;
+    }
     if (section.type === 'table') {
       const d = section.data || {};
       const rc = (d.headers ? 1 : 0) + (d.rows || []).length;
@@ -310,8 +317,16 @@ function renderChartPDF(parts, section, x0, y0, contentW) {
 function renderImagePDF(parts, section, x0, y0, contentW, context = {}) {
   const dataUrl = section.dataUrl || section.content;
   const image = context.registerImage?.(dataUrl);
-  const displayW = Math.min(contentW, Number(section.width) || (image ? contentW : 300));
-  const displayH = Number(section.height) || (image ? Math.max(80, displayW * image.height / image.width) : 120);
+  const sectionW = Number(section.width);
+  const sectionH = Number(section.height);
+  const displayW = Math.min(contentW, sectionW || (image ? contentW : 300));
+  let displayH = sectionH || (image ? Math.max(80, displayW * image.height / image.width) : 120);
+  // document.to-pdf escribe width/height en px (canvas de la imagen). Si el
+  // ancho pedido se recorta a contentW, el alto debe re-escalarse proporcional:
+  // conservar el alto crudo deformaba la imagen y desbordaba la pagina.
+  if (image && sectionW && sectionH && displayW < sectionW) {
+    displayH = displayW * (image.height / image.width);
+  }
   const boxY = y0 - displayH;
   if (image) {
     parts.push(`q ${displayW} 0 0 ${displayH} ${x0} ${boxY} cm /${image.name} Do Q`);

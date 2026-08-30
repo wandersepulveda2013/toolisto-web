@@ -141,6 +141,28 @@
 
 ---
 
+## Cycle 136 — PDF bug fix: imagenes anchas ya no se deforman ni desbordan en document.to-pdf (CE-073)
+
+| Field | Value |
+|-------|-------|
+| **Date** | 2026-08-29 |
+| **Branch** | main |
+| **HEAD inicial** | c8ad0e9 |
+| **HEAD final** | commit CE-073 de este ciclo |
+| **Task** | CE-073 (BUG_FIX, P2, informe PDF): en `document.to-pdf`, `normalizePdfImageSections(..., {updateSize:true})` escribe `width/height` en px del canvas en cada seccion de imagen, y `renderImagePDF` (`workspace/core/pdf-generator.js`) recortaba el ancho a `contentW` pero conservaba el alto crudo. Una captura 1600x900 se dibujaba 481.6x900 (ratio 0.53 vs 1.78) y el cajon sobresalia por arriba de la pagina (cm `y` negativo). Ademas `estimateSectionH` reservaba ~900 pt por imagen ancha, dejando paginas casi vacias y empujando la imagen a su propia hoja. |
+| **Hypothesis** | Re-escalar el alto proporcional cuando el ancho se recorta conserva el aspecto (coherente con el fallback actual `displayW * image.height / image.width` cuando falta height) y encaja la caja dentro de la pagina; sincronizar `estimateSectionH` con el mismo criterio evita la reserva absurda. No cambia nada en imagenes estrechas ni sin width/height. |
+| **Change** | `workspace/core/pdf-generator.js`: (a) `renderImagePDF` ahora calcula `sectionW`/`sectionH` una vez y, si `image` existe, ambos estan presentes y el ancho pedido se recorto (`displayW < sectionW`), re-deriva `displayH = displayW * (image.height / image.width)`; (b) `estimateSectionH` para `image` devuelve `sectionH * (contentW / sectionW)` cuando `sectionW > contentW` (mismo criterio que el render). Cero cambios de interfaz y ninguno de paginacion: el resto de secciones conserva su camino exacto. |
+| **Bugs encontrados** | (1) El defecto de producto: deformacion + desborde de pagina para imagenes anchas. (2) La reserva de `estimateSectionH` usaba el alto crudo (px) de una imagen ancha, reservando mas del doble del area real. Sin otros bugs introducidos; verificado con `generatePDF` real (modulo puro). |
+| **Tests ejecutados** | Suite nueva `tests/workspace/pdf-image-aspect-test.mjs` 11/11, pure Node sin navegador: carga `pdf-generator.js` real por `new Function` (sin imports) y construye JPEGs estructurales SOF0 (1600x900 y 200x100) verificados por `readJpegDimensions` de verdad (`/Subtype /Image` real). Chequeos en el stream `cm`: ancho recortado 481.6 pt, ratio 1600/900 (~1.778) conservado, alto re-escalado ~270.9 (no 900 crudo), caja con `y >= 0` (dentro de la pagina); imagen estrecha 200x100 sin recorte ni deformacion; fallback sin width/height con aspecto coherente (2.0); anti-regresion estatica (`displayH = displayW * (image.height / image.width)` y `sectionH * (contentW / sectionW)` presentes). Registrada en `scripts/test-workspace-release.mjs`. |
+| **Tests PASS** | 11 (CE-073) + RELEASE GATE completo 38/38 suites PASS (34 previas + CE-064/071/072/073) = 0 fail. |
+| **Tests FAIL** | 0. |
+| **Commits** | CE-073 (fix `pdf-generator.js` + suite 11/11 + registro gate + trackers). |
+| **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL` (harness niega `git push*`). Manifests del release-gate y evidencias regeneradas se excluyen del commit (anti-churn). |
+| **Limitaciones** | El fix cubre la vía `document.to-pdf` (updateSize escribe px reales). En diseños (vía `preparePdfImages`) `section.width/height` también vienen del canvas, por lo que el mismo criterio aplica. No se validó en navegador la ruta de diseños con ancho > `contentW` (sin E2E de diseño PDF en gate); el render comparte `renderImagePDF`. |
+| **Proxima prioridad** | Proximo TODO de producto o DISCOVERY cuando el backlog este vacio (`cli recommend`). |
+
+---
+
 ## Cycle 128 — Fix test-debt in engine/parser/planner suites + register them in the gate (CE-065)
 
 | Field | Value |
