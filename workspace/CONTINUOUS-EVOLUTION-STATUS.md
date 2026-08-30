@@ -126,7 +126,7 @@
 | **Date** | 2026-08-29 |
 | **Branch** | main |
 | **HEAD inicial** | 5b99a00 |
-| **HEAD final** | commit CE-072 de este ciclo |
+| **HEAD final** | c8ad0e9 (commit CE-072 de este ciclo) |
 | **Task** | CE-072 (BUG_FIX, P2, flujo estrella): `tabla → grafico` (operaciones `data.to-chart` y `report.create`) usaba una copia local divergente `parseLocaleChartNumber` que (a) interpretaba fechas/horas como numeros (`15/01/2024` → 15012024, `14:30` → 1430) ganando la seleccion de columna numerica sobre la real, (b) perdia el signo en parentesis `(1.234,56)` → +1234.56 y (c) destruia la escala de `%`. La MISMA tabla producia graficos distintos segun el punto de entrada: boton UI (`createChartFromTable`, parser canonico). |
 | **Hypothesis** | Eliminar la copia y unificar `tableChartSeries` en el parser canonico `parseLocaleNumber` (`core/locale-parser.js`, contrato documentado «All modules must use this instead of ad-hoc parsing») hace que el flujo produzca exactamente las mismas series que la UI para cualquier tabla (paridad punto a punto), sin regresiones en tablas limpias. |
 | **Change** | `workspace/core/workflow-operations.js`: nuevo import `parseLocaleNumber` desde `./locale-parser.js`; `tableChartSeries` (scoring de columna numerica + serie) reemplaza las 3 llamadas a `parseLocaleChartNumber` por `parseLocaleNumber`; se ELIMINA la funcion local `parseLocaleChartNumber` (~21 lineas con strip ad-hoc `replace(/[^\d,.+\-()]/g`). Cero cambios de interfaz: las operaciones quedan funcionalmente iguales para datos limpios, y producen series correctas (paridad exacta con `tableChartData` de workspace.js) para fechas/horas/parentesis/porcentajes/millares. |
