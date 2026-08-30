@@ -163,6 +163,28 @@
 
 ---
 
+## Cycle 137 — PDF bug fix: celdas anchas y filas irregulares ya no salen de la pagina en tablas (CE-074)
+
+| Field | Value |
+|-------|-------|
+| **Date** | 2026-08-29 |
+| **Branch** | main |
+| **HEAD inicial** | 3bd34e2 |
+| **HEAD final** | commit CE-074 de este ciclo |
+| **Task** | CE-074 (BUG_FIX, P2, informe PDF): `renderTablePDF` dibujaba cada celda en una sola linea fija (baseline `ry-13`) con altura de fila fija de 20 pt. Con una celda larga (URL, cadena sin espacios) el texto se extendia hasta ~722 pt en una pagina de 595 (se escapaba por el borde derecho); con celdas de varias lineas, el conteo fijo de 20 pt por fila hacia colisionar las filas entre si y podia empujar texto fuera de la pagina. |
+| **Hypothesis** | Hacer que el render, la estimacion de paginacion y la paginacion compartan un mismo criterio de altura real de fila —derivado del contenido envuelto a la columna— elimina el desborde horizontal (celdas cortadas fuera del borde) y el vertical (filas solapadas), sin cambiar la salida de tablas limpias de una linea por celda (siguen 20 pt por fila). |
+| **Change** | `workspace/core/pdf-generator.js`: nuevos helpers de modulo `cellLines` (envuelve por espacios y ademas corta tokens mas largos que la columna: evita que una URL desborde) y `tableRowHeight` (alto real = max lineas `* 12.6 + 4`, nunca menos de 20 pt) mas `TABLE_ROW_H`/`TABLE_TOP_INSET`/`CELL_LINE_HEIGHT`. `renderTablePDF` ahora posiciona cada celda en lineas envueltas dentro de la fila y dibuja la grilla con altos reales acumulados; `estimateSectionH` y `addTableSections` usan el mismo helper para reservar y paginar por alto real (una fila mas alta que la pagina usable se fuerza igual, tomando el criterio previo de `Math.max(1, availableRows)`). Tablas normales producen exactamente 20 pt por fila (bytes del stream de grilla identicos a los previos salvo el inseto acumulado). |
+| **Bugs encontrados** | (1) El defecto de producto: celda larga fuera del borde derecho (reproducido: right edge 722 > 595). (2) Altura de fila fija ignorando el contenido multi-lineal (solapamiento). Sin otros bugs introducidos; revalidadas las suites huerfanas `pdf-table-pagination-test` (7/7) y `workflow-document-pdf-test` (66/66). |
+| **Tests ejecutados** | Suite nueva `tests/workspace/pdf-table-wrap-test.mjs` 18/18, pure Node: (1) URL de 67 chars partida en varias lineas, ninguna linea supera 524 pt, sin NaN/undefined; (2) celda de 160 chars agranda la fila a 54.4 pt y la grilla vertical abarca 20+54.4+20; (3) tabla limpia conserva 20 pt por fila y una linea por celda (sin regresion); (4) tabla de 42 filas con filas altas genera varias paginas, cada fila exactamente una vez y sin texto fuera de la pagina; (5) anti-regresion estatica (hard-break, `maxLines * CELL_LINE_HEIGHT + 4`, envuelto por celda en render, `used + tableRowHeight(...) <= usableH + 0.01` en paginacion y suma por fila en estimacion). Registrada en `scripts/test-workspace-release.mjs`. |
+| **Tests PASS** | 18 (CE-074) + suites huerfanas de PDF revalidadas (pagination 7/7, workflow-document-pdf 66/66) + RELEASE GATE completo 39/39 suites PASS = 0 fail. |
+| **Tests FAIL** | 0. |
+| **Commits** | CE-074 (fix `pdf-generator.js` + suite 18/18 + registro gate + trackers). |
+| **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL` (harness niega `git push*`). Manifests del release-gate y evidencias regeneradas se excluyen del commit (anti-churn). |
+| **Limitaciones** | No se repite el encabezado de tabla en fragmentos de paginas posteriores con contenido nuevo distinto a las filas (se mantiene el comportamiento previo de repetirlo). La estimacion usa unicamente conteo de chars (~56 chars en una columna de 120 pt) identico en estimate/render, por lo que paginacion y dibujo siempre coinciden; no hay uso de metrica real de glifos (sin dependencias). |
+| **Proxima prioridad** | Proximo TODO de producto o DISCOVERY cuando el backlog este vacio (`cli recommend`). |
+
+---
+
 ## Cycle 128 — Fix test-debt in engine/parser/planner suites + register them in the gate (CE-065)
 
 | Field | Value |

@@ -77,6 +77,7 @@ run('text-to-document (Markdown -> bloques, CE-064)', 'node', ['tests/workspace/
 run('doc-to-table-multispace (tablas OCR multiespacio, CE-071)', 'node', ['tests/workspace/doc-to-table-multispace-test.mjs']);
 run('chart-series-locale (tabla -> grafico con parser canonico, CE-072)', 'node', ['tests/workspace/chart-series-locale-test.mjs']);
 run('pdf-image-aspect (imagen ancha no se deforma en PDF, CE-073)', 'node', ['tests/workspace/pdf-image-aspect-test.mjs']);
+run('pdf-table-wrap (celdas anchas y filas irregulares en PDF, CE-074)', 'node', ['tests/workspace/pdf-table-wrap-test.mjs']);
 // Suites del motor de flujos / parser / planificador (CE-065): antes solo
 // pasaban quitando los imports por VM pero crasheaban en aislamiento por
 // dependencias sin resolver (WORKFLOW_DEFINITION_VERSION, createExecutionResources).

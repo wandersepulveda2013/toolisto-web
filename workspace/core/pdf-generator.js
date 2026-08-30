@@ -5,6 +5,57 @@
  * Soporta A4/Letter, portrait/landscape, acentos, saltos de pagina.
  * Tablas renderizadas como grilla, graficos como barras, imagenes embebidas.
  */
+const TABLE_ROW_H = 20;
+const TABLE_TOP_INSET = 14;
+const CELL_LINE_HEIGHT = 9 * 1.4;
+
+// Lineas de una celda de tabla: envuelve por espacios y ademas corta tokens
+// mas largos que la columna (una URL/cadena sin espacios no desborda la pagina).
+function cellLines(text, cellW, fontSize) {
+  if (!text) return [''];
+  const charsPerLine = Math.max(1, Math.floor(cellW / (fontSize * 0.5)));
+  const words = String(text).split(/\s+/);
+  const lines = [];
+  let current = '';
+  const hardBreak = (rest) => {
+    while (rest.length > charsPerLine) {
+      lines.push(rest.slice(0, charsPerLine));
+      rest = rest.slice(charsPerLine);
+    }
+    lines.push(rest);
+  };
+  words.forEach(word => {
+    const candidate = current ? current + ' ' + word : word;
+    if (candidate.length > charsPerLine) {
+      if (current) { lines.push(current); current = ''; }
+      if (word.length > charsPerLine) hardBreak(word);
+      else current = word;
+    } else {
+      current = candidate;
+    }
+  });
+  if (current) lines.push(current);
+  return lines.length ? lines : [''];
+}
+
+// Altura en pt de una fila de tabla segun el contenido real (no solo 20pt):
+// mantiene coherencia entre estimacion de paginacion, reserva y render.
+function tableRowHeight(cells, colW, fontSize) {
+  let maxLines = 1;
+  (cells || []).forEach(cell => {
+    const n = cellLines(String(cell != null ? cell : ''), Math.max(10, colW - 6), fontSize).length;
+    if (n > maxLines) maxLines = n;
+  });
+  return Math.max(TABLE_ROW_H, maxLines * CELL_LINE_HEIGHT + 4);
+}
+
+function tableColWidth(data, contentW) {
+  const headers = (data && data.headers) || [];
+  const rows = (data && data.rows) || [];
+  const colCount = Math.max(1, headers.length || (rows[0] ? rows[0].length : 1));
+  return contentW / colCount;
+}
+
 function pdfString(str) {
   const parts = [];
   for (let i = 0; i < str.length; i++) {
@@ -32,8 +83,6 @@ function generatePDF(config) {
   const contentW = pageW - mLeftPt - mRightPt;
   const usableH = pageH - mTopPt - mBottomPt;
   const lineHeight = 14;
-  const tableRowH = 20;
-  const tableTopInset = 14;
 
   const objects = [];
   let objCount = 0;
@@ -87,9 +136,13 @@ function generatePDF(config) {
       return sectionH || 150;
     }
     if (section.type === 'table') {
-      const d = section.data || {};
-      const rc = (d.headers ? 1 : 0) + (d.rows || []).length;
-      return Math.max(30, rc * tableRowH + tableTopInset);
+      const d = section.data && typeof section.data === 'object' ? section.data : {};
+      const rows = d.rows || [];
+      const colW = tableColWidth(d, contentW);
+      let h = TABLE_TOP_INSET + ((d.headers || []).length > 0 ? tableRowHeight(d.headers, colW, 10) : 0);
+      if (rows.length === 0) return Math.max(30, h);
+      rows.forEach(r => { h += tableRowHeight(r, colW, 9); });
+      return Math.max(30, h);
     }
     if (section.type === 'chart') {
       const s = (section.data && section.data.series) || [];
@@ -109,21 +162,29 @@ function generatePDF(config) {
       return;
     }
 
+    const colW = tableColWidth(data, contentW);
+    // Las filas pueden tener altura variable (celdas envueltas): se encajan por
+    // su alto real, no por un multiplo fijo de tableRowH.
     let rowIndex = 0;
     while (rowIndex < rows.length) {
-      const availableRows = Math.floor((usableH - currentY - tableTopInset) / tableRowH) - (hasHeader ? 1 : 0);
-      if (availableRows < 1 && currentPage.length > 0) {
-        newPage();
-        continue;
+      let used = currentY + TABLE_TOP_INSET + (hasHeader ? tableRowHeight(data.headers, colW, 10) : 0);
+      const pageRows = [];
+      let idx = rowIndex;
+      while (idx < rows.length && used + tableRowHeight(rows[idx], colW, 9) <= usableH + 0.01) {
+        pageRows.push(rows[idx]);
+        used += tableRowHeight(rows[idx], colW, 9);
+        idx++;
       }
-      // A page with the configured margins always fits at least one row in normal formats.
-      // Keep the row intact even with an unusually restrictive custom margin.
-      const rowCount = Math.max(1, availableRows);
-      const pageRows = rows.slice(rowIndex, rowIndex + rowCount);
+      // Una fila unica mas alta que la pagina usable se fuerza igual (mismo
+      // criterio que el comportamiento previo de Math.max(1, availableRows)).
+      if (pageRows.length === 0) {
+        pageRows.push(rows[idx]);
+        idx++;
+      }
       const fragment = { ...section, data: { ...data, rows: pageRows } };
       currentPage.push({ section: fragment, y: currentY });
       currentY += estimateSectionH(fragment);
-      rowIndex += pageRows.length;
+      rowIndex = idx;
       if (rowIndex < rows.length) newPage();
     }
   }
@@ -250,27 +311,37 @@ function renderTablePDF(parts, section, x0, y0, contentW) {
   rows.forEach(r => allRows.push(r));
   const colCount = Math.max(1, headers.length || (rows[0] ? rows[0].length : 1));
   const colW = contentW / colCount;
-  const rowH = 20;
-  const startY = y0 - 14;
+  const startY = y0 - TABLE_TOP_INSET;
+  const rowHeights = allRows.map((r, ri) => tableRowHeight(r, colW, ri === 0 && headers.length > 0 ? 10 : 9));
+  const totalH = rowHeights.reduce((a, b) => a + b, 0);
 
   parts.push('0.2 0.2 0.2 RG');
+  let rowTop = startY;
   allRows.forEach((row, ri) => {
-    const ry = startY - ri * rowH;
+    const rh = rowHeights[ri];
+    const rowBottom = rowTop - rh;
+    const fontSize = ri === 0 && headers.length > 0 ? 10 : 9;
     const isHeader = ri === 0 && headers.length > 0;
     if (isHeader) {
-      parts.push(`0 0 0 0.3 0.8 0.6 rg ${x0} ${ry - rowH} ${contentW} ${rowH} re f`);
+      parts.push(`0 0 0 0.3 0.8 0.6 rg ${x0} ${rowBottom} ${contentW} ${rh} re f`);
       parts.push('0 0 0 rg');
     }
+    const cellLinesPerCell = (row || []).map(cell => cellLines(String(cell != null ? cell : ''), Math.max(10, colW - 6), fontSize));
     (row || []).forEach((cell, ci) => {
       const cx = x0 + ci * colW;
-      parts.push(`BT /F1 ${isHeader ? 10 : 9} Tf ${cx + 3} ${ry - 13} Td ${pdfString(String(cell != null ? cell : ''))} Tj ET`);
+      const lines = cellLinesPerCell[ci];
+      lines.forEach((ln, li) => {
+        const ly = rowTop - 14 - li * (fontSize * 1.4);
+        parts.push(`BT /F1 ${fontSize} Tf ${cx + 3} ${ly} Td ${pdfString(ln)} Tj ET`);
+      });
     });
-    parts.push(`${x0} ${ry - rowH} m ${x0 + contentW} ${ry - rowH} l S`);
+    parts.push(`${x0} ${rowBottom} m ${x0 + contentW} ${rowBottom} l S`);
+    rowTop = rowBottom;
   });
   parts.push(`${x0} ${startY} m ${x0 + contentW} ${startY} l S`);
   for (let ci = 0; ci <= colCount; ci++) {
     const vx = x0 + ci * colW;
-    parts.push(`${vx} ${startY} m ${vx} ${startY - allRows.length * rowH} l S`);
+    parts.push(`${vx} ${startY} m ${vx} ${startY - totalH} l S`);
   }
   parts.push('0 0 0 rg');
 }
