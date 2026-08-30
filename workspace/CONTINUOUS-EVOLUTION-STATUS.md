@@ -229,6 +229,28 @@
 
 ---
 
+## Cycle 140 — PDF bug fix: el grafico ya no solapa lo siguiente ni deja huecos (CE-077)
+
+| Field | Value |
+|-------|-------|
+| **Date** | 2026-08-30 |
+| **Branch** | main |
+| **HEAD inicial** | 21ba0c1 |
+| **HEAD final** | commit CE-077 de este ciclo |
+| **Task** | CE-077 (BUG_FIX, P2, informe PDF): `estimateSectionH` reservaba para la seccion `chart` una altura O(n) `30 + n*18 + 40`, pero el render del grafico es de altura FIJA (titulo ~12 pt + chartH 100 + etiquetas; no crece con el numero de series). Infra-reserva con <= 5 series: con UNA serie reservaba 100 pt cuando el render dibuja ~150 — probe real: barra 655.3..755.3 y baseline del texto siguiente en 673.3 (el parrafo se imprimia SOBRE la barra). Sobre-reserva creciente: 20 series -> ~430 pt de hueco vacio; 80 series -> ~1510 pt, empujando el contenido posterior a una pagina casi vacia (agravado por el recorte de CE-075). Mientras en `text` el estimador se corregia con CE-076, el `chart` seguia con su propio desajuste (mutax). |
+| **Hypothesis** | Como el render usa un chartH fijo de 100, la estimacion correcta es constante en el numero de series: `Math.max(150, 30 + (tituloLines-1)*16.8 + 120)` — 150 pt cubren el caso positivo extremo (etiqueta de valor arriba de una barra llena ~ chartTop-108) y el negativo (etiqueta abajo hasta chartTop-20); el termino del titulo cubre titulos que ahora pueden partirse en varias lineas (CE-076). Con eso el texto siguiente queda SIEMPRE debajo del contenido dibujado y un grafico enorme ya no expande el documento. |
+| **Change** | `workspace/core/pdf-generator.js`, rama `chart` de `estimateSectionH`: se elimina `30 + s.length*18 + 40` y se estima con `wrapText(String(chartData.title || section.content || 'Grafico'), contentW, 'text')` para las lineas del titulo y la formula `Math.max(150, 30 + (titleLines.length - 1) * 16.8 + 120)`. |
+| **Bugs encontrados** | (1) Infra-reserva <= 5 series (solape del texto siguiente sobre la barra, confirmado por probe). (2) Sobre-reserva O(n) que con documentos con muchas series creaba huecos de pagina y paginas casi vacias. Sin bugs nuevos introducidos: sonda post-fix con n=1/6/20/80 -> baseline del texto bajo las barras en todos los casos. |
+| **Tests ejecutados** | Suite nueva `tests/workspace/pdf-chart-layout-test.mjs` 10/10, pure Node (generatePDF real): chart de 1 serie + texto (baseline bajo la barra), 20 series (barras dentro de la pagina, texto bajo, 1 pagina), 80 series (barras recortadas <= 595, texto bajo, chart+texto en UNA pagina), anti-regresion estatica (formula nueva presente, `30 + s.length*18 + 40` ausente). Registrada en `scripts/test-workspace-release.mjs`. Suites huerfanas revalidadas: `workflow-document-pdf-test` 66/66 (incluye secciones chart) y `pdf-table-pagination-test` 7/7. |
+| **Tests PASS** | 10 (CE-077) + huerfanas (66 + 7) + RELEASE GATE completo 42/42 suites PASS = 0 fail. |
+| **Tests FAIL** | 0. |
+| **Commits** | CE-077 (fix `pdf-generator.js` + suite 10/10 + registro gate + trackers). |
+| **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL` (harness niega `git push*`). Manifests del release-gate y evidencias regeneradas se excluyen del commit (anti-churn). |
+| **Limitaciones** | La altura del chart sigue estimandose (150 pt >= render en todos los caminos validados); el grafico sigue recortando a `maxFitBars` (~33) series con "+N" (CE-075) y la etiqueta de valor puede solaparse entre barras densas. No se repitio el E2E de navegador (defecto puro de generacion cubierto por el stream; `workflow-document-pdf` ya cubre chart->PDF). |
+| **Proxima prioridad** | Proximo TODO de producto o DISCOVERY cuando el backlog este vacio (`cli recommend`). |
+
+---
+
 ## Cycle 128 — Fix test-debt in engine/parser/planner suites + register them in the gate (CE-065)
 
 | Field | Value |

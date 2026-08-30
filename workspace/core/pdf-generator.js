@@ -151,8 +151,15 @@ function generatePDF(config) {
       return Math.max(30, h);
     }
     if (section.type === 'chart') {
-      const s = (section.data && section.data.series) || [];
-      return Math.max(100, 30 + s.length * 18 + 40);
+      // El render del grafico tiene altura fija (titulo ~12 pt + chartH 100 +
+      // etiquetas), NO crece con el numero de series. La estimacion anterior
+      // (30 + n*18 + 40) infra-reservaba para <= 5 series (la barra se dibujaba
+      // sobre la seccion siguiente) y sobre-reservaba 430-1510 pt para muchas
+      // series (hueco vacio / pagina casi vacia tras el recorte de CE-075).
+      const chartData = section.data && typeof section.data === 'object' ? section.data : {};
+      const chartTitle = String(chartData.title || section.content || 'Grafico');
+      const titleLines = wrapText(chartTitle, contentW, 'text');
+      return Math.max(150, 30 + (titleLines.length - 1) * 16.8 + 120);
     }
     const lines = wrapText(section.content || '', contentW, section.type);
     return Math.max(24, estimateTextSectionH(section));
