@@ -88,6 +88,7 @@ run('pdf-image-fit (imagenes encajadas en la pagina, CE-078)', 'node', ['tests/w
 // Ahora incluyen schema-versions.js y execution-resources.js y se registran en el
 // gate para que queden protegidas contra regresion en vez de ser deuda oculta.
 run('instruction-parser (intenciones de texto libre)', 'node', ['tests/workspace/instruction-parser-test.mjs']);
+run('instruction-parser-dest-format (formato de destino prioritario en conversiones, CE-079)', 'node', ['tests/workspace/instruction-parser-dest-format-test.mjs']);
 run('workflow-engine (motor de flujos, recursos de ejecución)', 'node', ['tests/workspace/workflow-engine-test.mjs']);
 run('instruction-planner (planificador de flujos)', 'node', ['tests/workspace/instruction-planner-test.mjs']);
 run('workflow-ui (resultados al Workspace, CE-047/048/049)', 'node', ['tests/workspace/workflow-ui-test.mjs'], {

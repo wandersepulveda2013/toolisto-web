@@ -273,6 +273,28 @@
 
 ---
 
+## Cycle 142 — Parser bug fix: formato de destino prioritario en conversiones (CE-079)
+
+| Field | Value |
+|-------|-------|
+| **Date** | 2026-08-30 |
+| **Branch** | main |
+| **HEAD inicial** | 040a6b7 |
+| **HEAD final** | commit CE-079 de este ciclo |
+| **Task** | CE-079 (BUG_FIX, P2, parser de instrucciones): `parse` resolvia el formato de DESTINO de convert/compress/to-pdf con `detectFormat`, que recorre los aliases en orden de definicion (`FORMAT_ALIASES`: jpg, jpeg, png, webp, svg, gif, bmp, pdf) y devuelve el PRIMERO presente en el texto. Cuando la instruccion nombraba la FUENTE y el DESTINO, la fuente podia ganar por orden: probe `convierte este jpg a webp` -> image/jpeg (la conversion "a webp" resolvia a jpeg, sin cambio); `convierte este png a gif` -> png (gif se define despues); `convierte esta webp a jpg` -> image/webp (webp antes que jpg). Ademas, el formato de origen inline rompia el sinonimo exacto: `pasa esta imagen jpg a png` no reconocia NI conversion (intents == []) porque el sinonimo 'pasa esta imagen a' no matchea con el formato entre 'imagen' y 'a'. El `detectFormat` indirecto tambien alimentaba la ambiguedad de convert (preguntaba formato aunque hubiera destino claro atras de " a " en algunos casos). |
+| **Hypothesis** | Un `detectDestinationFormat(normalized)` que busque el alias DESPUES de una preposicion de destino (" a ", " a formato ", " en ") resuelve la fuente-vs-destino sin romper las frases de destino unico (todas usan " a <formato>"); y un patron regex que tolere el formato inline ("pasa esta imagen <X> a <Y>") restaura el reconocimiento de conversion en ese patron. |
+| **Change** | `workspace/core/instruction-parser.js`: nuevo `detectDestinationFormat(text)` (marca posiciones de " a ", " en ", " a formato ", analiza el segmento posterior por palabras completas; cae a `detectFormat`). Se usa en: rama convert/compress/to-pdf (`detectDestinationFormat(normalized)`), rama strip-metadata, y la condicion de ambiguedad `convert`. En `findActions`, `convertInline = /pas(?:a|ar|e)\w*\s+(?:esta|estas|la|las|en)?\s*imagen(?:es)?s?\s+\S+\s+a\b/i` se anade como span de accion `convert` solo si no hay ya un convert (no desvanece los sinonimos exactos). Se exporta `detectDestinationFormat`. |
+| **Bugs encontrados** | (1) Fuente gana a destino por orden de definicion (jpg->webp, png->gif, webp->jpg). (2) Sinonimo roto con formato inline (pasa esta imagen jpg a png -> sin accion). Sin bugs nuevos: probe post-fix resuelve todas las conversiones con fuente+destino al destino correcto. |
+| **Tests ejecutados** | Suite nueva `tests/workspace/instruction-parser-dest-format-test.mjs` 17/17, pure Node (carga por sandbox como en la suite heredada): jpg->webp=webp, png->jpg=jpeg, jpg->png=png, png->gif=gif, webp->jpg=jpeg; destinos unicos conservados (convertir a jpg, Pasa esta imagen a jpg, conviertelas a webp, convertir a pdf, a formato png, strip-metadata a jpg); sin formato -> warning + PNG por defecto; anti-regresion estatica (detectDestinationFormat, uso en convert/compress/to-pdf y en ambiguedad, patron convertInline). Suite heredada `instruction-parser-test.mjs` 116/116 sin regresion. Registrada en `scripts/test-workspace-release.mjs`. |
+| **Tests PASS** | 17 (CE-079) + 116 (heredada) + RELEASE GATE completo 44/44 = 0 fail. |
+| **Tests FAIL** | 0. (En la primera pasada del gate, `multi-tab-concurrency` CE-060 marco transitoriamente 1/113 en '5.8 delayed autosave outcome is deterministic' — carrera de timing real, no relacionada con este cambio; la suite paso 3/3 re-ejecuciones 113/113 y el gate quedo 44/44 OK.) |
+| **Commits** | CE-079 (fix `instruction-parser.js` + suite 17/17 + registro gate + trackers). |
+| **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL` (harness niega `git push*`). Manifests del release-gate y evidencias regeneradas se excluyen del commit (anti-churn). |
+| **Limitaciones** | `detectDestinationFormat` ara por posicion de preposicion, no por gramatica completa; una frase sin " a "/" en " y con fuente+destino (p. ej. "convertir jpg webp") sigue cayendo a detectFormat (orden de definicion). El patron inline cubre la forma "pasa/pasar ... imagen ... a ..." de conversion; otras formas con el formato origen inline no se ampliaron. No se repitio el E2E de navegador de la conversion (defecto puro de parser, cubierto por el stream; el planificador `instruction-planner` ya usa el formato del intent). |
+| **Proxima prioridad** | Proximo TODO de producto o DISCOVERY cuando el backlog este vacio (`cli recommend`). |
+
+---
+
 ## Cycle 128 — Fix test-debt in engine/parser/planner suites + register them in the gate (CE-065)
 
 | Field | Value |

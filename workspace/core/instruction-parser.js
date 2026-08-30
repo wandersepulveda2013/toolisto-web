@@ -81,6 +81,34 @@ export function createInstructionParser() {
     return null;
   }
 
+  // Formato de DESTINO de una conversion: el alias que aparece DESPUES de una
+  // preposicion de destino (" a ", " en ", " a formato "). Sin esto, la
+  // conversion "convierte este jpg a webp" devolvio el formato FUENTE ("jpg")
+  // porque detectFormat recorre los aliases en orden de definicion y encuentra
+  // "jpg" antes que "webp": la imagen se convertia a jpeg (sin cambio) en vez
+  // de a webp. Se prefiere el formato en posicion de destino y se reserva
+  // detectFormat como respaldo (frases sin preposicion, estilo "formato webp").
+  function detectDestinationFormat(text) {
+    const t = (text || '').toLowerCase();
+    const destIndexes = [];
+    const marker = /\ba\s+formato\b|\ba\b|\ben\b/g;
+    let m;
+    while ((m = marker.exec(t)) !== null) {
+      destIndexes.push(m.index + m[0].length);
+    }
+    if (destIndexes.length === 0) return detectFormat(t);
+    const after = destIndexes.map(i => t.slice(i)).sort((x, y) => x.length - y.length);
+    for (const segment of after) {
+      for (const [alias, mime] of Object.entries(FORMAT_ALIASES)) {
+        const pos = segment.indexOf(alias);
+        // El alias debe ir precedido de espacio (palabra/extension completa) para
+        // no capturar substrings como "a" dentro de "banco" ni "pdf" en "webpdf".
+        if (pos === 0 || (pos > 0 && /\s/.test(segment[pos - 1]))) return mime;
+      }
+    }
+    return detectFormat(t);
+  }
+
   function detectDimension(text) {
     const m = DIMENSION_RE.exec(text);
     if (m && m[1] && m[2]) return { width: parseInt(m[1]), height: parseInt(m[2]) };
@@ -119,6 +147,20 @@ export function createInstructionParser() {
           matchedSpans.push({ start: idx, end: idx + nsyn.length, action });
           break;
         }
+      }
+    }
+
+    // "pasa esta imagen jpg a png" / "pasar estas imagenes webp a jpg": el
+    // sinonimo exacto 'pasa esta imagen a' no matchea porque el formato FUENTE
+    // queda entre 'imagen' y 'a'. Se tolera un token entre ambos para la
+    // conversion (patron de conversion con formato de origen inline).
+    const convertInline = /pas(?:a|ar|e)\w*\s+(?:esta|estas|la|las|en)?\s*imagen(?:es)?s?\s+\S+\s+a\b/i;
+    if (!matchedSpans.some(s => s.action === 'convert')) {
+      const m = convertInline.exec(normalized);
+      if (m) {
+        const start = m.index;
+        const end = Math.min(normalized.length, m.index + m[0].length);
+        matchedSpans.push({ start, end, action: 'convert' });
       }
     }
 
@@ -173,7 +215,7 @@ export function createInstructionParser() {
         ],
       });
     }
-    if (actions.includes('convert') && !normalized.includes(' a ') && !detectFormat(normalized)) {
+    if (actions.includes('convert') && !normalized.includes(' a ') && !detectDestinationFormat(normalized)) {
       ambiguities.push({
         id: 'convert-format',
         question: '¿A qué formato quieres convertir?',
@@ -227,9 +269,9 @@ export function createInstructionParser() {
       const intent = { action, target: guessTarget(action), options: {} };
 
       if (action === 'convert' || action === 'compress' || action === 'to-pdf') {
-        const fmt = detectFormat(normalized);
+        const fmt = detectDestinationFormat(normalized);
         if (fmt) intent.options.format = fmt;
-        else if (action === 'convert' && action !== 'to-pdf') warnings.push('No se indicó el formato de destino. Se usará PNG por defecto.');
+        else if (action === 'convert') warnings.push('No se indicó el formato de destino. Se usará PNG por defecto.');
       }
 
       if (action === 'resize') {
@@ -255,7 +297,7 @@ export function createInstructionParser() {
       }
 
       if (action === 'strip-metadata') {
-        const fmt = detectFormat(normalized);
+        const fmt = detectDestinationFormat(normalized);
         if (fmt) intent.options.format = fmt;
       }
 
@@ -348,5 +390,5 @@ export function createInstructionParser() {
     return 'file';
   }
 
-  return { parse, normalize, detectFormat, detectDimension, detectRotation, detectQuality, SYNONYMS, correctText, SPELLING_CORRECTIONS };
+  return { parse, normalize, detectFormat, detectDestinationFormat, detectDimension, detectRotation, detectQuality, SYNONYMS, correctText, SPELLING_CORRECTIONS };
 }
