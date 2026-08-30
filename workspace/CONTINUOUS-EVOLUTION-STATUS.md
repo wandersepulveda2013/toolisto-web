@@ -119,6 +119,28 @@
 
 ---
 
+## Cycle 135 — Star-flow bug fix: tabla → grafico with the canonical locale parser (CE-072)
+
+| Field | Value |
+|-------|-------|
+| **Date** | 2026-08-29 |
+| **Branch** | main |
+| **HEAD inicial** | 5b99a00 |
+| **HEAD final** | commit CE-072 de este ciclo |
+| **Task** | CE-072 (BUG_FIX, P2, flujo estrella): `tabla → grafico` (operaciones `data.to-chart` y `report.create`) usaba una copia local divergente `parseLocaleChartNumber` que (a) interpretaba fechas/horas como numeros (`15/01/2024` → 15012024, `14:30` → 1430) ganando la seleccion de columna numerica sobre la real, (b) perdia el signo en parentesis `(1.234,56)` → +1234.56 y (c) destruia la escala de `%`. La MISMA tabla producia graficos distintos segun el punto de entrada: boton UI (`createChartFromTable`, parser canonico). |
+| **Hypothesis** | Eliminar la copia y unificar `tableChartSeries` en el parser canonico `parseLocaleNumber` (`core/locale-parser.js`, contrato documentado «All modules must use this instead of ad-hoc parsing») hace que el flujo produzca exactamente las mismas series que la UI para cualquier tabla (paridad punto a punto), sin regresiones en tablas limpias. |
+| **Change** | `workspace/core/workflow-operations.js`: nuevo import `parseLocaleNumber` desde `./locale-parser.js`; `tableChartSeries` (scoring de columna numerica + serie) reemplaza las 3 llamadas a `parseLocaleChartNumber` por `parseLocaleNumber`; se ELIMINA la funcion local `parseLocaleChartNumber` (~21 lineas con strip ad-hoc `replace(/[^\d,.+\-()]/g`). Cero cambios de interfaz: las operaciones quedan funcionalmente iguales para datos limpios, y producen series correctas (paridad exacta con `tableChartData` de workspace.js) para fechas/horas/parentesis/porcentajes/millares. |
+| **Bugs encontrados** | (1) El defecto de producto: parser duplicado y divergente del canonico (fechas/horas → numeros fantasma, signo perdido, % sin escala). (2) Sin otros bugs introducidos; se verifico con VM del modulo real. |
+| **Tests ejecutados** | Suite nueva `tests/workspace/chart-series-locale-test.mjs` 18/18, pure Node: carga `locale-parser.js` + `workflow-operations.js` reales por VM (`tableChartSeries` ejecutado) y comprueba: Fecha (`15/01/2024`) rechazada como columna numerica → `numericIndex` apunta a Monto con la celda vacia omitida ([1234.56, 2500]); horas (`14:30`) no puntuan; `(1.234,56)` → -1234.56; `5%` → 0.05; `1.500,25` → 1500.25; tabla limpia `Trimestre|Ventas` → 3 series finitas (regresion workflow-chart-e2e); todo-texto → series vacias (aviso accionable); anti-regresion estatica (sin `parseLocaleChartNumber`, import canonico presente, >=3 usos de `parseLocaleNumber(row?.[` , sin strip ad-hoc, workspace.js tambien canonico). Registrada en `scripts/test-workspace-release.mjs`. |
+| **Tests PASS** | 18 (CE-072) + RELEASE GATE completo 34/34 suites PASS (incl. Star-Flow E2E con OCR real, BOM CSV, dist-smoke, CE-058/059/060/061) = 0 fail. |
+| **Tests FAIL** | 0. |
+| **Commits** | CE-072 (fix `workflow-operations.js` + suite 18/18 + registro gate + trackers). |
+| **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL` (harness niega `git push*`). Manifests del release-gate y evidencias regeneradas se excluyen del commit (anti-churn). |
+| **Limitaciones** | `parseLocaleNumber` sigue el contrato del repo: las fechas se rechazan, por lo que una tabla SOLO con fechas ya no grafica numeros fantasma sino que avisa de columna no numerica (comportamiento deseado y coherente con la UI). El E2E de navegador `workflow-chart-e2e.mjs` sigue huerfano (no registrado en el gate); no se toco su registro en este ciclo. |
+| **Proxima prioridad** | Proximo TODO de producto o DISCOVERY cuando el backlog este vacio (`cli recommend`). |
+
+---
+
 ## Cycle 128 — Fix test-debt in engine/parser/planner suites + register them in the gate (CE-065)
 
 | Field | Value |

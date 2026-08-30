@@ -3,6 +3,7 @@ import { parseTabularText } from './tabular-text-parser.js';
 import { parseInvoiceText, invoiceRows } from './invoice.js';
 import { generatePDF } from './pdf-generator.js';
 import { normalizePdfImageSections } from './pdf-images.js';
+import { parseLocaleNumber } from './locale-parser.js';
 
 export function registerWorkflowOperations(registry) {
   const ops = [
@@ -590,40 +591,18 @@ export function registerWorkflowOperations(registry) {
 
 // ── Pure helpers (no DOM) ──
 
-function parseLocaleChartNumber(value) {
-  let text = String(value ?? '').trim();
-  if (!text) return null;
-  if (/[A-Za-zÀ-ÿ]/.test(text)) return null;
-  text = text.replace(/\s+/g, '').replace(/[^\d,.+\-()]/g, '').replace(/[()]/g, '');
-  if (!text || !/[\d]/.test(text)) return null;
-  const comma = text.lastIndexOf(',');
-  const dot = text.lastIndexOf('.');
-  if (comma >= 0 && dot >= 0) {
-    if (comma > dot) text = text.replace(/\./g, '').replace(',', '.');
-    else text = text.replace(/,/g, '');
-  } else if (comma >= 0) {
-    const groups = text.split(',');
-    text = groups.length > 2 && groups.at(-1).length === 3 ? groups.join('') : text.replace(',', '.');
-  } else if (dot >= 0) {
-    const groups = text.split('.');
-    text = groups.length > 2 && groups.at(-1).length === 3 ? groups.join('') : text;
-  }
-  const number = Number(text);
-  return Number.isFinite(number) ? number : null;
-}
-
 function tableChartSeries(headers, rows, maxSeries = 30) {
   const safeHeaders = Array.isArray(headers) ? headers : [];
   const safeRows = Array.isArray(rows) ? rows : [];
   const candidateIndexes = safeHeaders.slice(1).map((_, index) => index + 1);
   const numericIndex = candidateIndexes.sort((left, right) => {
-    const leftScore = safeRows.filter(row => parseLocaleChartNumber(row?.[left]) !== null).length;
-    const rightScore = safeRows.filter(row => parseLocaleChartNumber(row?.[right]) !== null).length;
+    const leftScore = safeRows.filter(row => parseLocaleNumber(row?.[left]) !== null).length;
+    const rightScore = safeRows.filter(row => parseLocaleNumber(row?.[right]) !== null).length;
     return rightScore - leftScore || left - right;
   })[0] ?? 1;
   const series = safeRows.slice(0, maxSeries).map(row => {
     const label = (row || []).slice(0, numericIndex).map(value => String(value ?? '').trim()).filter(Boolean).join(' ');
-    return { label: label || String(row?.[0] ?? ''), value: parseLocaleChartNumber(row?.[numericIndex]) };
+    return { label: label || String(row?.[0] ?? ''), value: parseLocaleNumber(row?.[numericIndex]) };
   }).filter(item => item.value !== null);
   return { series, numericIndex };
 }
