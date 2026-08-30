@@ -77,8 +77,8 @@ check('ratio de fallback conserva 2.0', fallback && near(ratio(fallback.w, fallb
 
 // ─── 4. Anti-regresion estatica ───
 console.log('--- 4. pdf-generator.js protege el aspecto al recortar el ancho ---');
-check('renderImagePDF re-escala alto cuando el ancho se recorta', pdfSource.includes('displayH = displayW * (image.height / image.width)'));
-check('estimateSectionH estima alto proporcional para imagenes anchas', pdfSource.includes('return sectionH * (contentW / sectionW);'));
+check('renderImagePDF re-escala alto cuando el ancho se recorta', pdfSource.includes('const scaled = fitImageDisplay(sectionW, sectionH, contentW, usableH)'));
+check('fitImageDisplay preserva la proporcion y encaja dentro de la pagina', /function fitImageDisplay\(sectionW, sectionH, contentW, usableH\)[\s\S]*?let w = Math\.min\(contentW, sectionW\)[\s\S]*?let h = sectionH \* \(w \/ sectionW\)/.test(pdfSource));
 
 console.log(`\nResultados: ${pass} pass, ${fail} fail, ${pass + fail} tests`);
 process.exit(fail ? 1 : 0);

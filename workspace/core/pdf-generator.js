@@ -136,9 +136,8 @@ function generatePDF(config) {
     if (section.type === 'image') {
       const sectionW = Number(section.width);
       const sectionH = Number(section.height);
-      // Coherente con renderImagePDF: si el ancho (px) se recorta a contentW,
-      // el alto estimado se re-escala proporcional (evita paginas casi vacias).
-      if (sectionW && sectionH && sectionW > contentW) return sectionH * (contentW / sectionW);
+      const fit = fitImageDisplay(sectionW, sectionH, contentW, usableH);
+      if (fit) return fit.h;
       return sectionH || 150;
     }
     if (section.type === 'table') {
@@ -235,6 +234,7 @@ function generatePDF(config) {
           if (image) pageImages.set(image.name, image.id);
           return image;
         },
+        usableH,
       });
     });
     contentParts.push('Q');
@@ -421,18 +421,44 @@ function renderChartPDF(parts, section, x0, y0, contentW) {
   parts.push('0 0 0 rg');
 }
 
+// Encaje de imagenes dentro del area usable (ancho del contenido y alto usable):
+// conserva la proporcion y devuelve null si faltan dimensiones para que el
+// llamador use su fallback. Coherente entre estimacion (estimateSectionH) y
+// render (renderImagePDF) para no paginar a la estimacion y dibujar a otra.
+function fitImageDisplay(sectionW, sectionH, contentW, usableH) {
+  if (!sectionW || !sectionH || !contentW || !usableH) return null;
+  let w = Math.min(contentW, sectionW);
+  let h = sectionH * (w / sectionW);
+  if (h > usableH) {
+    h = usableH;
+    w = h * (sectionW / sectionH);
+  }
+  return { w, h };
+}
+
 function renderImagePDF(parts, section, x0, y0, contentW, context = {}) {
   const dataUrl = section.dataUrl || section.content;
   const image = context.registerImage?.(dataUrl);
   const sectionW = Number(section.width);
   const sectionH = Number(section.height);
-  const displayW = Math.min(contentW, sectionW || (image ? contentW : 300));
-  let displayH = sectionH || (image ? Math.max(80, displayW * image.height / image.width) : 120);
-  // document.to-pdf escribe width/height en px (canvas de la imagen). Si el
-  // ancho pedido se recorta a contentW, el alto debe re-escalarse proporcional:
-  // conservar el alto crudo deformaba la imagen y desbordaba la pagina.
-  if (image && sectionW && sectionH && displayW < sectionW) {
-    displayH = displayW * (image.height / image.width);
+  const usableH = context.usableH || 0;
+  // Una imagen mas alta que la pagina usable se re-escala para caber en alto
+  // (antes solo se acotaba el ancho: una captura estrecha y larga se dibujaba
+  // fuera del margen inferior y empujaba lo siguiente a paginas vacias).
+  const scaled = fitImageDisplay(sectionW, sectionH, contentW, usableH);
+  let displayW = contentW;
+  let displayH = sectionH || 120;
+  if (scaled) {
+    displayW = scaled.w;
+    displayH = scaled.h;
+  } else if (image) {
+    displayW = Math.min(contentW, sectionW || contentW);
+    displayH = Math.max(80, displayW * (image.height / image.width));
+    const capped = fitImageDisplay(displayW, displayH, contentW, usableH);
+    if (capped) {
+      displayW = capped.w;
+      displayH = capped.h;
+    }
   }
   const boxY = y0 - displayH;
   if (image) {

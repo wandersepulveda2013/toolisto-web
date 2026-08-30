@@ -251,6 +251,28 @@
 
 ---
 
+## Cycle 141 — PDF bug fix: imagenes encajadas en la pagina (CE-078)
+
+| Field | Value |
+|-------|-------|
+| **Date** | 2026-08-30 |
+| **Branch** | main |
+| **HEAD inicial** | 5d4f7f0 |
+| **HEAD final** | commit CE-078 de este ciclo |
+| **Task** | CE-078 (BUG_FIX, P2, informe PDF): `renderImagePDF` acotaba solo el ANCHO (`displayW = Math.min(contentW, sectionW || ...)`) y derivaba el alto del crudo (`sectionH`) re-escalado por ancho solo cuando `displayW < sectionW`. Cuando el ancho pedido ya cabia (captura estrecha o `sectionW <= contentW`), el alto crudo se usaba sin limite superior: una imagen 768x6000 llegaba a `h=960` (mLx 56.7 - 960 -> por debajo del margen) y cualquier `sectionW <= contentW` con alto desproporcionado se recortaba visualmente. La estimacion (`estimateSectionH`) solo re-escalaba cuando `sectionW > contentW`, por lo que no coincidia con el render para imagenes estrechas-altas: paginas casi vacias (estimacion pequena) o imagenes truncadas en el render. |
+| **Hypothesis** | Un unico `fitImageDisplay(sectionW, sectionH, contentW, usableH)` compartido por estimacion y render, que encaje dentro del area usable conservando la proporcion (primero por ancho, luego por alto, sin agrandar lo que ya cabe), alinea ambos y garantiza que ningun cajon de imagen exceda la pagina. |
+| **Change** | `workspace/core/pdf-generator.js`: nuevo helper `fitImageDisplay(sectionW, sectionH, contentW, usableH)` (returns `null` si faltan dimensiones). `estimateSectionH` rama `image`: `const fit = fitImageDisplay(...); if (fit) return fit.h;`. `renderImagePDF` firma `(parts, section, x0, y0, contentW, context)`: usa `context.usableH` y aplica `fitImageDisplay` para `displayW/displayH` (manteniendo el fallback sin dimensiones via `image.height/image.width` y acotandolo tambien). `generatePDF` pasa `usableH` en el context al llamar `renderSectionPDF`. |
+| **Bugs encontrados** | (1) Imagen estrecha y muy alta (400x5000) dibujada fuera del margen inferior. (2) Imagen alta (768x6000) no encajada en alto (h=960 excedia usableH 728.6). (3) Desalineacion estimacion/render para imagenes estrechas-altas (paginas casi vacias / imagenes recortadas). Sin bugs nuevos: sonda post-fix 400x5000 -> 58.3x728.6, 3000x800 -> 481.6x128.4, 768x6000 -> 93.3x728.6, 560x315 -> 481.6x270.9 (todas dentro de la pagina, proporcion conservada). |
+| **Tests ejecutados** | Suite nueva `tests/workspace/pdf-image-fit-test.mjs` 16/16, pure Node (JPEG minimo 1x1 + parseo de `cm`): estrecha-alta y alta encajadas por alto dentro del margen, ancha por ancho, imagen que cabe no agrandada, proporcion conservada; anti-regresion estatica (`fitImageDisplay` presente en modulo/render/estimacion, `usableH` en el context, estimacion antigua de un solo eje eliminada). Suite `tests/workspace/pdf-image-aspect-test.mjs` (CE-073) actualizada a la nueva implementacion compartida: 11/11 (sus 2 checks estaticos antiguos asertaban las viejas lineas borradas). Registrada en `scripts/test-workspace-release.mjs`. Huerfanas revalidadas: `workflow-document-pdf` 66/66, `pdf-table-pagination` 7/7, `pdf-text-wrap` 9/9, `pdf-chart-layout` 10/10. |
+| **Tests PASS** | 16 (CE-078) + 11 (CE-073 actualizada) + huerfanas (66+7+9+10) + RELEASE GATE completo 43/43 = 0 fail. |
+| **Tests FAIL** | 0. |
+| **Commits** | CE-078 (fix `pdf-generator.js` + suite 16/16 + actualizacion CE-073 + registro gate + trackers). |
+| **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL` (harness niega `git push*`). Manifests del release-gate y evidencias regeneradas se excluyen del commit (anti-churn). |
+| **Limitaciones** | El encaje de imagen depende de `width`/`height` en px y de `usableH` (context). Sin `width`/`height` se conserva el fallback proporcional (`image.height/image.width`) despues de acotarlo por alto. No se repitio el E2E de navegador (defecto puro de generacion cubierto por el stream; `workflow-document-pdf` ya cubre imagen->PDF). |
+| **Proxima prioridad** | Proximo TODO de producto o DISCOVERY cuando el backlog este vacio (`cli recommend`). |
+
+---
+
 ## Cycle 128 — Fix test-debt in engine/parser/planner suites + register them in the gate (CE-065)
 
 | Field | Value |
