@@ -42,6 +42,11 @@ AI_AUTONOMY/runner.lock
 AI_AUTONOMY/.fake-marker.txt
 AI_AUTONOMY/.tree-pids/
 
+# CE-070 evidence-driven history + auto-tuned policy (runtime, gitignored)
+AI_AUTONOMY/history.jsonl
+AI_AUTONOMY/policy.json
+AI_AUTONOMY/policy.json.tmp
+
 # Diagnostic audit scripts (ad-hoc, not part of the test suite)
 tests/workspace/find-corrupt.mjs
 tests/workspace/ocr-diagnostic.mjs

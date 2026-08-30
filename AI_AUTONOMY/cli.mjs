@@ -44,17 +44,20 @@ import * as state from './state.mjs';
 import * as runtime from './runtime.mjs';
 import * as runner from './runner.mjs';
 import * as queue from './queue.mjs';
+import * as history from './history.mjs';
 
 // ROOT = the workspace root that contains AI_AUTONOMY/. Resolved from this file's
 // own location (not process.cwd()) so PowerShell can invoke the CLI from anywhere.
 const MODULE_DIR = dirname(fileURLToPath(import.meta.url));
 const ROOT = dirname(MODULE_DIR);
 export const FILE = {
-  runtime: join(ROOT, 'AI_AUTONOMY', 'runtime.json'),
-  state: join(ROOT, 'AI_AUTONOMY', 'state.json'),
-  events: join(ROOT, 'AI_AUTONOMY', 'events.jsonl'),
-  lock: join(ROOT, 'AI_AUTONOMY', 'runner.lock'),
-  heartbeat: join(ROOT, 'AI_AUTONOMY', 'heartbeat.json'),
+  runtime: process.env.TOOLISTO_RUNTIME_FILE || join(ROOT, 'AI_AUTONOMY', 'runtime.json'),
+  state: process.env.TOOLISTO_STATE_FILE || join(ROOT, 'AI_AUTONOMY', 'state.json'),
+  events: process.env.TOOLISTO_EVENTS_FILE || join(ROOT, 'AI_AUTONOMY', 'events.jsonl'),
+  lock: process.env.TOOLISTO_LOCK_FILE || join(ROOT, 'AI_AUTONOMY', 'runner.lock'),
+  heartbeat: process.env.TOOLISTO_HEARTBEAT_FILE || join(ROOT, 'AI_AUTONOMY', 'heartbeat.json'),
+  history: process.env.TOOLISTO_HISTORY_FILE || join(ROOT, 'AI_AUTONOMY', 'history.jsonl'),
+  policy: process.env.TOOLISTO_POLICY_FILE || join(ROOT, 'AI_AUTONOMY', 'policy.json'),
 };
 
 function out(obj) {
@@ -471,6 +474,179 @@ async function cmdSupervise(args) {
   });
 }
 
+// HISTORY / METRICS / RECOMMEND / TUNE / POLICY — Evidence-driven autonomy (CE-070).
+// These read/write history.jsonl (append-only) and policy.json (versioned). All
+// pure logic lives in history.mjs; the CLI is a thin bridge so PowerShell can
+// consume machine-readable JSON like the rest of the runtime bridge.
+
+function durToPhases(ms) {
+  const ph = {};
+  for (const p of runtime.PHASES) {
+    if (p === 'DONE') continue;
+    ph[p] = ms;
+  }
+  return ph;
+}
+
+function cmdHistoryRecord(args) {
+  const entry = history.normalizeCycleEntry({
+    kind: 'cycle',
+    cycle: args.cycle,
+    taskId: args.task,
+    ce: args.ce,
+    taskType: args['task-type'],
+    source: args.source,
+    priority: args.priority,
+    selectedScore: args['selected-score'],
+    durationMs: args['duration-ms'] || (args['duration-s'] ? Number(args['duration-s']) * 1000 : 0),
+    initialState: args['from-state'],
+    finalState: args['to-state'],
+    filesChanged: args['files-changed'],
+    commits: args.commits,
+    focusedTests: args['focused-tests'],
+    regressionTests: args['regression-tests'],
+    retries: args.retries,
+    crashes: args.crashes,
+    loops: args.loops,
+    stalls: args.stalls,
+    recoveries: args.recoveries,
+    safeMode: args['safe-mode'] === 'true' || args['safe-mode'] === '1',
+    envFailure: args['env-failure'] === 'true' || args['env-failure'] === '1',
+    blocked: args.blocked === 'true' || args.blocked === '1',
+    promptSizeChars: args['prompt-size'],
+    recoveryPromptSizeChars: args['recovery-size'],
+    supervisorVerdicts: String(args.verdicts || '').split(',').map((s) => s.trim()).filter(Boolean),
+    finalOutcome: args.outcome || args.verdict,
+    failureFingerprints: String(args.fingerprints || '').split(',').map((s) => s.trim()).filter(Boolean),
+    recoveryStrategies: String(args.strategies || '').split(',').map((s) => s.trim()).filter(Boolean),
+    phaseDurations: durToPhases(args['duration-ms'] ? Number(args['duration-ms']) : (args['duration-s'] ? Number(args['duration-s']) * 1000 : 0)),
+    partial: args.partial === 'true' || args.partial === '1',
+    deferred: args.deferred === 'true' || args.deferred === '1',
+    flags: String(args.flags || '').split(',').map((s) => s.trim()).filter(Boolean),
+    note: args.note,
+  });
+  const stored = history.recordCycle(FILE.history, entry);
+  return okExit({ recorded: true, cycle: stored.cycle, taskId: stored.taskId, outcome: history.classifyOutcome(stored) });
+}
+
+function cmdHistoryList(args) {
+  const { cycles } = history.loadHistory(FILE.history);
+  const limit = args.limit ? Number(args.limit) : 0;
+  const arr = limit > 0 ? cycles.slice(-limit) : cycles;
+  return okExit({ cycles: arr, count: cycles.length });
+}
+
+function cmdMetrics() {
+  const { cycles, corrupt, total, partialHistory } = history.loadHistory(FILE.history);
+  return okExit({
+    metrics: history.metrics(cycles),
+    corruption: { corrupt, total, partialHistory },
+    foreignSafetyEvents: allEntries(FILE.history).filter((e) => e.kind === 'safety').length,
+  });
+}
+
+function cmdRecommend(args) {
+  const { cycles } = history.loadHistory(FILE.history);
+  const policy = history.readPolicy(FILE.policy) || history.policyFileShape(runtime.PHASE_TIMEOUTS_MS);
+  const taskRec = history.recommendTask(
+    Object.values(queue.parseMarkdownQueue(safeRead(join(ROOT, 'workspace', 'CONTINUOUS-EVOLUTION-QUEUE.md'))).tasks),
+    cycles
+  );
+  const timeouts = {};
+  for (const ph of runtime.PHASES) {
+    if (ph === 'DONE') continue;
+    const samples = cycles.flatMap((c) => (c.phaseDurations && c.phaseDurations[ph]) ? [c.phaseDurations[ph]] : [c.durationMs || 0]);
+    timeouts[ph] = history.recommendTimeout(ph, samples, policy.phases[ph] ?? runtime.PHASE_TIMEOUTS_MS[ph], policy.bounds || {});
+  }
+  const bloat = history.detectPromptBloat(cycles);
+  const lowValue = cycles.map((c) => ({ cycle: c.cycle, value: history.valueSignal(c), signals: history.detectLowValueActivity(c) })).filter((x) => x.signals.length > 0);
+  const recovery = history.recommendRecovery(args.fp || null, cycles);
+  return okExit({
+    taskRecommendation: taskRec,
+    timeoutRecommendations: history.sortKeys(timeouts),
+    contextWarnings: bloat,
+    lowValueActivity: lowValue,
+    recoveryRecommendation: recovery,
+    policy: policy.policyVersion,
+  });
+}
+
+// TUNE: recommendation-first. Default recommendation mode (mission §27);
+// auto-apply PREVIEW only via --preview (never silent, always bounded).
+function cmdTune(args) {
+  const { cycles } = history.loadHistory(FILE.history);
+  let policy = history.readPolicy(FILE.policy) || history.policyFileShape(runtime.PHASE_TIMEOUTS_MS);
+  const timeouts = {};
+  for (const ph of runtime.PHASES) {
+    if (ph === 'DONE') continue;
+    const samples = cycles.flatMap((c) => (c.phaseDurations && c.phaseDurations[ph]) ? [c.phaseDurations[ph]] : [c.durationMs || 0]);
+    timeouts[ph] = history.recommendTimeout(ph, samples, policy.phases[ph] ?? runtime.PHASE_TIMEOUTS_MS[ph], policy.bounds || {});
+  }
+  const applied = [];
+  if (args['apply'] === 'true' || args.apply === '1') {
+    for (const [ph, rec] of Object.entries(timeouts)) {
+      if (rec.status !== 'INSUFFICIENT_EVIDENCE' && rec.recommendedMs !== rec.currentMs && rec.status !== 'KEEP_CURRENT') {
+        const res = history.applyPolicyChange(policy, {
+          phase: ph,
+          newMs: rec.recommendedMs,
+          reason: rec.reason,
+          evidence: `samples ${rec.samples}, p90 ${rec.p90}, p50 ${rec.p50}`,
+        });
+        if (res.ok) {
+          applied.push({ phase: ph, fromMs: policy.phases[ph], toMs: res.policy.phases[ph] });
+          policy = res.policy;
+        }
+      }
+    }
+    if (applied.length) history.writePolicy(FILE.policy, policy);
+  }
+  return okExit({
+    mode: args['apply'] === 'true' || args.apply === '1' ? 'apply' : 'recommend',
+    autoApplyDefault: false,
+    explanation: 'adaptive auto-tuning OFF by default; recommendations must be reviewed before apply (CE-070 §27)',
+    timeouts: history.sortKeys(timeouts),
+    appliedChanges: applied,
+    policyVersion: policy.policyVersion,
+  });
+}
+
+// POLICY: versioning + rollback (mission §19).
+function cmdPolicy(args) {
+  const policy = history.readPolicy(FILE.policy) || history.policyFileShape(runtime.PHASE_TIMEOUTS_MS);
+  if (args.apply) {
+    const res = history.applyPolicyChange(policy, {
+      phase: args['phase'] || args.phase,
+      newMs: args['new-ms'] || args.newMs,
+      reason: args.reason,
+      evidence: args.evidence,
+    });
+    if (!res.ok) return nokExit({ reason: res.reason, status: res.status });
+    history.writePolicy(FILE.policy, res.policy);
+    return okExit({ policyVersion: res.policy.policyVersion, status: res.status, phases: res.policy.phases });
+  }
+  if (args.rollback) {
+    const res = history.rollbackPolicy(policy);
+    if (!res.ok) return nokExit({ reason: res.reason, status: res.status });
+    history.writePolicy(FILE.policy, res.policy);
+    return okExit({ policyVersion: res.policy.policyVersion, status: res.status, phases: res.policy.phases });
+  }
+  return okExit({ policy, autoApply: false });
+}
+
+function safeRead(p) {
+  try { return readFileSync(p, 'utf8'); } catch { return ''; }
+}
+function allEntries(p) {
+  if (!existsSync(p)) return [];
+  const out = [];
+  for (const line of readFileSync(p, 'utf8').split('\n')) {
+    const t = line.trim();
+    if (!t) continue;
+    try { out.push(JSON.parse(t)); } catch { /* isolated */ }
+  }
+  return out;
+}
+
 async function main() {
   const [cmd, ...rest] = process.argv.slice(2);
   if (!cmd) return err('usage: cli.mjs <command> [args]', 2);
@@ -496,6 +672,15 @@ async function main() {
     case 'inspect': return cmdInspect();
     case 'read-state': return cmdReadState();
     case 'supervise': return cmdSupervise(args);
+    case 'history': {
+      const sub = args.sub || args.record ? 'record' : 'list';
+      if (args.record) return cmdHistoryRecord(args);
+      return cmdHistoryList(args);
+    }
+    case 'metrics': return cmdMetrics();
+    case 'recommend': return cmdRecommend(args);
+    case 'tune': return cmdTune(args);
+    case 'policy': return cmdPolicy(args);
     case 'lock-status': {
       const ls = isLockStale(FILE.lock);
       return okExit({ stale: ls.stale, lock: ls.lock });

@@ -144,6 +144,39 @@ function Get-RuntimeBoot {
   return Invoke-Runtime @('boot')
 }
 
+# CE-070: registra el ciclo terminado en la historia estructurada del runtime
+# (AI_AUTONOMY/history.jsonl) para el sistema evidence-driven: outcome ya
+# clasificado por el runtime, senales de valor/loop/stall/recovery y tamano de
+# prompt (fresh vs recovery) para deteccion de context bloat.
+function Write-CycleHistory {
+  param(
+    [int]$Cycle,
+    [string]$ModeShort,
+    [string]$TaskId,
+    [string]$Outcome,
+    [string]$Result,
+    [string]$NextAction,
+    [int]$Exit,
+    [int]$DurationS,
+    [string]$HeadFrom,
+    [string]$HeadTo,
+    [int]$PromptChars,
+    [int]$RecoveryChars,
+    [switch]$SafeMode,
+    [switch]$EnvFailure
+  )
+  $hArgs = @('history', '--record', '--cycle', ([string]$Cycle), '--ce', $ModeShort, '--task', $TaskId,
+             '--task-type', $Result, '--outcome', $Outcome, '--verdicts', $Outcome,
+             '--duration-s', ([string]$DurationS), '--commits', '0', '--files-changed', '0',
+             '--retries', '0', '--crashes', '0', '--loops', '0', '--stalls', '0', '--recoveries', '0',
+             '--prompt-size', ([string]$PromptChars), '--recovery-size', ([string]$RecoveryChars),
+             '--from-state', 'TODO', '--to-state', ($(if ($Exit -eq 0) { 'DONE' } else { 'FAILED' })))
+  if ($SafeMode) { $hArgs += @('--safe-mode', 'true') }
+  if ($EnvFailure) { $hArgs += @('--env-failure', 'true') }
+  if ($NextAction) { $hArgs += @('--strategies', $NextAction) }
+  $null = Invoke-Runtime $hArgs
+}
+
 # CE-069: construye el contexto de RECOVERY compacto tras un fallo supervisado
 # (mision §11 / §12): solo lo necesario (Cycle, CE, state, task, last verified,
 # reason, recovery count, siguiente accion, prohibicion de repetir trabajo).
@@ -279,6 +312,7 @@ try {
   # limpia tras su consumo (no contamina ciclos posteriores). $taskId es la
   # identidad estable del ciclo actual para supervisor/recuperacion.
   $recoveryPrompt = ""
+  $recoveryPromptChars = 0
   $taskId = $null
 
   while ($isUnlimited -or $cycle -lt $MaxCycles) {
@@ -430,7 +464,8 @@ Al terminar, cierra tu respuesta final con una linea exacta: RESULTADO_CICLO: <T
     # limpiamos de inmediato para no contaminar ciclos posteriores.
     if (-not [string]::IsNullOrWhiteSpace($recoveryPrompt)) {
       $prompt = "$recoveryPrompt`r`n`r`n$prompt"
-      Write-Log "Recovery context del ciclo anterior antepuesto al prompt de este ciclo."
+      $recoveryPromptChars = $recoveryPrompt.Length
+      Write-Log "Recovery context del ciclo anterior antepuesto al prompt de este ciclo ($recoveryPromptChars chars)."
       $recoveryPrompt = ""
     }
 
@@ -495,6 +530,9 @@ OUTPUT:
       $nextAction = if ($rec -and $rec.ok) { $rec.action } else { 'RETRY_DIRECT' }
       $delayMin = 1
       if ($rec -and $rec.ok -and $rec.backoffMinutes -gt 0) { $delayMin = $rec.backoffMinutes }
+      # CE-070: registrar el ciclo en la historia estructurada (fallo de infra,
+      # no penalizado como fallo de calidad de la tarea -> EnvFailure).
+      Write-CycleHistory -Cycle $cycle -ModeShort $modeShort -TaskId $taskId -Outcome 'CONFIG_ERROR' -Result 'SIN_MARCA' -NextAction $nextAction -Exit 5 -DurationS 0 -HeadFrom $headFrom -HeadTo $headFrom -PromptChars $prompt.Length -RecoveryChars 0 -EnvFailure
       if ($nextAction -eq 'SAFE_MODE') {
         Write-Log "RUNTIME SAFE_MODE tras SUPERVISOR FAILURE del ciclo $cycle. Deteniendo (requiere intervencion humana)."
         Write-WatchLog "SAFE_MODE tras SUPERVISOR FAILURE ciclo $cycle."
@@ -537,11 +575,19 @@ OUTPUT:
     Add-Content -LiteralPath $logFile -Value "`n================================================================`nSUPERVISOR OUTCOME: $outcome`nEXIT CODE: $exit`nRESULTADO CICLO: $result (bucket $bucket) HEAD $headFrom -> $headTo`n================================================================`n" -Encoding UTF8
     Remove-Item -LiteralPath $CycleFile -Force -ErrorAction SilentlyContinue
 
+    # CE-070: registrar el ciclo terminado en la historia estructurada del
+    # runtime (policy evidence). Envio determinista de las metricas reales del
+    # ciclo mas las de supervision (ignorando la transicion de modo).
+    if ($modeShort -and $taskId) {
+      Write-CycleHistory -Cycle $cycle -ModeShort $modeShort -TaskId $taskId -Outcome $outcome -Result $result -NextAction '' -Exit $exit -DurationS $durSec -HeadFrom $headFrom -HeadTo $headTo -PromptChars $prompt.Length -RecoveryChars $recoveryPromptChars -SafeMode:($nextAction -eq 'SAFE_MODE')
+    }
+
     # CE-068/069: el resultado del ciclo YA se persistio en el runtime dentro de
     # cli supervise (SUCCESS o FAILURE). Aqui solo consultamos la recuperacion.
     if ($exit -eq 0) {
       $consecutiveFailures = 0
       $recoveryPrompt = ""
+      $recoveryPromptChars = 0
       Remove-Item -LiteralPath $BackoffFile -Force -ErrorAction SilentlyContinue
       Write-Log "Cycle $cycle OK (supervisor SUCCESS, resultado $result). Estado persistente: SUCCESS."
       if ($supResp -and $supResp.treeCleaned) { Write-Log "Supervisor: process tree limpiado exitosamente al terminar." }

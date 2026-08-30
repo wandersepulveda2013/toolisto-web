@@ -38,6 +38,8 @@ function setupWorkspace() {
   const files = [
     'cli.mjs', 'supervisor.mjs', 'runtime.mjs', 'guard.mjs', 'state.mjs',
     'runner.mjs', 'lock.mjs', 'commit-guard.mjs', 'queue.mjs', 'fake-opencode.mjs', 'fake-runner.mjs',
+    // CE-070: cli.mjs bridges evidence-driven history; the copy must include it.
+    'history.mjs',
   ];
   for (const f of files) copyFileSync(join(AUTH_DIR, f), join(dir, 'AI_AUTONOMY', f));
   execFileSync('git', ['init', '-q'], { cwd: dir });

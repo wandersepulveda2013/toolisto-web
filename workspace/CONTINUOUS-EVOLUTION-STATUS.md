@@ -75,6 +75,28 @@
 
 ---
 
+## Cycle 133 — Evidence-Driven Autonomous Optimization: the system learns from its own operational history (CE-070)
+
+| Field | Value |
+|-------|-------|
+| **Date** | 2026-08-29 |
+| **Branch** | main |
+| **HEAD inicial** | ac52fcf |
+| **HEAD final** | commit CE-070 de este ciclo |
+| **Task** | CE-070 (ARCHITECTURE_IMPROVEMENT, P0, sistema autonomo): el sistema detecta/interrumpe/recupera (desde CE-067..CE-069) pero no aprende de su propia historia operativa. Objetivo: un modelo de ciclo maquina-legible + clasificacion determinista outcome/valor + priorizacion de tareas basada en evidencia + recomendacion de timeouts robusta + analisis de estrategias de recuperacion + deteccion de prompt-bloat/LOW_VALUE_ACTIVITY + policy versionada reversible — sin ML, sin heuristica opaca, decisions explicables/acotadas/reversibles. |
+| **Hypothesis** | Si el runtime registra cada ciclo terminado en `history.jsonl` (append-only, determinista) y expone decisiones via `cli history/metrics/recommend/tune/policy`, el launcher de produccion puede priorizar mejor, recomendar factiblemente (nunca con <10 muestras), penalizar fracasos distinguiendo TAREA vs ENTORNO, evitar churn (drift <=20% por paso, delta critico >=5%) y revertir cualquier ajuste de policy — sin que el sistema se detenga por falta de backlog. |
+| **Change** | Nuevo `AI_AUTONOMY/history.mjs`: normalizeCycleEntry/recordCycle/loadHistory (JSONL, corrupcion aislada, PARTIAL_HISTORY), classifyOutcome (SUCCESS_PRODUCT/BUG_FIX/RELIABILITY/TEST_DEBT/ARCHITECTURE, PARTIAL, DEFERRED, BLOCKED_EXTERNAL, FAILED, SAFE_MODE, INVALID), valueSignal (CRITICAL/HIGH/MEDIUM/LOW), detectLowValueActivity, historicalPenalty (env-vs-task, env pesa ~10x menos), scoreTaskDetail/scoreTask/selectTaskExplainable (9 componentes explicitos + tie-break determinista por id), recommendTask (TODO -> RECOMMENDED_NEXT_TASK; sin TODO -> DISCOVERY con guidance que penaliza test-only/doc-only recientes y sugiere areas subrepresentadas), recoveryStrategyStats/recommendRecovery, recommendTimeout (p90/p50, nunca media; INSUFFICIENT_EVIDENCE <10 muestras; hard bounds; maxAdjustmentPct 20%; minMeaningfulDelta 5%; KEEP_CURRENT anti-churn), detectPromptBloat (CONTEXT_BLOAT por crecimiento y umbral absoluto), metrics, policyFileShape/readPolicy/writePolicy/applyPolicyChange/rollbackPolicy (versionada, audit trail, bounds, NO_PREVIOUS). `cli.mjs` anade `history record/list`, `metrics`, `recommend`, `tune` (recomendacion-only por defecto; auto-apply OFF), `policy show/apply/rollback`, con FILE paths sobreescribibles via env (TOOLISTO_*) para tests aislados. `RUN-OPENCODE-AUTONOMOUS.ps1`: helper `Write-CycleHistory` llamado tras cada ciclo (exito y falla supervisada con outcome real, exit, duracion, tamanos de prompt fresh/recovery) y en SUPERVISOR FAILURE con `--env-failure` (fallo de infra NO penaliza la calidad de la tarea). `.gitignore`: + `history.jsonl`, `policy.json`, `policy.json.tmp`. |
+| **Bugs encontrados** | (1) `rollbackPolicy` crasheaba (`ReferenceError: policyVersion`) y no restauraba bien fase/version/sol — reescrito con version anterior y `changes.slice(0,-1)`. (2) `writePolicy` dejaba `policy.json.tmp` huerfano en el workspace -> se elimina tras escribir y se ignora en git. (3) `cmdTune` reasignaba `const policy` -> `let`. (4) `ce069/ce068` copian `AI_AUTONOMY/*` a temp para ejecutar cli real: sin `history.mjs` la copia rompia el import -> anadido a la lista de ficheros copiados. (5) En la suite, `writeFileSync(..., {flag:'a'})` con full content duplicaba el fichero (bug del test, no del modulo) y la expectativa I7 asumia salto directo al hard max cuando el disenio protege por pasos de 20% (drift). |
+| **Tests ejecutados** | Suite nueva `ce070-history-learning-test` 117/117 (A clasificacion, B valor, C low-value, D penalizacion env-vs-task, E scoring explicable, F seleccion determinista + tie-break, G recomendacion todo/discovery, H backtest determinista sobre fixtures 12 ciclos, I timeouts robustos INSUFFICIENT/samples/bounds/drift/clamp, J prompt bloat, K recovery stats/recommend, L storage + corrupcion aislada + deterministic reload, M metrics, N policy versioning/rollback/bounds/NO_PREVIOUS, O CLI e2e completo record/metrics/recommend/tune/policy/apply/rollback, P perf 3000 ciclos). Regresion: CE-069 66/66, CE-068 36/36, policy 45/45, orchestrator 85/85, resilience 17/17. Parse-AST OK (0 errores) de ambos .ps1. |
+| **Tests PASS** | 117/117 (CE-070) + 66 + 36 + 45 + 85 + 17 = 366 checks PASS. |
+| **Tests FAIL** | 0. |
+| **Commits** | CE-070 (history.mjs + puente CLI history/metrics/recommend/tune/policy + launcher Write-CycleHistory + suite CE-070 + .gitignore + traceback en ce069/ce068 + run-all). |
+| **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL` (harness niega `git push*`). Smoke de opencode real sigue `SKIPPED_EXTERNAL_CONSTRAINT` (harness niega el binario `opencode`) — igual que CE-069, el flujo queda cubierto por pruebas de subproceso real. |
+| **Limitaciones** | `recommendTimeout` usa la duracion total del ciclo como unica muestra por fase mientras el launcher no mida fases reales (el registro de fases queda listo en el modelo; el launcher puede poblarlo despues). Auto-apply de policy queda OFF por defecto (recomendacion-only) por disenio. Ficheros extranos del repo quedan intactos (no se tocan). |
+| **Proxima prioridad** | Cuando el backlog-no-vacio lo pida, usar `cli recommend`/`tune` como entrada real de priorizacion; o deep-audit de opencode real cuando el dueno autorice lanzarlo. |
+
+---
+
 ## Cycle 128 — Fix test-debt in engine/parser/planner suites + register them in the gate (CE-065)
 
 | Field | Value |
