@@ -97,6 +97,28 @@
 
 ---
 
+## Cycle 134 — Star-flow bug fix: convertDocToTable multi-space OCR tables via parseTabularText (CE-071)
+
+| Field | Value |
+|-------|-------|
+| **Date** | 2026-08-29 |
+| **Branch** | main |
+| **HEAD inicial** | ad1a0c1 |
+| **HEAD final** | commit CE-071 de este ciclo |
+| **Task** | CE-071 (BUG_FIX, P2, flujo estrella): «documento → tabla» producia columnas fantasma en tablas OCR alineadas por columnas — `detectSeparator` devuelve `''` para tablas multi-espacio y `line.split(' ')` creaba `Columna 2`/`Columna 4` con celdas vacias en el eslabon estrella `archivo → OCR → documento → tabla`. |
+| **Hypothesis** | Delegar el parsing en `parseTabularText` (unico precedente probado del repo, `split(/\s+/)` + `reconstructWhitespaceRow` con anclas numericas) y aplicar `normalizeOcrNumber` post-parsing elimina las columnas fantasma sin perder la confianza de celdas ni la relacion `source-document`, y sin regresiones en delimitadores explicitos (`;`, `|`). |
+| **Change** | `workspace/workspace.js`: `convertDocToTable` importa y delega en `parseTabularText` (del `core/tabular-text-parser.js`, el mismo parser de la operacion `text.to-table`); las filas se normalizan con `normalizeOcrNumber` (conserva el fix del signo OCR `1-`→`-`), el separator resultante es `parsed.delimiter || 'whitespace'`, y se conserva `buildCellConfidenceMatrix` y la relacion `source-document`. Se elimina la funcion muerta `rebuildTableRow` (~18 lineas; cero referencias en tests). Suite nueva `tests/workspace/doc-to-table-multispace-test.mjs` 20/20 registrada en `scripts/test-workspace-release.mjs`. `tests/workspace/persistence-lifecycle-audit.mjs` §19f: el check de `saveData(project.id, table)` dentro del `.then(saveAsset)` se robustece de numero de linea absoluto (L2426) a `findIndex` con lookback de `saveAsset(` — el cambio neto de lineas de workspace.js rompia el check estatico. |
+| **Bugs encontrados** | (1) Bug de producto: `detectSeparator || ' '` + `line.split(' ')` para tablas whitespace-aligned. (2) Check fragil de numero de linea absoluto en persistence-lifecycle-audit §19f (regate de autor solo, sin cambiar criterios). |
+| **Tests ejecutados** | `doc-to-table-multispace-test` 20/20 (parsing multi-espacio sin columnas fantasma, fixture Star-Flow reproduce exactamente 5 filas/15 celdas con negativos, `;`/`|` intactos, checks estaticos de la delegacion: import presente, `parseTabularText(lines.join(` usado, sin `line.split(separator)`, sin fallback `|| ' '`, `parsed.headers`/`parsed.rows` consumidos, `rebuildTableRow` inexistente, confianza + `source-document` conservadas). `persistence-lifecycle-audit` 95/95 tras el fix del check. RELEASE GATE completo `node scripts/test-workspace-release.mjs` 33/33 PASS (build + sync source→dist + Workspace + Phase 3A/3B + P11 + OCR source + Star-Flow E2E con OCR real + BOM CSV + engine-idle + workflow export + text-to-doc + doc-to-table-multispace + instruction parser/engine/planner + workflow UI + capture-flow + dist-smoke + autosave-lock + CE-058 x4 + CE-059 x3 + CE-060 x3 + CE-061 x3 + CE-066). |
+| **Tests PASS** | 20 (CE-071) + 95 (lifecycle audit) + RELEASE GATE 33/33 suites; total 0 fail. |
+| **Tests FAIL** | 0. |
+| **Commits** | CE-071 (fix `convertDocToTable` + suite 20/20 + registro gate + fix check fragil §19f). |
+| **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL` (harness niega `git push*`). Manifests del release-gate y evidencias regeneradas se excluyen del commit (anti-churn). |
+| **Limitaciones** | `parseTabularText` asume columnas ancladas por posicion numerica; tablas con celdas de texto muy alineadas usan la misma estrategia que `text.to-table` (precedente probado). El fixture dificil del OCR sigue siendo limite documentado de CE-006 (independiente de este fix). |
+| **Proxima prioridad** | Proximo TODO de producto o DISCOVERY cuando el backlog este vacio (`cli recommend`). |
+
+---
+
 ## Cycle 128 — Fix test-debt in engine/parser/planner suites + register them in the gate (CE-065)
 
 | Field | Value |

@@ -3,6 +3,7 @@ import { appStore } from './core/state.js';
 import { on, emit } from './core/events.js';
 import { generateId } from './core/db.js';
 import { detectSeparator, parseLocaleNumber } from './core/locale-parser.js';
+import { parseTabularText } from './core/tabular-text-parser.js';
 import {
   createProject, updateProject, deleteProject, loadProjects as _loadProjects,
   selectProject, saveDoc, loadDocs, deleteDoc, saveData, loadData, deleteData, saveCapture,
@@ -2243,25 +2244,6 @@ function setTableReviewStatus(table, status) {
   return true;
 }
 
-function rebuildTableRow(tokens, headerCount) {
-  const cells = tokens.map(normalizeOcrNumber);
-  if (cells.length === headerCount) return cells;
-  if (cells.length > headerCount && headerCount >= 3) {
-    let numericIndex = -1;
-    for (let i = 0; i < cells.length; i++) {
-      if (parseLocaleNumber(cells[i]) !== null) { numericIndex = i; break; }
-    }
-    if (numericIndex !== -1) {
-      const rebuilt = new Array(headerCount).fill('');
-      rebuilt[0] = cells.slice(0, numericIndex).join(' ');
-      rebuilt[1] = cells[numericIndex];
-      rebuilt[headerCount - 1] = cells.slice(numericIndex + 1).join(' ');
-      return rebuilt;
-    }
-  }
-  return cells;
-}
-
 let _convertingDocToTable = false;
 function convertDocToTable(doc) {
   if (_convertingDocToTable) { toast('Conversión en curso, espera', 'info'); return; }
@@ -2272,21 +2254,11 @@ function convertDocToTable(doc) {
   const start = Date.now();
   const table = createTableDocument(doc.name || 'Tabla extraida', project.id);
   const sheet = table.sheets[0];
-  const separator = detectSeparator(lines, { maxLines: 5 }) || ' ';
-  const parsedRows = lines.map(line => line.split(separator).map(cell => cell.trim()));
-  const headerCount = parsedRows.length > 0 ? parsedRows[0].length : 1;
-  const normalizedRows = parsedRows.map((row, index) => {
-    if (index === 0) return row.map((cell, i) => cell || 'Columna ' + (i + 1));
-    if (separator === ' ') return rebuildTableRow(row, headerCount);
-    return row.map(normalizeOcrNumber);
-  });
-  if (normalizedRows.length > 0) {
-    sheet.columns = normalizedRows[0];
-    sheet.rows = normalizedRows.slice(1).length > 0 ? normalizedRows.slice(1) : [normalizedRows[0].map(() => '')];
-  } else {
-    sheet.columns = ['Texto'];
-    sheet.rows = [lines];
-  }
+  const parsed = parseTabularText(lines.join('\n'));
+  const separator = parsed.delimiter || 'whitespace';
+  const normalizedRows = parsed.rows.map(row => row.map(normalizeOcrNumber));
+  sheet.columns = parsed.headers;
+  sheet.rows = normalizedRows.length > 0 ? normalizedRows : [parsed.headers.map(() => '')];
   table.headers = sheet.columns;
   table.rows = sheet.rows;
   table.sourceAssetId = doc.id;

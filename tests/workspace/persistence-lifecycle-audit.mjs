@@ -886,14 +886,19 @@ console.log('\n--- Section 19: Repository-wide async persistence audit ---');
     storageCode.includes("assertIntegrity().then(audit => emit('integrity:audited', audit)).catch("));
 }
 
-// 19f. Specific audit of saveData call at L2426 (inside saveAsset .then)
+// 19f. Specific audit of saveData fire-and-forget inside saveAsset().then
+// (documented limitation; robust to source line changes, unlike the old L2426 check)
 {
-  const line2426 = wsCode.split('\n')[2425];
-  check('L2426 saveData inside saveAsset .then — fire-and-forget (documented)',
-    line2426 && line2426.includes('saveData(project.id, table)'),
-    line2426 ? line2426.trim() : 'not found');
-  check('L2426 has no individual .catch() (documented limitation)',
-    line2426 && !line2426.includes('.catch('));
+  const wsLines = wsCode.split('\n');
+  const fafIndex = wsLines.findIndex((line, index) =>
+    line.includes('saveData(project.id, table);') &&
+    wsLines.slice(Math.max(0, index - 12), index).some(prev => prev.includes('saveAsset(')));
+  const fafLine = wsLines[fafIndex];
+  check('saveData fire-and-forget inside saveAsset .then (documented)',
+    !!fafLine && fafLine.includes('saveData(project.id, table)'),
+    fafLine ? fafLine.trim() : 'not found');
+  check('saveData fire-and-forget has no individual .catch() (documented limitation)',
+    !!fafLine && !fafLine.includes('.catch('));
 }
 
 // ================================================================
