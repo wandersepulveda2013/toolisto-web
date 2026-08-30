@@ -295,6 +295,28 @@
 
 ---
 
+## Cycle 143 — Register orphan PDF test suites in the release gate (CE-080)
+
+| Field | Value |
+|-------|-------|
+| **Date** | 2026-08-30 |
+| **Branch** | main |
+| **HEAD inicial** | 7007473 |
+| **HEAD final** | commit CE-080 de este ciclo |
+| **Task** | CE-080 (MEANINGFUL_TEST_COVERAGE, P3): tres suites del camino PDF eran ORFANAS: `pdf-table-pagination-test.mjs` (7/7), `workflow-document-pdf-test.mjs` (66/66) y `pdf-images-shared-test.mjs` (12/12). Un cotejo automatico (listar `tests/workspace/*.mjs` vs los archivos citados en `scripts/test-workspace-release.mjs` y `tests/run-all.mjs`) encontro que NO estaban registradas en ninguno de los dos runners. Se re-ejecutaban a mano en cada ciclo como "red de seguridad" de los cambios de paginacion/estimacion de PDF, pero al no estar en el gate, una regresion en ese camino (por ejemplo la altura de estimacion, el wrap de texto, el encaje de imagenes de CE-076/077/078) era invisible para la regresion automatizada. Es el mismo tipo de deuda de cobertura que se ataco en CE-065. |
+| **Hypothesis** | Registrar las tres suites en `scripts/test-workspace-release.mjs` (junto a las demas suites de PDF) elimina el riesgo de deriva y hace que el gate las proteja de forma automatica, sin modificar su contenido (solo la ejecucion). |
+| **Change** | `scripts/test-workspace-release.mjs`: se anaden tres `run(...)` tras `pdf-image-fit` (CE-078) con un comentario que explicita que eran huérfanas y cubren el camino `document.to-pdf` y la normalizacion compartida de imagenes. Ningun archivo de producto cambiado. |
+| **Bugs encontrados** | Ninguno en este ciclo (higiene/cobertura). Se confirmo que las tres suites pasan limpias en aislamiento: `pdf-table-pagination` 7/7, `workflow-document-pdf` 66/66, `pdf-images-shared` 12/12. |
+| **Tests ejecutados** | Las tres suites en aislamiento (7 + 66 + 12 = 85 checks, 0 fail) y el RELEASE GATE completo despues de registrarlas: 45 suites PASS 0 fail. |
+| **Tests PASS** | 45 suites (incluye las 3 nuevas registradas) = 0 fail. |
+| **Tests FAIL** | 0. |
+| **Commits** | CE-080 (registro en `test-workspace-release.mjs` + trackers). |
+| **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL` (harness niega `git push*`). Merger de manifests del release-gate y evidencias regeneradas se excluyen del commit (anti-churn). |
+| **Limitaciones** | Solo se registraron estas 3 suites del camino PDF; hay mas archivos en `tests/workspace` y en `tests/` que pueden ser orfanos de otros runners (auditoria mas amplia queda como oportunidad si se quiere). No se añadio cobertura nueva, solo se puso en el gate lo que ya existia. |
+| **Proxima prioridad** | Proximo TODO de producto o DISCOVERY cuando el backlog este vacio (`cli recommend`). |
+
+---
+
 ## Cycle 128 — Fix test-debt in engine/parser/planner suites + register them in the gate (CE-065)
 
 | Field | Value |

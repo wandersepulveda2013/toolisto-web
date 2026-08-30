@@ -82,6 +82,12 @@ run('pdf-chart-overflow (barras de grafico siempre dentro del area, CE-075)', 'n
 run('pdf-text-wrap (texto y titulos dentro del area, CE-076)', 'node', ['tests/workspace/pdf-text-wrap-test.mjs']);
 run('pdf-chart-layout (grafico sin solape ni hueco por altura real, CE-077)', 'node', ['tests/workspace/pdf-chart-layout-test.mjs']);
 run('pdf-image-fit (imagenes encajadas en la pagina, CE-078)', 'node', ['tests/workspace/pdf-image-fit-test.mjs']);
+// Suites del camino PDF que eran HUERFANAS (solo se ejecutaban a mano en cada
+// ciclo, nunca registradas ni en run-all ni en este gate): queden protegidas
+// contra regresion en vez de ser cobertura silenciosa.
+run('pdf-images-shared (normalizacion de imagenes PDF compartida, CE-037)', 'node', ['tests/workspace/pdf-images-shared-test.mjs']);
+run('pdf-table-pagination (paginacion de tablas PDF)', 'node', ['tests/workspace/pdf-table-pagination-test.mjs']);
+run('workflow-document-pdf (document.to-pdf end to end, tabla/grafico/imagen)', 'node', ['tests/workspace/workflow-document-pdf-test.mjs']);
 // Suites del motor de flujos / parser / planificador (CE-065): antes solo
 // pasaban quitando los imports por VM pero crasheaban en aislamiento por
 // dependencias sin resolver (WORKFLOW_DEFINITION_VERSION, createExecutionResources).
