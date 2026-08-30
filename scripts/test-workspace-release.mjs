@@ -79,6 +79,7 @@ run('chart-series-locale (tabla -> grafico con parser canonico, CE-072)', 'node'
 run('pdf-image-aspect (imagen ancha no se deforma en PDF, CE-073)', 'node', ['tests/workspace/pdf-image-aspect-test.mjs']);
 run('pdf-table-wrap (celdas anchas y filas irregulares en PDF, CE-074)', 'node', ['tests/workspace/pdf-table-wrap-test.mjs']);
 run('pdf-chart-overflow (barras de grafico siempre dentro del area, CE-075)', 'node', ['tests/workspace/pdf-chart-overflow-test.mjs']);
+run('pdf-text-wrap (texto y titulos dentro del area, CE-076)', 'node', ['tests/workspace/pdf-text-wrap-test.mjs']);
 // Suites del motor de flujos / parser / planificador (CE-065): antes solo
 // pasaban quitando los imports por VM pero crasheaban en aislamiento por
 // dependencias sin resolver (WORKFLOW_DEFINITION_VERSION, createExecutionResources).

@@ -207,6 +207,28 @@
 
 ---
 
+## Cycle 139 — PDF bug fix: texto y titulos largos ya no salen del area ni solapan (CE-076)
+
+| Field | Value |
+|-------|-------|
+| **Date** | 2026-08-30 |
+| **Branch** | main |
+| **HEAD inicial** | 9b38aa4 |
+| **HEAD final** | commit CE-076 de este ciclo |
+| **Task** | CE-076 (BUG_FIX, P2, informe PDF): `document.to-pdf` desbordaba texto por dos vias complementarias. (a) `wrapText` NO partia tokens mas largos que la linea (a diferencia de `cellLines`): un titulo/URL de 130 chars se emitia como UNA linea a 24 pt — ~1560 pt de ancho en una pagina de 595 — saliendose por el borde derecho de la pagina. (b) `estimateSectionH` reservaba altos fijos para titulo/subtitulo/fecha/footer (36/26/20/24) y contaba lineas de texto con `lineHeight` 14, mientras el render dibuja `fontSize*1.4` (16.8 pt para texto a 12, 33.6 para titulos a 24): las secciones multilinea se dibujaban mas altas de lo reservado, solapando la seccion siguiente (un titulo largo tras el fix (a) solapaba el parrafo) y cayendo en el margen inferior al final de pagina. |
+| **Hypothesis** | Partir tokens largos en `wrapText` por el mismo criterio que `cellLines` (charsPerLine) elimina el desborde horizontal; y alinear `estimateSectionH` con la altura REAL del render (`size + (lines-1)*size*1.4`) elimina el solape vertical y el texto en el margen inferior, sin cambiar la salida de documentos de una linea (single-line conserva 36/26/20/24 y texto 24 pt). |
+| **Change** | `workspace/core/pdf-generator.js`: `wrapText` anade rama para `word.length > charsPerLine` (parte el token en trozos de charsPerLine con `rest.slice`, como `cellLines`); nuevo `estimateTextSectionH(section)` dentro de `generatePDF` (size por tipo + `(lines.length-1)*size*1.4 + 8`) usado por title/subtitle/date/footer (`Math.max(fijo, real)`) y por el caso `text` (`Math.max(24, real)`); se elimina la constante muerta `lineHeight` (solo la usaba la estimacion antigua). |
+| **Bugs encontrados** | (1) El defecto (a): token largo en UNA linea fuera del borde (probe: F2 len 130 a 24 pt, maxRight 1560 > 595). (2) El defecto (b): estimacion menor que el render para >= 6 lineas de texto y para cualquier titulo multilinea. Sin otros bugs introducidos; verificado empiricamente con `generatePDF` real. |
+| **Tests ejecutados** | Suite nueva `tests/workspace/pdf-text-wrap-test.mjs` 9/9, pure Node: (1) URL larga partida en varias lineas, ninguna excede `x + len*12*0.5 > area`; (2) titulo de 130 chars en ~4 lineas dentro del borde y con el texto siguiente apilado DEBAJO (`y` menor que la ultima linea del titulo, sin solape); (3) parrafo de 8 lineas cerrando una pagina ocupada a 42 lineas: toda linea `y >= margen inferior`; (4) anti-regresion estatica (hard-break presente, `estimateTextSectionH`/`size * 1.4` presentes, `const lineHeight = 14;` eliminado). Registrada en `scripts/test-workspace-release.mjs`. Suites huerfanas de PDF revalidadas: `pdf-table-pagination-test` 7/7 y `workflow-document-pdf-test` 66/66 (tocan estimacion y wrapText). |
+| **Tests PASS** | 9 (CE-076) + huerfanas PDF (7 + 66) + RELEASE GATE completo 41/41 suites PASS = 0 fail. |
+| **Tests FAIL** | 0. |
+| **Commits** | CE-076 (fix `pdf-generator.js` + suite 9/9 + registro gate + trackers). |
+| **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL` (harness niega `git push*`). Manifests del release-gate y evidencias regeneradas se excluyen del commit (anti-churn). |
+| **Limitaciones** | El hard-break de tokens corta a charsPerLine en una frontera de caracteres (identico a `cellLines`); no usa metrica de glifos real (sin dependencias). La estimacion de texto sigue siendo de chars, pero ahora SIEMPRE >= el render (nunca infra-reserva). No se repitio el E2E de navegador (defecto puro de generacion cubierto por el stream). |
+| **Proxima prioridad** | Proximo TODO de producto o DISCOVERY cuando el backlog este vacio (`cli recommend`). |
+
+---
+
 ## Cycle 128 — Fix test-debt in engine/parser/planner suites + register them in the gate (CE-065)
 
 | Field | Value |

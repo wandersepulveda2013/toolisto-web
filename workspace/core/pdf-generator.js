@@ -82,7 +82,6 @@ function generatePDF(config) {
   const mRightPt = m.right * 2.835;
   const contentW = pageW - mLeftPt - mRightPt;
   const usableH = pageH - mTopPt - mBottomPt;
-  const lineHeight = 14;
 
   const objects = [];
   let objCount = 0;
@@ -120,13 +119,20 @@ function generatePDF(config) {
     currentY = 0;
   }
 
+  function estimateTextSectionH(section) {
+    const type = section.type;
+    const size = type === 'title' ? 24 : type === 'subtitle' ? 16 : type === 'date' || type === 'footer' ? 10 : 12;
+    const lines = wrapText(section.content || '', contentW, type);
+    return size + Math.max(0, lines.length - 1) * (size * 1.4) + 8;
+  }
+
   function estimateSectionH(section) {
     if (section.type === 'page-break') return 0;
-    if (section.type === 'title') return 36;
-    if (section.type === 'subtitle') return 26;
-    if (section.type === 'date') return 20;
+    if (section.type === 'title') return Math.max(36, estimateTextSectionH(section));
+    if (section.type === 'subtitle') return Math.max(26, estimateTextSectionH(section));
+    if (section.type === 'date') return Math.max(20, estimateTextSectionH(section));
     if (section.type === 'divider') return 20;
-    if (section.type === 'footer') return 24;
+    if (section.type === 'footer') return Math.max(24, estimateTextSectionH(section));
     if (section.type === 'image') {
       const sectionW = Number(section.width);
       const sectionH = Number(section.height);
@@ -149,7 +155,7 @@ function generatePDF(config) {
       return Math.max(100, 30 + s.length * 18 + 40);
     }
     const lines = wrapText(section.content || '', contentW, section.type);
-    return lines.length * lineHeight + 10;
+    return Math.max(24, estimateTextSectionH(section));
   }
 
   function addTableSections(section) {
@@ -479,6 +485,18 @@ function wrapText(text, maxWidth, type, fontSizeOverride) {
   const lines = [];
   let current = '';
   words.forEach(word => {
+    // Un token mas largo que la linea (URL, nombre largo) se corta por
+    // charsPerLine: si no, la linea se dibuja fuera del borde derecho.
+    if (word.length > charsPerLine) {
+      if (current) { lines.push(current); current = ''; }
+      let rest = word;
+      while (rest.length >= charsPerLine) {
+        lines.push(rest.slice(0, charsPerLine));
+        rest = rest.slice(charsPerLine);
+      }
+      if (rest) current = rest;
+      return;
+    }
     if ((current + ' ' + word).trim().length > charsPerLine) {
       if (current) lines.push(current);
       current = word;
