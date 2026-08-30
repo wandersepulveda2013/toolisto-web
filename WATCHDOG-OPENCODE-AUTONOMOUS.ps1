@@ -84,6 +84,18 @@ function Detect-NarrationLoop {
   return ""
 }
 
+# CE-068: lee el heartbeat persistente del runtime (AI_AUTONOMY/heartbeat.json)
+# como fuente EXTERNA de liveness/estado. SOLO informativo: nunca compite con el
+# runner para matar/reiniciar; si el runner esta vivo, el runtime ya lo gobierna.
+# Devuelve un hashtable o $null.
+function Read-RuntimeHeartbeat {
+  $hb = Join-Path $ProjectRoot "AI_AUTONOMY\heartbeat.json"
+  if (-not (Test-Path -LiteralPath $hb)) { return $null }
+  try {
+    return (Get-Content -LiteralPath $hb -Raw -ErrorAction Stop | ConvertFrom-Json)
+  } catch { return $null }
+}
+
 # 1. Runner activo?
 if (-not (Test-Path -LiteralPath $LockFile)) {
   if (Test-Path -LiteralPath (Join-Path $ProjectRoot "AUTONOMOUS_STOP")) {
@@ -113,6 +125,17 @@ if (-not $runnerAlive) {
 }
 
 Say "WATCHDOG: runner vivo (PID $runnerPid)."
+
+# CE-068: heartbeat del runtime como fuente externa de estado (SIN competir con el
+# launcher para matar/reiniciar). Si el runtime manda SAFE_MODE, se informa.
+$hb = Read-RuntimeHeartbeat
+if ($hb) {
+  $hbState = "cycle=$($hb.cycle) task=$($hb.taskId) phase=$($hb.phase) verified=$($hb.lastVerifiedStep) streak=$($hb.crashLoopStreak)"
+  Say "WATCHDOG: heartbeat runtime => $hbState"
+  if ($hb.safeMode) {
+    Say "WATCHDOG: RUNTIME SAFE_MODE activo (cycle $($hb.cycle)). El runner lo gestiona; sin accion del watchdog. Requiere intervencion humana para reanudar."
+  }
+}
 
 # 2. Ciclo en curso?
 if (-not (Test-Path -LiteralPath $CycleFile)) {

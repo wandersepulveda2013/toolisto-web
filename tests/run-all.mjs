@@ -31,6 +31,8 @@ const tests = [
   { name: 'Evidence Determinism', cmd: 'node tests/evidence-determinism.mjs' },
   { name: 'AI Autonomy Orchestrator', cmd: 'node tests/ai-autonomy-orchestrator-test.mjs' },
   { name: 'AI Autonomy Resilience', cmd: 'node tests/ai-autonomy-resilience-simulation.mjs' },
+  { name: 'CE-068 Real Runtime Integration', cmd: 'node tests/ce068-runtime-integration-test.mjs' },
+  { name: 'AI Autonomy Runtime Policy', cmd: 'node tests/ai-autonomy-runtime-policy-test.mjs' },
   { name: 'Image Interactive', cmd: 'node tests/gate-e2e-image-tools.mjs' },
   { name: 'Enhance Scanned Document', cmd: 'node tests/gate-e2e-enhance-scanned-document.mjs' },
   { name: 'Word Family', cmd: 'node tests/gate-e2e-word-tools.mjs' },

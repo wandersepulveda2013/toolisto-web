@@ -123,6 +123,27 @@ function Get-CycleResult {
   return "SIN_MARCA"
 }
 
+# CE-068: invoca el runtime (AI_AUTONOMY/cli.mjs) y devuelve el JSON parseado.
+# El runtime es la UNICA fuente de verdad del state machine / recuperacion; este
+# runner CONSUME sus decisiones y persiste el estado a traves de reinicios.
+# Devuelve $null si el CLI no produce JSON valido.
+function Invoke-Runtime {
+  param([string[]]$Args2)
+  $json = ""
+  try {
+    $json = & node (Join-Path $ProjectRoot "AI_AUTONOMY\cli.mjs") @Args2 2>$null
+  } catch {
+    Write-WatchLog "Runtime CLI no disponible: $($_.Exception.Message)"
+    return $null
+  }
+  try { return ($json | ConvertFrom-Json) } catch { return $null }
+}
+
+# Consulta al runtime si es seguro arrancar/proseguir el ciclo actual.
+function Get-RuntimeBoot {
+  return Invoke-Runtime @('boot')
+}
+
 # Inicializacion
 if (-not (Get-Command opencode -ErrorAction SilentlyContinue)) {
   Write-Error "opencode no esta en el PATH. Instala OpenCode y reintenta."
@@ -243,6 +264,24 @@ try {
     $missionF = $mf.Mission
     $statusF  = $mf.Status
     $queueF   = $mf.Queue
+
+    # CE-068: el runtime gobierna este ciclo. Consulta persistente de estado antes
+    # de lanzar opencode. SAFE_MODE / BLOCKED_OWNER detienen el runner (no se lanza).
+    $boot = Get-RuntimeBoot
+    if ($boot -and $boot.action -eq "SAFE_MODE") {
+      Write-Log "RUNTIME SAFE_MODE en ciclo $cycle ($($boot.reason)). El estado persistente manda SAFE_MODE; deteniendo el runner (requiere intervencion humana)."
+      Write-WatchLog "SAFE_MODE en ciclo ${cycle}: $($boot.reason)"
+      break
+    }
+    if ($boot -and $boot.action -eq "BLOCKED_OWNER") {
+      Write-Log "RUNTIME BLOCKED_OWNER en ciclo ${cycle}: otra instancia activa tiene el estado persistente. Deteniendo (single-instance)."
+      Write-WatchLog "BLOCKED_OWNER en ciclo $cycle"
+      break
+    }
+    # Seed RUNNING en el runtime (FRESH/RESUME/COMPLETE_TRACKERS continuan igual).
+    $null = Invoke-Runtime @('start-cycle', '--cycle', ($cycle.ToString()))
+    # Heartbeat: snapshot persistente de liveness para el watchdog externo (fallback).
+    $null = Invoke-Runtime @('heartbeat')
 
     if ($Mode -eq "CONTINUOUS_EVOLUTION") {
       $prompt = @"
@@ -399,23 +438,45 @@ OUTPUT:
     Add-Content -LiteralPath $logFile -Value "`n================================================================`nEXIT CODE: $exit`nRESULTADO CICLO: $result (bucket $bucket) HEAD $headFrom -> $headTo`n================================================================`n" -Encoding UTF8
     Remove-Item -LiteralPath $CycleFile -Force -ErrorAction SilentlyContinue
 
-    if ($exit -ne 0) {
-      $consecutiveFailures++
-      $level = [Math]::Min($consecutiveFailures, $BackoffMinutes.Count)
-      $delayMin = $BackoffMinutes[$level - 1]
-      $nextRetry = (Get-Date).AddMinutes($delayMin).ToString("yyyy-MM-dd HH:mm:ss")
-      try {
-        Set-Content -LiteralPath $BackoffFile -Value ("Level=$level DelayMinutes=$delayMin NextRetry=$nextRetry ConsecutiveFailures=$consecutiveFailures") -Encoding UTF8
-      } catch { }
-      Write-Log "Cycle $cycle termino con exit code $exit (fallos consecutivos: $consecutiveFailures). Backoff $delayMin min (proximo intento ~$nextRetry)."
-      Write-WatchLog "Ciclo $cycle con exit $exit. Backoff nivel $level ($delayMin min)."
-      Get-Content -LiteralPath $logFile -Tail 25 | ForEach-Object { Write-Host "    $_" }
-      Write-Log "Esperando $delayMin min (auto-recovery) antes del proximo ciclo..."
-      Start-Sleep -Seconds ($delayMin * 60)
-    } else {
+    # CE-068: el resultado del ciclo se persiste en el runtime (state machine).
+    # El runtime decide el backoff/crash-loop/SAFE_MODE y esos contadores NO se
+    # reinician al reiniciar el runner (persistencia de estado, mission CE-068).
+    if ($exit -eq 0) {
+      $null = Invoke-Runtime @('finish', '--result', $result)
       $consecutiveFailures = 0
       Remove-Item -LiteralPath $BackoffFile -Force -ErrorAction SilentlyContinue
-      Write-Log "Cycle $cycle OK (exit 0, resultado $result)."
+      Write-Log "Cycle $cycle OK (exit 0, resultado $result). Estado persistente: SUCCESS."
+    } else {
+      # Clasificacion del fallo para el runtime (crash de proceso = CRASH).
+      $failOutcome = "CRASH"
+      $failReason = "exit code $exit"
+      if ($result -eq "SIN_MARCA") { $failReason = "exit $exit sin RESULTADO_CICLO" }
+      $failResp = Invoke-Runtime @('fail', '--outcome', $failOutcome, '--reason', $failReason)
+      # El runtime devuelve la proxima accion + backoff persistido.
+      $rec = Invoke-Runtime @('recover')
+      $delayMin = 1
+      if ($rec -and $rec.ok -and $rec.backoffMinutes -gt 0) { $delayMin = $rec.backoffMinutes }
+      $nextAction = if ($rec -and $rec.ok) { $rec.action } else { "RETRY_DIRECT" }
+      $consecutiveFailures = 1
+
+      if ($nextAction -eq "SAFE_MODE") {
+        Write-Log "RUNTIME SAFE_MODE tras fallo del ciclo $cycle (exit $exit). Crash-loop persistido alcanzado; deteniendo el runner (requiere intervencion humana)."
+        Write-WatchLog "SAFE_MODE tras ciclo $cycle (exit $exit). Crash-loop persistido."
+        break
+      }
+      if ($nextAction -eq "DEFER_TASK" -or $nextAction -eq "CONTEXT_RESET" -or $nextAction -eq "STRATEGY_SWITCH") {
+        Write-Log "Runtime recomienda $nextAction para el ciclo $cycle (exit $exit)."
+      }
+
+      $nextRetry = (Get-Date).AddMinutes($delayMin).ToString("yyyy-MM-dd HH:mm:ss")
+      try {
+        Set-Content -LiteralPath $BackoffFile -Value ("Level=Runtime DelayMinutes=$delayMin NextRetry=$nextRetry ConsecutiveFailures=$consecutiveFailures Next=$nextAction") -Encoding UTF8
+      } catch { }
+      Write-Log "Cycle $cycle termino con exit code $exit. Runtime -> $nextAction, backoff persistido $delayMin min (proximo intento ~$nextRetry)."
+      Write-WatchLog "Ciclo $cycle con exit $exit. Runtime $nextAction backoff $delayMin min."
+      Get-Content -LiteralPath $logFile -Tail 25 | ForEach-Object { Write-Host "    $_" }
+      Write-Log "Esperando $delayMin min (auto-recovery, backoff del runtime) antes del proximo ciclo..."
+      Start-Sleep -Seconds ($delayMin * 60)
     }
 
     if (Test-Path -LiteralPath $StopFlag) {

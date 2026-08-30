@@ -30,6 +30,29 @@
 
 ---
 
+## Cycle 131 — Real Runtime Integration: launcher consumes persistent AI_AUTONOMY runtime (CE-068)
+
+| Field | Value |
+|-------|-------|
+| **Date** | 2026-08-29 |
+| **Branch** | main |
+| **HEAD inicial** | 293cc6a |
+| **HEAD final** | (commit CE-068 de este ciclo) |
+| **Task** | CE-068 (ARCHITECTURE_IMPROVEMENT, P0, sistema autonomo): integrar el runtime `AI_AUTONOMY` (CE-067) en el launcher real `RUN-OPENCODE-AUTONOMOUS.ps1` para que las ejecuciones reales de OpenCode queden gobernadas por estado persistente — progreso verificado, interrupcion de bucle de narracion, recuperacion ante crash, presupuesto de reintentos, backoff de crash-loop, SAFE_MODE, lock de instancia unica y heartbeat. Regla clave: reiniciar el runner NO debe resetear los contadores de crash-loop/reintentos. |
+| **Hypothesis** | Si el launcher real delega el state machine al runtime (`AI_AUTONOMY/cli.mjs`), las decisiones de recuperacion (backoff, SAFE_MODE, presupuesto de reintentos) se persisten en `runtime.json` y sobreviven a reinicios del runner, cerrando la brecha de CE-067 ("la integracion del runner en el bucle PS1 queda documentada como proximo paso"). |
+| **Change** | Nuevo `AI_AUTONOMY/runtime.mjs` (operational state + politica: retry budget 3 crash->SAFE_MODE, backoff 1/2/5/10 min, phase timeouts, `detectVerifiedProgress`/`isPhaseStalled` por senales reales HEAD/owned, heartbeat, atomic write/read), `supervisor.mjs` (spawn + killTree/taskkill + guard-loop + phase-stall + verified + clean-success con `RESULTADO_CICLO`), `cli.mjs` (bridge JSON-over-stdout: boot/plan/start-cycle/heartbeat/set-phase/record-action/finish/fail/recover/inspect + supervise), `fake-opencode.mjs`/`fake-runner.mjs` (procesos controlados para la simulacion real del contrato). `RUN-OPENCODE-AUTONOMOUS.ps1` integrado: por ciclo consulta `boot` (SAFE_MODE/BLOCKED_OWNER -> detiene), `start-cycle` (seed RUNNING), `heartbeat` (liveness para watchdog); tras ejecutar opencode llama `finish` (exit 0) o `fail`+`recover` (exit != 0) usando el backoff PERSISTIDO del runtime en vez de su array local `BackoffMinutes` (que se reiniciaba). Se corrigieron dos `$cycle:` (scope-qualifier) que rompian el parse. `WATCHDOG-OPENCODE-AUTONOMOUS.ps1` ampliado: lee `AI_AUTONOMY/heartbeat.json` como fallback externo (informativo, sin competir con el launcher). |
+| **Bugs encontrados** | El array local `BackoffMinutes`/`consecutiveFailures` del launcher se reiniciaba en cada reinicio (violaba la regla CE-068); el supervisor heredado tenia imports/hoisting de `failOutcome` y doble `import child_process`; `runCliSafe` del harness descartaba stdout en exit != 0. |
+| **Bugs corregidos** | El launcher usa el backoff/SAFE_MODE persistido del runtime; `supervisor.mjs` reescrito limpio (imports top, single `child_process`, `failOutcome` antes del timer, `allStdout` module-local); CLI maneja exit != 0 con stdout JSON. |
+| **Tests ejecutados** | `ce068-runtime-integration-test` 36/36 (casos A-J + resiliencia con PROCESOS REALES en git repo aislado: A fresh boot, B resume, C COMPLETE_TRACKERS, D bucle de narracion interrumpido con fake inalcanzable, E crash persistido, F crash-loop -> SAFE_MODE + backoff, G instancia unica con lock vivo, H lock stale, I archivo extrano, J ciclo exitoso con HEAD REAL movido); `ai-autonomy-runtime-policy-test` 45/45 (retry budget, backoff, SAFE_MODE, phase stall, verified dect, heartbeat, restart-no-reset). Registrados en `tests/run-all.mjs`. Parse-AST OK de `RUN-OPENCODE-AUTONOMOUS.ps1` y `WATCHDOG-OPENCODE-AUTONOMOUS.ps1`. |
+| **Tests PASS** | 36/36 + 45/45 = 81 checks PASS en las 2 suites nuevas CE-068. |
+| **Tests FAIL** | 0. |
+| **Commits** | CE-068 (impl `AI_AUTONOMY/*` + launcher/watchdog wiring + tests + trackers). |
+| **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL` (harness niega `git push*`; `gh` sin autenticar). La supervision en tiempo real de opencode real (narration-loop/phase-stall) queda certificada a nivel de supervisor con `fake-opencode`; el launcher sincrono ejecuta opencode con su propia captura de log y delega las DECISIONES de recuperacion al runtime. |
+| **Limitaciones** | El launcher mantiene su ejecucion sincrona de opencode (robusta y probada en produccion); no se sustituyo por el modo `supervise` (background+guard) para no desestabilizar el runner vivo. La interrupcion en vivo de un bucle de narracion sobre opencode REAL se certifica indirectamente via el supervisor (callable por `cli supervise`). Los runtime files (`runtime.json`/`state.json`/`heartbeat.json`/`events.jsonl`) son artefactos de ejecucion y no se commitean. |
+| **Proxima prioridad** | Proxima oportunidad DISCOVERED/TODO de producto, o evolucion del launcher hacia el modo `supervise` (background+guard) si se autoriza estabilizar la supervision en vivo. |
+
+---
+
 ## Cycle 128 — Fix test-debt in engine/parser/planner suites + register them in the gate (CE-065)
 
 | Field | Value |
