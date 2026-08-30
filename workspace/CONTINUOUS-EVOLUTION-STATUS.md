@@ -302,7 +302,7 @@
 | **Date** | 2026-08-30 |
 | **Branch** | main |
 | **HEAD inicial** | 7007473 |
-| **HEAD final** | commit CE-080 de este ciclo |
+| **HEAD final** | 32267b0 (commit CE-080 de este ciclo) |
 | **Task** | CE-080 (MEANINGFUL_TEST_COVERAGE, P3): tres suites del camino PDF eran ORFANAS: `pdf-table-pagination-test.mjs` (7/7), `workflow-document-pdf-test.mjs` (66/66) y `pdf-images-shared-test.mjs` (12/12). Un cotejo automatico (listar `tests/workspace/*.mjs` vs los archivos citados en `scripts/test-workspace-release.mjs` y `tests/run-all.mjs`) encontro que NO estaban registradas en ninguno de los dos runners. Se re-ejecutaban a mano en cada ciclo como "red de seguridad" de los cambios de paginacion/estimacion de PDF, pero al no estar en el gate, una regresion en ese camino (por ejemplo la altura de estimacion, el wrap de texto, el encaje de imagenes de CE-076/077/078) era invisible para la regresion automatizada. Es el mismo tipo de deuda de cobertura que se ataco en CE-065. |
 | **Hypothesis** | Registrar las tres suites en `scripts/test-workspace-release.mjs` (junto a las demas suites de PDF) elimina el riesgo de deriva y hace que el gate las proteja de forma automatica, sin modificar su contenido (solo la ejecucion). |
 | **Change** | `scripts/test-workspace-release.mjs`: se anaden tres `run(...)` tras `pdf-image-fit` (CE-078) con un comentario que explicita que eran huérfanas y cubren el camino `document.to-pdf` y la normalizacion compartida de imagenes. Ningun archivo de producto cambiado. |
