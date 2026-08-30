@@ -165,15 +165,25 @@ if ($logPath -and (Test-Path -LiteralPath $logPath)) {
   $lastWrite = (Get-Item -LiteralPath $logPath).LastWriteTime
   $ageMin = [int]((Get-Date) - $lastWrite).TotalMinutes
   if ($ageMin -ge $StaleMinutes) {
-    Say "WATCHDOG: CICLO COLGADO. Proceso opencode PID $($child.ProcessId) del ciclo $titleArg con log sin cambios desde hace $ageMin min (limite $StaleMinutes)."
-    if ($KillStale) {
-      Say "WATCHDOG: terminando proceso colgado PID $($child.ProcessId) (-KillStale). El runner continuara con auto-recovery."
+    # CE-069 §15: si un supervisor LIVE esta gobernando este OpenCode (heartbeat lo
+    # muestra), el watchdog NO debe matarlo: el supervisor es la autoridad sobre el
+    # proceso vivo. El watchdog solo fallback cuando el supervisor no esta activo.
+    $supervised = ($hb -and $hb.supervisor -eq "live" -and $hb.opencodePid -eq $child.ProcessId)
+    if ($supervised) {
+      Say "WATCHDOG: ciclo $titleArg con log sin cambios desde hace $ageMin min, PERO el supervisor LIVE (PID $($hb.opencodePid)) lo esta gobernando. El supervisor clasifica loop/stall y limpiara el arbol si procede; el watchdog NO interviene (jerarquia: launcher/supervisor primero, watchdog ultimo recurso)."
+    } elseif ($KillStale) {
+      Say "WATCHDOG: CICLO COLGADO sin supervisor live. Proceso opencode PID $($child.ProcessId) del ciclo $titleArg con log sin cambios desde hace $ageMin min (limite $StaleMinutes). Terminando (-KillStale). El runner continuara con auto-recovery."
       Stop-Process -Id $child.ProcessId -Force -ErrorAction SilentlyContinue
     } else {
-      Say "WATCHDOG: usa -KillStale para terminar ese proceso colgado."
+      Say "WATCHDOG: CICLO COLGADO sin supervisor live. Proceso opencode PID $($child.ProcessId) del ciclo $titleArg con log sin cambios desde hace $ageMin min (limite $StaleMinutes). Usa -KillStale para terminarlo."
     }
   } else {
-    Say "WATCHDOG: ciclo vivo, log actualizado hace $ageMin min. OK."
+    $supervised = ($hb -and $hb.supervisor -eq "live")
+    if ($supervised) {
+      Say "WATCHDOG: ciclo vivo (log $ageMin min) bajo supervisor LIVE (PID $($hb.opencodePid), clasificacion $($hb.classification)). El supervisor gestiona loop/stall; watchdog solo informa."
+    } else {
+      Say "WATCHDOG: ciclo vivo, log actualizado hace $ageMin min. OK."
+    }
     # Progreso verificado: un ciclo que ESCRIBE log (narracion) pero NO produce
     # eventos verificados en AI_AUTONOMY/events.jsonl es un bucle de narracion
     # invisible al check de LastWriteTime (el texto SI avanza). Detectarlo aqui.

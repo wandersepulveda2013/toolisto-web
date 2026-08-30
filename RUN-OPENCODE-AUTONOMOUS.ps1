@@ -144,6 +144,36 @@ function Get-RuntimeBoot {
   return Invoke-Runtime @('boot')
 }
 
+# CE-069: construye el contexto de RECOVERY compacto tras un fallo supervisado
+# (mision §11 / §12): solo lo necesario (Cycle, CE, state, task, last verified,
+# reason, recovery count, siguiente accion, prohibicion de repetir trabajo).
+# El launcher lo antepone al prompt del proximo intento para que OpenCode sepa
+# exactamente que hacer sin cargar el historial completo.
+function Format-RecoveryPrompt {
+  param(
+    [int]$Cycle,
+    [string]$ModeShort,
+    [string]$Outcome,
+    [string]$Reason,
+    [string]$NextAction,
+    [string]$LastHead = ""
+  )
+  $headLine = if ($LastHead) { "LAST VERIFIED: HEAD $LastHead" } else { "LAST VERIFIED: (ninguno en este ciclo)" }
+  return @"
+RECOVERY CONTEXTO COMPACTO (ciclo anterior fallo bajo supervision)
+CYCLE: $Cycle
+CE: CE-069
+STATE: TRACKERS/RUNNING
+FAILURE: $Outcome
+REASON: $Reason
+$headLine
+RUNTIME NEXT ACTION: $NextAction
+NEXT ACTION: retoma SOLO el paso pendiente (actualiza QUEUE y STATUS del ciclo, y el commit).
+DO NOT repeat work ya completado ni vuelvas a caer en el bucle de narracion que causo la interrupcion.
+Ejecuta de forma directa y verificable: un commit real o un cambio de archivo propio antes de terminar.
+"@
+}
+
 # Inicializacion
 if (-not (Get-Command opencode -ErrorAction SilentlyContinue)) {
   Write-Error "opencode no esta en el PATH. Instala OpenCode y reintenta."
@@ -244,6 +274,12 @@ try {
   $cycle = $startCycle
   $consecutiveFailures = 0
   $lastExit = 0
+  # CE-069: estado de recuperacion por ciclo. $recoveryPrompt contiene el contexto
+  # compacto del ciclo anterior fallido y se antepone SOLO al proximo prompt; se
+  # limpia tras su consumo (no contamina ciclos posteriores). $taskId es la
+  # identidad estable del ciclo actual para supervisor/recuperacion.
+  $recoveryPrompt = ""
+  $taskId = $null
 
   while ($isUnlimited -or $cycle -lt $MaxCycles) {
     $cycle++
@@ -278,8 +314,13 @@ try {
       Write-WatchLog "BLOCKED_OWNER en ciclo $cycle"
       break
     }
+    # CE-069: identidad estable del ciclo desde el runtime (boot -> start-cycle).
+    # taskId del boot es el planificado/fuente de verdad; start-cycle puede
+    # confirmarlo. Conservamos el de mayor autoridad y lo pasamos al supervisor.
+    if ($boot -and $boot.taskId) { $taskId = $boot.taskId }
     # Seed RUNNING en el runtime (FRESH/RESUME/COMPLETE_TRACKERS continuan igual).
-    $null = Invoke-Runtime @('start-cycle', '--cycle', ($cycle.ToString()))
+    $scResp = Invoke-Runtime @('start-cycle', '--cycle', ($cycle.ToString()))
+    if ($scResp -and $scResp.taskId) { $taskId = $scResp.taskId }
     # Heartbeat: snapshot persistente de liveness para el watchdog externo (fallback).
     $null = Invoke-Runtime @('heartbeat')
 
@@ -384,11 +425,20 @@ Al terminar, cierra tu respuesta final con una linea exacta: RESULTADO_CICLO: <T
 "@
     }
 
+    # CE-069 §11/§12: si el ciclo anterior fallo bajo supervision, anteponemos el
+    # contexto de RECOVERY compacto al prompt de ESTE intento (un solo uso) y lo
+    # limpiamos de inmediato para no contaminar ciclos posteriores.
+    if (-not [string]::IsNullOrWhiteSpace($recoveryPrompt)) {
+      $prompt = "$recoveryPrompt`r`n`r`n$prompt"
+      Write-Log "Recovery context del ciclo anterior antepuesto al prompt de este ciclo."
+      $recoveryPrompt = ""
+    }
+
     $ts = Get-Date -Format "yyyyMMdd-HHmmss"
     $startedTs = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
     $logFile = Join-Path $LogDir ("cycle-{0:D3}-{1}.log" -f $cycle, $ts)
     $headFrom = git rev-parse --short HEAD 2>$null
-    $cmdLine = "opencode run --agent build --model opencode/deepseek-v4-flash-free --title `"$titleArg`" <prompt>"
+    $cmdLine = "opencode run --agent build --model opencode/deepseek-v4-flash-free --title `"$titleArg`" <prompt> (supervisado cli supervise)"
     $header = @"
 ================================================================
 Cycle: $cycle
@@ -406,19 +456,68 @@ $prompt
 OUTPUT:
 "@
     Set-Content -LiteralPath $logFile -Value $header -Encoding UTF8
-    Set-Content -LiteralPath $CycleFile -Value "Cycle=$cycle Mode=$Mode Title=$titleArg Started=$startedTs Log=$logFile" -Encoding UTF8
+    Set-Content -LiteralPath $CycleFile -Value "Cycle=$cycle Mode=$Mode Title=$titleArg Started=$startedTs Log=$logFile Supervisor=live" -Encoding UTF8
 
-    Write-Log "Cycle $cycle ($ModeShort) - lanzando opencode run..."
+    # CE-069: OpenCode se lanza SUPERVISADO via `cli supervise`. El supervisor
+    # (AI_AUTONOMY/supervisor.mjs) es la UNICA autoridad sobre el proceso vivo:
+    # detecta bucle de narracion / stall, reevalua progreso verificado, interrumpe
+    # de forma graceful y, si es necesario, termina el process tree completo, sin
+    # dejar huerfanos. PowerShell solo ORQUESTA ciclos (no vigila el mismo PID).
+    # La sesion OpenCode corre sincronamente bajo el supervisor: el launcher espera
+    # el veredicto JSON y deja que el runtime decida la recuperacion.
+    Write-Log "Cycle $cycle ($ModeShort) - lanzando opencode SUPERVISADO (cli supervise). El supervisor controla el proceso vivo."
+    $promptFile = Join-Path $ProjectRoot "_toolisto_autopilot\tmp\cycle-$cycle.prompt.txt"
+    try { $null = New-Item -ItemType Directory -Force -Path (Split-Path -Parent $promptFile) } catch { }
+    try { Set-Content -LiteralPath $promptFile -Value $prompt -Encoding UTF8 } catch { }
+
+    $ocArgs = "run --agent build --model opencode/deepseek-v4-flash-free --title `"$titleArg`""
+    $supArgs = @('supervise', '--cmd', 'opencode', '--args', $ocArgs, '--prompt-file', $promptFile, '--stdout-log', $logFile, '--cycle', ($cycle.ToString()))
+    if ($taskId) { $supArgs += @('--task', $taskId) }
+    $supResp = $null
     try {
-      & opencode run --agent build --model opencode/deepseek-v4-flash-free --title $titleArg $prompt 2>&1 | Tee-Object -FilePath $logFile -Append
-      $exit = $LASTEXITCODE
+      $supResp = Invoke-Runtime $supArgs
     } catch {
-      $exit = -1
-      Write-Log "Fallo GRAVE de infraestructura del runner al lanzar opencode: $($_.Exception.Message)"
-      Write-WatchLog "FALLO GRAVE al lanzar opencode: $($_.Exception.Message)"
-      Add-Content -LiteralPath $logFile -Value "`nFALLO GRAVE al lanzar opencode: $($_.Exception.Message)`n" -Encoding UTF8
-      Remove-Item -LiteralPath $CycleFile -Force -ErrorAction SilentlyContinue
-      break
+      $supResp = $null
+      Write-Log "FALLO GRAVE de infraestructura del runner al invocar el supervisor: $($_.Exception.Message)"
+      Write-WatchLog "FALLO GRAVE al invocar cli supervise: $($_.Exception.Message)"
+    }
+
+    # Fallback de supervisor (mision §14): si el supervisor falla (sin JSON valido),
+    # NO volvemos silenciosamente al modo no supervisado. Preservamos el checkpoint
+    # y dejamos que el runtime decida el retry seguro.
+    if (-not $supResp -or -not $supResp.ok) {
+      $supReason = if ($supResp -and $supResp.reason) { $supResp.reason } else { 'supervisor internal failure (no JSON)' }
+      Write-Log "SUPERVISOR FAILURE en el ciclo ${cycle}: $supReason. Preservando checkpoint; el runtime decide el retry seguro (sin volver al modo no supervisado)."
+      Write-WatchLog "SUPERVISOR FAILURE ciclo ${cycle}: $supReason. Checkpoint preservado."
+      $null = Invoke-Runtime @('fail', '--outcome', 'CONFIG_ERROR', '--reason', $supReason)
+      $rec = Invoke-Runtime @('recover')
+      $exit = 5
+      $nextAction = if ($rec -and $rec.ok) { $rec.action } else { 'RETRY_DIRECT' }
+      $delayMin = 1
+      if ($rec -and $rec.ok -and $rec.backoffMinutes -gt 0) { $delayMin = $rec.backoffMinutes }
+      if ($nextAction -eq 'SAFE_MODE') {
+        Write-Log "RUNTIME SAFE_MODE tras SUPERVISOR FAILURE del ciclo $cycle. Deteniendo (requiere intervencion humana)."
+        Write-WatchLog "SAFE_MODE tras SUPERVISOR FAILURE ciclo $cycle."
+        break
+      }
+      $nextRetry = (Get-Date).AddMinutes($delayMin).ToString("yyyy-MM-dd HH:mm:ss")
+      try { Set-Content -LiteralPath $BackoffFile -Value ("Level=Runtime DelayMinutes=$delayMin NextRetry=$nextRetry ConsecutiveFailures=1 Next=$nextAction") -Encoding UTF8 } catch { }
+      Write-Log "Esperando $delayMin min (supervisor failure) antes del proximo ciclo..."
+      Start-Sleep -Seconds ($delayMin * 60)
+      continue
+    }
+
+    # Veredicto del supervisor (ya persistido en el runtime por cli supervise).
+    $outcome = if ($supResp.outcome) { $supResp.outcome } else { 'CRASH' }
+    $supReason = if ($supResp.reason) { $supResp.reason } else { $outcome }
+    $exit = switch ($outcome) {
+      'SUCCESS' { 0 }
+      'CRASH'   { if ($supResp.exitCode) { [int]$supResp.exitCode } else { 1 } }
+      'LOOP_INTERRUPTED' { 2 }
+      'STALL'   { 3 }
+      'TIMEOUT' { 4 }
+      'CONFIG_ERROR' { 5 }
+      default   { 1 }
     }
     $lastExit = $exit
     $finishedTs = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
@@ -430,29 +529,26 @@ OUTPUT:
     $startObj = [datetime]::ParseExact($startedTs, "yyyy-MM-dd HH:mm:ss", $null)
     $endObj = [datetime]::ParseExact($finishedTs, "yyyy-MM-dd HH:mm:ss", $null)
     $durSec = [int]($endObj - $startObj).TotalSeconds
-    $metricsHeader = "cycle`tmode`tstarted`tfinished`tduration_s`texit`tresult`tbucket`thead_from`thead_to"
+    $metricsHeader = "cycle`tmode`tstarted`tfinished`tduration_s`texit`tresult`tbucket`thead_from`thead_to`toutcome"
     if (-not (Test-Path -LiteralPath $MetricsFile)) {
       Set-Content -LiteralPath $MetricsFile -Value $metricsHeader -Encoding UTF8
     }
-    Add-Content -LiteralPath $MetricsFile -Value ("{0}`t{1}`t{2}`t{3}`t{4}`t{5}`t{6}`t{7}`t{8}`t{9}" -f $cycle, $Mode, $startedTs, $finishedTs, $durSec, $exit, $result, $bucket, $headFrom, $headTo) -Encoding UTF8
-    Add-Content -LiteralPath $logFile -Value "`n================================================================`nEXIT CODE: $exit`nRESULTADO CICLO: $result (bucket $bucket) HEAD $headFrom -> $headTo`n================================================================`n" -Encoding UTF8
+    Add-Content -LiteralPath $MetricsFile -Value ("{0}`t{1}`t{2}`t{3}`t{4}`t{5}`t{6}`t{7}`t{8}`t{9}`t{10}" -f $cycle, $Mode, $startedTs, $finishedTs, $durSec, $exit, $result, $bucket, $headFrom, $headTo, $outcome) -Encoding UTF8
+    Add-Content -LiteralPath $logFile -Value "`n================================================================`nSUPERVISOR OUTCOME: $outcome`nEXIT CODE: $exit`nRESULTADO CICLO: $result (bucket $bucket) HEAD $headFrom -> $headTo`n================================================================`n" -Encoding UTF8
     Remove-Item -LiteralPath $CycleFile -Force -ErrorAction SilentlyContinue
 
-    # CE-068: el resultado del ciclo se persiste en el runtime (state machine).
-    # El runtime decide el backoff/crash-loop/SAFE_MODE y esos contadores NO se
-    # reinician al reiniciar el runner (persistencia de estado, mission CE-068).
+    # CE-068/069: el resultado del ciclo YA se persistio en el runtime dentro de
+    # cli supervise (SUCCESS o FAILURE). Aqui solo consultamos la recuperacion.
     if ($exit -eq 0) {
-      $null = Invoke-Runtime @('finish', '--result', $result)
       $consecutiveFailures = 0
+      $recoveryPrompt = ""
       Remove-Item -LiteralPath $BackoffFile -Force -ErrorAction SilentlyContinue
-      Write-Log "Cycle $cycle OK (exit 0, resultado $result). Estado persistente: SUCCESS."
+      Write-Log "Cycle $cycle OK (supervisor SUCCESS, resultado $result). Estado persistente: SUCCESS."
+      if ($supResp -and $supResp.treeCleaned) { Write-Log "Supervisor: process tree limpiado exitosamente al terminar." }
     } else {
-      # Clasificacion del fallo para el runtime (crash de proceso = CRASH).
-      $failOutcome = "CRASH"
-      $failReason = "exit code $exit"
-      if ($result -eq "SIN_MARCA") { $failReason = "exit $exit sin RESULTADO_CICLO" }
-      $failResp = Invoke-Runtime @('fail', '--outcome', $failOutcome, '--reason', $failReason)
-      # El runtime devuelve la proxima accion + backoff persistido.
+      # No se vuelve a llamar a fail: cmdSupervise ya persistio el fallo con el
+      # outcome clasificado (LOOP_INTERRUPTED / STALL / CRASH / TIMEOUT). Solo
+      # recuperamos backoff + proxima accion del runtime (persistente).
       $rec = Invoke-Runtime @('recover')
       $delayMin = 1
       if ($rec -and $rec.ok -and $rec.backoffMinutes -gt 0) { $delayMin = $rec.backoffMinutes }
@@ -460,20 +556,25 @@ OUTPUT:
       $consecutiveFailures = 1
 
       if ($nextAction -eq "SAFE_MODE") {
-        Write-Log "RUNTIME SAFE_MODE tras fallo del ciclo $cycle (exit $exit). Crash-loop persistido alcanzado; deteniendo el runner (requiere intervencion humana)."
-        Write-WatchLog "SAFE_MODE tras ciclo $cycle (exit $exit). Crash-loop persistido."
+        Write-Log "RUNTIME SAFE_MODE tras fallo supervisado del ciclo $cycle (outcome $outcome). Crash-loop persistido alcanzado; deteniendo el runner (requiere intervencion humana)."
+        Write-WatchLog "SAFE_MODE tras ciclo $cycle (outcome $outcome). Crash-loop persistido."
         break
       }
       if ($nextAction -eq "DEFER_TASK" -or $nextAction -eq "CONTEXT_RESET" -or $nextAction -eq "STRATEGY_SWITCH") {
-        Write-Log "Runtime recomienda $nextAction para el ciclo $cycle (exit $exit)."
+        Write-Log "Runtime recomienda $nextAction para el ciclo $cycle (outcome $outcome): se ajustara el contexto del proximo intento."
       }
+
+      # CE-069 §11/§12: contexto de RECOVERY compacto para el proximo intento.
+      # Se antepone al prompt del siguiente ciclo; en intentos sucesivos el
+      # runtime ya escalo a STRATEGY_SWITCH/CONTEXT_RESET/DEFER_TASK/SAFE_MODE.
+      $recoveryPrompt = Format-RecoveryPrompt -Cycle $cycle -ModeShort $modeShort -Outcome $outcome -Reason $supReason -NextAction $nextAction -LastHead $headTo
 
       $nextRetry = (Get-Date).AddMinutes($delayMin).ToString("yyyy-MM-dd HH:mm:ss")
       try {
-        Set-Content -LiteralPath $BackoffFile -Value ("Level=Runtime DelayMinutes=$delayMin NextRetry=$nextRetry ConsecutiveFailures=$consecutiveFailures Next=$nextAction") -Encoding UTF8
+        Set-Content -LiteralPath $BackoffFile -Value ("Level=Runtime DelayMinutes=$delayMin NextRetry=$nextRetry ConsecutiveFailures=$consecutiveFailures Next=$nextAction Outcome=$outcome") -Encoding UTF8
       } catch { }
-      Write-Log "Cycle $cycle termino con exit code $exit. Runtime -> $nextAction, backoff persistido $delayMin min (proximo intento ~$nextRetry)."
-      Write-WatchLog "Ciclo $cycle con exit $exit. Runtime $nextAction backoff $delayMin min."
+      Write-Log "Cycle $cycle termino (supervisor outcome $outcome). Runtime -> $nextAction, backoff persistido $delayMin min (proximo intento ~$nextRetry)."
+      Write-WatchLog "Ciclo $cycle con outcome $outcome ($supReason). Runtime $nextAction backoff $delayMin min."
       Get-Content -LiteralPath $logFile -Tail 25 | ForEach-Object { Write-Host "    $_" }
       Write-Log "Esperando $delayMin min (auto-recovery, backoff del runtime) antes del proximo ciclo..."
       Start-Sleep -Seconds ($delayMin * 60)

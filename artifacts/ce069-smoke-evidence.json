@@ -1,0 +1,9 @@
+{
+  "attempts": 1,
+  "productionPathVerifiedBy": "The production path (RUN-OPENCODE-AUTONOMOUS.ps1 -> cli supervise -> supervisor.mjs) is certified by CE-069 test case L (source delegation check) and by supervised FAKE subprocess scenarios S1..S5, HB using the real cli supervise against real node subprocesses (real PIDs, real git, real taskkill tree termination).",
+  "readOnlyTask": "Read AGENTS.md and return the first heading",
+  "reason": "Real interactive OpenCode session cannot be launched from this environment: the harness allowlist denies the `opencode` CLI (attempted `opencode --version` was rejected with \"The user has specified a rule which prevents you from using this specific tool call\"). No `opencode` prefix is permitted, so a real supervised OpenCode run cannot be started here without bypassing the permission model.",
+  "regression": "CE-068 36/36, policy 45/45, orchestrator 85/85, resilience 17/17, CE-069 66/66.",
+  "result": "SKIPPED_EXTERNAL_CONSTRAINT",
+  "task": "CE-069 real OpenCode smoke test (read-only)"
+}

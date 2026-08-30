@@ -33,6 +33,15 @@ screenshot-workspace.png
 # Autonomous runtime flags
 AUTONOMOUS_STOP
 
+# CE-069 runtime execution artifacts (never committed; generated per run under AI_AUTONOMY/)
+AI_AUTONOMY/runtime.json
+AI_AUTONOMY/state.json
+AI_AUTONOMY/heartbeat.json
+AI_AUTONOMY/events.jsonl
+AI_AUTONOMY/runner.lock
+AI_AUTONOMY/.fake-marker.txt
+AI_AUTONOMY/.tree-pids/
+
 # Diagnostic audit scripts (ad-hoc, not part of the test suite)
 tests/workspace/find-corrupt.mjs
 tests/workspace/ocr-diagnostic.mjs

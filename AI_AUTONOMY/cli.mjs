@@ -18,8 +18,9 @@
 //   acquire-lock [--token T]
 //   release-lock [--token T]
 //   start-cycle --task T --head H [--cycle N]
-//   supervise --cmd CMD [--args "a b"] [--cycle N] [--task T] [--phase P]
-//             [--phase-timeout-ms N] [--owned a,b] [--recovery 1]
+//   supervise --cmd CMD [--args "a b"] [--prompt-file F] [--stdout-log L]
+//             [--cycle N] [--task T] [--phase P] [--phase-timeout-ms N]
+//             [--graceful-ms N] [--owned a,b] [--live-heartbeat H]
 //   record-action --step S [--head H] [--commit C]
 //   set-phase --phase P
 //   heartbeat [--pid P]
@@ -32,7 +33,7 @@
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { execFileSync } from 'child_process';
-import { writeFileSync, mkdirSync, existsSync, readFileSync } from 'fs';
+import { writeFileSync, mkdirSync, existsSync, readFileSync, appendFileSync } from 'fs';
 import {
   acquireLock,
   releaseLock,
@@ -326,10 +327,16 @@ function readFileSafe(p) {
   return readFileSync(p, 'utf8');
 }
 
-// SUPERVISE: run the controlled child and persist the result.
+// SUPERVISE: run the controlled child (OpenCode or fake) to a verdict, with live
+// supervision: verified-progress detection, narration-loop/stall classification,
+// graceful-then-hard interrupt, process-tree cleanup, live heartbeat, and live
+// stdout streaming to --stdout-log when requested. PowerShell delegates to this
+// ONE authority over the child (CE-069: supervisor owns the live process; the
+// PowerShell launcher only orchestrates cycles, never watches the same PID).
 async function cmdSupervise(args) {
   const { superviseChild, makeRepoAccessor } = await import('./supervisor.mjs');
-  // Build runtime seed.
+  // Preserve the checkpoint from the previous cycle so a supervisor failure or
+  // crash never loses what we already committed (mission §14: checkpoint saved).
   let rt = readRuntimeOrNull();
   if (!rt) {
     rt = runtime.newRuntime(1, args.cycle != null ? Number(args.cycle) : 1, args.task || null, currentHead());
@@ -337,19 +344,89 @@ async function cmdSupervise(args) {
   const ownedFiles = String(args.owned || '').split(',').map((s) => s.trim()).filter(Boolean);
   const cmd = args.cmd;
   if (!cmd) return nokExit({ reason: '--cmd required' });
+  // --args is whitespace-split (opencode flags). The prompt itself MUST ride on
+  // --prompt-file so multi-line Spanish prompts survive intact (never embedded in
+  // the whitespace-split flag list).
   const childArgs = String(args.args || '').length ? String(args.args).split(/\s+/).filter(Boolean) : [];
+  if (args['prompt-file']) {
+    try {
+      childArgs.push(readFileSync(String(args['prompt-file']), 'utf8'));
+    } catch (e) {
+      return nokExit({ reason: '--prompt-file unreadable: ' + e.message });
+    }
+  }
+  const stdoutLog = args['stdout-log'] ? String(args['stdout-log']) : null;
+  if (stdoutLog) {
+    mkdirSync(dirname(stdoutLog), { recursive: true });
+  }
+  const liveBeat = args['live-heartbeat'] ? String(args['live-heartbeat']) : FILE.heartbeat;
 
-  const verdict = await superviseChild(rt, {
-    root: ROOT,
-    cmd,
-    args: childArgs,
-    ownedFiles,
-    gitAccessor: makeRepoAccessor({ root: ROOT }),
-    phase: args.phase || 'IMPLEMENTING',
-    phaseTimeoutMs: args['phase-timeout-ms'] != null ? Number(args['phase-timeout-ms']) : 5 * 60 * 1000,
-    pollIntervalMs: 500,
-    onLine: (l) => { /* narration only used by guard inside supervisor */ },
-  });
+  // Live heartbeat writer: reflects supervisor live state during the run (§16).
+  const liveFields = {
+    supervisor: 'live',
+    launcherPid: Number.isFinite(Number(process.ppid)) ? process.ppid : null,
+    cycle: args.cycle != null ? Number(args.cycle) : rt.cycle,
+    taskId: args.task || rt.taskId,
+  };
+  const writeLiveBeat = (snap) => {
+    try {
+      const beat = runtime.buildHeartbeat(
+        { ...rt, opencodePid: snap.rootPid || rt.opencodePid, lastVerifiedStep: rt.lastVerifiedStep },
+        { launcherAlive: true }
+      );
+      const merged = {
+        ...beat,
+        supervisor: 'live',
+        classification: snap.classification || beat.supervisor,
+        lastVerifiedAtRun: snap.lastVerifiedAt || 0,
+        lastNarrationAtRun: snap.lastNarrationAt || 0,
+        intents: snap.intents || 0,
+        verified: snap.verified || 0,
+        loopCount: rt.loopCount || 0,
+        crashLoopStreak: rt.crashLoopStreak || 0,
+      };
+      writeFileSyncAtomic(liveBeat, JSON.stringify(stable(merged), null, 2) + '\n');
+    } catch { /* best-effort */ }
+  };
+
+  let verdict;
+  try {
+    verdict = await superviseChild(rt, {
+      root: ROOT,
+      cmd,
+      args: childArgs,
+      ownedFiles,
+      gitAccessor: makeRepoAccessor({ root: ROOT }),
+      phase: args.phase || 'IMPLEMENTING',
+      phaseTimeoutMs: args['phase-timeout-ms'] != null ? Number(args['phase-timeout-ms']) : 5 * 60 * 1000,
+      gracefulMs: args['graceful-ms'] != null ? Number(args['graceful-ms']) : 5000,
+      pollIntervalMs: 500,
+      onLive: (snap) => writeLiveBeat(snap),
+      onLine: (line, isStderr) => {
+        if (stdoutLog) {
+          try { appendFileSync(stdoutLog, (isStderr ? '[stderr] ' : '') + line + '\n', 'utf8'); } catch { /* best-effort */ }
+        }
+      },
+    });
+  } catch (e) {
+    // Supervisor internal failure (mission §14): never silent-unsupervise. Keep
+    // the checkpoint we loaded and persist a CONFIG_ERROR so the runtime can
+    // decide a safe retry. Do NOT fall back to the old unsupervised launcher.
+    rt = runtime.onFailure(rt, (rt.updatedSeq || 0) + 1, { outcome: 'CONFIG_ERROR', reason: 'supervisor internal: ' + e.message });
+    runtime.writeRuntime(rt, FILE.runtime);
+    writeFileSyncAtomic(liveBeat, JSON.stringify(stable({ supervisor: 'error', error: String(e && e.message || e) }), null, 2) + '\n');
+    return okExit({
+      ok: false,
+      supervisorFailure: true,
+      outcome: 'CONFIG_ERROR',
+      reason: 'supervisor internal: ' + e.message,
+      next: rt._next || null,
+    });
+  }
+
+  if (stdoutLog) {
+    try { appendFileSync(stdoutLog, `\n[SUPERVISOR] outcome=${verdict.outcome} reason=${verdict.reason} treeCleaned=${verdict.treeCleaned}\n`, 'utf8'); } catch { /* best-effort */ }
+  }
 
   // Persist outcome into runtime + state.
   const seq = (rt.updatedSeq || 0) + 1;
@@ -389,6 +466,7 @@ async function cmdSupervise(args) {
     headFrom: verdict.headFrom,
     headTo: verdict.headTo,
     stats: verdict.stats,
+    treeCleaned: verdict.treeCleaned,
     next: rt._next || null,
   });
 }
