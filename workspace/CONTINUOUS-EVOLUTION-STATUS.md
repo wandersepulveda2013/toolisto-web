@@ -185,6 +185,28 @@
 
 ---
 
+## Cycle 138 — PDF bug fix: las barras del grafico ya no salen del area ni de la pagina con muchas series (CE-075)
+
+| Field | Value |
+|-------|-------|
+| **Date** | 2026-08-30 |
+| **Branch** | main |
+| **HEAD inicial** | 4d2b478 |
+| **HEAD final** | commit CE-075 de este ciclo |
+| **Task** | CE-075 (BUG_FIX, P2, informe PDF): `renderChartPDF` dibujaba cada barra en un pitch fijo `barW + 4` (hasta 32 pt) sin limite por `contentW`. Con una tabla de muchas filas (las series = filas en `tableChartSeries`), el grafico desbordaba: con 16 series la ultima barra caia en 566.7 pt (fuera del area de contenido 538.3) y con 20 en 606.3 pt (fuera de la pagina A4 de 595). El flujo estrella `documento → tabla → grafico → informe → PDF` producia barras recortadas solo por el visor y texto/grilla fantasma en el PDF. |
+| **Hypothesis** | Re-escalar el ancho de barra para que la ultima barra quede dentro de `contentW` elimina el desborde para los conteos normales; y si ni con el ancho minimo (10 pt) caben todas las barras, RECORTAR a las que quepan mostrando un marcador "+N" (las series ocultas se indican, no se silencian) garantiza que ningun rect salga del area ni de la pagina para cualquier conteo. |
+| **Change** | `workspace/core/pdf-generator.js` `renderChartPDF`: nuevo `maxFitBars = Math.max(1, Math.floor(contentW / (minBar + 4)))`; si `series.length > maxFitBars` se dibujan solo `maxFitBars - 2` barras (reservando un hueco para el marcador) con `barW = minBar` y `pitch = minBar + 4`, y tras el bucle se dibuja `(+hiddenCount)` en `baseline - 4`; si no es el caso, se re-escala `barW = Math.max(minBar, (contentW - 4 * drawn.length + 2) / drawn.length)` con `pitch` ajustado solo cuando la ultima barra superaria `contentW` (conteos normales mantienen la geometria previa byte a byte). `allVals`/`maxVal` usan solo las barras dibujadas. |
+| **Bugs encontrados** | (1) El defecto de producto: desborde a 566.7 (16) y 606.3 (20) pt, y con conteos extremos (>= 40) incluso a 614.7/1174.7 pt aun con ancho minimo. (2) En el desarrollo, el recorte por `maxFitBars` no re-apretaba el pitch (barW ~15.2 daba pitch 19.2 y la ultima barra seguia fuera) -> se fuerza `barW = minBar; pitch = minBar + 4` en la via de recorte. Sin otros bugs introducidos; verificado empiricamente con `generatePDF` real. |
+| **Tests ejecutados** | Suite nueva `tests/workspace/pdf-chart-overflow-test.mjs` 15/15, pure Node: carga `pdf-generator.js` real por `new Function` y comprueba en el stream (`re f`): 6 series geometria intacta y dentro; 16 series enteras y encajadas (antes 566.7); 20 series enteras y encajadas (antes fuera de pagina 606.3); 80 series recortadas con `+N` exacto (80 - barras dibujadas) y todas dentro; ningun rect (ni relleno de pagina) supera 595; anti-regresion estatica (`tooMany`/`maxFitBars` y `'+' + hiddenCount` presentes). Registrada en `scripts/test-workspace-release.mjs`. |
+| **Tests PASS** | 15 (CE-075) + RELEASE GATE completo 40/40 suites PASS (incl. Star-Flow E2E con OCR real, BOM CSV, dist-smoke, CE-058/059/060/061, registradas CE-064/071..075) = 0 fail. |
+| **Tests FAIL** | 0. |
+| **Commits** | CE-075 (fix `pdf-generator.js` + suite 15/15 + registro gate + trackers). |
+| **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL` (harness niega `git push*`). Manifests del release-gate y evidencias regeneradas se excluyen del commit (anti-churn). |
+| **Limitaciones** | Con mas de `maxFitBars` (~33) series el grafico recorta barras (ancho minimo 10 pt: mas barras serian ilegibles) y lo senala con "+N"; la resolucion de alto nivel (agrupar series) queda fuera de alcance de fase. La etiqueta de valor puede solaparse entre barras densas (nanismo del propio ancho minimo). No se repitio el E2E de navegador de este camino (el defecto es puro de generacion y queda cubierto por el stream). |
+| **Proxima prioridad** | Proximo TODO de producto o DISCOVERY cuando el backlog este vacio (`cli recommend`). |
+
+---
+
 ## Cycle 128 — Fix test-debt in engine/parser/planner suites + register them in the gate (CE-065)
 
 | Field | Value |

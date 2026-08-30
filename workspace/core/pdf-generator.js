@@ -357,8 +357,26 @@ function renderChartPDF(parts, section, x0, y0, contentW) {
   renderTextLines(parts, title, x0, y0, contentW, 12, '/F2');
   const chartTop = y0 - 30;
   const chartH = 100;
-  const barW = Math.max(10, Math.min(28, (contentW - 10) / series.length));
-  const allVals = series.map(s => s.value || 0);
+  const minBar = 10;
+  // Con muchas series (tabla con muchas filas) el pitch fijo (barW + 4) empuja
+  // las barras fuera del area de contenido e incluso de la pagina. Dos niveles:
+  // 1) se re-escala barW para que la ultima barra quede dentro de contentW;
+  // 2) si ni con el ancho minimo caben, se recortan a lo que quepa y se muestra
+  //    un marcador "+N" (las series restantes se indican, no se silencian).
+  const maxFitBars = Math.max(1, Math.floor(contentW / (minBar + 4)));
+  const tooMany = series.length > maxFitBars;
+  const drawn = tooMany ? series.slice(0, Math.max(1, maxFitBars - 2)) : series;
+  const hiddenCount = series.length - drawn.length;
+  let barW = Math.max(minBar, Math.min(28, (contentW - 10) / drawn.length));
+  let pitch = barW + 4;
+  if (tooMany) {
+    barW = minBar;
+    pitch = minBar + 4;
+  } else if (x0 + (drawn.length - 1) * pitch + 4 + (barW - 2) > x0 + contentW) {
+    barW = Math.max(minBar, (contentW - 4 * drawn.length + 2) / drawn.length);
+    pitch = barW + 4;
+  }
+  const allVals = drawn.map(s => s.value || 0);
   const maxVal = Math.max(1, ...allVals.map(v => Math.abs(v)));
   const hasNeg = allVals.some(v => v < 0);
   const baseline = hasNeg ? chartTop - chartH / 2 : chartTop;
@@ -366,9 +384,9 @@ function renderChartPDF(parts, section, x0, y0, contentW) {
   parts.push('0.8 0.8 0.8 RG');
   parts.push(`${x0} ${baseline} m ${x0 + contentW} ${baseline} l S`);
 
-  series.forEach((s, i) => {
+  drawn.forEach((s, i) => {
     const val = s.value || 0;
-    const bx = x0 + i * (barW + 4) + 4;
+    const bx = x0 + i * pitch + 4;
     const barH = Math.round((Math.abs(val) / maxVal) * (hasNeg ? chartH / 2 : chartH));
     if (val >= 0) {
       parts.push('0.318 0.404 0.910 rg');
@@ -382,6 +400,11 @@ function renderChartPDF(parts, section, x0, y0, contentW) {
     parts.push(`BT /F1 7 Tf ${bx} ${baseline + 10} Td ${pdfString(label)} Tj ET`);
     parts.push(`BT /F1 7 Tf ${bx} ${val >= 0 ? baseline - barH - 8 : baseline + barH + 10} Td ${pdfString(String(val))} Tj ET`);
   });
+  if (hiddenCount > 0) {
+    const markerX = x0 + drawn.length * pitch + 2;
+    parts.push('0 0 0 rg');
+    parts.push(`BT /F1 7 Tf ${markerX} ${baseline - 4} Td ${pdfString('+' + hiddenCount)} Tj ET`);
+  }
   parts.push('0 0 0 rg');
 }
 
