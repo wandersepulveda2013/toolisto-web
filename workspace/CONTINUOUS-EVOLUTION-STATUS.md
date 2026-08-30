@@ -148,7 +148,7 @@
 | **Date** | 2026-08-29 |
 | **Branch** | main |
 | **HEAD inicial** | c8ad0e9 |
-| **HEAD final** | commit CE-073 de este ciclo |
+| **HEAD final** | d2a5300 (commit CE-073 de este ciclo) |
 | **Task** | CE-073 (BUG_FIX, P2, informe PDF): en `document.to-pdf`, `normalizePdfImageSections(..., {updateSize:true})` escribe `width/height` en px del canvas en cada seccion de imagen, y `renderImagePDF` (`workspace/core/pdf-generator.js`) recortaba el ancho a `contentW` pero conservaba el alto crudo. Una captura 1600x900 se dibujaba 481.6x900 (ratio 0.53 vs 1.78) y el cajon sobresalia por arriba de la pagina (cm `y` negativo). Ademas `estimateSectionH` reservaba ~900 pt por imagen ancha, dejando paginas casi vacias y empujando la imagen a su propia hoja. |
 | **Hypothesis** | Re-escalar el alto proporcional cuando el ancho se recorta conserva el aspecto (coherente con el fallback actual `displayW * image.height / image.width` cuando falta height) y encaja la caja dentro de la pagina; sincronizar `estimateSectionH` con el mismo criterio evita la reserva absurda. No cambia nada en imagenes estrechas ni sin width/height. |
 | **Change** | `workspace/core/pdf-generator.js`: (a) `renderImagePDF` ahora calcula `sectionW`/`sectionH` una vez y, si `image` existe, ambos estan presentes y el ancho pedido se recorto (`displayW < sectionW`), re-deriva `displayH = displayW * (image.height / image.width)`; (b) `estimateSectionH` para `image` devuelve `sectionH * (contentW / sectionW)` cuando `sectionW > contentW` (mismo criterio que el render). Cero cambios de interfaz y ninguno de paginacion: el resto de secciones conserva su camino exacto. |
