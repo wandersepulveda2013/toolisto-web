@@ -192,7 +192,7 @@
 | **Date** | 2026-08-30 |
 | **Branch** | main |
 | **HEAD inicial** | 4d2b478 |
-| **HEAD final** | commit CE-075 de este ciclo |
+| **HEAD final** | e6f4a44 (commit CE-075 de este ciclo) |
 | **Task** | CE-075 (BUG_FIX, P2, informe PDF): `renderChartPDF` dibujaba cada barra en un pitch fijo `barW + 4` (hasta 32 pt) sin limite por `contentW`. Con una tabla de muchas filas (las series = filas en `tableChartSeries`), el grafico desbordaba: con 16 series la ultima barra caia en 566.7 pt (fuera del area de contenido 538.3) y con 20 en 606.3 pt (fuera de la pagina A4 de 595). El flujo estrella `documento → tabla → grafico → informe → PDF` producia barras recortadas solo por el visor y texto/grilla fantasma en el PDF. |
 | **Hypothesis** | Re-escalar el ancho de barra para que la ultima barra quede dentro de `contentW` elimina el desborde para los conteos normales; y si ni con el ancho minimo (10 pt) caben todas las barras, RECORTAR a las que quepan mostrando un marcador "+N" (las series ocultas se indican, no se silencian) garantiza que ningun rect salga del area ni de la pagina para cualquier conteo. |
 | **Change** | `workspace/core/pdf-generator.js` `renderChartPDF`: nuevo `maxFitBars = Math.max(1, Math.floor(contentW / (minBar + 4)))`; si `series.length > maxFitBars` se dibujan solo `maxFitBars - 2` barras (reservando un hueco para el marcador) con `barW = minBar` y `pitch = minBar + 4`, y tras el bucle se dibuja `(+hiddenCount)` en `baseline - 4`; si no es el caso, se re-escala `barW = Math.max(minBar, (contentW - 4 * drawn.length + 2) / drawn.length)` con `pitch` ajustado solo cuando la ultima barra superaria `contentW` (conteos normales mantienen la geometria previa byte a byte). `allVals`/`maxVal` usan solo las barras dibujadas. |
