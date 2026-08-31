@@ -94,6 +94,7 @@ run('workflow-document-pdf (document.to-pdf end to end, tabla/grafico/imagen)', 
 // Ahora incluyen schema-versions.js y execution-resources.js y se registran en el
 // gate para que queden protegidas contra regresion en vez de ser deuda oculta.
 run('instruction-parser (intenciones de texto libre)', 'node', ['tests/workspace/instruction-parser-test.mjs']);
+run('invoice-fields (extraccion de campos de factura, CE-081)', 'node', ['tests/workspace/invoice-fields-test.mjs']);
 run('instruction-parser-dest-format (formato de destino prioritario en conversiones, CE-079)', 'node', ['tests/workspace/instruction-parser-dest-format-test.mjs']);
 run('workflow-engine (motor de flujos, recursos de ejecución)', 'node', ['tests/workspace/workflow-engine-test.mjs']);
 run('instruction-planner (planificador de flujos)', 'node', ['tests/workspace/instruction-planner-test.mjs']);
@@ -125,6 +126,7 @@ run('cross-store-integrity (cascade, orphan, import atomicity, CE-061)', 'node',
 run('storage-surface-audit (LWW stores without _writeSeq, CE-061)', 'node', ['tests/workspace/storage-surface-audit.mjs']);
 run('id-collision-serialization (ID uniqueness, roundtrip, localStorage, CE-061)', 'node', ['tests/workspace/id-collision-serialization.mjs']);
 run('document-editor-data-loss (HTML export table/chart + autosave estructural, CE-066)', 'node', ['tests/workspace/document-editor-data-loss-test.mjs']);
+run('document-editor-persistence-race (persistencia adversarial con reload y LWW logico, CE-082)', 'node', ['tests/workspace/document-editor-persistence-race-test.mjs']);
 
 // 4. Manifest de evidencia
 const evidence = {
