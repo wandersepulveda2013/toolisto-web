@@ -317,6 +317,49 @@
 
 ---
 
+## Cycle 144 — Fix orphan invoice-fields test that only passed in a foreign context (CE-081)
+
+| Field | Value |
+|-------|-------|
+| **Date** | 2026-08-30 |
+| **Branch** | main |
+| **HEAD inicial** | e90935d |
+| **HEAD final** | a408a9c (commit CE-081 de este ciclo) |
+| **Task** | CE-081 (MEANINGFUL_TEST_COVERAGE, P3): `tests/workspace/invoice-fields-test.mjs` (extraccion de campos de factura del flujo estrella, 29 checks) era HUERFANA: no estaba en `tests/run-all.mjs` ni en `scripts/test-workspace-release.mjs`. Al correrla en aislamiento fallaba con `ReferenceError: WORKFLOW_DEFINITION_VERSION is not defined`: `workflow-model.js` importa esa constante de `schema-versions.js`, pero el test usa `stripImports()` (borra todos los `import`) y la constante quedaba indefinida, asi que la suite solo "pasaba" si un contexto ajeno definia la constante. Mismo tipo de deuda de cobertura que CE-065/CE-080. |
+| **Hypothesis** | Inyectar `WORKFLOW_DEFINITION_VERSION: 1` en el sandbox del test permite que pase limpia en aislamiento y registrarla en el gate. |
+| **Change** | `tests/workspace/invoice-fields-test.mjs`: se injecta `WORKFLOW_DEFINITION_VERSION: 1` en `sandbox` + `sandboxArgs` del `new Function` (mismo idiom que `model-fk-test.mjs`). `scripts/test-workspace-release.mjs`: se registra la suite junto al parser de instrucciones. |
+| **Bugs encontrados** | Deuda de cobertura: suite huérfana que solo pasaba en contexto ajeno. |
+| **Tests PASS** | invoice-fields 29/29 en aislamiento; RELEASE GATE completo 46 suites PASS 0 fail. |
+| **Tests FAIL** | 0. |
+| **Commits** | CE-081 (fix sandbox + registro en gate + trackers). |
+| **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`. Manifests del gate y evidencias regeneradas excluidos del commit (anti-churn). |
+| **Limitaciones** | Correccion de infraestructura de test; no cambio de producto. |
+| **Proxima prioridad** | Auditoria adversarial de persistencia del editor (CE-082, siguiente ciclo). |
+
+---
+
+## Cycle 145 — Adversarial persistence race audit of the document editor: no reproducible data-loss defect; guarantees certified + residual risks tested (CE-082)
+
+| Field | Value |
+|-------|-------|
+| **Date** | 2026-08-30 |
+| **Branch** | main |
+| **HEAD inicial** | a408a9c |
+| **HEAD final** | 2ce42bc (commit CE-082 de este ciclo) |
+| **Task** | CE-082 (auditoria adversarial, P2): auditar el camino de persistencia del editor de documentos END-TO-END (`autoSaveDoc -> lock -> saveDoc -> almacen -> reload`) con el CODIGO REAL de `workspace.js` y una capa persistente en memoria fiel a `storage.js`, para certificar garantias anti-perdida o descubrir una condicion de carrera real de data-loss. |
+| **Hypothesis** | Sin asumir un bug: si existe una condicion de carrera real de data-loss, una suite adversarial determinista que re-cargue la entidad tras cada escenario destructivo y valide el CONTENIDO EXACTO la revelara; si no existe, la suite certifica las garantias y documenta los riesgos residuales. |
+| **Change** | Suite nueva `tests/workspace/document-editor-persistence-race-test.mjs` 21/21 (pure, determinista x3). Extrae por regex `_createSaveLock`, `_createEntityLockMap`, `autoSaveDoc`, `_flushDirtyEntity` REALES de `workspace.js` y los cablea con `appStore` real (createStore de `state.js`), capa persistente en memoria que replica fielmente `saveDoc` de `storage.js` (guard `_writeSeq` coalescing, migrateObject, dbGet/dbPut), timers manuales deterministas y `reload` (loadDoc) tras cada escenario. NO se cambio ningun archivo de produccion: no se encontro defecto reproducible en las rutas vivas (CE-057/058 ya endurecieron lock/stale-write/flush). Registrada en `scripts/test-workspace-release.mjs`. |
+| **Cobertura** | (1) LWW por orden logico: edits rapidos = ultimo, out-of-order no sobrescribe, mutacion en vuelo = ultimo, 3 docs alternos reload exacto. (2) flush-before-navigate conserva. (3) cambio de documento nunca cruza ids. (4) fallo de escritura no marca guardado + recuperacion persiste. (5) aislamiento por id (20 writes de A no tocan B). (6) delete mientras save en vuelo. |
+| **Bugs encontrados** | Ninguno reproducible de data-loss en las rutas vivas. Dos RISCOS RESIDUALES documentados y probados en la suite: (a) un fallo transitorio del write no marca `isDirty=false` (edge de UX, no perdida real: el proximo debounce re-envia); (b) `deleteDoc` NO cancela un save en vuelo del lock -> el `dbPut` puede RESUCITAR un doc borrado (ventana minima: el editor flushea al salir antes de que el borrado sea alcanzable, que solo vive en la vista Documentos). |
+| **Tests PASS** | document-editor-persistence-race 21/21 (x3). |
+| **Tests FAIL** | 0. |
+| **Commits** | CE-082 (suite adversarial + registro en gate + trackers). |
+| **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`. Manifests del gate y evidencias regeneradas excluidos (anti-churn). |
+| **Limitaciones** | Fuera de alcance de una suite pura: no se puede sincronizar de forma determinista el race REAL entre `deleteDoc` y el write in-flight dentro de IndexedDB (se modela con la capa en memoria); el risque de resurreccion de (b) queda como limite documentado con plan, no cerrado este ciclo. |
+| **Proxima prioridad** | Si se quiere cerrar el risque (b) (delete cancela save en vuelo del lock) en un ciclo futuro; de lo contrario siguiente TODO de producto o DISCOVERY. |
+
+---
+
 ## Cycle 128 — Fix test-debt in engine/parser/planner suites + register them in the gate (CE-065)
 
 | Field | Value |
