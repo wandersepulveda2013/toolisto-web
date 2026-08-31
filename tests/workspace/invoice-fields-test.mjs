@@ -16,8 +16,8 @@ function stripImports(code) {
   return code.replace(/^import\s.*;?\s*$/gm, '').replace(/^export\s+/gm, '');
 }
 
-const sandbox = { console, Map, Array, Object, Error, RegExp, parseInt, Math, Set, Number, Date, JSON };
-const sandboxArgs = ['console', 'Map', 'Array', 'Object', 'Error', 'RegExp', 'parseInt', 'Math', 'Set', 'Number', 'Date', 'JSON'];
+const sandbox = { console, Map, Array, Object, Error, RegExp, parseInt, Math, Set, Number, Date, JSON, WORKFLOW_DEFINITION_VERSION: 1 };
+const sandboxArgs = ['console', 'Map', 'Array', 'Object', 'Error', 'RegExp', 'parseInt', 'Math', 'Set', 'Number', 'Date', 'JSON', 'WORKFLOW_DEFINITION_VERSION'];
 
 const invoiceFn = new Function(...sandboxArgs,
   stripImports(invoiceCode) + '\nreturn { parseInvoiceText, invoiceRows };'
