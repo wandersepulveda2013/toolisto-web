@@ -532,6 +532,30 @@
 
 ---
 
+## Cycle 154 — DISCOVERY PASS: cola vacia -> busqueda nueva de oportunidades con evidencia
+
+| Field | Value |
+|-------|-------|
+| **Date** | 2026-09-01 |
+| **Branch** | main |
+| **HEAD inicial** | 3d2d698 (CE-087 docs) |
+| **HEAD final** | 3d2d698 (solo documentacion; sin cambios de codigo) |
+| **Task** | DISCOVERY PASS (regla 6) tras quedar la cola DISCOVERED vacia y las 7 oportunidades previas (CE-083..CE-089) DONE. Buscar oportunidades NUEVAS genuinas (fiabilidad, perdida de datos, UX, plataforma, tests) con evidencia file:line, no especulacion ni trabajo artificial. |
+| **Areas inspeccionadas** | (1) Persistencia/autosave/cambio de entidad: `workspace.js` (`_flushDirtyEntity` 1156-1178, autosave 845-873, doc card 3121), `state.js` (store 1-31, appStore 71-72). (2) Undo/redo: `workspace.js` (`_captureWorkspaceState` 824-837, `_appHistory` 1012, `tableHistories` 4684-4712, `renderBlock` 3804, tablas 4847-4854/5051/5415). (3) Import/export: `storage.js` (export 272-291, import 293-418), `bundle.js` (validate 197-201). (4) Boot/recovery: `workspace.js` initApp (916), boot call (8766-8771), `state.js` 71-72, `workspace-storage.js` (8-15), `db.js` (38-42). (5) PDF/generador revalidado (sin hallazgo nuevo): suites 86/86 en el release gate del ciclo anterior. (6) Sitio publico/APLUNO (accesibilidad, demos, offline): sin hallazgo accionable de prioridad alta (skip/aria en toolisto.html, offline.html deliberadamente excluido del SW en paginas de marketing, demos sin cobertura funcional -> DEBIL/por ahora). |
+| **Evidencia principal** | (CE-090) `workspace.js:3121` card handler setea `currentDoc`+`currentView` juntos; `state.js:11` comparacion por referencia -> sin `renderView`/`_flushDirtyEntity` al cambiar de doc/tabla dentro de la misma vista; autosave 845-873 lee solo el nuevo current. (CE-091) `workspace.js:830` snapshot de `documents` descarta `block.type`/`html`/`headers`/`rows`; `3804` `block.type.startsWith` crashea con `type` undefined. (CE-092) `state.js:71-72` `JSON.parse(localStorage...)` sin try/catch a nivel de import. (CE-093) `storage.js:309-350,417` remapea refs sin validar targets en el bundle; assertIntegrity post-commit solo evento. (CE-094) `storage.js:272-291` export lee IndexedDB sin flushear autosaves pendientes. (CE-095) `workspace.js:4706-4712` `commitTableEdit` sin cap de historial vs `maxEntries:50` de `_appHistory` (1012). |
+| **Candidatos rechazados (con motivo)** | · Bottom-table `addRow` sin confirmacion (LOW VALUE: undo existe, accion intencional). · `_colFilters` fuera de checkpoint (LOW VALUE: estado transitorio de UI no persistido; impacto minimo). · Estado vacio del editor (NO computable como defecto: ya tiene boton «Agregar bloque»). · Electron/desktop undo manual con execCommand en un bloque (incluido en CE-091). · APLUNO sin cobertura funcional de demos y offline deliberado (DEBIL para este ciclo: fuera del foco del Workspace; valor dudoso). · Undo de tabla desalineado con topbar (fundido en CE-091). |
+| **Aceptados** | CE-090 (P1, data-loss doc/tabla switch), CE-091 (P1, undo corruptor de lista de docs/desalineado tabla), CE-092 (P2, localStorage corrupto rompe boot), CE-093 (P2, import acepta refs colgantes), CE-094 (P2, export exporta estado stale), CE-095 (P3, historial de tabla sin cap de memoria). Ordenados por valor/riesgo. |
+| **Nuevo orden de la cola** | P1: CE-090 (proximo ciclo recomendado), CE-091. P2: CE-092, CE-093, CE-094. P3: CE-095. Seis candidatos NUEVOS (deduplicados contra historial y suites). |
+| **Recomendacion siguiente ciclo** | CE-090 (P1) — perdida de datos al cambiar de documento/tabla sin navegar; flush-on-switch con test adversarial (patron CE-082). |
+| **Resultado** | DISCOVERY. Nuevo backlog de 6 oportunidades accionables con evidencia; ningun codigo de produccion modificado en este ciclo. |
+| **Tests/checks** | Ningun test nuevo necesario para discovery: se reutilizo evidencia estatica file:line verificada por lectura directa (state.js, workspace.js, storage.js, bundle.js). El release gate del ciclo anterior (CE-087) quedo 46 suites PASS / 0 FAIL. |
+| **Commits** | 3d2d698 fue HEAD pre-ciclo; este ciclo SOLO documentacion (QUEUE + STATUS). (Commit de docs si las reglas lo permiten.) |
+| **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`. Working tree conserva reworks ajenos no commiteados (ADSENSE, TLT-*, offline.html, opencode.json, etc.) SIN tocar. |
+| **Limitaciones** | La prioridad P1 de CE-090/091 se asigno por la clase de riesgo (perdida de datos / corrupcion en memoria) y requiere implementarla + test adelantado para confirmar la reproduccion real; la evidencia aqui es estatica (file:line) no ejecutada, propia de un ciclo de discovery. |
+| **Proxima prioridad** | Implementar CE-090 (P1) como siguiente ciclo autonomo. |
+
+---
+
 ## Cycle 128 — Fix test-debt in engine/parser/planner suites + register them in the gate (CE-065)
 
 | Field | Value |
