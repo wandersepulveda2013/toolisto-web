@@ -82,6 +82,7 @@ run('pdf-chart-overflow (barras de grafico siempre dentro del area, CE-075)', 'n
 run('pdf-text-wrap (texto y titulos dentro del area, CE-076)', 'node', ['tests/workspace/pdf-text-wrap-test.mjs']);
 run('pdf-chart-layout (grafico sin solape ni hueco por altura real, CE-077)', 'node', ['tests/workspace/pdf-chart-layout-test.mjs']);
 run('pdf-image-fit (imagenes encajadas en la pagina, CE-078)', 'node', ['tests/workspace/pdf-image-fit-test.mjs']);
+run('design-report-wysiwyg (preview pagina igual que el PDF, CE-087)', 'node', ['tests/workspace/design-report-wysiwyg-test.mjs']);
 // Suites del camino PDF que eran HUERFANAS (solo se ejecutaban a mano en cada
 // ciclo, nunca registradas ni en run-all ni en este gate): queden protegidas
 // contra regresion en vez de ser cobertura silenciosa.

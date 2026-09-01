@@ -56,6 +56,53 @@ function tableColWidth(data, contentW) {
   return contentW / colCount;
 }
 
+// Estimacion en pt de la altura de una seccion de texto con su fuente real.
+// Reutilizada tanto por generatePDF como por la vista previa (CE-087) para que
+// la maquetacion WYSIWYG coincida con el PDF exportado.
+function estimateTextSectionH(section, contentW) {
+  const type = section.type;
+  const size = type === 'title' ? 24 : type === 'subtitle' ? 16 : type === 'date' || type === 'footer' ? 10 : 12;
+  const lines = wrapText(section.content || '', contentW, type);
+  return size + Math.max(0, lines.length - 1) * (size * 1.4) + 8;
+}
+
+// Estimacion en pt de la altura de una seccion del reporte usando la MISMA
+// logica de encaje/altura variable que el render PDF (CE-087). Es la fuente
+// unica de verdad de paginacion: la vista previa la reutiliza para que no haya
+// reflow distinto (tablas envolvedoras, imagenes re-escaladas, texto multi-linea).
+function estimateSectionH(section, contentW, usableH) {
+  if (!section) return 0;
+  if (section.type === 'page-break') return 0;
+  if (section.type === 'title') return Math.max(36, estimateTextSectionH(section, contentW));
+  if (section.type === 'subtitle') return Math.max(26, estimateTextSectionH(section, contentW));
+  if (section.type === 'date') return Math.max(20, estimateTextSectionH(section, contentW));
+  if (section.type === 'divider') return 20;
+  if (section.type === 'footer') return Math.max(24, estimateTextSectionH(section, contentW));
+  if (section.type === 'image') {
+    const sectionW = Number(section.width);
+    const sectionH = Number(section.height);
+    const fit = fitImageDisplay(sectionW, sectionH, contentW, usableH);
+    if (fit) return fit.h;
+    return sectionH || 150;
+  }
+  if (section.type === 'table') {
+    const d = section.data && typeof section.data === 'object' ? section.data : {};
+    const rows = d.rows || [];
+    const colW = tableColWidth(d, contentW);
+    let h = TABLE_TOP_INSET + ((d.headers || []).length > 0 ? tableRowHeight(d.headers, colW, 10) : 0);
+    if (rows.length === 0) return Math.max(30, h);
+    rows.forEach(r => { h += tableRowHeight(r, colW, 9); });
+    return Math.max(30, h);
+  }
+  if (section.type === 'chart') {
+    const chartData = section.data && typeof section.data === 'object' ? section.data : {};
+    const chartTitle = String(chartData.title || section.content || 'Grafico');
+    const titleLines = wrapText(chartTitle, contentW, 'text');
+    return Math.max(150, 30 + (titleLines.length - 1) * 16.8 + 120);
+  }
+  return Math.max(24, estimateTextSectionH(section, contentW));
+}
+
 // Reverse map Unicode -> byte cp1252 (winansi) para la mitad alta 0x80-0x9F que NO
 // coincide con Latin-1: '€'(0x20AC)->0x80, comillas/guiones/puntos/tm/fi... Asi un
 // charCodeAt >= 0x100 se re-mapea a su byte winansi correcto y evita el octal >3
@@ -133,58 +180,13 @@ function generatePDF(config) {
     currentY = 0;
   }
 
-  function estimateTextSectionH(section) {
-    const type = section.type;
-    const size = type === 'title' ? 24 : type === 'subtitle' ? 16 : type === 'date' || type === 'footer' ? 10 : 12;
-    const lines = wrapText(section.content || '', contentW, type);
-    return size + Math.max(0, lines.length - 1) * (size * 1.4) + 8;
-  }
-
-  function estimateSectionH(section) {
-    if (section.type === 'page-break') return 0;
-    if (section.type === 'title') return Math.max(36, estimateTextSectionH(section));
-    if (section.type === 'subtitle') return Math.max(26, estimateTextSectionH(section));
-    if (section.type === 'date') return Math.max(20, estimateTextSectionH(section));
-    if (section.type === 'divider') return 20;
-    if (section.type === 'footer') return Math.max(24, estimateTextSectionH(section));
-    if (section.type === 'image') {
-      const sectionW = Number(section.width);
-      const sectionH = Number(section.height);
-      const fit = fitImageDisplay(sectionW, sectionH, contentW, usableH);
-      if (fit) return fit.h;
-      return sectionH || 150;
-    }
-    if (section.type === 'table') {
-      const d = section.data && typeof section.data === 'object' ? section.data : {};
-      const rows = d.rows || [];
-      const colW = tableColWidth(d, contentW);
-      let h = TABLE_TOP_INSET + ((d.headers || []).length > 0 ? tableRowHeight(d.headers, colW, 10) : 0);
-      if (rows.length === 0) return Math.max(30, h);
-      rows.forEach(r => { h += tableRowHeight(r, colW, 9); });
-      return Math.max(30, h);
-    }
-    if (section.type === 'chart') {
-      // El render del grafico tiene altura fija (titulo ~12 pt + chartH 100 +
-      // etiquetas), NO crece con el numero de series. La estimacion anterior
-      // (30 + n*18 + 40) infra-reservaba para <= 5 series (la barra se dibujaba
-      // sobre la seccion siguiente) y sobre-reservaba 430-1510 pt para muchas
-      // series (hueco vacio / pagina casi vacia tras el recorte de CE-075).
-      const chartData = section.data && typeof section.data === 'object' ? section.data : {};
-      const chartTitle = String(chartData.title || section.content || 'Grafico');
-      const titleLines = wrapText(chartTitle, contentW, 'text');
-      return Math.max(150, 30 + (titleLines.length - 1) * 16.8 + 120);
-    }
-    const lines = wrapText(section.content || '', contentW, section.type);
-    return Math.max(24, estimateTextSectionH(section));
-  }
-
   function addTableSections(section) {
     const data = section.data || {};
     const rows = data.rows || [];
     const hasHeader = (data.headers || []).length > 0;
     if (rows.length === 0) {
       currentPage.push({ section, y: currentY });
-      currentY += estimateSectionH(section);
+      currentY += estimateSectionH(section, contentW, usableH);
       return;
     }
 
@@ -209,7 +211,7 @@ function generatePDF(config) {
       }
       const fragment = { ...section, data: { ...data, rows: pageRows } };
       currentPage.push({ section: fragment, y: currentY });
-      currentY += estimateSectionH(fragment);
+      currentY += estimateSectionH(fragment, contentW, usableH);
       rowIndex = idx;
       if (rowIndex < rows.length) newPage();
     }
@@ -224,7 +226,7 @@ function generatePDF(config) {
       addTableSections(section);
       return;
     }
-    const neededH = estimateSectionH(section);
+    const neededH = estimateSectionH(section, contentW, usableH);
     if (currentY + neededH > usableH && currentPage.length > 0) newPage();
     currentPage.push({ section, y: currentY });
     currentY += neededH;
@@ -555,4 +557,4 @@ function wrapText(text, maxWidth, type, fontSizeOverride) {
   return lines.length ? lines : [''];
 }
 
-export { generatePDF };
+export { generatePDF, estimateSectionH, fitImageDisplay, tableColWidth, tableRowHeight };
