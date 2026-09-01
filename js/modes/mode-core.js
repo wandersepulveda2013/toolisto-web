@@ -9,6 +9,7 @@
   var modes = [];
   var booted = false;
   var installed = false;
+  var mountedToolId = null;
 
   function toolConfig() {
     var el = document.getElementById('tool-page-config');
@@ -16,20 +17,26 @@
     try { return JSON.parse(el.textContent); } catch (e) { return null; }
   }
 
-  function boot() {
-    if (booted) return;
-    booted = true;
+  function dispatch() {
     var cfg = toolConfig();
     if (!cfg || !cfg.toolId) return;
+    if (mountedToolId === cfg.toolId) return;
     for (var i = 0; i < modes.length; i++) {
       var m = modes[i];
       if (!m) continue;
       var ids = m.toolIds || [];
       if (ids.indexOf(cfg.toolId) !== -1) {
+        mountedToolId = cfg.toolId;
         try { m.init(cfg); } catch (e) { console.error('[Toolisto mode:' + (m.name || cfg.toolId) + ']', e); }
         return;
       }
     }
+  }
+
+  function boot() {
+    if (booted) return;
+    booted = true;
+    dispatch();
   }
 
   function esc(s) {
@@ -117,7 +124,7 @@
   window.ToolistoModes = {
     register: function (mode) {
       modes.push(mode);
-      if (booted) boot();
+      dispatch();
     },
     boot: boot,
     esc: esc,

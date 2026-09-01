@@ -20,7 +20,7 @@
   },
   "charDefects": [],
   "originality": {
-    "globalBoilerplateRatio": 0.046,
+    "globalBoilerplateRatio": 0.034,
     "leastOriginal": [
       {
         "cat": "pdf",
@@ -33,16 +33,6 @@
         "uniquePct": 0.4
       },
       {
-        "cat": "audio",
-        "slug": "recortar-audio",
-        "uniquePct": 0.429
-      },
-      {
-        "cat": "video",
-        "slug": "recortar-video",
-        "uniquePct": 0.429
-      },
-      {
         "cat": "pdf",
         "slug": "pdf-a-png",
         "uniquePct": 0.455
@@ -50,11 +40,6 @@
       {
         "cat": "spreadsheets",
         "slug": "json-a-csv",
-        "uniquePct": 0.5
-      },
-      {
-        "cat": "spreadsheets",
-        "slug": "extraer-tabla-imagen-excel",
         "uniquePct": 0.5
       },
       {
@@ -71,44 +56,59 @@
         "cat": "images",
         "slug": "png-a-webp",
         "uniquePct": 0.556
+      },
+      {
+        "cat": "spreadsheets",
+        "slug": "excel-a-json",
+        "uniquePct": 0.6
+      },
+      {
+        "cat": "pdf",
+        "slug": "pdf-a-imagenes",
+        "uniquePct": 0.636
+      },
+      {
+        "cat": "images",
+        "slug": "webp-a-jpg",
+        "uniquePct": 0.636
       }
     ],
-    "medianUniquePct": 0.909,
+    "medianUniquePct": 1,
     "minUniquePct": 0.364
   },
   "pairwise": {
     "maxSimilarity": 0.145,
     "nearDuplicatePairs": [],
     "nearDuplicateThreshold": 0.45,
-    "pairsAbove010": 5
+    "pairsAbove010": 4
   },
   "scope": "src/data/tools.json strict editorial (instructions + limitations + faq)",
   "sharedSentences": {
     "byFrequency": [
       {
-        "n": 31,
+        "n": 26,
         "pages": [
-          "comprimir-imagen",
-          "csv-a-excel",
           "excel-a-csv",
           "excel-a-json",
-          "json-a-excel"
+          "json-a-excel",
+          "csv-a-json",
+          "json-a-csv"
         ],
         "sentence": "mis archivos se suben a un servidor"
       },
       {
-        "n": 25,
+        "n": 20,
         "pages": [
-          "comprimir-imagen",
-          "csv-a-excel",
           "excel-a-csv",
           "excel-a-json",
-          "json-a-excel"
+          "json-a-excel",
+          "csv-a-json",
+          "json-a-csv"
         ],
         "sentence": "no todo el procesamiento ocurre en tu navegador los archivos nunca salen de tu dispositivo"
       },
       {
-        "n": 12,
+        "n": 10,
         "pages": [
           "eliminar-paginas-pdf",
           "invertir-orden-pdf",
@@ -119,7 +119,7 @@
         "sentence": "pdf protegidos con contrasena requieren la contrasena"
       },
       {
-        "n": 10,
+        "n": 9,
         "pages": [
           "girar-pdf",
           "eliminar-paginas-pdf",
@@ -152,28 +152,6 @@
         "sentence": "no todo el procesamiento ocurre en tu navegador"
       },
       {
-        "n": 5,
-        "pages": [
-          "redimensionar-imagen",
-          "extraer-contenido-word",
-          "convertir-listas-en-tablas",
-          "extraer-tabla-imagen-excel",
-          "html-a-imagen"
-        ],
-        "sentence": "elige el formato de salida"
-      },
-      {
-        "n": 5,
-        "pages": [
-          "borrar-objetos-de-imagen",
-          "girar-pdf",
-          "duplicar-paginas-pdf",
-          "insertar-paginas-en-blanco-pdf",
-          "extraer-tabla-imagen-excel"
-        ],
-        "sentence": "haz clic en procesar y descarga el resultado"
-      },
-      {
         "n": 4,
         "pages": [
           "imagenes-a-pdf",
@@ -182,16 +160,6 @@
           "txt-a-pdf"
         ],
         "sentence": "haz clic en crear pdf"
-      },
-      {
-        "n": 4,
-        "pages": [
-          "pdf-a-imagenes",
-          "firmar-pdf",
-          "pdf-a-jpg",
-          "pdf-a-png"
-        ],
-        "sentence": "solo acepta un archivo pdf"
       },
       {
         "n": 4,
@@ -212,6 +180,15 @@
           "quitar-audio-video"
         ],
         "sentence": "selecciona el archivo de video"
+      },
+      {
+        "n": 3,
+        "pages": [
+          "redimensionar-imagen",
+          "extraer-contenido-word",
+          "html-a-imagen"
+        ],
+        "sentence": "elige el formato de salida"
       },
       {
         "n": 3,
@@ -239,6 +216,15 @@
           "pdf-a-png"
         ],
         "sentence": "ajusta la escala si lo deseas"
+      },
+      {
+        "n": 3,
+        "pages": [
+          "pdf-a-imagenes",
+          "pdf-a-jpg",
+          "pdf-a-png"
+        ],
+        "sentence": "solo acepta un archivo pdf"
       },
       {
         "n": 3,
@@ -284,9 +270,18 @@
           "buscar-reemplazar-documentos"
         ],
         "sentence": "sube uno o varios archivos word"
+      },
+      {
+        "n": 3,
+        "pages": [
+          "excel-a-json",
+          "csv-a-json",
+          "xml-a-json"
+        ],
+        "sentence": "descarga el archivo json resultante"
       }
     ],
-    "distinctSharedOn2Plus": 80,
+    "distinctSharedOn2Plus": 65,
     "trustWhitelisted": 3
   },
   "sharednessPerTool": {
@@ -308,20 +303,6 @@
         "total": 10
       },
       {
-        "cat": "audio",
-        "n": 4,
-        "shared": 0.571,
-        "slug": "recortar-audio",
-        "total": 7
-      },
-      {
-        "cat": "video",
-        "n": 4,
-        "shared": 0.571,
-        "slug": "recortar-video",
-        "total": 7
-      },
-      {
         "cat": "pdf",
         "n": 6,
         "shared": 0.545,
@@ -333,13 +314,6 @@
         "n": 5,
         "shared": 0.5,
         "slug": "json-a-csv",
-        "total": 10
-      },
-      {
-        "cat": "spreadsheets",
-        "n": 5,
-        "shared": 0.5,
-        "slug": "extraer-tabla-imagen-excel",
         "total": 10
       },
       {
@@ -362,11 +336,32 @@
         "shared": 0.444,
         "slug": "png-a-webp",
         "total": 9
+      },
+      {
+        "cat": "spreadsheets",
+        "n": 4,
+        "shared": 0.4,
+        "slug": "excel-a-json",
+        "total": 10
+      },
+      {
+        "cat": "pdf",
+        "n": 4,
+        "shared": 0.364,
+        "slug": "pdf-a-imagenes",
+        "total": 11
+      },
+      {
+        "cat": "images",
+        "n": 4,
+        "shared": 0.364,
+        "slug": "webp-a-jpg",
+        "total": 11
       }
     ]
   },
   "shortTools": {
-    "count": 33,
+    "count": 30,
     "list": [
       {
         "faq": 2,
@@ -430,13 +425,6 @@
         "lim": 2,
         "slug": "aplanar-json",
         "words": 63
-      },
-      {
-        "faq": 2,
-        "instr": 4,
-        "lim": 1,
-        "slug": "unir-videos",
-        "words": 64
       },
       {
         "faq": 2,
@@ -559,13 +547,6 @@
       },
       {
         "faq": 2,
-        "instr": 4,
-        "lim": 1,
-        "slug": "recortar-audio",
-        "words": 68
-      },
-      {
-        "faq": 2,
         "instr": 3,
         "lim": 2,
         "slug": "texto-a-braille-unicode",
@@ -584,13 +565,6 @@
         "lim": 2,
         "slug": "cambiar-codificacion-csv",
         "words": 68
-      },
-      {
-        "faq": 2,
-        "instr": 3,
-        "lim": 2,
-        "slug": "extraer-ubicacion-foto",
-        "words": 69
       },
       {
         "faq": 2,

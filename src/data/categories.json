@@ -469,7 +469,7 @@
     "id": "spreadsheets",
     "name": "Hojas de cálculo y datos",
     "slug": "hojas-de-calculo",
-    "description": "Herramientas para convertir, fusionar y gestionar archivos CSV, Excel, JSON y XML.",
+    "description": "Convierte, limpia y organiza CSV, Excel, JSON y XML sin salir del navegador: CSV a XLSX, Excel a CSV, uniones, comparaciones, normalización de delimitadores y codificación, OCR de tablas imagen a Excel y más. La solución de hojas de cálculo 100% local.",
     "toolIds": [
       "csvToExcel",
       "excelToCsv",
@@ -561,19 +561,23 @@
     "faq": [
       {
         "q": "¿Puedo convertir un CSV a Excel manteniendo las columnas?",
-        "a": "Sí. Las herramientas de esta sección reconocen las columnas y las llevan de CSV a XLSX conservando la estructura de los datos."
+        "a": "Sí. La conversión CSV a XLSX reconoce el separador (coma, punto y coma, tabulación) y la codificación, y reconstruye las columnas en la hoja. Además hay herramientas para Excel a CSV, a JSON y a XML."
       },
       {
         "q": "¿Cómo uno varias hojas de cálculo en una?",
-        "a": "Con la herramienta para unir/concatenar tablas. Puedes combinar varios archivos en una sola hoja ordenada."
+        "a": "Con la herramienta para unir/concatenar tablas. Puedes combinar varios archivos CSV o Excel en una sola hoja manteniendo el orden de columnas y los títulos."
+      },
+      {
+        "q": "¿Cómo detecto errores en un CSV?",
+        "a": "Las herramientas de limpieza y normalización detectan delimitadores inconsistentes, codificación incorrecta, filas repetidas y celdas vacías, y las corrigen o marcan antes de exportar."
+      },
+      {
+        "q": "¿Puedo extraer una tabla de una imagen o de un PDF a Excel?",
+        "a": "Sí. Con OCR de tabla de imagen (reconoce filas y encabezados) y con extracción de tablas de PDF a Excel/CSV, ambos procesados en tu navegador."
       },
       {
         "q": "¿Mis datos se envían a un servidor?",
-        "a": "No. Todo el procesado es local, así que tus datos no se comparten con ningún servicio externo."
-      },
-      {
-        "q": "¿Puedo convertir Excel a PDF?",
-        "a": "Sí, tienes una herramienta específica que convierte hojas de cálculo a PDF conservando las columnas visibles."
+        "a": "No. Todo el procesado usa bibliotecas locales (SheetJS) en tu dispositivo; los datos nunca se comparten con servicios externos."
       }
     ]
   },
@@ -633,7 +637,7 @@
     "id": "qrcodes",
     "name": "QR y códigos",
     "slug": "qr-codigos",
-    "description": "Herramientas para generar, leer y gestionar códigos QR y códigos de barras.",
+    "description": "Genera y lee códigos QR y de barras en tu navegador: QR de texto, URL, WiFi, tarjetas de contacto, códigos de barras, lectura desde imágenes y generación por lotes desde CSV. Con colores, tamaños y niveles de corrección ajustables.",
     "toolIds": [
       "qrGenerate",
       "qrWifi",
@@ -663,15 +667,23 @@
     "faq": [
       {
         "q": "¿Puedo leer un código QR existente?",
-        "a": "Sí, las herramientas de esta sección decodifican el contenido de un QR para que veas qué contiene antes de compartirlo."
+        "a": "Sí, las herramientas de esta sección decodifican el contenido de un QR o código de barras desde una imagen para que veas qué contiene antes de compartirlo o verificar su origen."
       },
       {
         "q": "¿Qué contenido puedo convertir en un código QR?",
-        "a": "Habitualmente enlaces, textos, datos de contacto y otra información corta que la cámara del teléfono pueda leer."
+        "a": "Puedes elegir texto libre, una URL, datos de conexión WiFi, una tarjeta de contacto vCard o un código de barras. Según el tipo, el editor muestra los campos adecuados y genera un QR válido."
+      },
+      {
+        "q": "¿Puedo personalizar el diseño del QR?",
+        "a": "Sí. En los generadores ajustas el tamaño en píxeles, los colores de fondo y de primer plano y el nivel de corrección de errores, manteniendo siempre un QR legible por la cámara del teléfono."
+      },
+      {
+        "q": "¿Puedo generar muchos códigos a la vez?",
+        "a": "Sí, con la generación por lote cargas un CSV con las columnas que quieras usar (URL, texto, etc.) y la herramienta produce todos los QR en un ZIP listo para descargar."
       },
       {
         "q": "¿Mis códigos se generan en un servidor?",
-        "a": "No, la generación es local. El contenido no se envía a ningún servicio externo."
+        "a": "No. La generación y la lectura ocurren en tu navegador; el contenido nunca se envía a servicios externos."
       }
     ]
   },
@@ -679,7 +691,7 @@
     "id": "video",
     "name": "Video",
     "slug": "video",
-    "description": "Herramientas para comprimir, recortar, unir y convertir archivos de video.",
+    "description": "Herramientas de video en tu navegador: comprime un video para enviarlo por correo o WhatsApp, recorta el fragmento que necesitas, une varios archivos, extrae el audio y convierte video a GIF. Sin subir archivos a servidores.",
     "toolIds": [
       "compressVideo",
       "trimVideo",
@@ -705,15 +717,23 @@
     "faq": [
       {
         "q": "¿Puedo reducir el peso de un video para enviarlo?",
-        "a": "Sí, la herramienta de compresión de video reduce el tamaño ajustando la resolución y la calidad según lo que necesites."
+        "a": "Sí, la herramienta de compresión reduce el tamaño ajustando la resolución (baja 360p, media 480p, alta 720p) y la calidad. Un video de varios minutos se optimiza buscando el equilibrio entre peso y nitidez."
       },
       {
         "q": "¿Puedo cortar la parte que no me sirve de un video?",
-        "a": "Sí, la herramienta de recorte te permite quedarte con el fragmento que necesitas."
+        "a": "Sí, la herramienta de recorte define inicio y fin en segundos y devuelve exactamente ese fragmento, en el mismo formato o convertido a MP4/WebM."
+      },
+      {
+        "q": "¿Puedo unir varios videos en uno solo?",
+        "a": "Sí. Ordenas los archivos con las flechas y el motor los combina; si los formatos difieren, se re-codifican al formato de salida elegido para que el resultado se reproduzca correctamente."
+      },
+      {
+        "q": "¿Cómo paso un video a GIF?",
+        "a": "Con la herramienta de video a GIF eliges el fragmento, los fotogramas por segundo y el ancho en píxeles; el resultado es un GIF para documentos, Discord o compatibilidad general."
       },
       {
         "q": "¿Se suben mis videos a un servidor?",
-        "a": "No, todos los archivos de video se procesan de forma local en tu navegador."
+        "a": "No. El procesado con FFmpeg.wasm ocurre en tu navegador; el motor se carga desde el propio sitio y tu archivo nunca sale del dispositivo."
       }
     ]
   },

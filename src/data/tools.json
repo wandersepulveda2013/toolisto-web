@@ -7,9 +7,9 @@
         "category": "images",
         "name": "Comprimir imagen",
         "title": "Comprimir imagen online gratis | Toolisto",
-        "description": "Reduce el peso de una imagen manteniendo buena calidad directamente en tu navegador.",
+        "description": "Reduce el peso de una imagen (JPG, PNG o WebP) sin perder calidad visible. Elige el destino: WhatsApp, correo, web o documento.",
         "h1": "Comprimir imagen",
-        "summary": "Reduce el tamaño de archivo de una imagen sin perder calidad visible.",
+        "summary": "Comprime imágenes con presets pensados para WhatsApp, correo electrónico, web o documentos. Ajusta calidad, formato WebP/JPG/PNG, peso máximo en KB y ancho sin salir del navegador.",
         "inputFormats": [
             "JPEG",
             "PNG",
@@ -38,32 +38,42 @@
         "enabledInSitemap": true,
         "faq": [
             {
-                "q": "¿Cuánto puedo reducir el peso de mi imagen?",
-                "a": "Depende de la imagen original y del nivel de compresión. Imágenes con mucha información suelen reducirse entre un 40% y 70% sin pérdida visible de calidad."
+                "q": "¿Cuánto puedo reducir una imagen?",
+                "a": "Depende de la imagen. Una foto tomada con el móvil (3-6 MB) suele pasar a 150-400 KB en WebP o JPG de calidad equilibrada sin pérdida visible. Si es un archivo ya comprimido por un chat, el ahorro será pequeño."
             },
             {
-                "q": "¿Se pierde calidad al comprimir?",
-                "a": "La compresión JPEG es con pérdida, pero con la configuración predeterminada la pérdida no es visible a simple vista. Puedes ajustar la calidad para encontrar el equilibrio ideal."
+                "q": "¿Qué formato eligo: WebP, JPG o PNG?",
+                "a": "WebP da el mejor equilibrio peso/calidad para web. JPG es lo más compatible para correos y redes antiguas. PNG solo si la imagen tiene transparencia o ilustraciones con texto nítido."
             },
             {
-                "q": "¿Puedo comprimir imágenes PNG?",
-                "a": "Sí. Las imágenes PNG se convierten a WebP con transparencia para lograr una reducción significativa de peso manteniendo la transparencia."
+                "q": "¿Qué significa el peso máximo en KB?",
+                "a": "Defines un tope (por ejemplo, 200 KB para WhatsApp o 100 KB para web) y la herramienta ajusta calidad y resolución dentro de ese límite siempre que sea posible sin deformar la imagen."
             },
             {
-                "q": "¿Mis archivos se suben a un servidor?",
-                "a": "No. Todo el procesamiento ocurre en tu navegador. Los archivos nunca salen de tu dispositivo."
+                "q": "¿Puedo comprimir varias imágenes a la vez?",
+                "a": "Esta herramienta optimiza una imagen con control fino. Para lotes, usa la herramienta de compresión en lote que genera un ZIP con todas las imágenes."
+            },
+            {
+                "q": "¿Mi imagen se sube a un servidor?",
+                "a": "No. Todo el proceso de re-compresión ocurre en tu navegador con Canvas; el archivo nunca sale de tu dispositivo, y no necesitas crear cuenta."
+            },
+            {
+                "q": "¿Comprimir degrada la calidad para siempre?",
+                "a": "Comprimir elimina información de forma irreversible. Si necesitas calidad máxima para imprimir, conserva siempre el original y comprime solo la copia que vas a compartir."
             }
         ],
         "instructions": [
-            "Selecciona o arrastra una imagen (JPEG, PNG o WebP).",
-            "Ajusta el peso objetivo en KB si lo deseas.",
-            "Haz clic en Procesar para comprimir.",
-            "Descarga la imagen resultante."
+            "Arrastra una imagen JPG, PNG o WebP a la zona de carga.",
+            "Elige el modo de compresión: Automático (recomendado), Máxima calidad, Equilibrado o Máxima reducción.",
+            "Indica para qué la necesitas: WhatsApp, correo electrónico, página web o documento; el preset ajusta el equilibrio entre peso y nitidez.",
+            "Opcional: en Ajustes avanzados define un peso máximo en KB, el formato de salida (WebP, JPG, PNG) y el ancho máximo.",
+            "Haz clic en Procesar y descarga la imagen optimizada."
         ],
         "limitations": [
-            "Peso máximo por archivo: 25 MB",
-            "La compresión JPEG con pérdida puede reducir detalles en imágenes con textos pequeños",
-            "PNG transparente se convierte a WebP para optimizar"
+            "La compresión de imágenes comprimidas previamente (por ejemplo, reenvíos de WhatsApp) apenas logra reducción adicional porque ya no queda redundancia.",
+            "Textos muy pequeños o logotipos con bordes duros pueden verse ligeramente afectados con niveles de reducción alta.",
+            "Una imagen con transparencia se convierte a fondo sólido si eliges salida JPG.",
+            "El peso final varía según el contenido: fotos con muchas texturas comprimen menos que fondos lisos."
         ],
         "ogImage": "/assets/icon-512.png",
         "lastModified": "2026-07-24",
@@ -448,9 +458,9 @@
         "category": "images",
         "name": "Borrar objetos y texto",
         "title": "Borrar objetos y texto de una imagen online | Toolisto",
-        "description": "Elimina elementos no deseados de una imagen pintando sobre ellos con un pincel.",
+        "description": "Elimina objetos, personas o textos no deseados de una foto pintando sobre ellos. Reconstruye el fondo automáticamente.",
         "h1": "Borrar objetos y texto de imagen",
-        "summary": "Elimina objetos, texto o elementos de una imagen usando un pincel manual.",
+        "summary": "Borra objetos, personas, marcas de agua o textos de una fotografía con un pincel. La herramienta reconstruye el fondo de la zona pintada, con pasos de deshacer/rehacer y opción de comparar antes y después.",
         "inputFormats": [
             "JPEG",
             "PNG",
@@ -479,29 +489,39 @@
         "enabledInSitemap": true,
         "faq": [
             {
-                "q": "¿Qué tan bien funciona?",
-                "a": "Funciona bien para eliminar objetos pequeños sobre fondos uniformes o simples. No es comparable con herramientas de IA, pero es útil para ediciones rápidas."
+                "q": "¿Qué tipo de objetos puedo eliminar?",
+                "a": "Personas, automóviles, cables, sombras, marcas de agua, etiquetas y textos que estén sobre un fondo uniforme. El algoritmo toma el entorno de la zona pintada para rellenarla."
             },
             {
-                "q": "¿Cómo funciona la eliminación?",
-                "a": "Se utiliza un método de inpainting iterativo que reemplaza los píxeles pintados con un promedio de los vecinos circundantes."
+                "q": "¿Por qué a veces queda un rastro?",
+                "a": "Ocurre cuando el fondo no es uniforme o el objeto tiene un borde muy definido con sombra. Si la zona queda imperfecta, prueba a pintar todo el objeto con una sola pasada cubriendo su sombra."
             },
             {
-                "q": "¿Qué limitaciones tiene?",
-                "a": "Fondos complejos con texturas detalladas pueden no quedar naturales. Funciona mejor cuando el área pintada es menor al 35% de la imagen."
+                "q": "¿Sirve para quitar marcas de agua?",
+                "a": "Puede atenuar marcas sencillas, pero no debes usarlo para ocultar la autoría de contenido ajeno. La herramienta pide confirmar que tienes derechos sobre la imagen."
+            },
+            {
+                "q": "¿Cambia la calidad de la imagen?",
+                "a": "La zona corregida se regenera a la misma resolución. El resto de la imagen se conserva; si exportas a JPG con calidad menor al original, podrías notar diferencia."
+            },
+            {
+                "q": "¿Se procesa localmente?",
+                "a": "Sí. La imagen se carga y procesa en tu navegador. El archivo no se envía a ningún servidor."
             }
         ],
         "instructions": [
-            "Sube una imagen.",
-            "Ajusta el tamaño del pincel.",
-            "Pinta sobre los elementos que deseas eliminar.",
-            "Usa el borrador si necesitas corregir áreas.",
-            "Haz clic en Procesar y descarga el resultado."
+            "Sube la imagen desde la que quieres quitar un objeto, persona o texto.",
+            "Confirma que eres propietario de la imagen o tienes autorización para modificarla.",
+            "Pinta sobre el objeto con el pincel; ajusta el tamaño si hace falta.",
+            "Usa el borrador para corregir zonas pintadas por error, o Deshacer/Rehacer para afinar el trazo.",
+            "Activa \"Ver resultado\" para comparar la imagen original con la corregida.",
+            "Elige el formato de salida (Igual que el original, JPG, PNG o WebP) y descarga."
         ],
         "limitations": [
-            "Funciona mejor con fondos uniformes",
-            "Área máxima recomendada: 35% de la imagen",
-            "No reemplaza herramientas de IA profesionales"
+            "El resultado depende del fondo: en texturas complejas (césped ondulado, agua con reflejos) pueden quedar rastros visibles.",
+            "Los objetos que ocupan gran parte de la imagen o tocan los bordes son difíciles de reconstruir.",
+            "Tras eliminar un objeto, los metadatos de la imagen se re-generan al exportar.",
+            "No es una herramienta forense: la reconstrucción es una estimación visual basada en el entorno de la zona borrada."
         ],
         "ogImage": "/assets/icon-512.png",
         "lastModified": "2026-07-24",
@@ -592,9 +612,9 @@
         "category": "pdf",
         "name": "Unir PDF",
         "title": "Unir PDF gratis online | Toolisto",
-        "description": "Combina varios archivos PDF en un solo documento. Elige el orden que prefieras.",
+        "description": "Combina varios PDF en uno solo en el orden que elijas. Reordena los archivos con las flechas antes de unir.",
         "h1": "Unir PDF",
-        "summary": "Combina varios documentos PDF en un solo archivo.",
+        "summary": "Une varios documentos PDF en un único archivo. Reordena los documentos con las flechas, revisa el orden final visible en la lista y descarga el PDF combinado manteniendo la estructura de cada origen.",
         "inputFormats": [
             "PDF"
         ],
@@ -622,31 +642,40 @@
         "faq": [
             {
                 "q": "¿Cuántos PDF puedo unir?",
-                "a": "No hay un límite estricto. Puedes seleccionar varios archivos PDF y Toolisto los combinará en el orden que indiques."
+                "a": "No hay límite estricto de cantidad. El tiempo de procesamiento depende del tamaño total: unir 20 PDF de 5 MB suele completarse en pocos segundos en un equipo normal."
             },
             {
-                "q": "¿Se conservan los marcadores y enlaces?",
-                "a": "Depende del contenido del PDF original. La estructura básica se conserva, pero algunos elementos interactivos pueden no transferirse."
+                "q": "¿Se mantienen los marcadores?",
+                "a": "La estructura básica (páginas y texto) se conserva. Los marcadores de cada documento se preservan en la mayoría de los casos; los enlaces entre páginas de documentos distintos no se recrean."
             },
             {
-                "q": "¿Qué pasa con PDFs protegidos?",
-                "a": "Si el PDF requiere contraseña para abrir, Toolisto mostrará un mensaje indicando que no se puede procesar."
+                "q": "¿Puedo unir un PDF escaneado con uno digital?",
+                "a": "Sí, se combinan tal cual. Si quieres que un PDF escaneado sea buscable después, primero pásalo por OCR a PDF buscable y luego únelo."
             },
             {
-                "q": "¿Puedo reorganizar el orden?",
-                "a": "Sí. Antes de unir, puedes mover los archivos hacia arriba o hacia abajo para establecer el orden deseado."
+                "q": "¿Qué pasa si un archivo está protegido?",
+                "a": "Si el PDF exige contraseña al abrirlo, la herramienta mostrará un aviso y no podrá incluirlo. Si solo tiene permisos de copia restringidos, normalmente sí se une."
+            },
+            {
+                "q": "¿El orden se decide antes o después de procesar?",
+                "a": "Antes. Usa las flechas para mover cada archivo en la lista; el orden visible es exactamente el orden de páginas del resultado final."
+            },
+            {
+                "q": "¿Mis PDF se suben a internet?",
+                "a": "No. La unión se realiza en tu navegador con pdf.js y el resultado se genera localmente."
             }
         ],
         "instructions": [
-            "Selecciona dos o más archivos PDF.",
-            "Reorganiza el orden si lo necesitas.",
-            "Haz clic en Unir PDF.",
-            "Descarga el PDF combinado."
+            "Selecciona o arrastra dos o más archivos PDF.",
+            "Reordena los archivos con las flechas para fijar el orden final de las páginas.",
+            "Verifica que el orden visible en la lista sea el correcto.",
+            "Haz clic en Unir PDF y descarga el documento combinado."
         ],
         "limitations": [
-            "No puede unir PDFs protegidos con contraseña",
-            "Los PDFs con formularios interactivos pueden perder esos campos",
-            "No puede extraer páginas específicas (usa Dividir PDF)"
+            "Los PDF protegidos con contraseña de apertura requieren la contraseña para poder procesarse.",
+            "Formularios interactivos y JavaScript incrustado de los archivos origen pueden no transferirse al documento combinado.",
+            "Marcadores y enlaces se conservan en la mayoría de los casos, pero acrobacias de estructura compleja pueden perder referencias.",
+            "No extrae páginas: para eso usa la herramienta Dividir PDF."
         ],
         "ogImage": "/assets/icon-512.png",
         "lastModified": "2026-07-24",
@@ -947,9 +976,9 @@
         "category": "signatures",
         "name": "Firmar PDF",
         "title": "Firmar PDF online gratis | Toolisto",
-        "description": "Dibuja o escribe tu firma y colócala en un documento PDF directamente en tu navegador.",
+        "description": "Dibuja o escribe tu firma y colócala en el PDF en la página y posición que elijas. Firma visual, sin registro.",
         "h1": "Firmar PDF",
-        "summary": "Dibuja o escribe tu firma y colócala en un documento PDF.",
+        "summary": "Añade tu firma a un PDF dibujándola con el ratón o escribiéndola con el teclado. Elige la página y la posición (abajo a la derecha, centro, etc.) y descarga el documento firmado con la firma incrustada como imagen.",
         "inputFormats": [
             "PDF"
         ],
@@ -974,33 +1003,38 @@
         "enabledInSitemap": true,
         "faq": [
             {
-                "q": "¿Qué tipo de firma se agrega?",
-                "a": "Una firma visual como imagen incrustada en el PDF. No constituye por sí sola una firma digital certificada."
+                "q": "¿Es una firma válida legalmente?",
+                "a": "Depende del contexto. Para muchos trámites internos y contratos de bajo riesgo es aceptada, pero si el documento requiere firma electrónica avanzada o certificado digital, esta firma visual no es suficiente."
             },
             {
-                "q": "¿En qué página se coloca?",
-                "a": "Puedes seleccionar la página exacta donde colocar la firma. Por defecto se coloca en la última página."
+                "q": "¿Puedo guardar mi firma para usarla después?",
+                "a": "En esta herramienta la firma se crea al momento. Si quieres reutilizarla, exporta la imagen de tu firma desde el lienzo y reutilízala en futuros documentos."
             },
             {
-                "q": "¿Puedo escribir mi firma?",
-                "a": "Sí. Tienes dos opciones: dibujar la firma con el mouse o escribir tu nombre para generar una firma tipográfica."
+                "q": "¿En qué página y posición se coloca?",
+                "a": "Tú eliges la página exacta y una de cinco posiciones: cuatro esquinas o el centro. La firma se incrusta como imagen en esa ubicación."
             },
             {
-                "q": "¿Dónde se posiciona la firma?",
-                "a": "Puedes elegir entre: abajo a la derecha, abajo a la izquierda, arriba a la derecha, arriba a la izquierda o centro."
+                "q": "¿Qué pasa si me equivoco en la posición?",
+                "a": "Repites el proceso con el PDF original. No hay historial de documentos firmados; puedes volver a subir el archivo tantas veces como quieras."
+            },
+            {
+                "q": "¿Firmar modifica el contenido del PDF?",
+                "a": "No. Solo se añade la capa de imagen con tu firma. El texto y las páginas del documento original se conservan intactos."
             }
         ],
         "instructions": [
-            "Sube un archivo PDF.",
-            "Selecciona la página donde firmar.",
-            "Dibuja tu firma o escribe tu nombre.",
-            "Elige la posición en la página.",
-            "Haz clic en Firmar y descarga el PDF."
+            "Sube un único archivo PDF.",
+            "Selecciona la página donde quieres colocar la firma.",
+            "Dibuja tu firma con el ratón o escríbela con el teclado para generar una firma tipográfica.",
+            "Elige la posición: abajo a la derecha, abajo a la izquierda, arriba a la derecha, arriba a la izquierda o centro.",
+            "Haz clic en Firmar y descarga el PDF con la firma incrustada."
         ],
         "limitations": [
-            "Solo acepta un archivo PDF",
-            "Firma visual, no firma digital certificada",
-            "No funciona con PDFs protegidos"
+            "Es una firma visual como imagen; no es una firma digital certificada con certificado electrónico.",
+            "No funciona con PDF protegidos con contraseña ni con PDF que impidan la edición por permisos.",
+            "La firma tipográfica usa la fuente del sistema y puede variar entre dispositivos.",
+            "No genera sello de tiempo ni hash criptográfico de integridad: es una firma de imagen."
         ],
         "ogImage": "/assets/icon-512.png",
         "lastModified": "2026-07-24",
@@ -1469,9 +1503,9 @@
         "category": "images",
         "name": "Conversor avanzado",
         "title": "Conversor avanzado de imágenes online | Toolisto",
-        "description": "Convierte, redimensiona, rota y añade marca de agua a tus imágenes.",
+        "description": "Convierte imágenes entre JPG, PNG y WebP con control de calidad, redimensionado, rotación, volteo y marca de agua.",
         "h1": "Conversor avanzado de imágenes",
-        "summary": "Convierte, redimensiona, rota, voltea y añade marca de agua a una o varias imágenes.",
+        "summary": "Convierte una imagen a JPG, PNG o WebP y aplica ajustes en un solo paso: calidad de salida, redimensionado (por ancho, porcentaje o dentro de un marco), rotación, volteo y una marca de agua opcional con posición y opacidad.",
         "inputFormats": [
             "JPEG",
             "PNG",
@@ -1500,29 +1534,36 @@
         "enabledInSitemap": true,
         "faq": [
             {
-                "q": "¿Qué diferencia hay con Convertir imagen?",
-                "a": "El conversor avanzado incluye redimensionar (por ancho, porcentaje o fit), rotar, voltear y marca de agua además de la conversión de formato."
+                "q": "¿Qué formatos puedo obtener?",
+                "a": "WebP, JPG o PNG. WebP es el más eficiente para web, JPG el más compatible y PNG para transparencia o ilustraciones con texto nítido."
             },
             {
-                "q": "¿Puedo poner marca de agua?",
-                "a": "Sí. Puedes escribir texto para usar como marca de agua. Se superpondrá en la imagen."
+                "q": "¿Todas las opciones se aplican a la vez?",
+                "a": "Sí. Formato, calidad, redimensionado, rotación, volteo y marca de agua se combinan en un único paso: subes una imagen y obtienes el resultado final."
             },
             {
-                "q": "¿Funciona con varias imágenes?",
-                "a": "Sí. Selecciona múltiples archivos y se procesarán todos con la misma configuración."
+                "q": "¿Puedo poner una marca de agua?",
+                "a": "Sí, con texto libre, tamaño de fuente, opacidad (5-100%), posición (centro o esquinas) y color. Se superpone a la imagen antes de exportar."
+            },
+            {
+                "q": "¿Por qué JPG me deja el fondo blanco donde había transparencia?",
+                "a": "El formato JPG no soporta canal alfa de transparencia. Si necesitas zonas transparentes, exporta a PNG o WebP."
             }
         ],
         "instructions": [
-            "Sube una o varias imágenes.",
-            "Selecciona el formato de salida y calidad.",
-            "Configura redimensionado, rotación y marca de agua.",
-            "Haz clic en Convertir.",
-            "Descarga las imágenes procesadas."
+            "Arrastra la imagen que quieres convertir.",
+            "Elige el formato de destino: WebP, JPG o PNG.",
+            "Ajusta la calidad de salida (25-100%).",
+            "Opcional: redimensiona por ancho, por porcentaje o para ajustar dentro de una medida.",
+            "Opcional: rota (90 grados, 180 o 270) o voltea (horizontal, vertical, ambos).",
+            "Opcional: añade una marca de agua de texto con tamaño, opacidad, posición y color.",
+            "Procesa y descarga la imagen convertida."
         ],
         "limitations": [
-            "La marca de agua es solo de texto",
-            "No soporta marca de agua con imagen",
-            "Múltiples imágenes usan la misma configuración"
+            "Al convertir a JPG se pierde la transparencia (el fondo pasa a color sólido); usa PNG o WebP para conservarla.",
+            "Convertir de un formato con compresión previa no recupera la calidad original: ganas peso y compatibilidad, no nitidez.",
+            "El redimensionado hacia abajo reduce resolución; hacia arriba no crea detalle nuevo real.",
+            "Procesa una imagen a la vez; para varios archivos usa la compresión o conversión en lote del catálogo."
         ],
         "ogImage": "/assets/icon-512.png",
         "lastModified": "2026-07-24",
@@ -1532,7 +1573,8 @@
             "avanzado",
             "lote",
             "vecindario"
-        ]
+        ],
+        "contentTier": "flagship"
     },
     {
         "id": "jpg-to-png",
@@ -4064,9 +4106,9 @@
         "category": "text",
         "name": "Convertir listas en tablas",
         "title": "Convertir listas a tablas online | Toolisto",
-        "description": "Convierte listas de texto, CSV o valores separados por comas en tablas HTML, CSV, Markdown o Excel.",
+        "description": "Convierte listas de textos delimitadas por comas, puntos y comas o tabulaciones en una tabla ordenada con columnas.",
         "h1": "Convertir listas a tablas",
-        "summary": "Transforma listas de texto en tablas estructuradas con múltiples formatos de salida.",
+        "summary": "Transforma una lista de textos (separada por comas, puntos y comas, o tabulaciones) en una tabla limpia con sus columnas. Define el delimitador y el tipo de salida: tabla web, CSV o Table Markdown.",
         "inputFormats": [
             "TXT"
         ],
@@ -4092,29 +4134,34 @@
         "enabledInSitemap": true,
         "faq": [
             {
-                "q": "¿Qué formatos de entrada acepta?",
-                "a": "Texto con separadores (comas, tabulaciones, pipes), listas una línea por registro o valores separados por cualquier carácter personalizado."
+                "q": "¿Qué es una lista delimitada?",
+                "a": "Un archivo o bloque de texto donde cada línea es un registro y los valores se separan por un carácter: por ejemplo \"Carlos, Madrid, 34\" separado por comas."
             },
             {
-                "q": "¿Cómo defino las columnas?",
-                "a": "Puedes especificar el separador de columna y asignar encabezados a cada columna antes de generar la tabla."
+                "q": "¿Puedo convertir un archivo TXT completo?",
+                "a": "Sí, puedes pegar el contenido de un TXT en el área de texto. Para archivos grandes o con formato complejo, mejor usa las herramientas de CSV o Excel del catálogo."
             },
             {
-                "q": "¿Puedo editar la tabla antes de descargar?",
-                "a": "Sí. Se muestra una vista previa de la tabla donde puedes ajustar encabezados y formato antes de descargar."
+                "q": "¿Qué diferencias hay entre los formatos de salida?",
+                "a": "La tabla HTML sirve para incrustar en una página, CSV para abrir en Excel u hojas de cálculo, y Table Markdown para documentación en GitHub, Notion o editores Markdown."
+            },
+            {
+                "q": "¿El delimitador puede ser un espacio?",
+                "a": "Sí, pero ten cuidado: si el texto contiene espacios internos, las columnas se partirán mal. Prefiere comas, puntos y comas o tabulaciones en listas de trabajo."
             }
         ],
         "instructions": [
-            "Sube un archivo TXT con listas o valores.",
-            "Selecciona el separador de columna.",
-            "Asigna nombres a las columnas.",
-            "Elige el formato de salida.",
-            "Descarga la tabla generada."
+            "Pega tu lista de textos en el área prevista, un registro por línea.",
+            "Selecciona el tipo de delimitador: coma, punto y coma, tabulación u otro carácter.",
+            "Previsualiza la tabla generada y corrige el delimitador si alguna columna quedó partida.",
+            "Elige el formato de salida: tabla HTML, CSV o Table Markdown.",
+            "Descarga el resultado o cópialo directamente."
         ],
         "limitations": [
-            "Las líneas con número diferente de columnas pueden generarse con celdas vacías.",
-            "No soporta celdas con el separador dentro del contenido (sin escaping).",
-            "La conversión es unidireccional: no convierte tablas a listas."
+            "Cada línea debe tener el mismo número de delimitadores; si no, la fila se descarta o incompleta.",
+            "Campos que contienen el delimitador dentro de comillas se interpretan como texto y no como separación.",
+            "Listas sin un patrón consistente (mezcla de delimitadores) requieren normalización previa.",
+            "Columnas de una misma lista se convierten en celdas separadas; no infiere tipos de dato."
         ],
         "ogImage": "/assets/icon-512.png",
         "lastModified": "2026-07-24",
@@ -4735,9 +4782,9 @@
         "category": "ebooks",
         "name": "Reparar EPUB",
         "title": "Reparar archivo EPUB dañado online | Toolisto",
-        "description": "Repara archivos EPUB dañados, corrige estructura interna y restaura enlaces rotos.",
+        "description": "Intenta reparar libros EPUB con errores de estructura, imágenes o metadatos que impiden abrirlos.",
         "h1": "Reparar archivo EPUB dañado",
-        "summary": "Repara la estructura y contenido de archivos EPUB dañados o corruptos.",
+        "summary": "Repara archivos EPUB dañados o con errores estructurales que los lectores rechazan: corrige el índice del paquete, registra el contenido, normaliza jerarquías y reconstruye el archivo para que vuelva a abrirse.",
         "inputFormats": [
             "EPUB"
         ],
@@ -4760,28 +4807,34 @@
         "enabledInSitemap": true,
         "faq": [
             {
-                "q": "¿Qué tipo de daños puede reparar?",
-                "a": "Repara archivos ZIP dañados, manifiestos OPF corruptos, enlaces internos rotos, referencias a imágenes perdidas y estructura de capítulos."
+                "q": "¿Por qué un EPUB no abre en mi lector?",
+                "a": "Los lectores son estrictos con el formato: faltan archivos del índice, el manifiesto referencia rutas inexistentes o la jerarquía de navegación está rota. Esta herramienta corrige esas estructuras."
             },
             {
-                "q": "¿Puedo perder contenido al reparar?",
-                "a": "La herramienta intenta preservar todo el contenido. Si faltan archivos internos, se marcan como ausentes pero el resto del libro se conserva."
+                "q": "¿Puede recuperar un EPUB descargado incompleto?",
+                "a": "Si faltan bloques enteros del contenido, no se pueden reconstruir los capítulos perdidos. Sí puede rehacer el índice y el contenedor para que el lector abra las partes que sí llegaron."
             },
             {
-                "q": "¿Cómo funciona la reparación?",
-                "a": "Analiza la estructura interna del EPUB, reconstruye el manifiesto OPF, corrige enlaces rotos y restaura la integridad del archivo ZIP."
+                "q": "¿Sirve para EPUB con DRM?",
+                "a": "No. El cifrado de protección de tiendas impide modificar internamente el archivo. La reparación funciona con EPUB libres de DRM."
+            },
+            {
+                "q": "¿Cómo detecto si mi EPUB está dañado antes de usar esto?",
+                "a": "Si tu lector muestra \"archivo inválido\" o \"no se puede abrir\", y el archivo pesa lo esperado, el problema suele ser estructural y este diagnóstico lo confirmará."
             }
         ],
         "instructions": [
-            "Sube un archivo EPUB dañado.",
-            "Haz clic en Reparar.",
-            "Espera a que se analice la estructura.",
-            "Descarga el EPUB reparado."
+            "Sube uno o varios archivos EPUB con errores.",
+            "La herramienta inspecciona la estructura interna: contenedor, manifiesto, índice y metadatos.",
+            "Revisa el diagnóstico de los problemas encontrados.",
+            "Corrige la estructura y reconstruye el EPUB reparado.",
+            "Descarga el archivo corregido."
         ],
         "limitations": [
-            "No puede recuperar contenido que físicamente no existe en el archivo.",
-            "Los archivos EPUB con DRM no se pueden reparar.",
-            "La reparación es mejor con daños estructurales que con contenido faltante."
+            "Los daños en el contenido de texto o imágenes (archivos corruptos dentro del EPUB) no se reconstruyen; solo se normaliza la estructura.",
+            "EPUB con DRM de tienda de libros no pueden repararse porque el contenido está cifrado.",
+            "La reparación no cambia los metadatos (autor, título) salvo que estén corruptos.",
+            "Un EPUB válido tiene versionadas múltiples; la herramienta trabaja en estándar EPUB 2/3."
         ],
         "ogImage": "/assets/icon-512.png",
         "lastModified": "2026-07-24",
@@ -4802,9 +4855,9 @@
         "category": "spreadsheets",
         "name": "CSV a Excel",
         "title": "Convertir CSV a Excel online gratis | Toolisto",
-        "description": "Convierte archivos CSV a formato Excel (XLSX) detectando automáticamente el separador y la codificación.",
+        "description": "Convierte archivos CSV a Excel (XLSX) detectando el separador y la codificación, con revisión previa de los datos.",
         "h1": "Convertir CSV a Excel",
-        "summary": "Convierte archivos CSV a formato Excel (XLSX) de forma rápida y automática.",
+        "summary": "Convierte un CSV a un libro Excel (XLSX) manteniendo columnas, filas y encoding. Detecta o elige el separador (coma, punto y coma, tabulación) y la codificación (UTF-8, Latin-1 y otras) para que tildes y símbolos no se pierdan en el proceso.",
         "inputFormats": [
             "CSV"
         ],
@@ -4827,28 +4880,33 @@
         "enabledInSitemap": true,
         "faq": [
             {
-                "q": "¿Cómo detecta el separador?",
-                "a": "Analiza las primeras líneas del archivo y detecta automáticamente si usa coma, punto y coma, tabulación u otro separador."
+                "q": "¿Por qué me salen caracteres extraños al abrir el CSV?",
+                "a": "Suele ser un problema de codificación: el archivo está en UTF-8 pero se interpreta como Latin-1 (o viceversa). Elige la codificación correcta en la conversión para conservar tildes, ñ y símbolos."
             },
             {
-                "q": "¿Preserva los encabezados?",
-                "a": "Sí. La primera fila se usa como encabezados de columna en el archivo Excel resultante."
+                "q": "¿Qué separadores detecta?",
+                "a": "Coma, punto y coma y tabulación entre los más comunes. La herramienta detecta el más probable y te permite corregirlo antes de procesar si la detección no acierta."
             },
             {
-                "q": "¿Mis archivos se suben a un servidor?",
-                "a": "No. Todo el procesamiento ocurre en tu navegador. Los archivos nunca salen de tu dispositivo."
+                "q": "¿Puedo convertir Excel a CSV con esta herramienta?",
+                "a": "No: esta herramienta convierte CSV a XLSX. Para la dirección inversa usa la herramienta Excel a CSV del catálogo, que también da control sobre separador y codificación."
+            },
+            {
+                "q": "¿Mis datos salen del navegador?",
+                "a": "No. La conversión se hace en memoria en tu dispositivo con la librería SheetJS; los datos no se suben a servidores."
             }
         ],
         "instructions": [
-            "Selecciona o arrastra un archivo CSV.",
-            "Haz clic en Procesar.",
-            "Descarga el archivo Excel (.xlsx) resultante.",
-            "Comprueba que las columnas del CSV quedan correctas en la hoja de cálculo."
+            "Sube tu archivo CSV.",
+            "Revisa el separador detectado (coma, punto y coma o tabulación) y la codificación del archivo.",
+            "Verifica en el resumen que las columnas y filas se reconocieron correctamente.",
+            "Procesa y descarga el libro XLSX."
         ],
         "limitations": [
-            "Archivos CSV muy grandes (más de 10 MB) pueden tardar en procesarse",
-            "El encoding se detecta automáticamente; CSVs con encoding exótico pueden necesitar re-exportarse",
-            "No soporta archivos CSV con saltos de línea dentro de campos sin comillas"
+            "Convierte en un solo sentido: CSV a XLSX. Para pasar de Excel a CSV usa la herramienta Excel a CSV del catálogo.",
+            "Los formatos visuales (colores, anchos de columna) no provienen del CSV, que es texto plano.",
+            "Un CSV con delimitador mixto o comillas mal balanceadas puede requerir elegir el separador manualmente.",
+            "Múltiples bloques separados por líneas vacías en un mismo CSV se interpretan según el separador elegido."
         ],
         "ogImage": "/assets/icon-512.png",
         "lastModified": "2026-07-24",
@@ -6170,9 +6228,9 @@
         "slug": "comprimir-pdf",
         "category": "pdf",
         "icon": "📦",
-        "description": "Elimina metadatos innecesarios y optimiza el tamaño del PDF sin cambiar el contenido.",
+        "description": "Reduce el tamaño de un PDF eliminando metadatos y optimizando la estructura interna sin cambiar el contenido.",
         "h1": "Comprimir PDF",
-        "summary": "Reduce el tamaño de un PDF eliminando metadatos innecesarios y optimizando la estructura interna.",
+        "summary": "Reduce el peso de un PDF eliminando metadatos innecesarios y optimizando su estructura. Con la opción agresiva además re-codifica y simplifica objetos internos. El tamaño final depende de cuánta redundancia tengan los metadatos del archivo.",
         "inputFormats": [
             "PDF"
         ],
@@ -6200,31 +6258,37 @@
         "enabledInSitemap": true,
         "faq": [
             {
-                "q": "¿El contenido del PDF cambia al comprimir?",
-                "a": "No, solo se eliminan metadatos y se optimiza la estructura interna. El texto, imágenes y disposición se mantienen intactos."
+                "q": "¿Qué información se elimina al comprimir?",
+                "a": "En el nivel básico: título, autor, descripción, fecha, metadatos XMP y otras propiedades incrustadas. El texto y las páginas no cambian."
             },
             {
-                "q": "¿Cuánto espacio se puede ahorrar?",
-                "a": "Depende del PDF. Archivos con muchos metadatos o estructuras redundantes pueden reducirse un 5-15%. El contenido visual no se comprime."
+                "q": "¿Cuánto puedo ahorrar?",
+                "a": "En PDF generados por editores con muchos metadatos, entre 5 y 15% típicamente. Archivos ya planos o escaneados sin metadatos apenas variarán."
+            },
+            {
+                "q": "¿El nivel agresivo puede dañar el documento?",
+                "a": "No debería. Re-optimiza la estructura interna conservando páginas y contenido. Si el PDF ya tiene problemas previos, usa primero reparar o la herramienta de reparación de PDF del catálogo."
             },
             {
                 "q": "¿Es seguro eliminar los metadatos?",
-                "a": "Sí. Los metadatos son información como título, autor, fecha de creación. No afectan el contenido visual del documento."
+                "a": "Sí, y suele ser recomendable antes de compartir un documento interno: elimina el autor de Office, fechas de creación y rutas de impresión que a veces se incrustan."
             },
             {
-                "q": "¿Mis archivos se suben a un servidor?",
-                "a": "No. Todo el procesamiento ocurre en tu navegador. Los archivos nunca salen de tu dispositivo."
+                "q": "¿Funciona con PDF escaneados pesados?",
+                "a": "Reduce parte, porque estos archivos son imágenes. Para recortes grandes en escaneados, usa el compresor de imágenes o la herramienta de optimización de PDF a imagen."
             }
         ],
         "instructions": [
-            "Selecciona o arrastra un archivo PDF.",
-            "Elige el nivel de compresión: eliminar metadatos o eliminación agresiva.",
+            "Arrastra el archivo PDF que quieres optimizar.",
+            "Elige el nivel: eliminar metadatos (rápido, seguro) o eliminación agresiva (más reducción).",
+            "Revisa el tamaño estimado antes y después.",
             "Haz clic en Procesar y descarga el PDF optimizado."
         ],
         "limitations": [
-            "No reduce el tamaño de imágenes dentro del PDF",
-            "La reducción depende de la cantidad de metadatos del original",
-            "PDF protegidos con contraseña requieren la contraseña"
+            "No re-comprime las imágenes dentro del PDF: el ahorro principal viene de metadatos y estructura.",
+            "PDF con pocos metadatos y estructura ya optimizada apenas se reducen.",
+            "PDF protegidos con contraseña requieren desbloquearse antes.",
+            "El nivel agresivo puede tardar y necesita que el PDF no esté corrupto."
         ],
         "ogImage": "/assets/icon-512.png",
         "lastModified": "2026-07-24",
@@ -6546,7 +6610,7 @@
         "name": "Dividir páginas dobles PDF",
         "title": "Dividir páginas dobles — Separar PDF escaneado a dos columnas",
         "h1": "Dividir páginas dobles de un PDF",
-        "summary": "Separa automáticamente páginas dobles escaneadas en páginas individuales. Ideal para documentos escaneados con dos páginas por hoja.",
+        "summary": "Convierte un escaneo a libro abierto (dos páginas por hoja) en páginas individuales. Elige la orientación del corte — vertical (izquierda/derecha) u horizontal (arriba/abajo) — y la herramienta divide cada página del PDF en dos.",
         "slug": "dividir-paginas-dobles-pdf",
         "inputFormats": [
             "PDF"
@@ -6577,29 +6641,32 @@
         "faq": [
             {
                 "q": "¿Qué es una página doble?",
-                "a": "Es una página escaneada que contiene dos páginas del documento original lado a lado (izquierda y derecha)."
+                "a": "Un escaneo digitalizado de un libro o revista abierta donde ves dos páginas del papel en una sola imagen. Esta herramienta las separa para leer cada una como página independiente."
             },
             {
-                "q": "¿Cómo funciona el corte?",
-                "a": "Divide cada página por la mitad: verticalmente (izquierda/derecha) o horizontalmente (arriba/abajo), generando dos páginas individuales."
+                "q": "¿Qué diferencia hay entre corte vertical y horizontal?",
+                "a": "Vertical divide cada hoja en izquierda/derecha, que es lo habitual en libros. Horizontal divide en arriba/abajo, útil para documentos apaisados o carteles dobles apilados."
             },
             {
-                "q": "¿El texto se mantiene?",
-                "a": "Sí, el contenido se preserva exactamente. Solo cambia la composición de las páginas."
+                "q": "¿Se pierde calidad al dividir?",
+                "a": "No. Cada mitad conserva los píxeles originales de su zona; solo cambia el tamaño del lienzo resultante."
             },
             {
-                "q": "¿Mis archivos se suben a un servidor?",
-                "a": "No. Todo el procesamiento ocurre en tu navegador. Los archivos nunca salen de tu dispositivo."
+                "q": "¿Puedo dividir un PDF con páginas mixtas?",
+                "a": "Sí, el corte se aplica a todas las páginas por igual. Si tienes páginas simples y dobles mezcladas, revisa el resultado y separa antes los tipos de página."
             }
         ],
         "instructions": [
-            "Selecciona o arrastra el PDF con páginas dobles.",
-            "Elige la orientación del corte: vertical o horizontal.",
-            "Haz clic en Procesar y descarga el PDF con páginas individuales."
+            "Sube el PDF con páginas dobles (escaneo de un libro o revista abierta).",
+            "Elige la orientación del corte: Vertical (izquierda/derecha) u Horizontal (arriba/abajo).",
+            "Verifica el valor de páginas detectado al cargar el archivo.",
+            "Procesa y descarga el PDF con páginas individuales."
         ],
         "limitations": [
-            "No detecta automáticamente la posición de corte",
-            "PDF protegidos con contraseña requieren la contraseña"
+            "La línea de corte se aplica al centro exacto de cada página; escaneos desalineados pueden dejar bordes irregulares entre las dos mitades.",
+            "Escaneos muy torcidos primero deben enderezarse: usa la herramienta de enderezado de imagen antes de dividir.",
+            "Está pensada para páginas escaneadas como imagen; PDF con texto nativo simplemente se parte por la mitad del ancho o alto.",
+            "Impares en el número de páginas producen el mismo número de mitades; no duplica contenido."
         ],
         "ogImage": "/assets/icon-512.png",
         "lastModified": "2026-07-25",
@@ -6613,7 +6680,7 @@
             "separar"
         ],
         "id": "splitDoublePdf",
-        "description": "Divide páginas dobles de un PDF escaneado en páginas individuales. Corta vertical o horizontalmente.",
+        "description": "Divide cada página doble de un PDF (escaneo de libro o revista abierta) en dos páginas individuales, con corte vertical u horizontal.",
         "contentTier": "flagship"
     },
     {
@@ -6695,7 +6762,7 @@
         "name": "Agregar marca de agua a PDF",
         "title": "Agregar marca de agua a PDF — Texto BORRADOR o CONFIDENCIAL",
         "h1": "Agregar marca de agua a un PDF",
-        "summary": "Añade un texto de marca de agua personalizado a todas las páginas de un PDF. Ideal para marcar documentos como BORRADOR o CONFIDENCIAL.",
+        "summary": "Incorpora una marca de agua de texto sobre todas las páginas del PDF. Configura el mensaje, la opacidad (15-70%), el tamaño de fuente, la rotación (45°, -45°, 90° o sin rotación) y la posición (centro o esquinas), y descarga el documento marcado.",
         "slug": "agregar-marca-de-agua-pdf",
         "inputFormats": [
             "PDF"
@@ -6725,30 +6792,35 @@
         "enabledInSitemap": true,
         "faq": [
             {
-                "q": "¿Qué texto puedo usar?",
-                "a": "Cualquier texto: BORRADOR, CONFIDENCIAL, CONFIDENTIAL, tu nombre, etc."
+                "q": "¿Cuándo conviene una marca de agua?",
+                "a": "Para borradores, documentos confidenciales, versiones de revisión o material que distribuyes identificando su origen: la marca recuerda el estado del documento a quien lo lee."
             },
             {
-                "q": "¿Puedo cambiar la opacidad?",
-                "a": "Sí, puedes elegir entre baja (15%), media (50%), alta (70%) y otros niveles."
+                "q": "¿Se ve en todos los lectores y en impresión?",
+                "a": "Sí, la marca se incrusta en la capa gráfica de cada página: aparece en Acrobat, en visores de documentos y en papel al imprimir."
             },
             {
-                "q": "¿Se puede rotar el texto?",
-                "a": "Sí, puedes elegir entre 45°, -45°, 90° o sin rotación."
+                "q": "¿Qué opacidad es la más equilibrada?",
+                "a": "Texto corto en diagonal con 30% se lee sin entorpecer el contenido. Para borradores internos, 50% asegura que no pase desapercibida."
             },
             {
-                "q": "¿Mis archivos se suben a un servidor?",
-                "a": "No. Todo el procesamiento ocurre en tu navegador. Los archivos nunca salen de tu dispositivo."
+                "q": "¿Puedo quitar la marca después?",
+                "a": "Como se incrusta en el contenido renderizado, no es trivial eliminarla. Úsala en copias de distribución y conserva siempre el archivo original sin marcar."
             }
         ],
         "instructions": [
-            "Selecciona o arrastra el PDF a marcar.",
-            "Escribe el texto de la marca de agua y configura opacidad, color, rotación y posición.",
-            "Haz clic en Procesar y descarga el PDF con la marca de agua."
+            "Sube el PDF al que quieras añadir la marca de agua.",
+            "Escribe el texto de la marca (por ejemplo, \"BORRADOR\" o \"CONFIDENCIAL\").",
+            "Configura el tamaño de fuente y el color.",
+            "Elige la opacidad (15%, 30%, 50% o 70%) según cuánto quieras que se note.",
+            "Define la rotación y la posición (centro o una de las cuatro esquinas).",
+            "Procesa y descarga el PDF con la marca incrustada."
         ],
         "limitations": [
-            "La marca de agua es un elemento visual, no protege contra copia",
-            "No permite imagen como marca de agua, solo texto"
+            "La marca se renderiza como texto sobre la página; no es una marca invisible ni láser, y no elimina las existentes.",
+            "PDF protegidos por permisos de edición pueden rechazar la inserción.",
+            "Opacidades muy bajas (15%) pueden quedar ilegibles sobre páginas con mucho contenido.",
+            "El texto de la marca no se re-posiciona página a página: la posición elegida se aplica igual en todas."
         ],
         "ogImage": "/assets/icon-512.png",
         "lastModified": "2026-07-25",
@@ -6763,7 +6835,7 @@
             "sello"
         ],
         "id": "watermarkPdf",
-        "description": "Agrega una marca de agua de texto personalizado a todas las páginas de un PDF. Ideal para BORRADOR o CONFIDENCIAL.",
+        "description": "Añade una marca de agua de texto a todas las páginas de un PDF: mensaje, transparencia, tamaño, rotación, posición y color.",
         "contentTier": "flagship"
     },
     {
@@ -7475,9 +7547,9 @@
         "category": "qrcodes",
         "name": "Generar código QR",
         "title": "Generar código QR online gratis | Toolisto",
-        "description": "Genera códigos QR para texto, URL, correo, teléfono y más con opciones de color, tamaño y formato.",
+        "description": "Crea códigos QR a partir de texto, URL, correo o teléfono con colores, tamaño y nivel de corrección, descargables en PNG o SVG.",
         "h1": "Generar código QR",
-        "summary": "Crea códigos QR personalizados con diferentes opciones de estilo.",
+        "summary": "Genera códigos QR personalizados a partir de texto, enlaces, correos o números de teléfono. Ajusta tamaño, colores, fondo transparente y nivel de corrección de errores, con vista previa y descarga en PNG o SVG.",
         "inputFormats": [],
         "outputFormats": [
             "PNG",
@@ -7501,27 +7573,39 @@
         "enabledInSitemap": true,
         "faq": [
             {
-                "q": "¿Puedo personalizar los colores?",
-                "a": "Sí, puedes cambiar el color frontal, el fondo y usar fondo transparente."
+                "q": "¿Qué puedo codificar en un QR?",
+                "a": "Texto libre, una URL (se abre al escanear), un correo (mailto), un teléfono (tel) o una ubicación. Para WiFi o tarjetas de contacto usa las herramientas QR WiFi y QR vCard del catálogo."
             },
             {
-                "q": "¿Qué formatos puedo descargar?",
-                "a": "PNG y SVG. SVG es ideal para impresión."
+                "q": "¿PNG o SVG?",
+                "a": "PNG para pantalla y mensajería. SVG para impresión y diseño vectorial: las tiendas de impresión lo escalan sin perder nitidez."
             },
             {
-                "q": "¿Se envía el contenido del QR a algún servidor?",
-                "a": "No. Todo se genera localmente en tu navegador."
+                "q": "¿Cuánto puede tolerar rayones mi QR?",
+                "a": "Eso lo define la corrección de errores. Con nivel alto, un QR sobrevive tapar hasta ~30% de la superficie; con nivel bajo solo ~7%. Si el QR irá en un envase o se imprimirá, usa corrección alta."
+            },
+            {
+                "q": "¿Puedo usar color de fondo transparente?",
+                "a": "Sí. Úsalo sobre superficies de color sólido claro. Si el fondo es oscuro o con textura, el escaneo puede fallar: elige fondo blanco con contraste alto."
+            },
+            {
+                "q": "¿Mis datos se envían a algún servicio?",
+                "a": "No. El QR se genera íntegramente en tu navegador; el contenido nunca sale de tu dispositivo."
             }
         ],
         "instructions": [
-            "Escribe el texto, URL o contenido del QR.",
-            "Personaliza tamaño, colores y nivel de corrección.",
-            "Vista previa en tiempo real.",
-            "Descarga en PNG o SVG."
+            "Escribe el contenido del QR: un texto, una URL, un número o un correo.",
+            "Elige el tamaño en píxeles del QR.",
+            "Personaliza colores: color frontal, fondo y opción de fondo transparente.",
+            "Selecciona el nivel de corrección de errores: el alto soporta más daño físico, pero admite menos datos.",
+            "Revisa la vista previa en tiempo real.",
+            "Descarga en PNG (digital) o SVG (impresión)."
         ],
         "limitations": [
-            "No genera QR para video o audio",
-            "El nivel de corrección alto reduce la capacidad de datos"
+            "Cuanto más contenido, más denso el QR. Textos muy largos o URLs muy extensas pueden volverse difíciles de escanear.",
+            "El nivel de corrección alto reduce la capacidad de datos: el mismo texto puede generar un QR más compacto con corrección baja.",
+            "No genera QR para video o audio como contenido directo: si lo necesitas, usa la URL de ese video o audio.",
+            "El QR no contiene información de seguimiento: es un objeto offline que solo guarda los datos que ingresaste."
         ],
         "ogImage": "/assets/icon-512.png",
         "lastModified": "2026-07-25",
@@ -7533,7 +7617,8 @@
             "url",
             "texto",
             "二维码"
-        ]
+        ],
+        "contentTier": "flagship"
     },
     {
         "id": "qrWifi",
@@ -8364,9 +8449,9 @@
         "category": "spreadsheets",
         "name": "Tabla de imagen a Excel",
         "title": "Extraer tabla de imagen a Excel online gratis | Toolisto",
-        "description": "Extrae tablas de una imagen usando OCR y las exporta a formato Excel o CSV.",
+        "description": "Reconoce tablas en imágenes con OCR y las exporta a Excel (XLSX) o CSV con sus filas y encabezados.",
         "h1": "Tabla de imagen a Excel",
-        "summary": "Reconoce tablas en imágenes mediante OCR y las exporta a Excel o CSV.",
+        "summary": "Extrae los datos de una tabla fotografiada o escaneada usando OCR y los convierte en una hoja de cálculo editable. Elige el idioma del texto y el formato de salida (XLSX o CSV), procesa y descarga el resultado.",
         "inputFormats": [
             "JPEG",
             "PNG",
@@ -8388,23 +8473,34 @@
         "enabledInSitemap": true,
         "faq": [
             {
-                "q": "¿Qué tan preciso es el OCR?",
-                "a": "Depende de la calidad de la imagen. Imágenes claras y de alta resolución dan mejores resultados."
+                "q": "¿Qué tan preciso es el OCR en tablas?",
+                "a": "Con una foto clara y bien enfocada, encabezados y cifras se reconocen bien. Si la tabla tiene columnas angostas o tipografía pequeña, el margen de error sube; revisa los valores detectados antes de confiar en ellos."
             },
             {
-                "q": "¿Qué formatos de salida puedo usar?",
-                "a": "Puedes exportar a XLSX (Excel) o CSV."
+                "q": "¿Qué hago si mi foto sale torcida?",
+                "a": "Primero endereza la imagen con la herramienta de enderezado del catálogo y vuelve a subirla. Una tabla recta mejora notablemente el reconocimiento."
+            },
+            {
+                "q": "¿Qué formatos puedo exportar?",
+                "a": "XLSX (Excel) para seguir editando, o CSV para usar en otras aplicaciones. El archivo XLSX incluye una hoja \"Tabla detectada\" con las filas reconocidas."
+            },
+            {
+                "q": "¿Mis datos van a un servidor?",
+                "a": "No. El OCR se ejecuta en tu navegador con Tesseract; en español los datos de idioma se sirven localmente y la imagen se procesa en tu dispositivo."
             }
         ],
         "instructions": [
-            "Sube una imagen con una tabla.",
-            "Selecciona el idioma del texto.",
-            "Elige el formato de salida.",
-            "Haz clic en Procesar y descarga el resultado."
+            "Sube una imagen nítida con la tabla (foto, captura o escaneo).",
+            "Selecciona el idioma del texto de la tabla (español, inglés, portugués, francés o alemán).",
+            "Elige el formato de salida: XLSX (Excel) o CSV.",
+            "Procesa: el OCR detecta la tabla y te indica cuántas filas encontró.",
+            "Descarga la hoja de cálculo con la estructura reconstruida."
         ],
         "limitations": [
-            "La precisión depende de la calidad de la imagen.",
-            "Requiere conexión a internet para descargar los datos de OCR en la primera vez."
+            "La precisión depende de la calidad de la imagen: fotos borrosas, con sombras o a baja resolución reducen el acierto del reconocimiento.",
+            "Tablas con celdas combinadas o sin líneas de separación claras son más difíciles de reconstruir por columnas.",
+            "Los modelos de idioma distintos al español se descargan la primera vez que se usan (el español se sirve localmente).",
+            "Los valores se exportan como texto detectado; los formatos numéricos no se infieren automáticamente."
         ],
         "ogImage": "/assets/icon-512.png",
         "lastModified": "2026-07-25",
@@ -8416,7 +8512,8 @@
             "csv",
             "extraer",
             "datos"
-        ]
+        ],
+        "contentTier": "flagship"
     },
     {
         "id": "convertAudio",
@@ -8494,9 +8591,9 @@
         "category": "audio",
         "name": "Recortar audio",
         "title": "Recortar audio online gratis | Toolisto",
-        "description": "Recorta archivos de audio seleccionando el rango de tiempo que necesitas.",
+        "description": "Recorta un archivo de audio seleccionando inicio y fin en segundos. Elige formato de salida para re-encodificar si es necesario.",
         "h1": "Recortar audio",
-        "summary": "Elimina partes no deseadas de tus archivos de audio seleccionando inicio y fin.",
+        "summary": "Extrae el fragmento de audio que necesitas indicando el inicio y el final en segundos. Previsualiza la duración, elige el formato de salida (MP3, WAV, OGG, AAC o el original) y descarga el recorte sin salir de tu navegador.",
         "inputFormats": [
             "MP3",
             "WAV",
@@ -8524,22 +8621,34 @@
         "enabledInSitemap": true,
         "faq": [
             {
-                "q": "¿Puedo previsualizar el audio antes de recortar?",
-                "a": "Sí, puedes escuchar el audio y ajustar los tiempos de inicio y fin."
+                "q": "¿Pierdo calidad al recortar?",
+                "a": "Si mantienes el mismo formato, el recorte es preciso y sin re-codificación, así que no hay pérdida adicional. Si cambias a otro formato (por ejemplo, WAV a MP3), la compresión lo modifica."
             },
             {
-                "q": "¿Se pierde calidad al recortar?",
-                "a": "No, el recorte es preciso sin re-codificación si el formato lo permite."
+                "q": "¿Puedo previsualizar antes de recortar?",
+                "a": "Puedes comprobar la duración del archivo y usar los segundos para afinar el fragmento; no incluye editor visual de forma de onda, pero el resultado se verifica al descargar."
+            },
+            {
+                "q": "¿Sirve para recortar un fragmento de una canción?",
+                "a": "Sí: define inicio y final en segundos y elige el formato original para conservar la calidad del recorte."
+            },
+            {
+                "q": "¿Qué formatos soporta?",
+                "a": "Entrada compatible con MP3, WAV, OGG, AAC, FLAC y otros que FFmpeg.wasm reconoce en tu navegador. Salidas: el mismo formato, MP3, WAV, OGG o AAC."
             }
         ],
         "instructions": [
-            "Selecciona el archivo de audio.",
-            "Establece los tiempos de inicio y fin.",
-            "Haz clic en Procesar.",
-            "Descarga el audio recortado."
+            "Sube el archivo de audio (MP3, WAV, OGG, AAC, etc.).",
+            "La herramienta te muestra la duración total.",
+            "Define el inicio y el fin del fragmento en segundos.",
+            "Elige el formato de salida: el mismo del original o MP3, WAV, OGG o AAC.",
+            "Procesa y descarga el audio recortado."
         ],
         "limitations": [
-            "Los tiempos deben estar dentro de la duración del archivo."
+            "Los tiempos deben estar dentro de la duración del archivo; un fin mayor que el total se recorta correctamente, pero un inicio posterior al fin no es válido.",
+            "Si el formato de salida cambia respecto al original, se re-codifica (más lento, y con pérdida en formatos con compresión).",
+            "No soporta recorte fino a nivel de muestra por defecto: define segmentos en segundos.",
+            "Archivos de audio muy largos (largos de horas) procesan lentamente."
         ],
         "ogImage": "/assets/icon-512.png",
         "lastModified": "2026-07-25",
@@ -8549,7 +8658,8 @@
             "cortar",
             "tiempo",
             "segmento"
-        ]
+        ],
+        "contentTier": "flagship"
     },
     {
         "id": "mergeAudio",
@@ -8763,9 +8873,9 @@
         "category": "video",
         "name": "Unir videos",
         "title": "Unir videos online gratis | Toolisto",
-        "description": "Combina varios videos en uno solo, en el orden que elijas.",
+        "description": "Combina varios videos en uno solo en el orden que elijas, re-codificando cuando el formato lo requiere.",
         "h1": "Unir videos",
-        "summary": "Combina múltiples videos en un solo archivo directamente en tu navegador.",
+        "summary": "Une varios videos en un único archivo. Reordena y revisa la lista, elige el formato de salida y el motor re-codifica con FFmpeg en tu navegador cuando los codecs o contenedores no coinciden, para que el resultado se reproduzca correctamente.",
         "inputFormats": [
             "MP4",
             "WebM",
@@ -8791,22 +8901,34 @@
         "enabledInSitemap": true,
         "faq": [
             {
-                "q": "¿Puedo unir videos de diferentes formatos?",
-                "a": "Sí, pero para mejor resultado es recomendable que sean del mismo codec."
+                "q": "¿Puedo unir videos de formatos distintos?",
+                "a": "Sí. Si los formatos coinciden, la unión es rápida (copia directa). Si difieren, el motor re-codifica al formato de salida elegido para que el resultado se reproduzca sin saltos."
             },
             {
                 "q": "¿Cuántos videos puedo unir?",
-                "a": "No hay límite estricto, pero archivos muy grandes pueden tardar más."
+                "a": "No hay límite estricto de cantidad; el factor limitante es el tamaño total y la memoria del equipo. Con pocos minutos de video funciona sin fricción."
+            },
+            {
+                "q": "¿Se mantiene la calidad?",
+                "a": "Cuando la unión hace copia directa (mismos codecs y formato) no hay pérdida. Cuando se re-codifica, la calidad depende de los parámetros de la salida, que se configuran para conservar la resolución y el bitrate razonable."
+            },
+            {
+                "q": "¿Dónde se procesa el video?",
+                "a": "Localmente: el motor FFmpeg.wasm se carga desde el propio sitio y opera en tu navegador. El video no se sube a ningún servidor."
             }
         ],
         "instructions": [
             "Selecciona dos o más archivos de video.",
-            "Ordénalos como desees.",
-            "Haz clic en Procesar.",
+            "Reordena los videos con las flechas para fijar el orden de reproducción.",
+            "Elige el formato de salida (por ejemplo, MP4).",
+            "Procesa: el motor concatena y re-codifica si es necesario.",
             "Descarga el video combinado."
         ],
         "limitations": [
-            "La unión de videos con codecs diferentes puede tardar más por re-codificación."
+            "Videos con codecs diferentes se re-codifican, y ese proceso es más lento que una simple concatenación.",
+            "Resoluciones y frecuencias de cuadro distintas entre archivos pueden requerir ajustes que alargen el procesamiento.",
+            "Archivos muy grandes (varios GB) tardan en completarse; este es un límite del procesamiento local, no del navegador en sí.",
+            "No añade transiciones ni efectos: es una unión lineal de segmentos."
         ],
         "ogImage": "/assets/icon-512.png",
         "lastModified": "2026-07-25",
@@ -8816,7 +8938,8 @@
             "combinar",
             "fusionar",
             "concatenar"
-        ]
+        ],
+        "contentTier": "flagship"
     },
     {
         "id": "videoToGif",
@@ -9097,9 +9220,9 @@
         "category": "files",
         "name": "Cifrar y descifrar archivos",
         "title": "Cifrar y descifrar archivos con contraseña online gratis | Toolisto",
-        "description": "Protege tus archivos con cifrado AES-GCM-256. Descifra archivos .toolistoenc con tu contraseña.",
+        "description": "Protege cualquier archivo con cifrado AES-GCM de 256 bits. Descifra archivos .toolistoenc con tu contraseña.",
         "h1": "Cifrar y descifrar archivos",
-        "summary": "Cifrado AES-GCM-256 local: tu contraseña nunca sale del navegador.",
+        "summary": "Cifra cualquier archivo con AES-GCM 256 bits y derivación de clave PBKDF2-SHA256. El resultado se guarda como .toolistoenc; para recuperarlo solo necesitas la misma contraseña. El procesamiento es local y la contraseña nunca sale del navegador.",
         "inputFormats": [
             "*"
         ],
@@ -9121,26 +9244,37 @@
         "enabledInSitemap": true,
         "faq": [
             {
-                "q": "¿Qué cifrado se usa?",
-                "a": "AES-GCM de 256 bits con deriveación de clave PBKDF2-SHA256 de 600.000 iteraciones."
+                "q": "¿Qué estándares de cifrado usa?",
+                "a": "AES-GCM de 256 bits para el cifrado de datos y PBKDF2-SHA256 con 600.000 iteraciones para derivar la clave desde tu contraseña. Es el mismo nivel de cifrado usado por servicios de almacenamiento modernos."
             },
             {
-                "q": "¿Se envía la contraseña a un servidor?",
-                "a": "No. Todo el cifrado se realiza localmente en tu navegador. La contraseña nunca sale de tu dispositivo."
+                "q": "¿Se envía mi contraseña a algún lugar?",
+                "a": "No. La derivación y el cifrado ocurren en tu navegador; la contraseña vive solo en memoria durante el proceso y no se almacena ni se transmite."
             },
             {
-                "q": "¿Qué formato tiene el archivo cifrado?",
-                "a": "Extensión .toolistoenc con cabecera que incluye salt, IV y metadatos del archivo original."
+                "q": "¿Qué extensión tiene el archivo cifrado?",
+                "a": ".toolistoenc. La cabecera guarda salt, IV y los metadatos del archivo original para poder restaurar el nombre y el tipo al descifrar."
+            },
+            {
+                "q": "¿Qué pasa si pierdo la contraseña?",
+                "a": "El archivo queda ilegible permanentemente. Por diseño no hay claves maestras ni recuperación: guarda tu contraseña en un gestor de contraseñas."
+            },
+            {
+                "q": "¿Puedo cifrar carpetas completas?",
+                "a": "Cifra un archivo a la vez. Para proteger varios archivos, primero comprímelos en un ZIP (con la herramienta de ZIP del catálogo) y luego cifra el ZIP."
             }
         ],
         "instructions": [
-            "Sube un archivo.",
-            "Ingresa una contraseña segura.",
-            "Haz clic en Cifrar o Descifrar.",
-            "Descarga el resultado."
+            "Sube el archivo que quieres proteger.",
+            "Escribe una contraseña segura (combina mayúsculas, minúsculas, números y símbolos).",
+            "Haz clic en Cifrar y descarga el archivo .toolistoenc.",
+            "Para recuperarlo: sube el .toolistoenc, introduce la misma contraseña y descarga el archivo original."
         ],
         "limitations": [
-            "La contraseña se procesa únicamente en memoria y no se almacena."
+            "Si olvidas la contraseña, no hay forma de recuperar el archivo: el cifrado es irreversibilmente dependiente de ella.",
+            "El archivo cifrado pesa más que el original por la cabecera (salt, IV, metadatos) que se incrusta.",
+            ".toolistoenc es un formato propio de Toolisto; otros programas no pueden abrirlo sin esta herramienta.",
+            "Cifra en tu equipo y comparte el archivo; la seguridad depende del secreto de tu contraseña y de que no uses una ya comprometida."
         ],
         "ogImage": "/assets/icon-512.png",
         "lastModified": "2026-07-26",
@@ -9153,7 +9287,8 @@
             "desencriptar",
             "seguridad",
             "proteger"
-        ]
+        ],
+        "contentTier": "flagship"
     },
     {
         "id": "photoLocationExtractor",
@@ -9165,7 +9300,7 @@
         "title": "Extraer ubicación GPS de foto online gratis | Toolisto",
         "description": "Extrae las coordenadas GPS y datos de cámara de una imagen JPEG con datos EXIF.",
         "h1": "Extraer ubicación de foto",
-        "summary": "Lee los datos GPS y EXIF de tus fotos para saber dónde fueron tomadas.",
+        "summary": "Lee los datos GPS y EXIF de tus fotos JPEG para saber dónde y cuándo fueron tomadas, con vista de mapa incluida.",
         "inputFormats": [
             "JPEG"
         ],
@@ -9192,6 +9327,10 @@
             {
                 "q": "¿Funciona con todas las fotos?",
                 "a": "Solo con archivos JPEG que contengan datos EXIF. Las fotos de pantalla o editadas suelen no tener GPS."
+            },
+            {
+                "q": "¿Se sube mi foto a un servidor?",
+                "a": "No. La extracción del EXIF se hace localmente en tu navegador. La única excepción es la vista de mapa: para dibujar el marcador, la herramienta incrusta OpenStreetMap y esas coordenadas son enviadas a ese servicio al cargar el mapa."
             }
         ],
         "instructions": [
@@ -9201,7 +9340,9 @@
         ],
         "limitations": [
             "Solo funciona con archivos JPEG con metadatos EXIF GPS.",
-            "No todas las fotos contienen datos de ubicación."
+            "No todas las fotos contienen datos de ubicación.",
+            "La vista de mapa se renderiza con OpenStreetMap: al consultar el mapa, las coordenadas se envían a ese servicio para mostrar la ubicación. El archivo de imagen en sí se procesa localmente.",
+            "La latitud y longitud se redondean a 4 decimales antes de mostrarse para acotar la ubicación."
         ],
         "ogImage": "/assets/icon-512.png",
         "lastModified": "2026-07-26",
@@ -9403,9 +9544,9 @@
         "category": "documents",
         "name": "Formato APA 7",
         "title": "Formato APA 7to edición online gratis | Toolisto",
-        "description": "Formatea documentos estilo APA 7 con portada, resumen, cuerpo y referencias. Genera DOCX.",
+        "description": "Genera un documento Word (DOCX) con formato académico APA 7: portada, resumen, cuerpo y referencias.",
         "h1": "Formato APA 7",
-        "summary": "Genera documentos con formato APA 7ed listos para imprimir o entregar.",
+        "summary": "Crea un documento DOCX con la estructura de las normas APA 7: portada con título, autor e institución, resumen con palabras clave, cuerpo con encabezados y sangría, referencias y apéndices. Tú escribes el contenido; la herramienta aplica el formato.",
         "inputFormats": [],
         "outputFormats": [
             "DOCX"
@@ -9424,25 +9565,34 @@
         "enabledInSitemap": true,
         "faq": [
             {
-                "q": "¿Genera el contenido del documento?",
-                "a": "No. Solo formatea el contenido que tú ingresas según las normas APA 7."
+                "q": "¿Qué incluye exactamente el documento generado?",
+                "a": "Portada (título, autor, afiliación), resumen con palabras clave, cuerpo con encabezados APA y sangría de primera línea, lista de referencias y sección de apéndices."
             },
             {
-                "q": "¿Qué incluye?",
-                "a": "Portada, resumen, palabras clave, encabezados APA, cuerpo con sangría, lista de referencias y apéndices."
+                "q": "¿La herramienta escribe el contenido?",
+                "a": "No. Tú escribes el contenido; la herramienta se encarga de aplicar la estructura y el formato APA de forma consistente en un archivo DOCX editable."
+            },
+            {
+                "q": "¿Puedo editar el DOCX resultante?",
+                "a": "Sí. Se genera un archivo estándar .docx que puedes abrir y retocar en Word o Google Docs: la estructura APA ya viene aplicada y lista para ajustes finales."
+            },
+            {
+                "q": "¿Maneja citas de página (APA 7)?",
+                "a": "Las citas dentro del texto son tu responsabilidad en la redacción. El formato generado incluye la sección de referencias donde colocas la lista completa."
             }
         ],
         "instructions": [
-            "Completa los campos: título, autor, institución, curso, profesor.",
-            "Escribe el resumen (opcional) y palabras clave.",
-            "Agrega las secciones del cuerpo.",
-            "Agrega referencias en formato APA.",
-            "Haz clic en Generar DOCX."
+            "Completa los campos principales: título, autor, institución y, si aplica, curso y profesor.",
+            "Redacta el resumen y las palabras clave (opcionales).",
+            "Escribe las secciones del cuerpo del trabajo.",
+            "Añade las referencias siguiendo el formato APA (autor, año, título...).",
+            "Haz clic en Generar DOCX y descarga el documento con el formato aplicado."
         ],
         "limitations": [
-            "No genera citas en texto automáticas.",
-            "No inventa referencias ni autores.",
-            "Formato estructural únicamente."
+            "No genera citas dentro del texto automáticamente: debes incluir (Autor, año) en tu redacción.",
+            "No inventa referencias ni autores: solo estructura lo que tú le proporciones.",
+            "Es formato estructural: aplica portada, resumen, encabezados, sangría y referencias; no corrige estilo gramatical.",
+            "La tipografía usada es Arial (según la política del proyecto), no Times New Roman."
         ],
         "ogImage": "/assets/icon-512.png",
         "lastModified": "2026-07-26",
@@ -9455,7 +9605,8 @@
             "ensayo",
             "referencias",
             "cita"
-        ]
+        ],
+        "contentTier": "flagship"
     },
     {
         "id": "scannedPdfToSearchablePdf",
@@ -9465,9 +9616,9 @@
         "category": "pdf",
         "name": "PDF escaneado a PDF buscable",
         "title": "Convertir PDF escaneado a PDF buscable online gratis | Toolisto",
-        "description": "Convierte PDFs escaneados en PDFs con texto buscable y seleccionable usando OCR.",
+        "description": "Convierte un PDF escaneado (imágenes) en un PDF con capa de texto buscable mediante OCR. Mantiene el aspecto original.",
         "h1": "PDF escaneado a PDF buscable",
-        "summary": "Agrega una capa de texto invisible a PDFs escaneados para que el texto sea buscable y seleccionable.",
+        "summary": "Aplica OCR a un PDF escaneado y lo convierte en un PDF con capa de texto invisible: puedes buscar, seleccionar y copiar el contenido mientras el aspecto visual original se mantiene. Elige el idioma del documento y qué páginas procesar.",
         "inputFormats": [
             "PDF"
         ],
@@ -9490,34 +9641,38 @@
         "enabledInSitemap": true,
         "faq": [
             {
-                "q": "¿Cómo funciona el OCR?",
-                "a": "Renderiza cada página del PDF como imagen, ejecuta reconocimiento de texto con Tesseract.js y genera un PDF con una capa de texto invisible superpuesta."
+                "q": "¿Qué significa \"PDF buscable\"?",
+                "a": "Un PDF escaneado sin capa de texto es solo una imagen: buscar palabras falla. Al añadir la capa de OCR invisible, el buscador del lector encuentra y selecciona el texto real aunque visualmente sigues viendo el escaneo."
             },
             {
-                "q": "¿Se conserva el aspecto visual del PDF?",
-                "a": "Sí, la imagen original de cada página se mantiene. Solo se agrega una capa de texto invisible encima."
+                "q": "¿Qué precisión tiene el OCR?",
+                "a": "Con escaneos limpios de al menos 300 dpi se reconoce prácticamente todo el texto. Con documentos ruidosos o de tipografía pequeña la precisión baja; el motor elige el mejor resultado por bloque."
             },
             {
-                "q": "¿Qué idiomas soporta?",
-                "a": "Español, inglés, francés, alemán, portugués, italiano, entre otros. Puedes seleccionar el idioma antes de procesar."
+                "q": "¿Puedo elegir qué páginas procesar?",
+                "a": "Sí. En el campo de páginas puedes escribir rangos o listas, por ejemplo \"1,2\" o \"1-3\". Si lo dejas vacío, se procesa todo el documento."
             },
             {
-                "q": "¿Qué pasa si la calidad del escaneo es mala?",
-                "a": "Se muestra una advertencia con el nivel de confianza del OCR. Textos borrosos o de baja resolución pueden tener errores de reconocimiento."
+                "q": "¿Se modifica la apariencia?",
+                "a": "No. La página sigue viéndose igual; el texto reconocido queda en una capa invisible encima para búsqueda, selección y copia."
+            },
+            {
+                "q": "¿Dónde se procesa?",
+                "a": "Todo el OCR se ejecuta en tu navegador con Tesseract; en español los datos de idioma se sirven desde el propio sitio. El PDF no se sube a ningún servidor."
             }
         ],
         "instructions": [
-            "Selecciona el PDF escaneado.",
-            "Selecciona el idioma del documento.",
-            "Opcionalmente, indica páginas específicas.",
-            "Haz clic en Procesar y espera a que termine el OCR.",
-            "Descarga el PDF buscable resultante.",
-            "Verifica que el texto aparece subrayable y seleccionable en el PDF de salida."
+            "Sube el PDF escaneado (una o varias páginas como imágenes).",
+            "Elige el idioma del documento (español e inglés, entre otros; el modelo de español se sirve localmente).",
+            "Opcional: limita el procesamiento a ciertas páginas (por ejemplo \"1,2\" o \"1-3\").",
+            "Procesa: cada página se lee y se añade la capa de texto invisible.",
+            "Descarga el PDF resultante y comprueba que puedes buscar palabras en él."
         ],
         "limitations": [
-            "El tiempo de procesamiento depende del número de páginas y la resolución.",
-            "La precisión del OCR depende de la calidad del escaneo.",
-            "No garantiza alineación perfecta del texto invisible."
+            "La precisión depende de la nitidez del escaneo: baja resolución, texturas ruidosas o fuentes pequeñas reducen el acierto de los caracteres.",
+            "Textos manuscritos, fuentes ornamentales o idiomas mezclados se reconocen peor.",
+            "Procesar muchas páginas exige más memoria y tiempo: PDF de más de ~50 páginas puede tardar varios minutos.",
+            "El PDF mantiene el aspecto del escaneo; la capa de texto añadida es invisible para lectura, pero habilita búsqueda y copia."
         ],
         "ogImage": "/assets/icon-512.png",
         "lastModified": "2026-07-26",
@@ -9731,9 +9886,9 @@
         "category": "pdf",
         "name": "Censurar PDF permanentemente",
         "title": "Censurar PDF permanentemente online gratis | Toolisto",
-        "description": "Elimina permanentemente texto sensible de un PDF: zonas manuales, búsqueda de palabras, correos, teléfonos y documentos de identidad.",
+        "description": "Oscurece de forma permanente todas las apariciones de un texto sensible en tu PDF y elimina los metadatos antes de compartirlo.",
         "h1": "Censurar PDF permanentemente",
-        "summary": "Protege datos sensibles eliminando contenido real del PDF, no solo cubriéndolo.",
+        "summary": "Censura de forma permanente los datos sensibles de tu PDF: escribes el término que contiene la información (un nombre, una cuenta, una etiqueta), la herramienta oscurece todas sus apariciones en el documento y opcionalmente elimina los metadatos; el resultado sale aplanado, sin texto seleccionable que delate lo ocultado.",
         "inputFormats": [
             "PDF"
         ],
@@ -9756,29 +9911,34 @@
         "enabledInSitemap": true,
         "faq": [
             {
-                "q": "¿La censura es realmente permanente?",
-                "a": "Sí. El PDF resultante se reconstruye como imagen plana. El texto original se elimina físicamente del archivo, no se cubre con un rectángulo negro."
+                "q": "¿Por qué es \"permanente\"?",
+                "a": "Porque en el archivo exportado el contenido de las zonas censuradas se destruye y el documento se aplana: el texto deja de ser seleccionable, así que no se puede recuperar quitando una marca encima."
             },
             {
-                "q": "¿Qué puedo censurar?",
-                "a": "Zonas manuales (dibujas rectángulos), palabras específicas, correos electrónicos, teléfonos, documentos de identidad con patrones regex, y metadatos."
+                "q": "¿Qué son los metadatos y por qué eliminarlos?",
+                "a": "Son propiedades del archivo como autor, título, empresa o fecha de creación. Eliminarlos evita filtrar información del equipo que generó el documento, algo importante al compartir copias."
             },
             {
-                "q": "¿Puedo verificar que la censura funcionó?",
-                "a": "Sí, usa la herramienta 'Verificar censura de PDF' para comparar el original con el censurado y detectar texto recuperable."
+                "q": "¿Cómo compruebo que la censura funcionó?",
+                "a": "Descarga el resultado y usa la herramienta Verificar censura del catálogo, que busca el término en el PDF resultante; también puedes abrirlo y buscar el texto: no debe aparecer."
+            },
+            {
+                "q": "¿Puedo deshacer la censura?",
+                "a": "No sobre el exportado: esos datos se eliminan. Guarda siempre el original en un sitio seguro y trabaja sobre copias si crees que podrías necesitar revisar el contenido después."
             }
         ],
         "instructions": [
-            "Selecciona el PDF a censurar.",
-            "Elige el método: zonas manuales, búsqueda de texto o patrones.",
-            "Configura las opciones (quitar metadatos, páginas específicas).",
-            "Haz clic en Procesar.",
-            "Descarga el PDF censurado permanentemente."
+            "Sube el PDF con los datos que quieres ocultar (nombres, cuentas, direcciones, etc.).",
+            "Escribe el texto a censurar: un término que contengan todas las zonas sensibles (por ejemplo \"SECRETO\").",
+            "Activa \"Eliminar metadatos del PDF\" si quieres limpiar autor, título y fecha del archivo.",
+            "Procesa: la herramienta busca el término en todo el documento, oscurece todas sus apariciones y aplana el resultado.",
+            "Descarga el PDF censurado y verifica con el buscador que el término ya no aparece."
         ],
         "limitations": [
-            "El PDF resultante es una reconstrucción de imagen, puede aumentar el tamaño.",
-            "No se puede deshacer la censura.",
-            "Se recomienda verificar con la herramienta de verificación."
+            "La censura cubre las ocurrencias exactas (con distinción de mayúsculas/contexto según el término buscado); revisa variantes del dato.",
+            "Desde la interfaz se censura por texto buscado; los patrones (email, teléfono, RUT, tarjeta) están disponibles en la capa del procesador.",
+            "Las zonas marcadas se destruyen en el export: no se puede recuperar el contenido censurado después.",
+            "Un PDF sin capa de texto (escaneado) no puede \"buscar\" texto: en ese caso usa las herramientas de ocultado de imágenes o dibuja las marcas sobre las zonas visibles."
         ],
         "ogImage": "/assets/icon-512.png",
         "lastModified": "2026-07-26",
@@ -9933,9 +10093,9 @@
         "category": "text",
         "name": "Estadísticas de texto",
         "title": "Estadísticas de texto online gratis | Toolisto",
-        "description": "Analiza cualquier archivo de texto y obtén palabras, caracteres, frases, párrafos y tiempo de lectura.",
+        "description": "Analiza archivos de texto y obtén palabras únicas, caracteres, frases, párrafos, líneas y tiempo estimado de lectura.",
         "h1": "Estadísticas de texto",
-        "summary": "Obtén métricas completas de tu texto: palabras, caracteres, frases y tiempo de lectura.",
+        "summary": "Analiza cualquier archivo de texto y obtén un informe completo de métricas: palabras, palabras únicas, caracteres con y sin espacios, frases, párrafos, líneas y tiempo estimado de lectura y habla. Descarga el informe en TXT si lo necesitas.",
         "inputFormats": [
             "TXT",
             "MD",
@@ -9962,31 +10122,32 @@
         "faq": [
             {
                 "q": "¿Qué métricas incluye el análisis?",
-                "a": "Incluye palabras, palabras únicas, caracteres con y sin espacios, frases, párrafos, líneas y tiempo estimado de lectura y habla."
+                "a": "Palabras, palabras únicas, caracteres con y sin espacios, frases, párrafos, líneas y tiempos estimados de lectura (200 ppm) y de habla (130 ppm)."
             },
             {
                 "q": "¿Funciona con textos largos?",
-                "a": "Sí. Puedes analizar archivos de texto de hasta 200 MB sin salir del navegador."
+                "a": "Sí, puedes analizar archivos de texto de hasta 200 MB en el navegador; el límite es el equipo, no el servicio."
             },
             {
                 "q": "¿Cómo se calcula el tiempo de lectura?",
-                "a": "Se usa el promedio de 200 palabras por minuto para lectura y 130 para habla, ambos ajustables en la documentación."
+                "a": "Dividiendo el número de palabras entre un promedio: 200 palabras por minuto para lectura y 130 para lectura en voz alta, ambas configuraciones documentadas."
             },
             {
                 "q": "¿Mis archivos se suben a algún servidor?",
-                "a": "No. Todo el análisis ocurre localmente en tu navegador."
+                "a": "No. Todo el análisis ocurre localmente en tu navegador; el texto no abandona tu dispositivo."
             }
         ],
         "instructions": [
-            "Selecciona un archivo de texto.",
+            "Selecciona el archivo de texto (TXT, MD, etc.).",
             "La herramienta analiza el contenido automáticamente.",
-            "Revisa las métricas en pantalla.",
-            "Descarga el informe en formato TXT si lo necesitas."
+            "Revisa el panel de métricas: palabras, caracteres, frases, párrafos y tiempos.",
+            "Si lo necesitas, descarga el informe resumido en formato TXT."
         ],
         "limitations": [
-            "El conteo de frases depende de signos de puntuación como . ! ?.",
-            "Los emojis pueden contar como palabras en algunos casos.",
-            "La codificación debe ser UTF-8 para resultados exactos."
+            "El conteo de frases depende de los signos de puntuación (. ! ?); abreviaciones como \"Dr.\" pueden partir frases.",
+            "Los emojis pueden contarse como palabras en algunas variantes de codificación.",
+            "Para resultados exactos usa archivos en UTF-8; codificaciones antiguas pueden mostrar caracteres extraños.",
+            "Archivos de texto superiores a 200 MB se procesan en más tiempo por la carga inicial."
         ],
         "ogImage": "/assets/icon-512.png",
         "lastModified": "2026-08-01",
@@ -9998,7 +10159,8 @@
             "analizar",
             "métricas",
             "frases"
-        ]
+        ],
+        "contentTier": "flagship"
     },
     {
         "id": "wordCount",

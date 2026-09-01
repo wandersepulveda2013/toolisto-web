@@ -4,10 +4,10 @@
     "byClass": {
       "CTA": 1,
       "PRIVACY_TRUST": 6,
-      "UI_INSTRUCTION": 7
+      "UI_INSTRUCTION": 6
     },
     "concerning": [],
-    "reused6plus": 14
+    "reused6plus": 13
   },
   "categories": {
     "enriched": 12,
@@ -17,10 +17,10 @@
     "HIGH_DUP": 0.7,
     "highValuePairs": [],
     "maxSimilarity": 0.296,
-    "pairCountAbove005": 20318,
+    "pairCountAbove005": 20311,
     "reviewBandPairs": []
   },
-  "final": "PASS",
+  "final": "FAIL",
   "guides": {
     "total": 10,
     "valid": 10
@@ -31,10 +31,10 @@
   },
   "indexable": 235,
   "links": {
-    "externalLinks": 225,
+    "externalLinks": 226,
     "internalBroken": 0,
-    "internalChecked": 10462,
-    "internalRedirectTargets": 4200,
+    "internalChecked": 10486,
+    "internalRedirectTargets": 4213,
     "samples": []
   },
   "metadata": {
@@ -48,23 +48,23 @@
   "orphans": [],
   "pagesDiscovered": 291,
   "placeholders": 0,
-  "sitemapUrls": 236,
+  "sitemapUrls": 219,
   "strictEditorial": {
-    "b100_139": 95,
-    "b70_99": 69,
-    "ge140": 11,
-    "lt70": 27,
-    "max": 176,
+    "b100_139": 86,
+    "b70_99": 63,
+    "ge140": 27,
+    "lt70": 26,
+    "max": 361,
     "metric": "instructions + limitations + faq (sin chrome: capability strip, formatos, privacidad, related-tools)",
     "min": 63,
     "p10": 68,
     "p25": 79,
-    "p50": 103,
-    "p75": 121,
-    "p90": 132,
-    "tierLT": 96,
-    "tierT1": 4,
-    "tierT2": 102,
+    "p50": 106,
+    "p75": 123,
+    "p90": 153,
+    "tierLT": 89,
+    "tierT1": 20,
+    "tierT2": 93,
     "totalTools": 202
   },
   "structuredData": {
@@ -142,13 +142,6 @@
         "mainWords": 66,
         "mainWordsTotal": 138,
         "page": "/powerpoint-a-pdf",
-        "sections": 4,
-        "tier": "TOOL_LT"
-      },
-      {
-        "mainWords": 66,
-        "mainWordsTotal": 136,
-        "page": "/unir-videos",
         "sections": 4,
         "tier": "TOOL_LT"
       },
@@ -272,13 +265,6 @@
         "tier": "TOOL_LT"
       },
       {
-        "mainWords": 70,
-        "mainWordsTotal": 142,
-        "page": "/recortar-audio",
-        "sections": 4,
-        "tier": "TOOL_LT"
-      },
-      {
         "mainWords": 71,
         "mainWordsTotal": 143,
         "page": "/convertir-audio",
@@ -289,13 +275,6 @@
         "mainWords": 71,
         "mainWordsTotal": 145,
         "page": "/csv-a-yaml",
-        "sections": 4,
-        "tier": "TOOL_LT"
-      },
-      {
-        "mainWords": 71,
-        "mainWordsTotal": 136,
-        "page": "/extraer-ubicacion-foto",
         "sections": 4,
         "tier": "TOOL_LT"
       },
@@ -475,13 +454,6 @@
         "tier": "TOOL_LT"
       },
       {
-        "mainWords": 81,
-        "mainWordsTotal": 146,
-        "page": "/formato-apa-7",
-        "sections": 4,
-        "tier": "TOOL_LT"
-      },
-      {
         "mainWords": 83,
         "mainWordsTotal": 158,
         "page": "/codificar-base64",
@@ -492,13 +464,6 @@
         "mainWords": 84,
         "mainWordsTotal": 159,
         "page": "/codificar-url",
-        "sections": 4,
-        "tier": "TOOL_LT"
-      },
-      {
-        "mainWords": 85,
-        "mainWordsTotal": 151,
-        "page": "/extraer-tabla-imagen-excel",
         "sections": 4,
         "tier": "TOOL_LT"
       },
@@ -567,13 +532,6 @@
       },
       {
         "mainWords": 89,
-        "mainWordsTotal": 157,
-        "page": "/cifrar-descifrar-archivo",
-        "sections": 4,
-        "tier": "TOOL_LT"
-      },
-      {
-        "mainWords": 89,
         "mainWordsTotal": 163,
         "page": "/excel-a-json",
         "sections": 4,
@@ -583,13 +541,6 @@
         "mainWords": 89,
         "mainWordsTotal": 160,
         "page": "/extraer-tablas-pdf-excel",
-        "sections": 4,
-        "tier": "TOOL_LT"
-      },
-      {
-        "mainWords": 90,
-        "mainWordsTotal": 172,
-        "page": "/generar-qr",
         "sections": 4,
         "tier": "TOOL_LT"
       },

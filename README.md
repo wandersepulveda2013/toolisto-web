@@ -5,7 +5,7 @@ APLUNO es la marca madre de una familia de productos digitales en español. Este
 ## Rutas públicas
 
 - `/` — portada institucional de APLUNO.
-- `/toolisto` — catálogo de Toolisto con 167 herramientas.
+- `/toolisto` — catálogo de Toolisto con 202 herramientas.
 - `/{slug}.html` — páginas funcionales de las herramientas de Toolisto.
 - `/ordia/` — presentación de Ordía.
 - `/workspace/` — presentación pública de Workspace.
