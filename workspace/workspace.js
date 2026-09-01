@@ -2636,9 +2636,10 @@ async function showTableLineage(table) {
 async function extractTextFromScan(project, capture) {
   if (!project || !capture) { toast('Proyecto o captura no disponible', 'warning'); return; }
   const start = Date.now();
+  const cancelOcr = { cancelled: false };
   const statusEl = h('div', { style: 'padding:12px;text-align:center;color:var(--ws-text-secondary)' }, 'Iniciando OCR...');
   const footer = h('div', { className: 'ws-modal-footer' },
-    h('button', { className: 'ws-btn', id: 'ocr-cancel-btn', onClick: () => { closeModal(); } }, 'Cancelar')
+    h('button', { className: 'ws-btn', id: 'ocr-cancel-btn', onClick: () => { cancelOcr.cancelled = true; closeModal(); } }, 'Cancelar')
   );
   showModal({ title: 'Extracción de texto (OCR)', body: [statusEl], footer });
   try {
@@ -2671,6 +2672,7 @@ async function extractTextFromScan(project, capture) {
     try {
       ocrResult = await recognizeText(canvas, {
         lang: 'spa',
+        signal: cancelOcr,
         onProgress: (pct, msg) => {
           statusEl.textContent = msg || ('Cargando OCR... ' + pct + '%');
         },
@@ -2682,6 +2684,10 @@ async function extractTextFromScan(project, capture) {
       await updateScanOcrState(capture, { status: 'error', confidence: 0 });
       closeModal();
       showManualTextEntry(project, capture, start);
+      return;
+    }
+    if (ocrResult && ocrResult.cancelled) {
+      // CE-088: el usuario cancelo el OCR: no crear documento sorpresa ni registro.
       return;
     }
     const text = ocrResult.text;

@@ -786,6 +786,23 @@ console.log('\n=== workflow-operations: signal passing to OCR ===');
 }
 
 /* ════════════════════════════════════════════════════════════════ */
+console.log('\n=== CE-088: extractTextFromScan aborta el OCR real ===');
+
+{
+  const wsSource = read('workspace/workspace.js');
+  check('workspace declara el flag de cancel del OCR',
+    /const cancelOcr\s*=\s*\{\s*cancelled:\s*false\s*\}/.test(wsSource));
+  check('el boton Cancelar muta el flag en vez de solo cerrar',
+    /ocr-cancel-btn[\s\S]{0,200}cancelOcr\.cancelled\s*=\s*true/.test(wsSource));
+  check('recognizeText recibe el signal del cancel',
+    /recognizeText\(canvas,\s*\{[\s\S]{0,200}signal:\s*cancelOcr/.test(wsSource));
+  check('tras recognize se aborta si el usuario cancelo (sin documento sorpresa)',
+    /if \(ocrResult && ocrResult\.cancelled\)\s*\{[\s\S]{0,200}return;\s*\}/.test(wsSource));
+  check('la ruta cancelada no abre el chooser de extraccion',
+    /if \(ocrResult && ocrResult\.cancelled\)\s*\{[\s\S]{0,160}return;\s*\}/.test(wsSource));
+}
+
+/* ════════════════════════════════════════════════════════════════ */
 console.log('\n=== workflow-ui: resultUrls tracking ===');
 
 {
