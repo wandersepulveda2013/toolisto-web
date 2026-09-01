@@ -391,11 +391,24 @@ export function registerWorkflowOperations(registry) {
           ? input
           : (input.blocks ? input.blocks.map(block => block.content || '').filter(Boolean).join('\n') : '');
         const parsed = parseInvoiceText(text);
+        // CE-083: los renglones de compra que parseInvoiceText calcula (lineItems)
+        // se exponen ahora como una segunda tabla real (Descripcion/Cantidad/Precio
+        // unitario/Importe) para poder continuar el encadenado documento -> tabla.
+        const items = (parsed.lineItems || []).map(item => [
+          item.description || '',
+          item.quantity ?? '',
+          item.unitPrice ?? '',
+          item.amount ?? '',
+        ]);
         return {
           headers: ['Campo', 'Valor', 'Confianza', 'Página'],
           rows: invoiceRows(parsed, 1),
           name: 'Campos de la factura',
           confidence: parsed.confidence,
+          lineItems: {
+            headers: ['Descripción', 'Cantidad', 'Precio unitario', 'Importe'],
+            rows: items,
+          },
         };
       },
     },

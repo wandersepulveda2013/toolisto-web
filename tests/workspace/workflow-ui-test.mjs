@@ -445,6 +445,48 @@ async function testAddResultPersists() {
   check('40. Duplicate table result saved once', savedTables.length === 1, 'saves=' + savedTables.length);
 }
 
+// --- 60-65. Invoice data result with lineItems persists both tables (CE-083) ---
+async function testAddInvoiceLineItems() {
+  savedTables.length = 0;
+  refreshCountCalls = 0;
+  appStore.set({ dataTables: [] });
+  const ui = createWorkflowUI(_registry, createAppHelpers());
+  ui.render(makeContainer());
+
+  const invoiceResult = {
+    kind: 'data',
+    name: 'Campos de la factura',
+    data: {
+      // saveData de produccion asigna un id real (generateId) en storage.js; se
+      // fija aqui un id estable para aislar el dedup de la tabla de renglones.
+      id: 'invoice-1',
+      headers: ['Campo', 'Valor', 'Confianza', 'Página'],
+      rows: [['Número de factura', 'N.00123', '86%', '1']],
+      name: 'Campos de la factura',
+      confidence: 86,
+      lineItems: {
+        headers: ['Descripción', 'Cantidad', 'Precio unitario', 'Importe'],
+        rows: [['Servicio de diseno', '1', '2500.00', '2500.00']],
+      },
+    },
+  };
+  const dupResult = JSON.parse(JSON.stringify(invoiceResult));
+
+  await ui.addResultToWorkspace(invoiceResult);
+  check('60. Invoice result persists the fields table', savedTables.length === 2 && savedTables[0].headers[0] === 'Campo' && savedTables[0].headers.join('|') === 'Campo|Valor|Confianza|Página', 'tables=' + savedTables.length + ' first=' + (savedTables[0] && savedTables[0].headers && savedTables[0].headers.join('|')));
+  check('61. Invoice result also persists the line-items table', savedTables.length === 2 && savedTables[1].headers.join('|') === 'Descripción|Cantidad|Precio unitario|Importe', 'tables=' + savedTables.length);
+  check('62. Line-items table rows are the invoice items', savedTables.length === 2 && savedTables[1].rows[0][0] === 'Servicio de diseno', JSON.stringify(savedTables[1] && savedTables[1].rows));
+  check('63. Line-items table uses a stable flow-invoice-items id', savedTables.length === 2 && /^flow-invoice-items-/.test(savedTables[1].id), 'id=' + (savedTables[1] && savedTables[1].id));
+
+  savedTables.length = 0;
+  refreshCountCalls = 0;
+  appStore.set({ dataTables: [] });
+  await ui.addResultToWorkspace(dupResult);
+  await ui.addResultToWorkspace(dupResult);
+  check('64. Re-adding the same invoice persists fields + items once each', savedTables.length === 2, 'tables=' + savedTables.length);
+  check('65. Duplicate invoice line-items table saved once', savedTables.filter(t => /^flow-invoice-items-/.test(t.id)).length === 1, 'items=' + savedTables.filter(t => /^flow-invoice-items-/.test(t.id)).length);
+}
+
 // --- 41-46. Image results and wrapped payloads added to Workspace (CE-048) ---
 async function testAddImageResultPersists() {
   savedImages.length = 0;
@@ -579,7 +621,7 @@ async function testAddTextResultPersists() {
   check('46. Exactly one category is active at a time', pressedCount === 1, 'pressed=' + pressedCount);
 })();
 
-globalThis.__vmProm = testAddResultPersists().then(() => testAddImageResultPersists()).then(() => testAddTextResultPersists()).then(() => {
+globalThis.__vmProm = testAddResultPersists().then(() => testAddImageResultPersists()).then(() => testAddTextResultPersists()).then(() => testAddInvoiceLineItems()).then(() => {
   console.log('\\nResultados: ' + pass + ' pass, ' + fail + ' fail, ' + (pass + fail) + ' tests\\n');
 }).catch(e => { console.error('ASYNC TEST ERROR:', e && (e.stack || e.message) || e); fail++; console.log('\\nResultados: ' + pass + ' pass, ' + fail + ' fail, ' + (pass + fail) + ' tests\\n'); });
 `;

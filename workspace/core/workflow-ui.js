@@ -952,6 +952,31 @@ export function createWorkflowUI(registry, appHelpers) {
         if (pushHistory) pushHistory({ action: 'workflow-result-add', tableId: table.id, result });
         if (refreshProjectCounts) await refreshProjectCounts(project.id);
         toast('Tabla anadida al Workspace', 'success');
+
+        // CE-083: cuando la factura trae renglones de compra (lineItems), se
+        // persiste ademas la tabla de renglones (Descripcion/Cantidad/Precio
+        // unitario/Importe) como tabla propia del proyecto para poder encadenarla
+        // en el flujo (documento -> tabla -> informe -> PDF) sin perder los items.
+        const itemsRows = payload.lineItems && Array.isArray(payload.lineItems.rows) ? payload.lineItems.rows : [];
+        if (itemsRows.length > 0) {
+          const liHeader = Array.isArray(payload.lineItems.headers) ? payload.lineItems.headers : ['Descripción', 'Cantidad', 'Precio unitario', 'Importe'];
+          let h = 0;
+          const liSeed = JSON.stringify(liHeader) + '\u0000' + JSON.stringify(itemsRows);
+          for (let i = 0; i < liSeed.length; i++) h = (h * 31 + liSeed.charCodeAt(i)) >>> 0;
+          const itemsTable = {
+            id: 'flow-invoice-items-' + h.toString(36),
+            name: (payload.lineItems.name && typeof payload.lineItems.name === 'string' ? payload.lineItems.name : 'Renglones de la factura'),
+            headers: liHeader,
+            rows: itemsRows,
+          };
+          const currTables = appStore.get('dataTables') || [];
+          if (!currTables.some(t => t.id === itemsTable.id)) {
+            if (saveData) await saveData(project.id, itemsTable);
+            appStore.set({ dataTables: [...currTables, itemsTable] });
+            if (pushHistory) pushHistory({ action: 'workflow-result-add-items', tableId: itemsTable.id, result });
+            if (refreshProjectCounts) await refreshProjectCounts(project.id);
+          }
+        }
       } else if (result.kind === 'image' && payload instanceof Blob) {
         // Un resultado de imagen de flujo (rotate/resize/convert/escáner) solo se
         // podía descargar; se persiste ahora como captura del proyecto para poder

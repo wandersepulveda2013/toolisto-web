@@ -101,6 +101,13 @@ const opResult = await invoiceOp.execute({ input: { data: SAMPLE_INVOICE }, opti
 check('Operation headers Campo/Valor/Confianza/Pagina', opResult.headers.join('|') === 'Campo|Valor|Confianza|Página', opResult.headers.join('|'));
 check('Operation fila numero de factura', opResult.rows[0][0] === 'Número de factura' && opResult.rows[0][1] === 'N.00123');
 check('Operation expone confianza global', typeof opResult.confidence === 'number' && opResult.confidence > 0, String(opResult.confidence));
+check('Operation expone tabla de renglones', opResult.lineItems && Array.isArray(opResult.lineItems.headers) && Array.isArray(opResult.lineItems.rows));
+check('Operation renglones trae los items', opResult.lineItems && opResult.lineItems.rows.length === 1 && opResult.lineItems.rows[0][0] === 'Servicio de diseno', JSON.stringify(opResult.lineItems && opResult.lineItems.rows));
+check('Operation renglones headers correctos', opResult.lineItems && opResult.lineItems.headers.join('|') === 'Descripción|Cantidad|Precio unitario|Importe', opResult.lineItems && opResult.lineItems.headers.join('|'));
+check('Operation renglon preserva cantidad/precio/importe', opResult.lineItems && opResult.lineItems.rows[0][1] === '1' && opResult.lineItems.rows[0][2] === '2500.00' && opResult.lineItems.rows[0][3] === '2500.00', JSON.stringify(opResult.lineItems && opResult.lineItems.rows[0]));
+
+const emptyItems = await invoiceOp.execute({ input: { data: 'Total: 100.00' }, options: {} });
+check('Operation sin renglones emite lista vacia', emptyItems.lineItems && emptyItems.lineItems.rows.length === 0, String(emptyItems.lineItems && emptyItems.lineItems.rows.length));
 
 // 3. instruction-parser — _extractFields intent
 const parser = createInstructionParser();

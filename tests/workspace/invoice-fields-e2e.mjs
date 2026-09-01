@@ -116,6 +116,7 @@ async function runInvoiceChain() {
   const extracted = rows.filter(r => r && r[1]).length;
   const invoiceNumber = (rows.find(r => r && r[0] === 'Número de factura') || [])[1] || '';
   const total = (rows.find(r => r && r[0] === 'Total') || [])[1] || '';
+  const lineItems = output && output.lineItems && Array.isArray(output.lineItems.rows) ? output.lineItems.rows : [];
   engine.destroy();
 
   return {
@@ -132,6 +133,8 @@ async function runInvoiceChain() {
     extracted,
     invoiceNumber,
     total,
+    lineItems,
+    lineItemCount: lineItems.length,
     confidence: output && typeof output.confidence === 'number' ? output.confidence : -1,
   };
 }
@@ -179,6 +182,10 @@ try {
   else ko('El Total de la factura llega desde el OCR');
   if (typeof result.confidence === 'number' && result.confidence > 0) ok('La extraccion expone confianza global', `${result.confidence}%`);
   else ko('La extraccion expone confianza global', String(result.confidence));
+  if (result.lineItemCount > 0) ok('La salida expone la tabla de renglones de factura', `${result.lineItemCount} renglon(es)`);
+  else ko('La salida expone la tabla de renglones de factura', String(result.lineItemCount));
+  if (result.lineItems && result.lineItems[0] && result.lineItems[0][0]) ok('El primer renglon trae la descripcion desde el OCR', String(result.lineItems[0][0]).slice(0, 40));
+  else ko('El primer renglon trae la descripcion desde el OCR');
 
   console.log('--- Errores ---');
   if (jsErrors.length === 0) ok('Cero errores de consola durante el flujo real');
