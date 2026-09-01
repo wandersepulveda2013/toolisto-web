@@ -445,6 +445,28 @@
 
 ---
 
+## Cycle 150 — CE-085: la busqueda universal alcanza el contenido del usuario
+
+| Field | Value |
+|-------|-------|
+| **Date** | 2026-09-01 |
+| **Branch** | main |
+| **HEAD inicial** | 1ecc62d |
+| **HEAD final** | 4f86584 |
+| **Task** | CE-085 (P2, ACTIVE->DONE): la busqueda universal (Ctrl+K) solo filtraba navegacion y las 167 herramientas; nunca buscaba documentos, tablas ni capturas del usuario. `filterPalette` construia su lista solo con `navItems` + `TOOLS_DATA`. |
+| **Hypothesis** | Extender `filterPalette` para agregar el contenido del proyecto actual (funcion ya recibe `appStore.get('currentProject')`) y hacer deep-link a la entidad correpondiente permite encontrar cualquier documento/tabla/captura por nombre sin salir del proyecto y 100% local. |
+| **Change** | `filterPalette` agrega, cuando hay proyecto activo, los documentos (`navigateTo('doc-editor', {doc})`), tablas de datos (`navigateTo('data-table', {dataTable})`) y capturas (`navigateTo('capture')`) del proyecto matcheando por nombre (case-insensitive), y etiqueta cada resultado con su tipo (Documento/Tabla/Captura). Se reutiliza el `project` ya declarado en la funcion (sin redeclaracion). |
+| **Bugs corregidos** | Contenido del usuario inencontrable por nombre con muchas capturas/documentos. |
+| **Tests ejecutados** | 7 checks nuevos CE-085 de inspeccion de source en `workflow-lifecycle-test` (89/89), coherentes con el patron que ese suite ya usaba para OCR/palette; release gate completo OK (build + sync source->dist + todas las suites). |
+| **Resultado** | FEATURE. La palette universal ahora busca contenido del usuario y hace deep-link a cada entidad. |
+| **Evidence** | `workspace/workspace.js` (bloque CE-085 en `filterPalette`), `tests/workspace/workflow-lifecycle-test.mjs` (checks CE-085). |
+| **Commits** | 4f86584 (feature CE-085). |
+| **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`. Working tree conserva reworks ajenos no commiteados sin tocar. |
+| **Limitaciones** | La busqueda compara por titulo (`name`) de documento/tabla/captura, no por contenido OCR ni texto de cuerpo; el scope limite al proyecto actual. Indexar el texto OCR como ruta futura. |
+| **Proxima prioridad** | Siguiente oportunidad P2: CE-086 (rename/duplicate/mover; `updateProject` sin uso) o CE-088 ya resuelto; en P3, CE-089 (multiples facturas por escaneo). |
+
+---
+
 ## Cycle 128 — Fix test-debt in engine/parser/planner suites + register them in the gate (CE-065)
 
 | Field | Value |
