@@ -511,6 +511,27 @@
 
 ---
 
+## Cycle 153 — CE-087: la preview del builder de diseno pagina igual que el PDF exportado
+
+| Field | Value |
+|-------|-------|
+| **Date** | 2026-09-01 |
+| **Branch** | main |
+| **HEAD inicial** | e6618b6 |
+| **HEAD final** | 41d602d |
+| **Task** | CE-087 (P3, DISCOVERED->DONE): la vista previa WYSIWYG del builder de diseno no coincidia con la paginacion del PDF: `estimateSectionHeight` (design-report.js:88) usaba altura fija por fila de tabla e ignoraba el wrap de celdas y el re-escalado de imagenes, mientras el generador real (`estimateSectionH` en pdf-generator.js) calculaba altura variable por contenido; el usuario disenaba esperando WYSIWYG pero el PDF refluia de pagina distinto (cortaba tablas, movia secciones). |
+| **Hypothesis** | Extraer el estimador de altura del generador real a una funcion top-level compartida y exportada, y que la preview la reutilice (decidiendo los saltos en pt con conversion de unidades preview px <-> pt) elimina la divergencia de paginacion al usar una sola fuente de verdad de encaje. |
+| **Change** | `pdf-generator.js`: `estimateSectionH(section, contentW, usableH)` y `estimateTextSectionH(section, contentW)` movidas a top-level (reusando `wrapText`, `fitImageDisplay`, `tableColWidth`, `tableRowHeight`) y exportadas; `generatePDF` las llama pasando `contentW`/`usableH`. `design-report.js`: importa `estimateSectionH`; `renderReportPreview` decide la paginacion en pt con la MISMA funcion (conversion `px=mm*scale` <-> `pt=mm*2.835`) y `estimateSectionHeight` delega en el mismo estimador. |
+| **Tests ejecutados** | Suite nueva `tests/workspace/design-report-wysiwyg-test.mjs` 14/14 (pure, sin navegador; carga ambos modulos reales por `new Function` concatenando pdf-generator antes de design-report): la preview genera el mismo numero de paginas que una referencia independiente en pt basada en el estimador compartido y que el PDF exportado, cada seccion cae en la misma pagina con el mismo `y` en px (< 1e-4), y `estimateSectionHeight` delega igual al estimador para title/table/image/chart. Registrada en el release gate. Release gate completo OK (build + sync source->dist + todas las suites). |
+| **Resultado** | ARCHITECTURE_IMPROVEMENT. Una sola fuente de verdad de encaje/paginacion compartida entre preview y PDF. |
+| **Evidence** | `workspace/core/pdf-generator.js` (`estimateSectionH`, `estimateTextSectionH`, export ampliado), `workspace/core/design-report.js` (import + paginacion en pt + delegacion), `tests/workspace/design-report-wysiwyg-test.mjs`. |
+| **Commits** | 41d602d (feature CE-087). |
+| **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`. Working tree conserva reworks ajenos no commiteados sin tocar. |
+| **Limitaciones** | La preview pinta cada seccion con su altura CSS natural (los [saltos de pagina, alturas estimadas] coinciden con el PDF, pero la altura visual del DOM de una imagen/linea puede no igualar el px exacto del exportado; el desbordamiento en la pagina previa queda oculto por `overflow:hidden`, igual que antes). La conversion de unidades asume escala fija 2. |
+| **Proxima prioridad** | La cola DISCOVERED quedo VACIA tras CE-087. Aplicar regla 6 (DISCOVERY futuro) si se continua: producir nueva evidencia file:line desde el codigo real y registrarla. |
+
+---
+
 ## Cycle 128 — Fix test-debt in engine/parser/planner suites + register them in the gate (CE-065)
 
 | Field | Value |
