@@ -8076,6 +8076,28 @@ function filterPalette(query, container) {
     ...navItems.map(i => ({ ...i, type: 'nav' })),
     ...TOOLS_DATA.map(t => ({ label: t.name, icon: 'tool', type: 'tool', tool: t, action: () => openTool(t) })),
   ];
+  if (project) {
+    // CE-085: la busqueda universal tambien alcanza el contenido del usuario del
+    // proyecto actual (documentos, tablas y capturas) por nombre y hace deep-link.
+    const userItems = [
+      ...(appStore.get('documents') || []).map(d => ({
+        label: d.name || 'Documento sin titulo',
+        icon: 'doc', type: 'document', entity: d,
+        action: () => navigateTo('doc-editor', { doc: d }),
+      })),
+      ...(appStore.get('dataTables') || []).map(t => ({
+        label: t.name || 'Tabla sin nombre',
+        icon: 'table', type: 'data', entity: t,
+        action: () => navigateTo('data-table', { dataTable: t }),
+      })),
+      ...(appStore.get('captures') || []).map(c => ({
+        label: c.name || 'Captura',
+        icon: 'camera', type: 'capture', entity: c,
+        action: () => navigateTo('capture'),
+      })),
+    ];
+    allItems.push(...userItems.map(i => ({ ...i, section: 'User' })));
+  }
   const filtered = q ? allItems.filter(i => i.label.toLowerCase().includes(q)) : allItems.slice(0, 12);
   filtered.forEach((item, idx) => {
     const el = h('button', {
@@ -8087,7 +8109,11 @@ function filterPalette(query, container) {
     },
       h('div', { className: 'item-icon', 'aria-hidden': 'true' }, svgIcon(item.icon, 16)),
       h('div', { className: 'item-label' }, item.label),
-      item.type === 'tool' ? h('span', { className: 'item-shortcut' }, 'Herramienta') : null
+      item.type === 'tool' ? h('span', { className: 'item-shortcut' }, 'Herramienta')
+        : item.type === 'document' ? h('span', { className: 'item-shortcut' }, 'Documento')
+        : item.type === 'data' ? h('span', { className: 'item-shortcut' }, 'Tabla')
+        : item.type === 'capture' ? h('span', { className: 'item-shortcut' }, 'Captura')
+        : null
     );
     container.appendChild(el);
   });

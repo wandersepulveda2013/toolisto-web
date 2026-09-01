@@ -803,6 +803,29 @@ console.log('\n=== CE-088: extractTextFromScan aborta el OCR real ===');
 }
 
 /* ════════════════════════════════════════════════════════════════ */
+console.log('\n=== CE-085: la busqueda universal alcanza el contenido del usuario ===');
+
+{
+  const wsSource = read('workspace/workspace.js');
+  check('filterPalette lee los documentos del proyecto',
+    /filterPalette[\s\S]{0,3000}appStore\.get\('documents'\)/.test(wsSource));
+  check('filterPalette lee las tablas de datos del proyecto',
+    /appStore\.get\('dataTables'\)/.test(wsSource));
+  check('filterPalette lee las capturas del proyecto',
+    /appStore\.get\('captures'\)/.test(wsSource));
+  check('resultado de documento hace deep-link a doc-editor',
+    /navigateTo\('doc-editor',\s*\{\s*doc:\s*d\s*\}\)/.test(wsSource));
+  check('resultado de tabla hace deep-link a data-table',
+    /navigateTo\('data-table',\s*\{\s*dataTable:\s*t\s*\}\)/.test(wsSource));
+  check('resultado de captura navega a la vista de capturas',
+    /type:\s*'capture'[\s\S]{0,80}navigateTo\('capture'\)/.test(wsSource));
+  check('se distingue el tipo de cada resultado (Documento/Tabla/Captura)',
+    /item\.type === 'document'\s*\?\s*h\([^)]*'Documento'/.test(wsSource) &&
+    /item\.type === 'data'\s*\?\s*h\([^)]*'Tabla'/.test(wsSource) &&
+    /item\.type === 'capture'\s*\?\s*h\([^)]*'Captura'/.test(wsSource));
+}
+
+/* ════════════════════════════════════════════════════════════════ */
 console.log('\n=== workflow-ui: resultUrls tracking ===');
 
 {
