@@ -360,6 +360,26 @@
 
 ---
 
+## Cycle 146 — Discovery de producto: 7 oportunidades nuevas registradas (CE-083→CE-089)
+
+| Field | Value |
+|-------|-------|
+| **Date** | 2026-09-01 |
+| **Branch** | main |
+| **HEAD inicial** | 63aa3d3 |
+| **HEAD final** | 63aa3d3 (ciclo de DISCOVERY: 0 cambios de produccion) |
+| **Task** | DISCOVERY (guia 1.8 / mision 3.6): la cola no tiene tareas `TODO` (solo CE-011 y CE-063 P3 DISCOVERED, ambas decisiones del dueno/host o gates ya heredados). El ciclo se dedica a generar oportunidades nuevas (P1/P2/P3) y registrarlas como DISCOVERED. Explorado con 3 agentes paralelos: area PDF del star-flow, Workspace UX/persistencia, y pipeline OCR/factura/documento-tabla. |
+| **Hypothesis** | Un barrido dirigido de gaps funcionales reales en las tres areas identifica candidatas que responden SI a las 4 preguntas de producto (necesidad real, 100% local/sin API key, diferenciada, implementacion real verificable) y no son decorativos ni mocks. |
+| **Change** | 7 candidatas nuevas registradas como DISCOVERED en `CONTINUOUS-EVOLUTION-QUEUE.md` (CE-083→CE-089), todas con evidencia file:line verificada leyendo el codigo real: (CE-083/P2) lineItems de factura calculados por `parseInvoiceText` pero descartados por `text.invoice-fields`; (CE-084/P2) `pdfString` escapa chars >= 256 con octal >3 digitos corrompiendo el string PDF; (CE-085/P2) la busqueda universal (Ctrl+K) no busca contenido del usuario; (CE-086/P2) sin rename/duplicar/mover para proyectos/docs/tablas/capturas (`updateProject` sin uso); (CE-087/P3) vista previa del builder de diseno != paginacion del PDF exportado; (CE-088/P2) el boton Cancelar de OCR no aborta el worker y aun crea el documento (`signal.cancelled` nunca se pasa); (CE-089/P3) el parser de factura asume una factura por escaneo y pierde el resto sin aviso. |
+| **Bugs encontrados** | 2 bugs funcionales candidatos (no corregidos este ciclo, registrados para evaluar): (CE-084) caracteres no-WinAnsi corrompen strings PDF; (CE-088) cancel de OCR no aborta. |
+| **Tests ejecutados** | 0 suites en este ciclo (DISCOVERY puro, sin cambios de codigo). Regresion no aplica: no se toco produccion. |
+| **Commits** | Ciclo sin commits (solo actualizacion de QUEUE.md; STATUS.md este registro). |
+| **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`. Working tree conserva reworks ajenos no commiteados (opencode.json, offline.html, styles.css, guides.json, generate-apluno-pages.mjs, evidencias y release-gate manifests) sin tocar. |
+| **Limitaciones** | DISCOVERY registra oportunidades con evidencia estatica; ninguna implementada. La promocion a TODO y ejecucion se decide por prioridad (P2 primero: CE-083/084/085/086/088; P3: CE-087/089) en el siguiente ciclo. |
+| **Proxima prioridad** | Promover a TODO la oportunidad DISCOVERED de mayor valor/riesgo. Recomendacion: CE-083 (superficie de lineItems de factura al usuario, sirve directo `documento -> tabla` del flujo estrella con datos ya calculados y bajo riesgo) o CE-084 (correccion de strings PDF no-WinAnsi). Alternativamente CE-011/CE-063 no aplican (decision del dueno/host). El despliegue del HEAD certificado depende del canal autorizado de GitHub. |
+
+---
+
 ## Cycle 128 — Fix test-debt in engine/parser/planner suites + register them in the gate (CE-065)
 
 | Field | Value |
