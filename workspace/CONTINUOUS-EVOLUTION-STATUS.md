@@ -423,6 +423,28 @@
 
 ---
 
+## Cycle 149 — CE-088: Cancelar OCR realmente aborta y no crea documento sorpresa
+
+| Field | Value |
+|-------|-------|
+| **Date** | 2026-09-01 |
+| **Branch** | main |
+| **HEAD inicial** | d62b6dd |
+| **HEAD final** | dc8c1fb |
+| **Task** | CE-088 (P2, ACTIVE): el boton «Cancelar» de `extractTextFromScan` (workspace.js) solo llamaba `closeModal()`; el worker Tesseract seguia y al resolver creaba el documento igualmente. `recognizeText` ya soportaba `signal` abortable (ocr-engine.js:56-63) sin uso. |
+| **Hypothesis** | Cablear un flag de cancel al boton existente, pasarlo como `signal` a `recognizeText` (que ya devuelve `{ cancelled:true }` al abortar) y abortar temprano despues del recognize evitara crear un documento sorpresa y volvera a la vista de captura. |
+| **Change** | `extractTextFromScan` declara `cancelOcr={cancelled:false}`; el boton `ocr-cancel-btn` lo muta (`cancelOcr.cancelled=true`) y cierra; se pasa `signal: cancelOcr` a `recognizeText`; tras recognize, si `ocrResult.cancelled` se regresa de inmediato sin crear documento, sin abrir `showExtractionModeChooser` y sin registrar ejecucion. |
+| **Bugs corregidos** | OCR largo no cancelable que creaba documento sorpresa tras pulsar Cancelar. Ahora el usuario vuelve a la vista de captura sin resultado no deseado. |
+| **Tests ejecutados** | 5 checks nuevos CE-088 en `workflow-lifecycle-test` (82/82), coherentes con el patron de inspeccion de source que ese suite ya usaba para `ocr-engine`/`workflow-operations`. Star-flow E2E OCR real 85/85 (el guard de cancel no altera el recorrido normal). Release gate completo OK (sync source->dist). |
+| **Resultado** | BUG_FIX. Cancelar OCR deja de fabricar un documento; el signal abortable de `recognizeText` por fin se usa. |
+| **Evidence** | `workspace/workspace.js` (`cancelOcr`, boton, guard `ocrResult.cancelled`), `tests/workspace/workflow-lifecycle-test.mjs` (checks CE-088). |
+| **Commits** | dc8c1fb (fix CE-088). |
+| **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`. Working tree conserva reworks ajenos no commiteados sin tocar. |
+| **Limitaciones** | El worker Tesseract no es preemptible en esta build: al cancelar se evita la creacion de documento y el chooser, pero el hilo de reconocimiento puede terminar el computo en segundo plano sin efecto visible. Abortar el worker de verdad exigiria integrar un token de cancelacion en `vendor/js/engine-loader.js` (fuera de alcance). |
+| **Proxima prioridad** | Siguiente oportunidad P2: CE-085 (busqueda universal por contenido de usuario) o CE-086 (rename/duplicate/mover). En P3, CE-089 (multiples facturas por escaneo). |
+
+---
+
 ## Cycle 128 — Fix test-debt in engine/parser/planner suites + register them in the gate (CE-065)
 
 | Field | Value |
