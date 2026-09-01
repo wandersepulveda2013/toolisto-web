@@ -380,6 +380,27 @@
 
 ---
 
+## Cycle 147 — CE-083: exponer lineItems de factura como tabla al Workspace (flujo estrella documento->tabla)
+
+| Field | Value |
+|-------|-------|
+| **Date** | 2026-09-01 |
+| **Branch** | main |
+| **HEAD inicial** | 40f77f9 |
+| **HEAD final** | 398330a |
+| **Task** | CE-083 (P2, ACTIVE): los `lineItems` que `parseInvoiceText` calcula (invoice.js:112-144) se descartaban en `text.invoice-fields`, rompiendo `archivo -> escaneo -> OCR -> documento -> tabla` para facturas. Implementar la superficie de lineItems al usuario sin modulo nuevo. |
+| **Hypothesis** | Emitir los renglones de compra como una tabla real en el output de la operacion y persistirlos en el Workspace con id estable y dedup cierra el flujo estrella para facturas con datos ya calculados y bajo riesgo (backward-compatible). |
+| **Change** | `text.invoice-fields.execute` (workflow-operations.js) anade `lineItems` `{headers:['Descripcion','Cantidad','Precio unitario','Importe'], rows}` derivado de `parsed.lineItems`, manteniendo `headers`/`rows`/`name`/`confidence` intactos. `addResultToWorkspace` rama data (workflow-ui.js) persiste los renglones como tabla propia de id estable `flow-invoice-items-<hash>` cuando `rows.length>0`, con dedup por id y refresh de counts, usando `pushHistory({action:'workflow-result-add-items'})`. |
+| **Tests ejecutados** | invoice-fields 34/34 (5 checks nuevos de lineItems), workflow-ui 71/71 (6 checks nuevos 60-65), invoice-fields e2e 16/16 (renglon `Servicio de diseno` extraido del OCR real; salida expone la tabla de renglones), release gate completo OK (todas las suites PASS). |
+| **Resultado** | FEATURE. El output de facturas ahora termina en tabla de renglones persistida en el Workspace, sirviendo el flujo estrella. |
+| **Evidence** | `workspace/core/workflow-operations.js` (lineItems), `workspace/core/workflow-ui.js` (`flow-invoice-items-`), `tests/workspace/invoice-fields-e2e.mjs` (assert de renglones). |
+| **Commits** | 398330a (implementacion CE-083). |
+| **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`. Working tree conserva reworks ajenos no commiteados sin tocar. |
+| **Limitaciones** | El dedup de la tabla de renglones colisiona en el harness de test con tablas de id `undefined` (en produccion `saveData` asigna id); los tests fijan id real y resetean estado entre fases. Limite documentado. |
+| **Proxima prioridad** | Siguiente oportunidad P2: CE-084 (correccion de strings PDF no-WinAnsi, bug de integridad del resultado profesional) o CE-085 (busqueda universal por contenido de usuario). |
+
+---
+
 ## Cycle 128 — Fix test-debt in engine/parser/planner suites + register them in the gate (CE-065)
 
 | Field | Value |
