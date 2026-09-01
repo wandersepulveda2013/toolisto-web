@@ -1312,6 +1312,78 @@ function deleteProjectConfirm(project) {
   });
 }
 
+// CE-086: renombrar en sitio un proyecto preservando su id y contenido.
+async function renameProjectCard(project) {
+  renameEntityModal({
+    title: 'Renombrar proyecto',
+    label: 'Nombre del proyecto',
+    value: project.name,
+    onRename: async (name) => {
+      const updated = await updateProject(project.id, { name });
+      if (!updated) { toast('No se pudo renombrar el proyecto.', 'error'); return; }
+      appStore.set({ projects: appStore.get('projects')?.map(p => p.id === project.id ? updated : p) || [] });
+      renderView('projects');
+      toast('Proyecto renombrado', 'success');
+    },
+  });
+}
+
+// CE-086: renombrar en sitio un documento preservando su id y bloques.
+function renameDocCard(doc) {
+  const project = appStore.get('currentProject');
+  if (!project) return;
+  renameEntityModal({
+    title: 'Renombrar documento',
+    label: 'Nombre del documento',
+    value: doc.name || doc.title || '',
+    onRename: async (name) => {
+      doc.name = name;
+      doc.title = name;
+      await saveDoc(project.id, doc);
+      appStore.set({ documents: appStore.get('documents')?.map(d => d.id === doc.id ? doc : d) || [] });
+      renderView('documents');
+      toast('Documento renombrado', 'success');
+    },
+  });
+}
+
+// CE-086: renombrar en sitio una tabla de datos preservando su id, columnas y filas.
+function renameDataTableCard(table) {
+  const project = appStore.get('currentProject');
+  if (!project) return;
+  renameEntityModal({
+    title: 'Renombrar tabla',
+    label: 'Nombre de la tabla',
+    value: table.name || '',
+    onRename: async (name) => {
+      table.name = name;
+      await saveData(project.id, table);
+      appStore.set({ dataTables: appStore.get('dataTables')?.map(t => t.id === table.id ? table : t) || [] });
+      renderView('data');
+      toast('Tabla renombrada', 'success');
+    },
+  });
+}
+
+// CE-086: renombrar en sitio una captura preservando su id, imagen y derivados.
+function renameCaptureCard(cap) {
+  const project = appStore.get('currentProject');
+  if (!project) return;
+  renameEntityModal({
+    title: 'Renombrar captura',
+    label: 'Nombre de la captura',
+    value: cap.name || '',
+    onRename: async (name) => {
+      cap.name = name;
+      await saveCapture(project.id, cap);
+      await refreshProjectCounts(project.id);
+      appStore.set({ captures: appStore.get('captures')?.map(c => c.id === cap.id ? cap : c) || [] });
+      renderView('capture');
+      toast('Captura renombrada', 'success');
+    },
+  });
+}
+
 async function exportProjectData() {
   const project = appStore.get('currentProject');
   if (!project) return;
@@ -1504,6 +1576,7 @@ function renderProjectsView(container) {
           (p.captureCount || 0) + ' capturas, ' + (p.docCount || 0) + ' documentos, ' + (p.dataCount || 0) + ' tablas'
         ),
         h('div', { style: 'display:flex;gap:6px;margin-top:10px' },
+          h('button', { className: 'ws-btn ws-btn-ghost ws-btn-sm', onClick: (e) => { e.stopPropagation(); renameProjectCard(p); } }, svgIcon('edit'), ' Renombrar'),
           h('button', { className: 'ws-btn ws-btn-ghost ws-btn-sm', onClick: (e) => { e.stopPropagation(); deleteProjectConfirm(p); } }, svgIcon('trash'), ' Eliminar')
         )
       );
@@ -2044,7 +2117,11 @@ function renderCaptureView(container, project) {
         e.stopPropagation();
         startWorkflowFromWorkspace({ id: 'capture-' + cap.id, name: cap.name || 'Captura', kind: 'image' });
       } }, svgIcon('flow'), ' Encadenar');
-      card.appendChild(h('div', { style: 'margin-top:6px;display:flex;gap:4px;flex-wrap:wrap' }, extractBtn, flowBtn, delBtn));
+      const renameBtn = h('button', { className: 'ws-btn ws-btn-ghost ws-btn-sm', onClick: (e) => {
+        e.stopPropagation();
+        renameCaptureCard(cap);
+      } }, svgIcon('edit'), ' Renombrar');
+      card.appendChild(h('div', { style: 'margin-top:6px;display:flex;gap:4px;flex-wrap:wrap' }, extractBtn, flowBtn, renameBtn, delBtn));
       grid.appendChild(card);
     });
     el.appendChild(grid);
@@ -3065,7 +3142,11 @@ function renderDocumentsView(container, project) {
         e.stopPropagation();
         startWorkflowFromWorkspace({ id: 'doc-' + doc.id, name: doc.title || doc.name || 'Documento', kind: 'document' });
       } }, svgIcon('flow'), ' Encadenar');
-      card.appendChild(h('div', { style: 'margin-top:6px;display:flex;gap:4px' }, flowBtn, delBtn));
+      const renameBtn = h('button', { className: 'ws-btn ws-btn-ghost ws-btn-sm', onClick: (e) => {
+        e.stopPropagation();
+        renameDocCard(doc);
+      } }, svgIcon('edit'), ' Renombrar');
+      card.appendChild(h('div', { style: 'margin-top:6px;display:flex;gap:4px' }, flowBtn, renameBtn, delBtn));
       grid.appendChild(card);
     });
     el.appendChild(grid);
@@ -4214,7 +4295,11 @@ async function renderDataView(container, project) {
         e.stopPropagation();
         startWorkflowFromWorkspace({ id: 'table-' + table.id, name: table.name || 'Tabla', kind: 'data' });
       } }, svgIcon('flow'), ' Encadenar');
-      card.appendChild(h('div', { style: 'margin-top:8px;display:flex;gap:4px' }, chartBtn, flowBtn, delBtn));
+      const renameBtn = h('button', { className: 'ws-btn ws-btn-ghost ws-btn-sm', onClick: (e) => {
+        e.stopPropagation();
+        renameDataTableCard(table);
+      } }, svgIcon('edit'), ' Renombrar');
+      card.appendChild(h('div', { style: 'margin-top:8px;display:flex;gap:4px' }, chartBtn, flowBtn, renameBtn, delBtn));
       grid.appendChild(card);
     });
     el.appendChild(grid);
@@ -8232,6 +8317,40 @@ function closeModal() {
   root.replaceChildren();
   if (_modalRestoreFocus && _modalRestoreFocus.isConnected) { _modalRestoreFocus.focus(); }
   _modalRestoreFocus = null;
+}
+
+// CE-086: dialogo reutilizable para renombrar en sitio una entidad del
+// proyecto (proyecto, documento, tabla o captura). Recibe el valor actual,
+// valida que no quede vacio y delega en onRename(newName) para persistir.
+function renameEntityModal({ title, label, value, confirmText = 'Renombrar', onRename }) {
+  let current = String(value || '');
+  const input = h('input', {
+    type: 'text',
+    className: 'ws-input ws-rename-input',
+    value: current,
+    ariaLabel: label,
+    onInput: (e) => { current = e.target.value; },
+    onKeydown: (e) => { if (e.key === 'Enter') confirmButton.click(); },
+  });
+  showModal({
+    title,
+    size: 'small',
+    content: h('div', { className: 'ws-rename-field' },
+      h('label', { className: 'ws-rename-label', html: label }),
+      input
+    ),
+    confirmText,
+    onConfirm: async () => {
+      const name = current.trim();
+      if (!name) { toast('El nombre no puede quedar vacío.', 'error'); return; }
+      await onRename(name);
+    },
+  });
+  const confirmButton = $('#ws-modal-root .ws-btn-confirm');
+  setTimeout(() => {
+    input.focus();
+    input.select();
+  }, 0);
 }
 
 function showContextMenu(x, y, items) {

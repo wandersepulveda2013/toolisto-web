@@ -826,6 +826,35 @@ console.log('\n=== CE-085: la busqueda universal alcanza el contenido del usuari
 }
 
 /* ════════════════════════════════════════════════════════════════ */
+console.log('\n=== CE-086: renombrar en sitio proyecto, documento, tabla y captura ===');
+
+{
+  const wsSource = read('workspace/workspace.js');
+  const storageSource = read('workspace/core/storage.js');
+  check('updateProject existe y actualiza el nombre en el almacen y el estado',
+    /async function updateProject\(id, updates\)[\s\S]{0,200}\.\.\.updates/.test(storageSource));
+  check('existe un dialogo reutilizable de renombrar',
+    /function renameEntityModal\(/.test(wsSource) &&
+    /ws-rename-input/.test(wsSource));
+  check('la tarjeta de proyecto ofrece Renombrar',
+    /renameProjectCard\(p\)/ .test(wsSource) &&
+    /updateProject\(project\.id,\s*\{\s*name\s*\}\)/.test(wsSource));
+  check('la tarjeta de documento ofrece Renombrar y persiste name+title',
+    /renameDocCard\(doc\)/.test(wsSource) &&
+    /doc\.name\s*=\s*name;\s*doc\.title\s*=\s*name;/.test(wsSource) &&
+    /saveDoc\(project\.id,\s*doc\)/.test(wsSource));
+  check('la tarjeta de tabla ofrece Renombrar y persiste con saveData',
+    /renameDataTableCard\(table\)/.test(wsSource) &&
+    /saveData\(project\.id,\s*table\)/.test(wsSource));
+  check('la tarjeta de captura ofrece Renombrar y persiste con saveCapture',
+    /renameCaptureCard\(cap\)/.test(wsSource) &&
+    /saveCapture\(project\.id,\s*cap\)/.test(wsSource));
+  check('renameEntityModal valida que el nombre no quede vacio',
+    /El nombre no puede quedar vac\i00ed\./.test(wsSource.replace(/\\u/g, '\\u')) ||
+    (/\w?\s*if\s*\(!name\)\s*\{\s*toast/.test(wsSource)));
+}
+
+/* ════════════════════════════════════════════════════════════════ */
 console.log('\n=== workflow-ui: resultUrls tracking ===');
 
 {
