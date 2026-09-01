@@ -489,6 +489,28 @@
 
 ---
 
+## Cycle 152 — CE-089: detectar multiples facturas en un escaneo y avisarlo
+
+| Field | Value |
+|-------|-------|
+| **Date** | 2026-09-01 |
+| **Branch** | main |
+| **HEAD inicial** | 0443365 |
+| **HEAD final** | 5f27126 |
+| **Task** | CE-089 (P3, ACTIVE->DONE): `parseInvoiceText` asumia una sola factura por escaneo; `valueFromLines` tomaba el primer match de cada campo, por lo que un escaneo con 2-3 recibos perdia todos menos uno SIN aviso. |
+| **Hypothesis** | Una heuristica conservadora y determinista que cuente «totales finales» (no subtotal/IVA) y numeros de factura repetidos permite detectar multiples recibos y avisar al usuario, evitando presentar una extraccion parcial como completa, sin implementar la division automatica (complejidad OCR real). |
+| **Change** | `detectMultipleInvoices` (invoice.js) cuenta lineas `finalTotal` (Total/Importe total/Monto total/Amount due + importe) y marcadores `invoiceNumber` (Factura/Invoice N...); si alguno >= 2 devuelve `{detected:true,count,note}`. `parseInvoiceText` expone `multipleInvoices`. `text.invoice-fields` lo refleja en `warning`; `renderResultItems` (workflow-ui.js) muestra la advertencia en el panel del flujo; `addResultToWorkspace` para una tabla con warning persiste una fila de aviso visible y lanza toast de warning. |
+| **Bugs corregidos** | Un escaneo de varios recibos se descifraba mal en silencio. Ahora se avisa claramente que puede haber varias facturas y que solo se extrajo la primera. |
+| **Tests ejecutados** | 7 checks nuevos CE-089 en `invoice-fields-test` (42/42, VM del parser + operacion real), incluido un check de NO falso positivo en factura unica y de no-aviso en subtotal/IVA (evita contar el cierre de la misma factura). Release gate completo OK. |
+| **Resultado** | FEATURE. Deteccion + aviso de multiples facturas en el panel y en la tabla persistida. |
+| **Evidence** | `workspace/core/invoice.js` (`detectMultipleInvoices`), `workspace/core/workflow-operations.js` (warning), `workspace/core/workflow-ui.js` (panel + persistencia del aviso), `tests/workspace/invoice-fields-test.mjs` (checks CE-089). |
+| **Commits** | 5f27126 (feature CE-089). |
+| **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`. Working tree conserva reworks ajenos no commiteados sin tocar. |
+| **Limitaciones** | No divide el escaneo en facturas separadas (complejidad OCR real; queda como ruta futura). La deteccion es conservadora: depende de que el OCR preserve etiquetas de Total/numero; un escaneo muy ruidoso podria no detectarse. El aviso va en la tabla y el panel, no obstruye. |
+| **Proxima prioridad** | Quedan TO_DO. En P3, CE-087 (coherencia WYSIWYG del builder de diseno vs paginacion del PDF exportado: `estimateSectionHeight` vs `pdf-generator`). |
+
+---
+
 ## Cycle 128 — Fix test-debt in engine/parser/planner suites + register them in the gate (CE-065)
 
 | Field | Value |
