@@ -401,6 +401,28 @@
 
 ---
 
+## Cycle 148 — CE-084: pdfString ya no corrompe strings PDF con chars fuera de WinAnsi
+
+| Field | Value |
+|-------|-------|
+| **Date** | 2026-09-01 |
+| **Branch** | main |
+| **HEAD inicial** | 572a3af |
+| **HEAD final** | 6a3a49f |
+| **Task** | CE-084 (P2, activa): `pdfString` (pdf-generator.js) escapa todo c>=128 como octal `padStart(3,'0')`; para chars con charCodeAt >= 0x100 (Euro/comillas/TM/guiones, CJK, emoji) el octal tiene 4+ digitos y el lector PDF trunca a `\ddd`, corrompiendo el resto del string. Bug de integridad del resultado profesional. |
+| **Hypothesis** | Representar correctamente el rango WinAnsi: emitir octal `\ddd` valido para 0x80-0xFF, re-mapear los chars>=0x100 con codigo cp1252 a su byte winansi, y degradar los fuera de winansi a un marcador no destructivo (espacio), sin emitir jamas un octal de 4+ digitos. |
+| **Change** | `pdfString` ahora: para c<=255 emite `\ddd` de 1 byte winansi; para c>=0x100 consulta `WINANSI_HIGH_CP` (tabla cp1252 inversa: Euro->0x80, TM->0x99, comillas/guiones/puntos) y emite el byte correspondiente; si el char no existe en winansi (CJK/emoji) degrada a espacio no destructivo. El flujo del stream es siempre estructuralmente valido. |
+| **Bugs corregidos** | Corrupcion de strings PDF con '€', '™', comillas tipograficas, guiones, 'ﬁ' y cualquier char con charCodeAt>=0x100; antes '€'(8634) emitia `\20254` que el lector leia como byte 0x82 + literal '54'. |
+| **Tests ejecutados** | `workflow-document-pdf` 75/75 (9 checks nuevos CE-084 sobre el stream real: sin `/(\\[0-7]{4,})/`, Euro->`\200`, TM->`\231`, ASCII alrededor preservado, CJK/emoji no corrompen, xref presente). Suites PDF individuales OK (text/table/chart-wrap, pagination). Release gate completo OK. |
+| **Resultado** | BUG_FIX. El resultado profesional PDF mantiene integridad de string incluso con simbolos de moneda y discriminacion CJK/emoji no destructiva. |
+| **Evidence** | `workspace/core/pdf-generator.js` (`WINANSI_HIGH_CP`, `pdfString`), `tests/workspace/workflow-document-pdf-test.mjs` (secciones 17-18). |
+| **Commits** | 6a3a49f (fix CE-084). |
+| **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`. Working tree conserva reworks ajenos no commiteados sin tocar. |
+| **Limitaciones** | Los chars fuera de winansi (CJK/emoji) se degradan a espacio (no renderizan en una fuente de 1 byte); limites documentados en comentario. El mapeo cp1252 cubre la mitad alta 0x80-0x9F (27 chars), el resto Latin-1 por rango directo. |
+| **Proxima prioridad** | Siguiente oportunidad P2: CE-085 (busqueda universal por contenido de usuario), CE-086 (rename/duplicate/mover), o CE-088 (Cancel de OCR no aborta). |
+
+---
+
 ## Cycle 128 — Fix test-debt in engine/parser/planner suites + register them in the gate (CE-065)
 
 | Field | Value |
