@@ -305,5 +305,42 @@ check('document.to-pdf visible in pdf category', registry.listByCategory('pdf').
   check('report chart reaches the PDF and draws bars', text.includes('Grafico de Ventas') && /re\s+f/.test(text));
 }
 
+// 17. CE-084: caracteres con charCodeAt >= 0x100 no corrompen el string PDF
+// (antes se emitia \ddd{4,} que el lector trunca a 3 digitos). Se verifica sobre
+// el stream real generado por document.to-pdf.
+{
+  const euroDoc = {
+    title: 'Ventas por 100 \u20AC', // '€' = U+20AC (8364), re-mapeado a winansi 0x80
+    blocks: [
+      { id: 'b1', type: 'heading1', content: 'Total \u20AC 1.995,50' },
+      { id: 'b2', type: 'paragraph', content: 'Mantenimiento \u2122 garantizado' }, // '™' = U+2122 -> 0x99
+    ],
+  };
+  const result = await op.execute({ input: { data: euroDoc }, options: {} });
+  const text = await result.text();
+  check('CE-084: PDF tiene header valido con simbolos >= 0x100', text.startsWith('%PDF-1'));
+  check('CE-084: no hay escape octal de 4+ digitos (corrupcion)', !/(\\[0-7]{4,})/.test(text));
+  check('CE-084: Euro se re-mapea a byte winansi 0x80 (\\200)', text.includes('\\200'));
+  check('CE-084: TM se re-mapea a byte winansi 0x99 (\\231)', text.includes('\\231'));
+  check('CE-084: PDF conserva el texto ASCII alrededor del Euro', text.includes('Total') && text.includes('Ventas por 100'));
+  check('CE-084: mantiene la integridad del stream (xref presente)', text.includes('xref'));
+}
+
+// 18. CE-084: caracter fuera de winansi (CJK/emoji) degrada a espacio, nunca corrompe
+{
+  const cjkDoc = {
+    title: 'Resumen',
+    blocks: [
+      { id: 'b1', type: 'heading1', content: 'Datos \u6D4B\u8BD5' }, // CJK fuera de 0xFF
+      { id: 'b2', type: 'paragraph', content: 'Informe \u{1F600} final' }, // emoji fuera de 0xFFFF
+    ],
+  };
+  const result = await op.execute({ input: { data: cjkDoc }, options: {} });
+  const text = await result.text();
+  check('CE-084: CJK/emoji no emiten escape octal corrupto', !/(\\[0-7]{4,})/.test(text));
+  check('CE-084: siguen validos los bytes winansi de la mitad baja', text.includes('Datos') && text.includes('final'));
+  check('CE-084: PDF con degradacion sigue siendo un PDF valido', text.startsWith('%PDF-1') && text.includes('xref'));
+}
+
 console.log('\nResultados: ' + pass + ' pass, ' + fail + ' fail, ' + (pass + fail) + ' tests\n');
 process.exit(fail > 0 ? 1 : 0);
