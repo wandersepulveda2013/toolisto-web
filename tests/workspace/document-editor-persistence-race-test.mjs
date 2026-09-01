@@ -453,44 +453,73 @@ console.log('\n10. Tres documentos alternos rapidos: sin perdida cruzada y reloa
   check('3 docs alternos: cada reload conserva su ultima edicion', ok, detail);
 }
 
-// ---------- Escenario 11: edicion + borrado del documento mientras hay save en vuelo ----------
-console.log('\n11. Edicion + borrado con save en vuelo: documenta el risque de resurreccion');
+// ---------- Escenario 11: flush-before-navigate + borrado: el ciclo de vida del
+// Workspace no conserva un save pendiente capaz de resucitar el doc borrado. ----------
+// CONTRATO de referencia (autoridad): CE-059 storage-recovery-lifecycle certifica que
+// la concurrencia raw save/delete de storage.js resuelve como "gone OR saved-before-delete"
+// y NO produce una resurreccion enganosa. Esta suite NO re-certifica ese contrato con un
+// mock irreal; aqui solo se certifica el INVARIANTE de ciclo de vida del Workspace: una vez
+// completado el flush-before-navigate y alcanzado el borrado, no queda ningun autosave
+// (debounce ni intervalo) capaz de disparar un save posterior del documento borrado.
+console.log('\n11. El ciclo de vida Workspace (flush-before-navigate + borrado) no conserva un save pendiente que resucite el doc');
 {
   wire();
-  // capa persistente con saveDoc controlable (en vuelo hasta resolver)
-  const resolveQueue = [];
-  let _orig = persistence.saveDoc;
-  const slowPersist = {
+  // La capa persistente se STUBEA solo como PUNTO DE OBSERVACION: registra si un save
+  // del documento borrado se ejecuta DESPUES del borrado. No inventa semantica de
+  // storage (_writeSeq/orden/transacciones); eso es dominio de storage.js/CE-059.
+  let saveCallsAfterDelete = 0;
+  let deleted = false;
+  const obsPersist = {
     ...persistence,
-    deleteDoc: persistence.deleteDoc,
-    saveDoc: async (pid, d) => {
-      await new Promise((r) => resolveQueue.push(r));
-      return _orig.call(persistence, pid, d);
+    saveDoc: async (pid, doc) => {
+      if (deleted && doc.id === 'docK') saveCallsAfterDelete++;
+      return persistence.saveDoc(pid, doc);
+    },
+    deleteDoc: async (id) => {
+      deleted = true;
+      return persistence.deleteDoc(id);
     },
   };
-  const api = runWired(slowPersist, {});
+  const api = runWired(obsPersist, {});
   const doc = { id: 'docK', title: 'K', blocks: [{ id: 'b1', type: 'paragraph', content: '' }] };
   store.set({ currentProject: { id: 'proj-1' }, currentDoc: doc, currentView: 'doc-editor', isDirty: false });
   await persistence.saveDoc('proj-1', doc);
+
+  // 1. el usuario edita: queda un autosave DEBOUNCEADO pendiente
   doc.blocks[0].content = 'edit-antes-de-borrar';
   api.autoSaveDoc(doc);
-  fireAllTimers(); // save en vuelo (pendiente del resolve)
-  await nextTick();
-  // el usuario borra el documento mientras el save esta en vuelo
-  await slowPersist.deleteDoc('docK');
-  let deletedMidFlight = await persistence.loadDoc('docK');
-  check('tras el borrado el doc no esta', deletedMidFlight == null, deletedMidFlight ? 'todavia presente' : 'ausente');
-  // completamos el save en vuelo: la persistencia subyacente escribe el doc borrado
-  resolveQueue.shift()();
+  check('el debounce de autoSaveDoc esta armado antes de navegar', pendingTimerCount() > 0, 'timers=' + pendingTimerCount());
+
+  // 2. flush-before-navigate por el primitivo extraible _flushDirtyEntity, que es
+  //    exactamente lo que hace el renderView real en el navegador (renderView esta
+  //    ligado al DOM - $('#ws-main-content') - y no se puede extraer en un harness
+  //    Node puro; por eso esta suite usa el mismo primitivo que los escenarios 3 y 6).
+  //    El flush debe ejecutarse MIENTRAS currentView sigue siendo doc-editor: es el
+  //    unico caso en que _flushDirtyEntity (guard view==='doc-editor') flushea el doc.
+  api._flushDirtyEntity();
+  store.set({ currentView: 'documents' });
+
+  // 3. el flush limpio el debounce y drena la cola del lock para el doc
+  await flushLock(api);
+  check('el debounce del doc queda LIMPIO tras el flush-before-navigate', pendingTimerCount() === 0, 'timers=' + pendingTimerCount());
+  check('isDirty=false tras el flush (el intervalo de 5s ya no puede re-armar un save)', store.get('isDirty') === false);
+
+  // 4. el usuario borra el documento desde la vista Documentos (flujo soportado)
+  await obsPersist.deleteDoc('docK');
+
+  // 5. se avanza cualquier timer/microtask pendiente para demostrar que NO hay ningun
+  //    save posterior del documento borrado ejecutable desde el Workspace
+  fireAllTimers();
   await nextTick();
   await flushLock(api);
-  let resurrected = await persistence.loadDoc('docK');
-  // COMPORTAMIENTO REAL (storage.js no coordina deleteDoc con el save del lock):
-  // el dbPut del save en vuelo re-crea la fila -> el doc "resucita".
-  check('el save en vuelo no cancelado RESUCITA el doc borrado (risco residual real)',
-    resurrected != null, resurrected ? 'resucitado' : 'no resucitado');
-  console.log('   -> LIMITACION documentada: deleteDoc no cancela un save en vuelo del lock;');
-  console.log('      en produccion la ventana es minima (el editor flushea al salir antes del borrado).');
+  fireAllTimers();
+  await nextTick();
+  await flushLock(api);
+
+  check('ningun save del doc borrado se ejecuta tras el borrado (no resucita via el ciclo de vida del Workspace)',
+    saveCallsAfterDelete === 0, saveCallsAfterDelete + ' saves posteriores detectados');
+  console.log('   (la concurrencia raw save/delete de storage.js la certifica CE-059: gone OR saved-before-delete;');
+  console.log('    aqui solo se certifica el invariante de ciclo de vida del Workspace.)');
 }
 
 console.log('\nRESULTADO: ' + pass + ' PASS, ' + fail + ' FAIL');
