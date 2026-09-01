@@ -405,6 +405,13 @@ export function registerWorkflowOperations(registry) {
           rows: invoiceRows(parsed, 1),
           name: 'Campos de la factura',
           confidence: parsed.confidence,
+          // CE-089: avisa cuando el escaneo puede agrupar varias facturas y
+          // solo se extrajo la primera, para no presentar una extraccion
+          // parcial como si fuera completa.
+          multipleInvoices: parsed.multipleInvoices,
+          warning: parsed.multipleInvoices && parsed.multipleInvoices.detected
+            ? parsed.multipleInvoices.note
+            : '',
           lineItems: {
             headers: ['Descripción', 'Cantidad', 'Precio unitario', 'Importe'],
             rows: items,

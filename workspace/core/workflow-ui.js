@@ -899,6 +899,13 @@ export function createWorkflowUI(registry, appHelpers) {
           onClick: () => addResultToWorkspace(r),
         }, 'Anadir al Workspace'));
       }
+      // CE-089: muestra la advertencia de multiples facturas en el panel de
+      // resultados del flujo para que el usuario no confie en una extraccion
+      // parcial sin darse cuenta.
+      const payloadNote = r.data && r.data.data && typeof r.data.data.warning === 'string' ? r.data.data.warning : (r.data && typeof r.data.warning === 'string' ? r.data.warning : '');
+      if (payloadNote) {
+        item.appendChild(h('div', { style: 'font-size:10px;color:var(--ws-warning);flex-basis:100%;line-height:1.4' }, payloadNote));
+      }
       resultsEl.appendChild(item);
     }
 
@@ -947,11 +954,17 @@ export function createWorkflowUI(registry, appHelpers) {
         const table = payload;
         const tables = appStore.get('dataTables') || [];
         if (tables.some(t => t.id === table.id)) { toast('La tabla ya esta en el Workspace', 'info'); return; }
+        // CE-089: si la factura advierte de multiples bloques, la advertencia se
+        // persiste como una fila visible para que no se pierda al abrir la tabla.
+        if (payload.warning && Array.isArray(table.rows)) {
+          table.rows = [...table.rows, ['Aviso', payload.warning, '', '']];
+        }
         if (saveData) await saveData(project.id, table);
         appStore.set({ dataTables: [...tables, table] });
         if (pushHistory) pushHistory({ action: 'workflow-result-add', tableId: table.id, result });
         if (refreshProjectCounts) await refreshProjectCounts(project.id);
-        toast('Tabla anadida al Workspace', 'success');
+        if (payload.warning) toast('Aviso: el escaneo parece contener varias facturas; se extrajo la primera.', 'warning');
+        else toast('Tabla anadida al Workspace', 'success');
 
         // CE-083: cuando la factura trae renglones de compra (lineItems), se
         // persiste ademas la tabla de renglones (Descripcion/Cantidad/Precio

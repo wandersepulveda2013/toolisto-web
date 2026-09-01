@@ -128,6 +128,29 @@ function parseLineItems(lines) {
   return items.slice(0, 200);
 }
 
+// CE-089: detecta si un escaneo agrupa varias facturas/recibos para no
+// extraer en silencio solo la primera. Heuristica conservadora y determinista:
+// cuenta lineas de «total final» (Total/Importe total/Amount due, NO subtotal ni
+// IVA) y marcadores de numero de factura repetidos. Una factura unica tiene
+// exactamente 1 total final y 1 numero; dos o mas de cualquiera => avisa.
+function detectMultipleInvoices(lines) {
+  const finalTotal = /^(?:(?:total\s+(?:a\s+pagar|factura|due|amount))|importe\s+total|monto\s+total|grand\s+total|amount\s+due|total)\s*[:#-]?\s*[$€£]?(?:USD|EUR|DOP|RD\$)?\s*-?\d[\d.,]*/i;
+  const invoiceNumber = /^(?:factura|invoice)\s*(?:n[º°o.]?|no\.?|number|#)?\s*[:#-]?\s*\d/i;
+  let totals = 0;
+  let numbers = 0;
+  for (const line of lines) {
+    if (finalTotal.test(line)) totals += 1;
+    if (invoiceNumber.test(line)) numbers += 1;
+  }
+  const count = Math.max(totals, numbers);
+  if (count < 2) return { detected: false, count, note: '' };
+  return {
+    detected: true,
+    count,
+    note: 'El escaneo parece contener ' + count + ' totales finales o numeros de factura: posiblemente son varias facturas y solo se extrajo la primera. Revisa cada recibo por separado.',
+  };
+}
+
 function parseInvoiceText(text) {
   const normalizedText = normalizeInvoiceText(text);
   const lines = normalizedText.split('\n');
@@ -142,6 +165,7 @@ function parseInvoiceText(text) {
     text: normalizedText,
     fields,
     lineItems: parseLineItems(lines),
+    multipleInvoices: detectMultipleInvoices(lines),
     confidence,
   };
 }
@@ -158,4 +182,4 @@ function invoiceRows(parsed, page = 1) {
   });
 }
 
-export { FIELD_DEFINITIONS, normalizeInvoiceText, parseInvoiceText, invoiceRows };
+export { FIELD_DEFINITIONS, normalizeInvoiceText, parseInvoiceText, invoiceRows, detectMultipleInvoices };

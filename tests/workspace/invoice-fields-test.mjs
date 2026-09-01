@@ -20,9 +20,9 @@ const sandbox = { console, Map, Array, Object, Error, RegExp, parseInt, Math, Se
 const sandboxArgs = ['console', 'Map', 'Array', 'Object', 'Error', 'RegExp', 'parseInt', 'Math', 'Set', 'Number', 'Date', 'JSON', 'WORKFLOW_DEFINITION_VERSION'];
 
 const invoiceFn = new Function(...sandboxArgs,
-  stripImports(invoiceCode) + '\nreturn { parseInvoiceText, invoiceRows };'
+  stripImports(invoiceCode) + '\nreturn { parseInvoiceText, invoiceRows, detectMultipleInvoices };'
 );
-const { parseInvoiceText, invoiceRows } = invoiceFn(...Object.values(sandbox));
+const { parseInvoiceText, invoiceRows, detectMultipleInvoices } = invoiceFn(...Object.values(sandbox));
 
 const opsFn = new Function(...sandboxArgs,
   stripImports(invoiceCode) + '\n' + stripImports(opsCode) + '\nreturn { registerWorkflowOperations, parseInvoiceText };'
@@ -108,6 +108,34 @@ check('Operation renglon preserva cantidad/precio/importe', opResult.lineItems &
 
 const emptyItems = await invoiceOp.execute({ input: { data: 'Total: 100.00' }, options: {} });
 check('Operation sin renglones emite lista vacia', emptyItems.lineItems && emptyItems.lineItems.rows.length === 0, String(emptyItems.lineItems && emptyItems.lineItems.rows.length));
+
+// 2b. CE-089 — deteccion de multiples facturas en un escaneo
+const multiInvoice = [
+  'FACTURA N.001',
+  'Proveedor: Comercial Ltda.',
+  'Subtotal: 500.00',
+  'ITBIS: 90.00',
+  'Total: 590.00',
+  'FACTURA N.002',
+  'Proveedor: Minisuper A',
+  'Subtotal: 800.00',
+  'ITBIS: 144.00',
+  'Total: 944.00',
+].join('\n');
+const multi = parseInvoiceText(multiInvoice);
+check('Detector avisa multiples bloques de total', multi.multipleInvoices && multi.multipleInvoices.detected === true, JSON.stringify(multi.multipleInvoices));
+check('Detector reporta el numero de bloques', multi.multipleInvoices && multi.multipleInvoices.count >= 2, String(multi.multipleInvoices && multi.multipleInvoices.count));
+check('Detector emite nota explicativa', multi.multipleInvoices && multi.multipleInvoices.note.length > 0, multi.multipleInvoices && multi.multipleInvoices.note);
+check('parseInvoiceText expone multipleInvoices', 'multipleInvoices' in multi && typeof multi.multipleInvoices.detected === 'boolean');
+
+const single = parseInvoiceText(SAMPLE_INVOICE);
+check('Detector NO avisa en factura unica', single.multipleInvoices && single.multipleInvoices.detected === false, JSON.stringify(single.multipleInvoices));
+const dashCheck = detectMultipleInvoices(SAMPLE_INVOICE.split('\n'));
+check('detectMultipleInvoices exportada y conservadora', dashCheck && dashCheck.detected === false, JSON.stringify(dashCheck));
+
+const multiOp = await invoiceOp.execute({ input: { data: multiInvoice }, options: {} });
+check('Operation advierte con warning en multiples facturas', typeof multiOp.warning === 'string' && multiOp.warning.length > 0, multiOp.warning);
+check('Operation multipleInvoices false quando unica', (await invoiceOp.execute({ input: { data: SAMPLE_INVOICE }, options: {} })).multipleInvoices.detected === false);
 
 // 3. instruction-parser — _extractFields intent
 const parser = createInstructionParser();
