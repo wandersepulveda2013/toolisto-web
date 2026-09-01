@@ -467,6 +467,28 @@
 
 ---
 
+## Cycle 151 — CE-086: renombrar en sitio proyecto, documento, tabla y captura
+
+| Field | Value |
+|-------|-------|
+| **Date** | 2026-09-01 |
+| **Branch** | main |
+| **HEAD inicial** | 54f621b |
+| **HEAD final** | 20cb369 |
+| **Task** | CE-086 (P2, ACTIVE->DONE): no habia rename en sitio para proyectos, documentos, tablas ni capturas; `updateProject` existia en storage.js pero la UI jamas lo invocaba; las tarjetas solo ofrecian Eliminar (+Encadenar/Extraer/Charts). |
+| **Hypothesis** | Un dialogo reutilizable de renombrar (input prefilled + validacion) cableado a los APIs de persistencia ya existentes (`updateProject`/`saveDoc`/`saveData`/`saveCapture`) permite renombrar cualquier entidad sin borrarla ni recrearla, 100% local. |
+| **Change** | `renameEntityModal({title,label,value,onRename})` usa `showModal` con un input `.ws-input` prefilled, valida que no quede vacio, Enter envia, y delega en `onRename`. Botones «Renombrar» añadidos a las 4 tarjetas: proyecto→`updateProject(p.id,{name})` + refrescar `projects` y re-render; documento→muta `name`+`title` y `saveDoc`; tabla→muta `name` y `saveData`; captura→muta `name`, `saveCapture` + `refreshProjectCounts`. Cada onRename refresca el array correspondiente del appStore y re-renderiza la vista. |
+| **Bugs corregidos** | Un «Documento sin titulo» o proyecto no se podia nombrar en sitio; ahora se renombra sin borrar/recriar, preservando id, bloques, filas y derivados. |
+| **Tests ejecutados** | 7 checks nuevos CE-086 de inspeccion de source en `workflow-lifecycle-test` (96/96), coherentes con el patron del suite; parseo real de workspace.js/storage.js/models.js (chequeo sin imports, PARSE OK); release gate completo OK (build + sync source->dist + todas las suites). |
+| **Resultado** | FEATURE. Rename en sitio para las 4 entidades del proyecto via dialogo reutilizable. |
+| **Evidence** | `workspace/workspace.js` (`renameEntityModal`, `renameProjectCard`, `renameDocCard`, `renameDataTableCard`, `renameCaptureCard`, botones en tarjetas), `tests/workspace/workflow-lifecycle-test.mjs` (checks CE-086). |
+| **Commits** | 20cb369 (feature CE-086). |
+| **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`. Working tree conserva reworks ajenos no commiteados sin tocar. |
+| **Limitaciones** | Solo rename en sitio: duplicate y mover (re-parentear entre proyectos) quedan como ruta futura; la fila CE-086 cierra el rename, no el resto. El dialogo no muestra mensaje de error por fallo de persistencia mas alla del toast generico. |
+| **Proxima prioridad** | Siguiente oportunidad P2: CE-085 ya resuelto; quedan CE-083/084/088 completadas. En P3, CE-089 (multiples facturas por escaneo) y CE-087 (coherencia WYSIWYG del builder de diseno). |
+
+---
+
 ## Cycle 128 — Fix test-debt in engine/parser/planner suites + register them in the gate (CE-065)
 
 | Field | Value |
