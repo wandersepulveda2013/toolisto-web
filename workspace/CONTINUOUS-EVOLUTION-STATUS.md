@@ -878,6 +878,31 @@
 
 ---
 
+## Cycle 168 — CE-103: la division por cero da error (#FORMULA), no escribe 0
+
+| Field | Value |
+|-------|-------|
+| **Date** | 2026-09-02 |
+| **Branch** | main |
+| **HEAD inicial** | 8d8f72a (Cycle 167 docs) |
+| **HEAD final** | 17b68ea (feature CE-103) |
+| **Task** | CE-103 (P1, DISCOVERY 2da ronda candidato #3 -> DONE): una formula con division por cero escribia `0` en la celda en lugar de senalar el error. |
+| **Potential bug (DISCOVERY 2da ronda, confirmado leyendo el source)** | `parseTerm` (dentro de `safeArithmetic`, workspace.js:4720): `value = operator === '*' ? value * right : (right === 0 ? 0 : value / right)` — la division por cero se forzaba a `0`. Asi `=A1/0` o `=SUM(...)/0` mostraban `0` (valor de hoja de calculo silenciosamente incorrecto). El contrato de errores del codigo ya era devolver vacio de `safeArithmetic` -> `#FORMULA` de `evaluateDataFormula`, coherente con `=abc` y `=1/()`. |
+| **Change** | `workspace.js`: en `parseTerm` la division por cero devuelve `NaN` en lugar de `0`. Como `NaN` no es finito, el guard final de `safeArithmetic` (`Number.isFinite(result) ? result : ''`, linea ~4738) lo rechaza y `evaluateDataFormula` lo mapea a `#FORMULA` (error visible). Sin cambio observable para la aritmetica no-dividente, y `safeArithmetic` solo se llama desde `evaluateDataFormula`. |
+| **Tests ejecutados** | Suite nueva `tests/workspace/div-by-zero-formula-test.mjs` 12/12 (pure; `safeArithmetic` REAL + `evaluateDataFormula` REAL + helpers REALES `parseLocaleNumber`/`columnNameToIndex`/`indexToColumnName`/`cellReferenceToPosition`/`numericValue`): nucleo `5/0 -> ''`, `0/0 -> ''`, `10/(2-2) -> ''`, `5/2 -> 2.5`, `0/5 -> 0`, `2+3*4 -> 14`; contrato final `=A1/0 -> #FORMULA`, `=B2/0 (referencia a formula B1/0) -> #FORMULA`, `=5/2 -> 2.5`, `=0/5 -> 0`, `=A1+A2 (5+3) -> 8`; y `parseTerm` divide por cero con `NaN` (no `0`). Registrada en el release gate. |
+| **Bug encontrado (confirmado)** | Division por cero escrita como `0` sin senalar error. |
+| **Bug corregido** | `NaN` en la division por cero -> rechazada por el guard finito -> `#FORMULA`. |
+| **Tests PASS** | `div-by-zero-formula` 12/12 (nuevo), todas las suites previas. Release gate completo OK. |
+| **Tests FAIL** | 0. |
+| **Resultado** | BUG_FIX (correctitud de formulas de hoja de calculo). |
+| **Evidence** | `workspace/workspace.js` (`parseTerm` de `safeArithmetic`), `tests/workspace/div-by-zero-formula-test.mjs`, `scripts/test-workspace-release.mjs`, queue/status. |
+| **Commits** | 17b68ea (feature CE-103): `workspace/workspace.js`, `tests/workspace/div-by-zero-formula-test.mjs`, `scripts/test-workspace-release.mjs`, `CONTINUOUS-EVOLUTION-QUEUE.md`. |
+| **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`; `git push` denegado. |
+| **Limitaciones** | El cambio solo afecta a `evaluateDataFormula` (unico caller de `safeArithmetic`). La semantica muestra `#FORMULA` (mismo indicador que una formula invalida), no una edicion visible distinta; el usuario ve un error explicito en lugar de un `0` incorrecto. |
+| **Proxima prioridad** | Backlog DISCOVERED VACIO. Proximo ciclo: DISCOVERY candidato #4 (createThumbnail produce canvas 0x0 para imagenes degradadas) o evolucion del runner (regla 6). |
+
+---
+
 ## Cycle 128 — Fix test-debt in engine/parser/planner suites + register them in the gate (CE-065)
 
 | Field | Value |
