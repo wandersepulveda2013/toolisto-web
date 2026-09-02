@@ -928,6 +928,31 @@
 
 ---
 
+## Cycle 170 — CE-105: choose/reorder-columns descartan indices fuera de rango (sin headers undefined)
+
+| Field | Value |
+|-------|-------|
+| **Date** | 2026-09-02 |
+| **Branch** | main |
+| **HEAD inicial** | f7fac04 (Cycle 169 docs) |
+| **HEAD final** | eb5a116 (feature CE-105) |
+| **Task** | CE-105 (P1, DISCOVERY 3ra ronda candidato #1 -> DONE): `choose-columns`/`reorder-columns` producian headers `undefined` y celdas `''` silenciosas con indices fuera de rango durante el rebuild en cadena. |
+| **Potential bug (DISCOVERY 3ra ronda, confirmado leyendo el source)** | `queryRunOperation` (workspace.js:5926-5941) mapeaba indices sin validar rango en `choose-columns` (5926-5934) y `reorder-columns` (5936-5941): `headers[column]` -> `undefined`, `normalize(row[column])` -> `''`. `queryRebuildModel` (6108-6116) re-ejecuta todos los pasos en cadena; un `remove-columns` previo reduce el nº de columnas, invalidando indices construidos de pasos posteriores -> perdida de datos silenciosa sin error. |
+| **Change** | `workspace.js`: en `remove-columns`/`choose-columns` y `reorder-columns` se filtra `indexes` a `Number.isInteger(col) && col >= 0 && col < headers.length` antes de construir `chosen`/`order`; los indices fuera de rango se descartan (nunca `headers[col]` undefined) y, si todos quedan fuera de rango, `if (!chosen.length) return result` devuelve el modelo intacto. |
+| **Tests ejecutados** | Suite nueva `tests/workspace/query-column-range-guard-test.mjs` 16/16 (pure; `queryRunOperation` REAL + `queryCloneShape`/`queryCloneRows` REALES + `queryRebuildModel` REAL): choose/reorder directos con indices fuera de rango (5, 9, 3) no producen `undefined`; todo-fuera de rango mantiene el modelo intacto; reorder valido segun el orden ascendente real de `queryRunOperation` (`indexes:[1]` -> [B,A]; `[2,0]` -> [A,C,B]); REBUILD en cadena `remove-columns [0,1]` + `reorder-columns [2,3]` ya no produce headers/filas `undefined` y conserva las 2 columnas restantes (C,D); analogo con choose-columns OOR en cadena. Registrada en el release gate. |
+| **Bug encontrado (confirmado)** | Indices fuera de rango en column ops -> headers `undefined` / celdas `''` en el rebuild. |
+| **Bug corregido** | Filtro de `indexes` al rango valido en choose/remove/reorder-columns. |
+| **Tests PASS** | `query-column-range-guard` 16/16 (nuevo), todas las suites previas. Release gate completo OK. |
+| **Tests FAIL** | 0. |
+| **Resultado** | BUG_FIX (correctitud de query: sin perdida silenciosa de columnas en el rebuild). |
+| **Evidence** | `workspace/workspace.js` (`queryRunOperation` column ops), `tests/workspace/query-column-range-guard-test.mjs`, `scripts/test-workspace-release.mjs`, queue/status. |
+| **Commits** | eb5a116 (feature CE-105): `workspace/workspace.js`, `tests/workspace/query-column-range-guard-test.mjs`, `scripts/test-workspace-release.mjs`, `CONTINUOUS-EVOLUTION-QUEUE.md`. |
+| **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`; `git push` denegado. |
+| **Limitaciones** | `queryRunOperation` ordena ascendentemente los indices (5858), asi que `reorder-columns` no soporta reordenar a una secuencia no ascendente (limitacion de diseno preexistente, no cambiada). El filtro solo descarta indices fuera de rango; no altera el orden ascendente. |
+| **Proxima prioridad** | Backlog DISCOVERED VACIO. Proximo ciclo: DISCOVERY 4ta ronda (nuevo pase) o evolucion del runner (regla 6). |
+
+---
+
 ## Cycle 128 — Fix test-debt in engine/parser/planner suites + register them in the gate (CE-065)
 
 | Field | Value |
