@@ -606,6 +606,31 @@
 
 ---
 
+## Cycle 157 — CE-092: el arranque sobrevive a un localStorage corrupto
+
+| Field | Value |
+|-------|-------|
+| **Date** | 2026-09-02 |
+| **Branch** | main |
+| **HEAD inicial** | 51380e0 (Cycle 156 docs) |
+| **HEAD final** | b251e09 (feature CE-092) |
+| **Task** | CE-092 (P2, DISCOVERED->DONE): `state.js:71-72` hacia `JSON.parse(localStorage.getItem('toolisto-recent-tools') || '[]')` (y favorite-tools) a nivel de import SIN try/catch. Una sola clave corrupta (JSON invalido: escritura parcial, otro tab, edicion manual) lanzaba al instanciar `appStore`, ANTES de `initApp`, dejando la pantalla en blanco sin ruta de recuperacion. |
+| **Hypothesis** | Envolver la lectura de esas preferencias en un helper seguro con try/catch (default `[]`) y limpiar la clave corrupta permite que el import de `appStore` nunca lance, conservando intactas las claves validas. Mas un test que cargue el CODIGO REAL de state.js con un localStorage controlado para confirmar el arranque sin crash y la auto-reparacion. |
+| **Change** | `state.js`: nuevo `function readJsonList(key)` que lee `localStorage.getItem(key)`; si es null devuelve `[]`; si `JSON.parse` lanza (JSON invalido) o el valor no es un array, hace `localStorage.removeItem(key)` (auto-recuperacion) y devuelve `[]`; si es un array valido lo devuelve intacto. `recentTools` y `favoriteTools` se inicializan con `readJsonList('toolisto-recent-tools')` / `readJsonList('toolisto-favorite-tools')`, retirando el `JSON.parse(...)` directo del import. |
+| **Tests ejecutados** | Suite nueva `tests/workspace/boot-recovery-test.mjs` 10/10 (pure; carga el CODIGO REAL de state.js extrayendo `createStore` + `readJsonList` y construyendo un appStore, con localStorage controlado inyectado como global y restaurado): (1) reproduccion: el `JSON.parse` sin try/catch LANZA con JSON invalido (era el crash de boot); (2) recentTools corrupto -> el store se construye sin lanzar, `[]` y la clave se elimina; (3) favoriteTools corrupto -> idem; (4) objeto (no array) -> `[]`; (5) clave ausente -> `[]`; (6) clave valida -> se conserva intacta sin eliminar; (7) array valido con elementos variados -> se conserva sin vaciar. Registrada en el release gate. |
+| **Bug encontrado (confirmado)** | Un `JSON.parse` sin try/catch a nivel de import del modulo `appStore` lanza ante cualquier clave de preferencia corrupta -> pantalla en blanco (reproducido en el test). |
+| **Bug corregido** | Lectura segura de las preferencias con default `[]`, eliminacion de la clave corrupta (auto-reparacion) y conservacion de las validas. |
+| **Tests PASS** | `boot-recovery` 10/10; regresiones: undo-corruption (CE-091) 15/15, doc-table-switch-flush (CE-090) 9/9, persistence/storage CE-058/059/060/061 OK. Release gate completo OK. |
+| **Tests FAIL** | 0. |
+| **Resultado** | BUG_FIX (boot recovery). El Workspace ya no deja de arrancar por una clave de preferencia corrupta. |
+| **Evidence** | `workspace/core/state.js` (`readJsonList`), `tests/workspace/boot-recovery-test.mjs`, `scripts/test-workspace-release.mjs` (registro de suite), queue/status. |
+| **Commits** | b251e09 (feature CE-092): `core/state.js`, `boot-recovery-test.mjs`, `test-workspace-release.mjs`, `CONTINUOUS-EVOLUTION-QUEUE.md`. |
+| **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`; `git push` denegado. Working tree conserva reworks ajenos sin tocar. |
+| **Limitaciones** | Solo cubre las dos claves deserializadas a nivel de import del modulo `appStore` (`recentTools`/`favoriteTools`). Otras claves de localStorage que se lean en otro punto del arranque con `JSON.parse` directo no estan cubiertas por este fix (se podrian auditar en un ciclo futuro si aparecen). La auto-reparacion elimina la clave corrupta (pierde esa preferencia puntual, que es inocua frente a bloquear el arranque). |
+| **Proxima prioridad** | Implementar CE-093 (P2) — `importProject` no valida que las referencias cruzadas remapeadas apunten a entidades existentes en el bundle (ref colgante persistida; `assertIntegrity` corre post-commit). |
+
+---
+
 ## Cycle 128 — Fix test-debt in engine/parser/planner suites + register them in the gate (CE-065)
 
 | Field | Value |
