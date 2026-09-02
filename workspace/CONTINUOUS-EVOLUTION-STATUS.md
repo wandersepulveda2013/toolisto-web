@@ -800,7 +800,31 @@
 | **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`; `git push` denegado. |
 | **Regresion honesta + correccion** | La primera version de este fix usaba `clearTimeout(attachTimer)` en el cierre; eso anadio un `clearTimeout(` literal que desequilibro la verificacion estatica de CE-058 (cuenta `setTimeout` vs `clearTimeout` en workspace.js y exige `|diff|<=2`): el diff paso de -2 a -3 y `persistence-lifecycle-audit` rompio (94/1). Se reescribio usando el flag `closed` en lugar de `clearTimeout` (el callback del timer no engancha si ya se cerro), restaurando el equilibrio (diff -2) y CE-058 a 95/95; el gate completo quedo OK. |
 | **Limitaciones** | La verificacion de CE-058 es estatica (cuenta ocurrencias literales de setTimeout/clearTimeout) y frágil frente a cambios que alteren ese balance; se respeto el margen +-2. El fix no cambia el comportamiento visible del menu (abre, cierra por item o por click fuera). |
-| **Proxima prioridad** | Backlog DISCOVERED VACIO. Proximo ciclo: DISCOVERY candidato #4 (doble clon JSON del workspace por push de undo) o evolucion del runner (regla 6). |
+| **Proxima prioridad** | Backlog DISCOVERED VACIO. Proximo ciclo: DISCOVERY candidato #6 (blobs/resultUrls del flujo sin revocar) o evolucion del runner (regla 6). |
+
+---
+
+## Cycle 165 — CE-100: el historial de undo clona el snapshot UNA sola vez (sin doble serializacion)
+
+| Field | Value |
+|-------|-------|
+| **Date** | 2026-09-02 |
+| **Branch** | main |
+| **HEAD inicial** | 464d9cb (Cycle 164 docs) |
+| **HEAD final** | fb5fc91 (feature CE-100) |
+| **Task** | CE-100 (P2, DISCOVERY->DONE): cada `_appHistory.push/undo/redo` pasaba un snapshot ya profundamente aislado (`_captureWorkspaceState` clona todos los campos), pero `cloneState` configurado hacia `JSON.parse(JSON.stringify(s))` OTRA VEZ -> serializaba el workspace COMPLETO dos veces por operacion de historial y duplicaba la memoria en el historial de 50 entradas. |
+| **Change** | `workspace.js`: `cloneState` pasa a identidad `(s) => s`, seguro porque TODAS las llamadas a `_appHistory.{push,undo,redo}` pasan `_captureWorkspaceState()` (unico usos; `pushGrouped` no se usa), que ya devuelve un snapshot aislado en profundidad. |
+| **Tests ejecutados** | Suite nueva `tests/workspace/undo-clone-once-test.mjs` 7/7 (pure; `createHistoryManager` REAL + `_captureWorkspaceState` REAL + contador instrumentado de JSON.parse/stringify): push con cloneState=identidad hace 0 serializaciones internas (antes 1 JSON completo por llamada); undo devuelve snapshots NO referenciados al estado vivo; la captura aislada por `_captureWorkspaceState` se mantiene aislada en el historial (x no se contamina al mutar el vivo); workspace.js declara cloneState identidad. Registrada en el release gate. |
+| **Bug encontrado (confirmado)** | Doble serializacion del workspace completo en cada operacion de historial. |
+| **Bug corregido** | `cloneState` identidad elimina la serializacion redundante (el snapshot ya viene aislado). |
+| **Tests PASS** | `undo-clone-once` 7/7 (nuevo), `undo-corruption` (CE-091) 15/15 (semantica intacta), mas todas las suites previas. Release gate completo OK. |
+| **Tests FAIL** | 0. |
+| **Resultado** | PERFORMANCE_IMPROVEMENT (perf + memoria en undo/redo de workspaces grandes). |
+| **Evidence** | `workspace/workspace.js` (`_appHistory` cloneState), `tests/workspace/undo-clone-once-test.mjs`, `scripts/test-workspace-release.mjs`, queue/status. |
+| **Commits** | fb5fc91 (feature CE-100): `workspace/workspace.js`, `tests/workspace/undo-clone-once-test.mjs`, `scripts/test-workspace-release.mjs`, `CONTINUOUS-EVOLUTION-QUEUE.md`. |
+| **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`; `git push` denegado. |
+| **Limitaciones** | La optimizacion es correcta SOLO porque los tres usos de `_appHistory` pasan `_captureWorkspaceState()`. Si en el futuro alguien introdujera un uso de `_appHistory` con el estado VIVO del store (con referencias compartidas), el cloneState de identidad propagaria aliasing; se anadio un comentario en workspace.js advirtiendo este contrato. |
+| **Proxima prioridad** | Backlog DISCOVERED VACIO. Proximo ciclo: DISCOVERY candidato #6 (blobs/resultUrls del flujo sin revocar) o evolucion del runner (regla 6). |
 
 ---
 
