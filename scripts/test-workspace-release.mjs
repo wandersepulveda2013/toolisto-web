@@ -138,6 +138,7 @@ run('table-history-cap (historial de deshacer de tabla acotado, CE-095)', 'node'
 run('session-cleanup (limpieza de entidades borradas en ws:session, CE-096)', 'node', ['tests/workspace/session-cleanup-test.mjs']);
 run('flow-snapshot-aliasing (snapshot de Flow clona nodos/edges, CE-097)', 'node', ['tests/workspace/flow-snapshot-aliasing-test.mjs']);
 run('block-drop-reorder (el drop de bloques valida el indice, CE-098)', 'node', ['tests/workspace/block-drop-reorder-test.mjs']);
+run('block-menu-listener (el menu de bloques desengancha su listener, CE-099)', 'node', ['tests/workspace/block-menu-listener-test.mjs']);
 
 // 4. Manifest de evidencia
 const evidence = {

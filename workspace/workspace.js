@@ -4064,20 +4064,32 @@ function showBlockMenu(anchor, doc, renderBlocks) {
   if (existing) existing.remove();
   const rect = anchor.getBoundingClientRect();
   const menu = h('div', { className: 'ws-block-menu', style: 'position:fixed;left:' + rect.left + 'px;top:' + rect.top + 'px' });
+  let attached = false;
+  let closed = false;
+  // Elimina el menu Y desengancha SIEMPRE el listener global: cada showBlockMenu
+  // creaba un closeMenu propio que solo se auto-eliminaba al click FUERA; al
+  // seleccionar un item el closeMenu quedaba colgado en document -> leak de
+  // listeners stale en sesiones largas. Aqui el cierre limpia en todas las vias.
+  function closeMenu() {
+    closed = true;
+    menu.remove();
+    if (attached) { document.removeEventListener('click', onDocClick); attached = false; }
+  }
+  const onDocClick = (e) => { if (!menu.contains(e.target)) closeMenu(); };
   BLOCK_TYPES.forEach(bt => {
     menu.appendChild(h('div', {
       className: 'ws-block-menu-item',
       onClick: () => {
         if (doc.blocks.length >= getWorkspaceConfig().maxDocumentBlocks) {
           toast(`Límite alcanzado: ${getWorkspaceConfig().maxDocumentBlocks.toLocaleString('es')} bloques`, 'warning');
-          menu.remove();
+          closeMenu();
           return;
         }
         const newBlock = { id: generateId(), type: bt.type, content: '' };
         doc.blocks.push(newBlock);
         renderBlocks();
         autoSaveDoc(doc);
-        menu.remove();
+        closeMenu();
       }
     },
       h('div', { className: 'item-icon' }, svgIcon(bt.icon, 16)),
@@ -4088,8 +4100,10 @@ function showBlockMenu(anchor, doc, renderBlocks) {
     ));
   });
   document.body.appendChild(menu);
-  const closeMenu = (e) => { if (!menu.contains(e.target)) { menu.remove(); document.removeEventListener('click', closeMenu); } };
-  setTimeout(() => document.addEventListener('click', closeMenu), 0);
+  // Attach difierido a un macrotask para que el click que ABRIO el menu no lo
+  // cierre de inmediato (la propagacion del mismo evento llegaria a document).
+  // Si el menu se cierra antes de este timer (via item), 'closed' evita enganchar.
+  setTimeout(() => { if (closed) return; document.addEventListener('click', onDocClick); attached = true; }, 0);
 }
 
 function autoSaveDoc(doc) {
