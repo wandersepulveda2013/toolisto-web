@@ -1440,11 +1440,42 @@ function renameCaptureCard(cap) {
   });
 }
 
+// CE-094: exportar debe reflejar la ULTIMA edicion en memoria, no la fila
+// persistida por el debounce. `exportProject` lee el estado desde IndexedDB; si
+// un autosave esta pendiente en la ventana del debounce (edicion recien hecha y
+// «Exportar» de inmediato), sin flushear se exportaria el valor ANTERIOR. Este
+// helper aguarda a que la entidad actual sucia (doc o tabla) quede guardada en
+// la base antes de que `exportProjectData` lea el bundle.
+async function _flushDirtyBeforeExport() {
+  const project = appStore.get('currentProject');
+  const view = appStore.get('currentView');
+  if (!project) return;
+  const doc = appStore.get('currentDoc');
+  const table = appStore.get('currentDataTable');
+  const dirty = appStore.get('isDirty');
+  clearTimeout(autoSaveDoc._timer);
+  clearTimeout(autoSaveTable._timer);
+  if (view === 'doc-editor' && doc && doc.id && dirty) {
+    await new Promise((resolve, reject) => {
+      _docLocks.getLock(doc.id).enqueue(() => saveDoc(project.id, doc).then(resolve, reject));
+    });
+    _lastAutosaveSnapshot = JSON.stringify(doc.blocks);
+  } else if (view === 'data-table' && table && table.id && dirty) {
+    await new Promise((resolve, reject) => {
+      _tableLocks.getLock(table.id).enqueue(() => saveData(project.id, table).then(resolve, reject));
+    });
+    await syncDerivedCharts(project, table);
+    _lastAutosaveTableSnapshot = JSON.stringify({ headers: table.headers, rows: table.rows, sheets: table.sheets });
+  }
+  appStore.set({ isDirty: false, lastSaved: Date.now() });
+}
+
 async function exportProjectData() {
   const project = appStore.get('currentProject');
   if (!project) return;
   try {
     const start = Date.now();
+    await _flushDirtyBeforeExport();
     const bundle = await exportProject(project.id);
     const blob = new Blob([JSON.stringify(bundle, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);

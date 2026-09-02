@@ -132,6 +132,7 @@ run('doc-table-switch-flush (flush-on-switch al cambiar de doc/tabla misma vista
 run('undo-corruption (undo conserva type de bloques + undo de tabla via topbar, CE-091)', 'node', ['tests/workspace/undo-corruption-test.mjs']);
 run('boot-recovery (localStorage corrupto no rompe el arranque, CE-092)', 'node', ['tests/workspace/boot-recovery-test.mjs']);
 run('bundle-reference-validation (referencias cruzadas del bundle validadas pre-write, CE-093)', 'node', ['tests/workspace/bundle-reference-validation-test.mjs']);
+run('export-flush-fidelity (el export refleja la ultima edicion en memoria, CE-094)', 'node', ['tests/workspace/export-flush-fidelity-test.mjs']);
 
 // 4. Manifest de evidencia
 const evidence = {
