@@ -5924,9 +5924,10 @@ function queryRunOperation(shape, operation, config = {}) {
   }
 
   if (operation === 'remove-columns' || operation === 'choose-columns') {
+    const validIndexes = indexes.filter(column => Number.isInteger(column) && column >= 0 && column < headers.length);
     const chosen = operation === 'choose-columns'
-      ? indexes
-      : headers.map((_, column) => column).filter(column => !indexes.includes(column));
+      ? validIndexes
+      : headers.map((_, column) => column).filter(column => !validIndexes.includes(column));
     if (!chosen.length) return result;
     result.headers = chosen.map(column => headers[column]);
     result.rows = rows.map(row => chosen.map(column => normalize(row[column])));
@@ -5934,7 +5935,8 @@ function queryRunOperation(shape, operation, config = {}) {
   }
 
   if (operation === 'reorder-columns') {
-    const order = indexes.length === headers.length ? indexes : [...indexes, ...headers.map((_, i) => i).filter(i => !indexes.includes(i))];
+    const validIndexes = indexes.filter(column => Number.isInteger(column) && column >= 0 && column < headers.length);
+    const order = validIndexes.length === headers.length ? validIndexes : [...validIndexes, ...headers.map((_, i) => i).filter(i => !validIndexes.includes(i))];
     result.headers = order.map(column => headers[column]);
     result.rows = rows.map(row => order.map(column => normalize(row[column])));
     return result;
