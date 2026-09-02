@@ -903,6 +903,31 @@
 
 ---
 
+## Cycle 169 — CE-104: createThumbnail guarda contra dimensiones degradadas (0x0)
+
+| Field | Value |
+|-------|-------|
+| **Date** | 2026-09-02 |
+| **Branch** | main |
+| **HEAD inicial** | 1c5ba0a (Cycle 168 docs) |
+| **HEAD final** | 0ead95a (feature CE-104) |
+| **Task** | CE-104 (P2, DISCOVERY 2da ronda candidato #4 -> DONE): una imagen degradada producia una miniatura 0x0 almacenada en IndexedDB sin error. |
+| **Potential bug (DISCOVERY 2da ronda, confirmado leyendo el source)** | `createThumbnail` (core/image-processor.js:53) hacía `scale = Math.min(maxSize / w, maxSize / h, 1)`; con `w` o `h` en 0 (o NaN/Infinity), `maxSize / 0 = Infinity` y `Math.min(...,1)` quedaba en 1 -> `canvas.width = Math.round(w * scale)` = 0 => miniatura `0xN`/`Nx0`/`0x0`. `processImageCapture` (linea ~560) llamaba `thumbnail.toDataURL('image/jpeg', 0.85)` incondicionalmente sobre ese canvas vacio. |
+| **Change** | `createThumbnail` retorna `null` si `w`/`h` no son finitos o `<= 0`; para fuentes validas clampea las dimensiones a `>=1` (protege contra fracionarios). `processImageCapture` guarda el thumbnail null con un ternario (`thumbnail ? thumbnail.toDataURL(...) : ''`), sin crashear ni guardar un asset 0x0. |
+| **Tests ejecutados** | Suite nueva `tests/workspace/thumbnail-guard-test.mjs` 12/12 (pure; `createThumbnail` REAL + `processImageCapture` REAL + document stub): imagen valida 800x600 -> miniatura <=400 preservando 4:3 (400x300); `w=0`, `h=0`, `w=0/h=0`, `w=NaN`, `h=Infinity` -> `null`; fuente valida 2x3 -> canvas valido (no queda en 0); processImageCapture usa el ternario de guarda (no llama toDataURL incondicionalmente). Registrada en el release gate. |
+| **Bug encontrado (confirmado)** | Miniaturas 0x0 para dimensiones degradadas, sin senal de error. |
+| **Bug corregido** | `null` para dimensiones no finitas/<=0 + guarda del consumidor `processImageCapture`. |
+| **Tests PASS** | `thumbnail-guard` 12/12 (nuevo), todas las suites previas. Release gate completo OK. |
+| **Tests FAIL** | 0. |
+| **Resultado** | BUG_FIX (robustez de pipeline de imagen: sin asset 0x0 ni crash en toDataURL). |
+| **Evidence** | `workspace/core/image-processor.js` (`createThumbnail`, `processImageCapture`), `tests/workspace/thumbnail-guard-test.mjs`, `scripts/test-workspace-release.mjs`, queue/status. |
+| **Commits** | 0ead95a (feature CE-104): `workspace/core/image-processor.js`, `tests/workspace/thumbnail-guard-test.mjs`, `scripts/test-workspace-release.mjs`, `CONTINUOUS-EVOLUTION-QUEUE.md`. |
+| **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`; `git push` denegado. |
+| **Limitaciones** | `createThumbnail` ahora puede retornar `null`; los consumidores deben manejar ese caso (se actualizo `processImageCapture`; `scanner-ui.js` solo importa `createThumbnail`, no lo invoca, verificable en el repo). El test de phase3a (`phase3a-test.mjs:286`) usa un canvas valido, asi que sigue pasando. |
+| **Proxima prioridad** | Backlog DISCOVERED VACIO. Proximo ciclo: DISCOVERY candidato #5 (dashboardChartItems: sentinela Infinity en bucket.min/max, sort con NaN) o evolucion del runner (regla 6). |
+
+---
+
 ## Cycle 128 — Fix test-debt in engine/parser/planner suites + register them in the gate (CE-065)
 
 | Field | Value |
