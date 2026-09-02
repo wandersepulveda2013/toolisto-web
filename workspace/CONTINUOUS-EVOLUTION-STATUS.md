@@ -853,6 +853,31 @@
 
 ---
 
+## Cycle 167 — CE-102: detect-type normaliza fechas SIN corrimiento de zona horaria
+
+| Field | Value |
+|-------|-------|
+| **Date** | 2026-09-02 |
+| **Branch** | main |
+| **HEAD inicial** | 561854a (Cycle 166 docs) |
+| **HEAD final** | fedae25 (feature CE-102) |
+| **Task** | CE-102 (P1, DISCOVERY 2da ronda candidato #2 -> DONE): el transform de query `detect-type` desplazaba fechas por zona horaria al normalizarlas. |
+| **Potential bug (DISCOVERY 2da ronda, confirmado leyendo el source)** | `queryRunOperation` -> `detect-type` (workspace.js, linea ~6014) hacía `value = new Date(value).toISOString().slice(0, 10)`. Para fechas con barra (`MM/DD/YYYY`, `YYYY/MM/DD`), `Date.parse` las toma como MEDIANOCHE LOCAL, pero `toISOString()` emite en UTC; para `YYYY-MM-DD` el parseo es UTC y `toISOString()` coincide solo si el offset es cero. En zonas con offset != 0 el dia civil resultante podia no ser la fecha escrita por el usuario. |
+| **Change** | `workspace.js`: nuevo helper `queryDateToIso(value)` que reconstruye la fecha desde sus COMPONENTES LOCALES (nunca via UTC): si el anio esta al inicio (4 digitos) usa anio/mes/dia; si esta al final usa mes/dia/anio (preservando la semantica US que ya aplicaba `Date.parse`), valida rangos (mes 1-12, dia 1-31) y rellena a dos digitos; solo cae a `new Date(...).toISOString().slice(0,10)` como fallback para valores que la regex no capta. `detect-type` ahora llama a `queryDateToIso`. |
+| **Tests ejecutados** | Suite nueva `tests/workspace/query-date-to-iso-test.mjs` 11/11 (pure; `queryDateToIso` REAL): conserva YYYY-MM-DD, YYYY/MM/DD, MM/DD/YYYY y padding (03/05/2024, 2024/2/7); salida == fecha escrita en todos los formatos; salida == fecha CALENDARIO LOCAL (invariante TZ deterministica vía getFullYear/getMonth/getDate, valida en el entorno con offset UTC 240 min); el bloque real de detect-type usa queryDateToIso y ya no usa toISOString. Registrada en el release gate. |
+| **Bug encontrado (confirmado)** | Silenciosa corrupcion de fecha por offset de zona horaria en detect-type. |
+| **Bug corregido** | Reconstruccion por componentes locales en `queryDateToIso` (TZ-independiente). |
+| **Tests PASS** | `query-date-to-iso` 11/11 (nuevo), todas las suites previas. Release gate completo OK. |
+| **Tests FAIL** | 0. |
+| **Resultado** | BUG_FIX (correctitud de fechas en query detect-type). |
+| **Evidence** | `workspace/workspace.js` (`queryDateToIso`, `detect-type`), `tests/workspace/query-date-to-iso-test.mjs`, `scripts/test-workspace-release.mjs`, queue/status. |
+| **Commits** | fedae25 (feature CE-102): `workspace/workspace.js`, `tests/workspace/query-date-to-iso-test.mjs`, `scripts/test-workspace-release.mjs`, `CONTINUOUS-EVOLUTION-QUEUE.md`. |
+| **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`; `git push` denegado. |
+| **Limitaciones** | Para formatos ambiguos sin anio inequivoco (ambos extremos <=2 digitos) se cae al fallback original (`new Date(...).toISOString()`), que depende de la heuristica de `Date.parse`. El fallback mantiene el comportamiento previo, no empeora. |
+| **Proxima prioridad** | Backlog DISCOVERED VACIO. Proximo ciclo: DISCOVERY candidato #3 (safeArithmetic `=X/0` devuelve `0`; esperado error/`''`) o evolucion del runner (regla 6). |
+
+---
+
 ## Cycle 128 — Fix test-debt in engine/parser/planner suites + register them in the gate (CE-065)
 
 | Field | Value |
