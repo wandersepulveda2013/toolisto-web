@@ -702,7 +702,31 @@
 | **Commits** | 2e99aed (feature CE-095): `workspace.js`, `core/state.js`, `table-history-cap-test.mjs`, `palette-localstorage-recovery-test.mjs`, `undo-corruption-test.mjs`, `test-workspace-release.mjs`, `CONTINUOUS-EVOLUTION-QUEUE.md`. |
 | **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`; `git push` denegado. Working tree conserva reworks ajenos sin tocar. |
 | **Limitaciones** | El cap (50) iguala `_appHistory`; un undo profundo mas alla de 50 pasos no es posible (acorde al tope del historial global). El bonus de la paleta es endurecimiento de READ/WRITE de preferencias; su comportamiento funcional (mover reciente al frente, toggle) no cambio. |
-| **Proxima prioridad** | Backlog DISCOVERED VACIO (CE-090..CE-095 completados). Siguiente ciclo: DISCOVERY de producto o evolucion del runner; regir por regla 6. |
+| **Proxima prioridad** | Un DISCOVERY independiente (subagente explore) encontro y descarto candidatos; el top #1 (`cleanupSessionsForProject`) es CE-096 (implementado y cerrado en Cycle 161). Backlog vuelve a quedar con DISCOVERED VACIO. Siguiente ciclo: DISCOVERY de nuevo o evolucion del runner (regla 6). |
+
+---
+
+## Cycle 161 — CE-096: `cleanupSessionsForProject` si elimina las entidades borradas de `ws:session`
+
+| Field | Value |
+|-------|-------|
+| **Date** | 2026-09-02 |
+| **Branch** | main |
+| **HEAD inicial** | 1ceb6e8 (Cycle 160 docs) |
+| **HEAD final** | 67547cf (feature CE-096) |
+| **Task** | CE-096 (P2, DISCOVERY->DONE): `cleanupSessionsForProject` nunca eliminaba las entidades borradas de los snapshots de `ws:session`. Construia `idSet` con las IDs (strings) y filtraba con `!idSet.has(d)` donde `d` era el OBJETO completo guardado en `documents`/`dataTables`/`captures`. `Set.prototype.has` usa `===`, asi que `Set.has({id:'x'})` siempre es `false` -> el filtro era un no-op silencioso. Tras borrar un proyecto, sus doc/tabla/captura seguian referenciadas en `ws:session` y podian reaparecer en la recuperacion de sesion. |
+| **Change** | `workspace/core/workspace-storage.js`: `cleanupSessionsForProject` compara ahora `d && typeof d === 'object' ? d.id : d` (fallback al string por si una sesion guarda IDs crudas) en los tres arrays (`documents`, `dataTables`, `captures`). |
+| **Tests ejecutados** | Suite nueva `tests/workspace/session-cleanup-test.mjs` 12/12 (pure; `_loadAllSessions` + `cleanupSessionsForProject` REALES extraidos de workspace-storage.js con dbGet/dbPut stub envelope): entidades borradas salen de los tres arrays y las conservadas permanecen; el barrido es global (una entidad borrada no queda referenciada en ninguna sesion persistida); el proyecto borrado nullifica `currentProjectId` y los no borrados lo conservan; sin sesiones no lanza ni escribe. Registrada en el release gate. |
+| **Bug encontrado (confirmado)** | Filtro de limpieza de sesiones que comparaba objetos contra strings -> nunca matcheaba (stale data/leak en recuperacion de sesion). Enmascarado en `id-collision-serialization` por una SIMULACION autocorregida (`simCleanupForProject` con `d?.id ?? d`); esta suite usa el codigo real. |
+| **Bug corregido** | `cleanupSessionsForProject` compara `d.id` cuando el elemento es objeto. |
+| **Tests PASS** | `session-cleanup` 12/12 (nuevo), mas todas las suites previas. Release gate completo OK. |
+| **Tests FAIL** | 0. |
+| **Resultado** | BUG_FIX (correctitud + datos stale). |
+| **Evidence** | `workspace/core/workspace-storage.js`, `tests/workspace/session-cleanup-test.mjs`, `scripts/test-workspace-release.mjs`, queue/status. |
+| **Commits** | 67547cf (feature CE-096): `workspace/core/workspace-storage.js`, `tests/workspace/session-cleanup-test.mjs`, `scripts/test-workspace-release.mjs`, `CONTINUOUS-EVOLUTION-QUEUE.md`. |
+| **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`; `git push` denegado. |
+| **Limitaciones** | El barrido de entidades es global (una entidad borrada se limpia de cualquier sesion que la referencie), coherente con el objetivo de no dejar referencias huerfanas. El cambio no altera el guardado de sesion (`saveWorkspaceSession`), solo la limpieza. |
+| **Proxima prioridad** | Backlog DISCOVERED VACIO de nuevo. Proximo ciclo: DISCOVERY candidato #2 ya identificado (aliasing de `flowNodes`/`flowEdges` en `_captureWorkspaceState`, workspace.js:844-845) o evolucion del runner. |
 
 ---
 
