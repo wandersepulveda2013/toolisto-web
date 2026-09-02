@@ -751,7 +751,31 @@
 | **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`; `git push` denegado. |
 | **Nota (honestidad/flake)** | En la primera corrida del gate, la suite ajena CE-060 (`stale-delete-lifecycle`) reporto un FAIL transitorio (exit 1) por timing del harness; al re-ejecutar el mismo gate quedo `RELEASE GATE: OK` (`PASS: 42, FAIL: 0`) y la suite pasa 120/120 en aislamiento. No proviene de este cambio (es CE-060, no toca `_captureWorkspaceState`). La investigacion/degradacion de ese flake transitorio queda documentada como candidato futuro en la cola (se profundiza solo si reaparece de forma repetible). |
 | **Limitaciones** | El clon dobla el coste de serializacion del grafo de Flow por push de historial (aceptable: 50 entradas max y grafo tipicamente pequeno); corrige la correctitud del undo a costa de ese coste. |
-| **Proxima prioridad** | Backlog DISCOVERED VACIO. Proximo ciclo: DISCOVERY de nuevo o evolucion del runner (regla 6). |
+| **Proxima prioridad** | Backlog DISCOVERED VACIO. Proximo ciclo: DISCOVERY candidato #5 ya identificado (drop de bloques reordena con NaN, workspace.js:4037) o evolucion del runner (regla 6). |
+
+---
+
+## Cycle 163 — CE-098: el drop de bloques valida el indice (no reordena con NaN)
+
+| Field | Value |
+|-------|-------|
+| **Date** | 2026-09-02 |
+| **Branch** | main |
+| **HEAD inicial** | 9d8b527 (Cycle 162 docs) |
+| **HEAD final** | 4312b61 (feature CE-098) |
+| **Task** | CE-098 (P2, DISCOVERY->DONE): el handler de `drop` de bloques hacía `parseInt(e.dataTransfer.getData('text/plain'))` y ejecutaba `splice(from,1)` + `splice(to,0,moved)` + `autoSaveDoc` sin validar el indice. Un drop extraneo (archivo del SO o seleccion sin nuestro indice) producia `from = NaN`; como `NaN !== to` es `true`, `splice(NaN,1)` -> `splice(0,1)` eliminaba el PRIMER bloque y lo reinsertaba en `to`, reordenando y autoguardando el documento silenciosamente. |
+| **Change** | `workspace.js`: se extrae la funcion nombrada `reorderBlock(blocks, from, to)` que devuelve `false` (sin tocar el array) si `from`/`to` no son enteros en `[0, blocks.length)`, si `from === to`, o si el array esta vacio/no es array; solo reordena y devuelve `true` en un reorder valido. El handler de `drop` llama `reorderBlock` y solo hace `renderBlocks()` + `autoSaveDoc` cuando devuelve `true`. |
+| **Tests ejecutados** | Suite nueva `tests/workspace/block-drop-reorder-test.mjs` 14/14 (pure; `reorderBlock` REAL extraido de workspace.js): from=NaN/-1/>=length y to fuera de rango devuelven `false` y NO mutan el orden; from==to no-op; reorder valido mueve el bloque correctamente (inicio->final, final->inicio); array vacio/no-array devuelven `false` sin lanzar. Registrada en el release gate. |
+| **Bug encontrado (confirmado)** | Reordenamiento silencioso y autoguardado del documento por un drop extraneo (NaN). |
+| **Bug corregido** | El reorder solo ocurre con indices validos. |
+| **Tests PASS** | `block-drop-reorder` 14/14 (nuevo), mas todas las suites previas. Release gate completo OK. |
+| **Tests FAIL** | 0. |
+| **Resultado** | BUG_FIX (integridad de datos del editor de documentos). |
+| **Evidence** | `workspace/workspace.js` (`reorderBlock` + handler de drop), `tests/workspace/block-drop-reorder-test.mjs`, `scripts/test-workspace-release.mjs`, queue/status. |
+| **Commits** | 4312b61 (feature CE-098): `workspace/workspace.js`, `tests/workspace/block-drop-reorder-test.mjs`, `scripts/test-workspace-release.mjs`, `CONTINUOUS-EVOLUTION-QUEUE.md`. |
+| **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`; `git push` denegado. |
+| **Limitaciones** | Un drop valido con el mismo indice (`from === to`) se considera no-op (orden intacto) y no re-renderiza ni autoguarda; comportamiento identico al previo para ese caso. El manual manager de drag tambien requiere que `dataTransfer` lleve el indice como entero en rango; un drag/reorder que no lo haga se ignora de forma segura. |
+| **Proxima prioridad** | Backlog DISCOVERED VACIO. Proximo ciclo: DISCOVERY candidato #3 (leak de listeners del menu contextual de bloques) o evolucion del runner (regla 6). |
 
 ---
 
