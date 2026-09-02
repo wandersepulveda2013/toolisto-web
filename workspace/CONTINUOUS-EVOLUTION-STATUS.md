@@ -556,6 +556,31 @@
 
 ---
 
+## Cycle 155 — CE-090: flush-on-switch al cambiar de documento/tabla sin salir de la vista
+
+| Field | Value |
+|-------|-------|
+| **Date** | 2026-09-02 |
+| **Branch** | main |
+| **HEAD inicial** | f708698 (Cycle 154 DISCOVERY docs) |
+| **HEAD final** | 112a7d4 (feature CE-090) |
+| **Task** | CE-090 (P1, DISCOVERED->DONE): hueco de perdida de datos al cambiar de documento (o tabla) dentro de la MISMA vista sin navegar. El card handler hace `appStore.set({ currentDoc: doc, currentView: 'doc-editor' })` (workspace.js:3121) en una llamada; al ser `currentView` ya `'doc-editor'`, state.js (comparacion por referencia) no notifica -> no corre renderView -> no corre `_flushDirtyEntity` (1156-1178) para el SALIENTE. El intervalo de autosave (845-873) solo lee la entidad NUEVA: un debounce pendiente del saliente (1s) queda sin perseguirse y puede perderse en la ventana de 5s. |
+| **Hypothesis** | Un flush-on-switch centralizado y testable: subscribir `currentDoc`/`currentDataTable` y flushear la entidad SALIENTE en el momento del cambio si su debounce sigue armado. El gate `_timer != null` es el unico disparador = solo actua cuando hay trabajo realmente pendiente (impide writes espurios al abrir un doc no editado, cuyo camino ya flusheo y limpio el timer en el cambio de vista). |
+| **Change** | `workspace.js`: nueva `installEntitySwitchFlush(store)` que registra los subscribers de `currentDoc`/`currentDataTable` (flushea el saliente si `autoSaveDoc._timer`/`autoSaveTable._timer` != null al cambiar de id); nueva `_flushOutgoingEntity(entity, kind)` que limpia el timer del saliente y guarda ESA entidad por su lock (doc -> `saveDoc`; table -> `saveData` + `syncDerivedCharts`) usando el snapshot `_lastAutosave*`; se llama `installEntitySwitchFlush(appStore)` en el init junto a los demas subscribers. Sin cambios en el card handler ni en los sites de switch: el subscriber centraliza el cover de todos (tarjetas de doc/tabla, sheets de workbook). |
+| **Tests ejecutados** | Suite nueva `tests/workspace/doc-table-switch-flush-test.mjs` 9/9 (pure, sin navegador; extrae por regex `_createSaveLock`, `_createEntityLockMap`, `autoSaveDoc`, `autoSaveTable`, `_flushOutgoingEntity`, `installEntitySwitchFlush`, `_flushDirtyEntity` REALES y las cablea con appStore real de state.js + capa persistente fiel a storage.js `saveDoc`/`saveData` (guard `_writeSeq`) + timers manuales): (1) doc->doc misma vista SIN renderView persiste la ultima edicion del saliente y no toca B; (2) tabla->tabla misma vista persiste T1 y no toca T2; (3) CONTROL NEGATIVO: sin `installEntitySwitchFlush` la edicion del saliente NO queda persistida al instante (reproduce la perdida exacta de CE-090, prueba que el fix es necesario y el escenario 1 no es tautologico); (4) regresion: el cambio de vista con `_flushDirtyEntity` real sigue flusheando. Registrada en `scripts/test-workspace-release.mjs`. |
+| **Bug encontrado (confirmado)** | El hueco de CE-090 se confirma con el control negativo: cambiar de doc dentro de la misma vista con el debounce pendiente deja la edicion del saliente sin persistir al instante; nadie la flushea hasta el autosave de 5s (o se pierde). |
+| **Bug corregido** | flush-on-switch guarda la entidad saliente en el momento del cambio de id si tiene trabajo pendiente. |
+| **Tests PASS** | `doc-table-switch-flush` 9/9; regresiones: `document-editor-persistence-race` (CE-082) 23/23, `cross-entity-integrity` (CE-058) 55/55, `autosave-lock` (CE-057), `storage-*` (CE-059/060/061). Release gate completo OK. |
+| **Tests FAIL** | 0. |
+| **Resultado** | BUG_FIX (data-loss). Los tests adversariales (99/99 en las suites de persistencia regresion) confirman que el fix no introduce perdidas ni writes espurios. |
+| **Evidence** | `workspace/workspace.js` (`installEntitySwitchFlush`, `_flushOutgoingEntity`), `tests/workspace/doc-table-switch-flush-test.mjs`, `scripts/test-workspace-release.mjs` (registro de suite), queue/status. |
+| **Commits** | 112a7d4 (feature CE-090): `workspace.js`, `doc-table-switch-flush-test.mjs`, `test-workspace-release.mjs`, `CONTINUOUS-EVOLUTION-QUEUE.md`. |
+| **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`; `git push` denegado. Working tree conserva reworks ajenos (ADSENSE, TLT-*, offline.html, opencode.json, etc.) sin tocar. |
+| **Limitaciones** | El subscriber cubre el cambio de id de `currentDoc`/`currentDataTable`. El intervalor de autosave (5s) y el flush-before-navigate por cambio de vista siguen siendo los caminos para entidades sin id o cuando el debounce ya vencio. La perdida residual de un write que falla (no marca guardado) es el edge ya documentado en CE-057/082, no afectado por este fix. |
+| **Proxima prioridad** | Implementar CE-091 (P1) — undo del topbar corrupto en la lista de documentos (blocks sin `type`) y desalineado con el undo de tabla. |
+
+---
+
 ## Cycle 128 — Fix test-debt in engine/parser/planner suites + register them in the gate (CE-065)
 
 | Field | Value |
