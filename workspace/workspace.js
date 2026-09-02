@@ -4036,14 +4036,26 @@ function renderBlock(block, index, doc, renderBlocks, updateMetrics = () => {}) 
     e.preventDefault();
     const from = parseInt(e.dataTransfer.getData('text/plain'));
     const to = index;
-    if (from !== to) {
-      const [moved] = doc.blocks.splice(from, 1);
-      doc.blocks.splice(to, 0, moved);
+    if (reorderBlock(doc.blocks, from, to)) {
       renderBlocks();
       autoSaveDoc(doc);
     }
   });
   return wrapper;
+}
+
+// Reordena un bloque de lugar SOLO si from/to son indices validos. Devuelve true
+// si movio el bloque; false si el drop era extraneo (NaN, fuera de rango, o
+// desde == hasta) y el documento NO debe tocarse. Evita que un drop de un archivo
+// externo sin nuestro indice compile NaN -> splice(0,1) y reordene silenciosamente.
+function reorderBlock(blocks, from, to) {
+  if (!Array.isArray(blocks) || blocks.length === 0) return false;
+  if (!Number.isInteger(from) || from < 0 || from >= blocks.length) return false;
+  if (!Number.isInteger(to) || to < 0 || to >= blocks.length) return false;
+  if (from === to) return false;
+  const [moved] = blocks.splice(from, 1);
+  blocks.splice(to, 0, moved);
+  return true;
 }
 
 function showBlockMenu(anchor, doc, renderBlocks) {
