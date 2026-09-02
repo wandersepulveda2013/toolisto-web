@@ -1116,6 +1116,55 @@ svg {
   align-self: end;
 }
 
+.apluno-contact-help {
+  max-width: 920px;
+  padding-bottom: clamp(90px, 12vw, 150px);
+}
+
+.apluno-contact-help h2 {
+  font-size: clamp(1.6rem, 3.4vw, 2.4rem);
+  letter-spacing: -.04em;
+  margin: clamp(40px, 6vw, 70px) 0 20px;
+  padding-top: 24px;
+  border-top: 1px solid var(--apluno-line);
+}
+
+.apluno-contact-help h3 {
+  font-size: 1.15rem;
+  letter-spacing: -.02em;
+  margin: 0 0 0.6rem;
+}
+
+.apluno-contact-help p {
+  margin: 0;
+  color: var(--apluno-muted);
+  line-height: 1.65;
+}
+
+.apluno-contact-help article + article {
+  margin-top: 26px;
+}
+
+.apluno-contact-help a {
+  color: var(--apluno-accent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}
+
+.apluno-contact-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(24px, 4vw, 44px) clamp(30px, 5vw, 60px);
+  margin-bottom: 20px;
+}
+
+@media (max-width: 720px) {
+  .apluno-contact-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
 .apluno-legal-copy {
   max-width: 920px;
   padding-top: clamp(80px, 10vw, 130px);

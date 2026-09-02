@@ -75,6 +75,20 @@ check(countLoaders(home) === 1, 'Portada: exactamente 1 loader de AdSense');
 check(home.includes(CLIENT_MARKER), 'Portada: loader usa el publisher ca-pub-2644615452393440');
 check(home.indexOf(LOADER_MARKER) < home.indexOf('</head>'), 'Portada: loader dentro de <head>');
 
+// Marcador oficial de verificación de cuenta Google AdSense (meta google-adsense-account).
+// Complementa el loader; se coloca en el <head> de todas las páginas de Apluno.
+check(home.includes('<meta name="google-adsense-account" content="ca-pub-2644615452393440">'), 'Portada: meta google-adsense-account presente con publisher correcto');
+check(home.indexOf('google-adsense-account') < home.indexOf('</head>'), 'Portada: meta google-adsense-account dentro de <head>');
+check(toolisto.includes('<meta name="google-adsense-account" content="ca-pub-2644615452393440">'), 'Toolisto catálogo: meta google-adsense-account presente');
+// El meta de verificación no debe aparecer en las páginas de procesamiento (páginas sin loader).
+let metaOnToolLeaks = 0;
+for (const tool of tools) {
+  const rel = `${tool.slug}.html`;
+  if (!existsSync(join(dist, rel))) continue;
+  if (read(rel).includes('google-adsense-account')) metaOnToolLeaks += 1;
+}
+check(metaOnToolLeaks === 0, `Herramientas de procesamiento: meta google-adsense-account NO presente (${tools.length} verificadas)`);
+
 // Toolisto catálogo: exactamente 1 loader.
 check(countLoaders(toolisto) === 1, 'Toolisto catálogo: exactamente 1 loader de AdSense');
 check(toolisto.includes(CLIENT_MARKER), 'Toolisto catálogo: loader usa el publisher correcto');

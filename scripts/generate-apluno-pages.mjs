@@ -352,11 +352,23 @@ function renderWorkspace() {
 
 function renderContact() {
   const email = escapeHtml(apluno.site.email);
-  const content = `<section class="apluno-page-hero apluno-section" data-reveal><p class="apluno-eyebrow">Contacto</p><h1>Hablemos con claridad.</h1><p>Para preguntas, comentarios o asuntos relacionados con Apluno y Toolisto, puedes escribirnos por correo.</p></section>
-    <section class="apluno-section apluno-contact-card" data-reveal><div><p class="apluno-eyebrow">Correo actual</p><a href="mailto:${email}">${email}</a></div><p>Usamos esta dirección mientras consolidamos la identidad pública de Apluno. No hay oficinas, equipos de ventas ni canales corporativos adicionales que anunciar por ahora.</p></section>`;
+  const content = `<section class="apluno-page-hero apluno-section" data-reveal><p class="apluno-eyebrow">Contacto</p><h1>Hablemos con claridad.</h1><p>Para preguntas, comentarios o asuntos relacionados con Apluno y Toolisto, puedes escribirnos por correo.</p><div>${renderCta({ href: `mailto:${email}`, label: 'Escribir por correo', tone: 'dark', arrow: false })}</div></section>
+    <section class="apluno-section apluno-contact-card" data-reveal><div><p class="apluno-eyebrow">Correo</p><a href="mailto:${email}">${email}</a></div><p>Usamos esta dirección mientras consolidamos la identidad pública de Apluno. No hay oficinas, equipos de ventas ni canales corporativos adicionales que anunciar por ahora.</p></section>
+    <section class="apluno-section apluno-contact-help">
+      <h2>Para qué puedes usar este correo</h2>
+      <div class="apluno-contact-grid">
+        <article data-reveal><h3>Preguntas sobre una herramienta</h3><p>Dudas sobre cómo funciona una herramienta de Toolisto: qué formatos admite, cómo interpretar un resultado o si puede hacer una tarea concreta.</p></article>
+        <article data-reveal><h3>Reportar un problema técnico</h3><p>Si una herramienta no abre, se queda cargando o devuelve un resultado incorrecto, escríbenos. Contribuye a que detectemos y corrijamos errores que no vemos en nuestras propias pruebas.</p></article>
+        <article data-reveal><h3>Sugerencias y mejoras</h3><p>Ideas sobre nuevas herramientas, cambios en la interfaz o mejoras en los flujos existentes. Las leemos teniendo en cuenta que todo el procesamiento ocurre en tu navegador.</p></article>
+        <article data-reveal><h3>Cuestiones de privacidad</h3><p>Preguntas sobre cómo se tratan tus archivos o sobre el tratamiento de datos de esta web. Te reenviamos a lo descrito en nuestra <a href="/privacy/">política de privacidad</a>; si algo no te queda claro, cuéntanoslo.</p></article>
+      </div>
+      <article data-reveal><h2>Cómo reportar un problema con precisión</h2><p>Para que podamos reproducir y entender un problema, incluye cuando sea posible: la dirección (URL) de la herramienta afectada, el formato y el tamaño aproximado del archivo que usabas, el navegador (y versión) elegido, y una descripción de qué esperabas y qué ocurrió en su lugar. Esta información es opcional, pero cuanto más concreta sea, más fácil nos resulta investigarla.</p></article>
+      <article data-reveal><h2>Qué esperar de una respuesta</h2><p>No ofrecemos un tiempo de respuesta garantizado ni un equipo de soporte técnico. Revisamos los mensajes que llegan y respondemos cuando podemos. Si tu consulta es urgente por motivos de privacidad o seguridad, indicálo en el asunto del correo.</p></article>
+      <article data-reveal><h2>Antes de escribir</h2><p>Para preguntas sobre el uso del sitio y sobre la responsabilidad sobre tus archivos, consulta primero nuestras <a href="/terms/">condiciones de uso</a>. Para tratar datos personales, la <a href="/privacy/">política de privacidad</a> resume cómo funciona el sitio hoy.</p></article>
+    </section>`;
   return renderPage(pageOptions({
     title: 'Contacto — Apluno',
-    description: 'Contacta con Apluno para preguntas y comentarios sobre sus productos digitales.',
+    description: 'Contacta con Apluno para preguntas, reportes de errores, sugerencias y asuntos de privacidad sobre sus productos digitales.',
     pathname: '/contact/',
     bodyClass: 'apluno-contact',
     content,

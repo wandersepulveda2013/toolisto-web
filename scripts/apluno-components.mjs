@@ -48,6 +48,7 @@ export function renderSeoMetadata({
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="description" content="${escapeHtml(description)}">
   <meta name="robots" content="${escapeHtml(robots)}">
+  <meta name="google-adsense-account" content="ca-pub-2644615452393440">
   <meta name="theme-color" content="#f5f4ef">
   <meta name="color-scheme" content="light">
   <title>${escapeHtml(title)}</title>${canonicalTag}

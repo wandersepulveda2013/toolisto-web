@@ -125,7 +125,7 @@
         },
         {
           "heading": "Revisa el resultado",
-          "body": "<p>Tras unir, abre el documento final y comprueba saltos de página, numeración y que las páginas estén en orden. Si el PDF unido quedó pesado, puedes <a href=\"/reducir-tamano-pdf\">comprimirlo</a> después.</p>"
+          "body": "<p>Tras unir, abre el documento final y comprueba saltos de página, numeración y que las páginas estén en orden. Si el PDF unido quedó pesado, puedes <a href=\"/comprimir-pdf\">comprimirlo</a> después.</p>"
         }
       ],
       "relatedToolSlugs": ["unir-pdf", "organizar-pdf", "intercalar-pdf"],

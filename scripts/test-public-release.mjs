@@ -93,7 +93,7 @@ const sampleRedirect = readFileSync(join(ROOT, 'dist', 'merge-pdf.html'), 'utf8'
 check(sampleRedirect.includes('rel="canonical"') && sampleRedirect.includes('href="https://apluno.com/unir-pdf"') && sampleRedirect.includes('noindex'), 'la página de redirect de /merge-pdf apunta al destino canónico sin indexarse');
 
 const adsenseResult = spawnSync(process.execPath, [join(ROOT, 'tests', 'adsense-integration.mjs')], { cwd: ROOT, stdio: 'inherit' });
-check(adsenseResult.status === 0, 'AdSense integration gate (tests/adsense-integration.mjs) — 21 PASS, 0 FAIL');
+check(adsenseResult.status === 0, 'AdSense integration gate (tests/adsense-integration.mjs) — 25 PASS, 0 FAIL');
 
 const seoResult = spawnSync(process.execPath, [join(ROOT, 'tests', 'apluno-production-seo.mjs')], { cwd: ROOT, stdio: 'inherit' });
 check(seoResult.status === 0, 'APLUNO production SEO gate (tests/apluno-production-seo.mjs) — 29 PASS, 0 FAIL');
@@ -106,6 +106,9 @@ check(strictEditorialResult.status === 0, 'Strict editorial regression (tests/st
 
 const contentSimilarityScopedResult = spawnSync(process.execPath, [join(ROOT, 'tests', 'content-similarity-scoped-regression.mjs')], { cwd: ROOT, stdio: 'inherit' });
 check(contentSimilarityScopedResult.status === 0, 'Content similarity/originality regression (tests/content-similarity-scoped-regression.mjs) — 5 PASS, 0 FAIL');
+
+const adsenseDodResult = spawnSync(process.execPath, [join(ROOT, 'tests', 'adsense-remediation-dod.mjs')], { cwd: ROOT, stdio: 'inherit' });
+check(adsenseDodResult.status === 0, 'AdSense remediation DoD (tests/adsense-remediation-dod.mjs) — 11 PASS, 0 FAIL');
 
 console.log(`\n=== Resultado: ${passed} PASS, ${failed} FAIL ===`);
 process.exit(failed ? 1 : 0);
