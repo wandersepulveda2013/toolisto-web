@@ -5816,6 +5816,21 @@ function queryIsDate(value) {
   return text.length > 5 && /^\d{1,4}[-/]\d{1,2}[-/]\d{1,4}/.test(text) && !Number.isNaN(Date.parse(text));
 }
 
+function queryDateToIso(value) {
+  const text = String(value == null ? '' : value).trim();
+  const m = text.match(/^(\d{1,4})[-/](\d{1,2})[-/](\d{1,4})/);
+  if (m) {
+    let y, mo, d;
+    if (m[1].length === 4) { y = +m[1]; mo = +m[2]; d = +m[3]; }
+    else if (m[3].length === 4) { mo = +m[1]; d = +m[2]; y = +m[3]; }
+    if (y && mo >= 1 && mo <= 12 && d >= 1 && d <= 31) {
+      const iso = String(y) + '-' + String(mo).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+      if (!Number.isNaN(Date.parse(iso))) return iso;
+    }
+  }
+  return new Date(text).toISOString().slice(0, 10);
+}
+
 function queryColumnType(rows, index) {
   const values = rows.map(row => String(row[index] == null ? '' : row[index]).trim()).filter(Boolean);
   if (!values.length) return 'ABC';
@@ -6011,7 +6026,7 @@ function queryRunOperation(shape, operation, config = {}) {
         if (operation === 'detect-type') {
           const number = queryNumber(value);
           if (number !== null && /^[-+]?\d+(?:[.,]\d+)?$/.test(value.trim())) value = String(number);
-          else if (queryIsDate(value)) value = new Date(value).toISOString().slice(0, 10);
+          else if (queryIsDate(value)) value = queryDateToIso(value);
         }
         row[column] = value;
       });
