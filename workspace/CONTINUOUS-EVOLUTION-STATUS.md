@@ -631,6 +631,31 @@
 
 ---
 
+## Cycle 158 — CE-093: referencias cruzadas del bundle validadas antes de escribir
+
+| Field | Value |
+|-------|-------|
+| **Date** | 2026-09-02 |
+| **Branch** | main |
+| **HEAD inicial** | 46a1e91 (Cycle 157 docs) |
+| **HEAD final** | 56bfe39 (feature CE-093) |
+| **Task** | CE-093 (P2, DISCOVERED->DONE): un bundle cuyo objeto referencia un ID que NO esta entre las entidades importadas dejaba, tras remapear con `remapRefs` (storage.js:325-350), una referencia colgante PERSISTIDA; `assertIntegrity` (517) corria despues del commit como fire-and-forget y solo emitia un evento que el usuario nunca ve. Sin rechazo pre-write de refs colgantes. |
+| **Hypothesis** | Auditar las referencias cruzadas del bundle ANTES de escribir (en `validateBundleImport`, tras el manifiesto): rechazar cualquier referencia cuyo destino no exista entre las entidades que se van a importar, con la MISMA semantica de campos que el auditor de huerfanos (core/integrity.js), y rechazar tambien en bundles heredados (sin manifest). |
+| **Change** | `core/bundle.js`: nuevo `validateBundleReferences(bundle)` que recalcula el conjunto de IDs importados por tipo de store mas un conjunto global, recorre cada objeto con `REF_SOURCE_FIELDS`/`REF_CONFIG_FIELDS`/`metadata.captureId`/`relations`/`inputAssetIds`/`derivedIds`, y rechaza (a) refs cuyo destino no exista en ningun store del bundle y (b) refs de tipo restringido (sourceTableId/tableId->tabla, sourceDocId/scanDocId->documento, captureId->captura) cuyo destino no este en su store correcto. `validateBundleImport` lo ejecuta tras el manifiesto y antes de cualquier escritura; aplica tambien a bundles heredados (sin manifest). Exportado para test. |
+| **Tests ejecutados** | Suite nueva `tests/workspace/bundle-reference-validation-test.mjs` 14/14 (pure; carga el CODIGO REAL de core/bundle.js en un sandbox quitando el `import` de schema-versions y la cola de `export`, evalua el cuerpo real): bundle integro ok; sourceDocId colgante rechazado con diagnostico; sourceTableId a tabla inexistente rechazado (validacion por tipo); metadata.captureId colgante rechazado; relation.targetId colgante rechazado; inputAssetIds colgante rechazado; asset->asset presente se conserva (sin falso positivo); bundle heredado (sin manifest) con ref colgante igual rechazado; regresion: el bundle de referencia (capture->asset, asset-2.correctedAssetId->asset-1, exe->asset, wf.steps.scanDocId->doc) importa ok. Registrada en el release gate. |
+| **Bug encontrado (confirmado)** | Receptor de import no rechazaba un bundle con referencias cruzadas colgantes (solo detectadas post-commit por el auditor, sin feedback al usuario). |
+| **Bug corregido** | `validateBundleImport` ahora rechaza el bundle con diagnostico ANTES de escribir nada, y quedan protegidos tanto bundles con manifest como heredados; los round-trips validos (Phase 5, storage) no sufren falsos rechazos. |
+| **Tests PASS** | `bundle-reference-validation` 14/14; regresiones: phase5-bundle-trust 53/53, storage-multicontext / cross-store / stale-delete / runtime-isolation OK, boot-recovery (CE-092) 10/10, undo-corruption (CE-091) 15/15. Release gate completo OK. |
+| **Tests FAIL** | 0. |
+| **Resultado** | BUG_FIX (integridad de importacion). Un bundle con refs colgantes ya no crea proyectos con graficos/encadenados rotos sin aviso. |
+| **Evidence** | `workspace/core/bundle.js` (`validateBundleReferences`, `validateBundleImport`), `tests/workspace/bundle-reference-validation-test.mjs`, `scripts/test-workspace-release.mjs` (registro de suite), queue/status. |
+| **Commits** | 56bfe39 (feature CE-093): `core/bundle.js`, `bundle-reference-validation-test.mjs`, `test-workspace-release.mjs`, `CONTINUOUS-EVOLUTION-QUEUE.md`. |
+| **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`; `git push` denegado. Working tree conserva reworks ajenos sin tocar. |
+| **Limitaciones** | La validacion es INTERNA al bundle: exige que cada destino exista entre las entidades importadas. Referencias a entidades de otros proyectos no se importan y, por tanto, un destino que apunte fuera del bundle se rechaza (comportamiento deseado: Toolisto es local y cada proyecto es autocontenido). `correctedAssetId`/`derivedIds` de assets se auditan contra el conjunto global; solo los campos restringidos exigen store concreto, igual que el auditor de huerfanos. |
+| **Proxima prioridad** | Implementar CE-094 (P3) — `exportProject` incluye `exportedAt: Date.now()` (timestamp absoluto) dentro del envelope, aunque el manifiesto ignora la moneda logico-lingüistica local-first de las evidencias de Gate. |
+
+---
+
 ## Cycle 128 — Fix test-debt in engine/parser/planner suites + register them in the gate (CE-065)
 
 | Field | Value |
