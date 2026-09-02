@@ -828,6 +828,31 @@
 
 ---
 
+## Cycle 166 — CE-101: exportTableCSV escapa headers y coacciona celdas (CSV valido)
+
+| Field | Value |
+|-------|-------|
+| **Date** | 2026-09-02 |
+| **Branch** | main |
+| **HEAD inicial** | 4a04501 (Cycle 165 docs) |
+| **HEAD final** | 7914030 (feature CE-101) |
+| **Task** | CE-101 (P1, DISCOVERY 2da ronda -> DONE): `exportTableCSV` lanzaba `TypeError` con celdas no-string y no escapaba los headers (un header con `,` o `"` corrompia el archivo CSV). |
+| **Potential bug (DISCOVERY 2da ronda, confirmado leyendo el source)** | `exportTableCSV` (workspace.js) usaba `table.headers.join(sep)` SIN escape y `c.includes(...)` sobre el valor bruto de celda -> (A) header con coma `"Precio, USD"` produce `Precio, USD,Cantidad` (estructura corrupta, no citado); (B) celda `null`/`undefined`/numero/booleano lanza `c.includes is not a function`. La hermana `queryExportCsv` ya tenia el escape correcto (`String(value == null ? '' : value)` + `/[,"\n]/` + quotes). |
+| **Change** | `workspace.js`: `exportTableCSV` refactorizado al MISMO escape que `queryExportCsv` (coercion a string con `String(value == null ? '' : value)`, escaping de comas/comillas/salto de linea en headers Y celdas vía un helper `escape`, fila de datos con linea nueva). Conserva el BOM `\uFEFF` y el flujo de descarga (Blob -> URL.createObjectURL -> a.click -> revokeObjectURL -> toast). |
+| **Tests ejecutados** | Suite nueva `tests/workspace/table-csv-escape-test.mjs` 9/9 (pure; `exportTableCSV` REAL + `queryExportCsv` REAL + DOM/Blob/URL stub): header con coma queda entre comillas `"Precio, USD"`; header con comillas se duplica `"""Nomina"""`; el CSV conserva el BOM; filas de datos intactas; celdas `null`/`undefined`/42/`true` ya no lanzan y se coaccionan (`,,42,true`); el escape es BYTE-IDENTICO a `queryExportCsv` (solo difiere el BOM); comillas internas con salto se duplican (`hola ""mundo""`). Registrada en el release gate. |
+| **Bug encontrado (confirmado)** | Headers sin escapar + celdas no-string crasheando. |
+| **Bug corregido** | Mismo escape de `queryExportCsv` en `exportTableCSV` (headers y celdas). |
+| **Tests PASS** | `table-csv-escape` 9/9 (nuevo), todas las suites previas. Release gate completo OK. |
+| **Tests FAIL** | 0. |
+| **Resultado** | BUG_FIX (robustez + correccion de exportacion CSV). |
+| **Evidence** | `workspace/workspace.js` (`exportTableCSV`), `tests/workspace/table-csv-escape-test.mjs`, `scripts/test-workspace-release.mjs`, queue/status. |
+| **Commits** | 7914030 (feature CE-101): `workspace/workspace.js`, `tests/workspace/table-csv-escape-test.mjs`, `scripts/test-workspace-release.mjs`, `CONTINUOUS-EVOLUTION-QUEUE.md`. |
+| **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`; `git push` denegado. |
+| **Limitaciones** | `queryExportCsv` no agrega BOM; `exportTableCSV` si, por lo que la comparacion byte-identica en el test quita el BOM del lado de `exportTableCSV`. El flujo de descarga depende de `URL.revokeObjectURL` inmediato tras el click (comportamiento previo, no cambiado). |
+| **Proxima prioridad** | Backlog DISCOVERED VACIO. Proximo ciclo: DISCOVERY candidato #2 (query `detect-type`: `new Date(...).toISOString().slice(0,10)` desplaza la fecha a UTC, meses hacia atras en America) o evolucion del runner (regla 6). |
+
+---
+
 ## Cycle 128 — Fix test-debt in engine/parser/planner suites + register them in the gate (CE-065)
 
 | Field | Value |
