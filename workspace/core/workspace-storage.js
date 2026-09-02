@@ -145,17 +145,17 @@ export async function cleanupSessionsForProject(projectId, deletedIds = []) {
       }
       if (Array.isArray(w.documents)) {
         const before = w.documents.length;
-        w.documents = w.documents.filter(d => !idSet.has(d));
+        w.documents = w.documents.filter(d => !idSet.has(d && typeof d === 'object' ? d.id : d));
         if (w.documents.length !== before) changed = true;
       }
       if (Array.isArray(w.dataTables)) {
         const before = w.dataTables.length;
-        w.dataTables = w.dataTables.filter(d => !idSet.has(d));
+        w.dataTables = w.dataTables.filter(d => !idSet.has(d && typeof d === 'object' ? d.id : d));
         if (w.dataTables.length !== before) changed = true;
       }
       if (Array.isArray(w.captures)) {
         const before = w.captures.length;
-        w.captures = w.captures.filter(c => !idSet.has(c));
+        w.captures = w.captures.filter(c => !idSet.has(c && typeof c === 'object' ? c.id : c));
         if (w.captures.length !== before) changed = true;
       }
     }
