@@ -5569,15 +5569,11 @@ function autoSaveTable(table) {
 
 function exportTableCSV(table) {
   const sep = ',';
-  let csv = table.headers.join(sep) + '\n';
-  (table.rows || []).forEach(row => {
-    csv += row.map(c => {
-      if (c.includes(sep) || c.includes('"') || c.includes('\n')) {
-        return '"' + c.replace(/"/g, '""') + '"';
-      }
-      return c;
-    }).join(sep) + '\n';
-  });
+  const escape = value => {
+    const text = String(value == null ? '' : value);
+    return /[,"\n]/.test(text) ? '"' + text.replace(/"/g, '""') + '"' : text;
+  };
+  const csv = [table.headers.map(escape).join(sep), ...(table.rows || []).map(row => row.map(escape).join(sep))].join('\n') + '\n';
   const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
   const url = URL.createObjectURL(blob);
   const a = h('a', { href: url, download: (table.name || 'datos') + '.csv' });

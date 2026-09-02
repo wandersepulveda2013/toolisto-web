@@ -140,6 +140,7 @@ run('flow-snapshot-aliasing (snapshot de Flow clona nodos/edges, CE-097)', 'node
 run('block-drop-reorder (el drop de bloques valida el indice, CE-098)', 'node', ['tests/workspace/block-drop-reorder-test.mjs']);
 run('block-menu-listener (el menu de bloques desengancha su listener, CE-099)', 'node', ['tests/workspace/block-menu-listener-test.mjs']);
 run('undo-clone-once (el historial de undo clona el snapshot una sola vez, CE-100)', 'node', ['tests/workspace/undo-clone-once-test.mjs']);
+run('table-csv-escape (exportTableCSV escapa headers y coacciona celdas, CE-101)', 'node', ['tests/workspace/table-csv-escape-test.mjs']);
 
 // 4. Manifest de evidencia
 const evidence = {
