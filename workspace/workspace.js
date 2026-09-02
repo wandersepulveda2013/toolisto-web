@@ -841,8 +841,8 @@ function _captureWorkspaceState() {
     dataTables: (s.dataTables || []).map(t => ({ id: t.id, name: t.name, headers: t.headers ? [...t.headers] : [], rows: t.rows ? t.rows.map(row => [...row]) : [], sheets: t.sheets ? JSON.parse(JSON.stringify(t.sheets)) : undefined, reviewStatus: t.reviewStatus })),
     captures: (s.captures || []).map(c => ({ id: c.id, name: c.name, dataUrl: c.dataUrl ? c.dataUrl.slice(0, 200) : null })),
     designConfig: s.designConfig ? JSON.parse(JSON.stringify(s.designConfig)) : null,
-    flowNodes: s.flowNodes || [],
-    flowEdges: s.flowEdges || [],
+    flowNodes: s.flowNodes ? JSON.parse(JSON.stringify(s.flowNodes)) : [],
+    flowEdges: s.flowEdges ? JSON.parse(JSON.stringify(s.flowEdges)) : [],
   };
 }
 
