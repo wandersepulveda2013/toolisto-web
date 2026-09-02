@@ -1027,7 +1027,13 @@ async function initApp() {
 
   _appHistory = createHistoryManager({
     maxEntries: 50,
-    cloneState: (s) => JSON.parse(JSON.stringify(s)),
+    // cloneState es identidad: TODAS las llamadas a _appHistory.{push,undo,redo}
+    // pasan _captureWorkspaceState(), que ya devuelve un snapshot DE aislado en
+    // profundidad de todos los campos (docs/blocks, tablas/rows/sheets,
+    // designConfig, currentDoc/DataTable, flowNodes/Edges). Re-clonarlo aqui
+    // con JSON.parse(JSON.stringify) serializaba el workspace entero DOS veces
+    // por cada push/undo/redo y duplicaba la memoria en el historial de 50.
+    cloneState: (s) => s,
     onChange: _historyChanged,
   });
 
