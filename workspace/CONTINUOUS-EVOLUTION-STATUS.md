@@ -775,7 +775,32 @@
 | **Commits** | 4312b61 (feature CE-098): `workspace/workspace.js`, `tests/workspace/block-drop-reorder-test.mjs`, `scripts/test-workspace-release.mjs`, `CONTINUOUS-EVOLUTION-QUEUE.md`. |
 | **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`; `git push` denegado. |
 | **Limitaciones** | Un drop valido con el mismo indice (`from === to`) se considera no-op (orden intacto) y no re-renderiza ni autoguarda; comportamiento identico al previo para ese caso. El manual manager de drag tambien requiere que `dataTransfer` lleve el indice como entero en rango; un drag/reorder que no lo haga se ignora de forma segura. |
-| **Proxima prioridad** | Backlog DISCOVERED VACIO. Proximo ciclo: DISCOVERY candidato #3 (leak de listeners del menu contextual de bloques) o evolucion del runner (regla 6). |
+| **Proxima prioridad** | Backlog DISCOVERED VACIO. Proximo ciclo: DISCOVERY candidato #4 (doble clon JSON del workspace por push de undo) o evolucion del runner (regla 6). |
+
+---
+
+## Cycle 164 — CE-099: el menu contextual de bloques desengancha su listener de document
+
+| Field | Value |
+|-------|-------|
+| **Date** | 2026-09-02 |
+| **Branch** | main |
+| **HEAD inicial** | 32435cd (Cycle 163 docs) |
+| **HEAD final** | 95452fe (feature CE-099) |
+| **Task** | CE-099 (P3, DISCOVERY->DONE): `showBlockMenu` registraba cada apertura un `closeMenu` en `document.addEventListener('click', closeMenu)` via `setTimeout(0)`, y SOLO lo auto-eliminaba cuando el click caia FUERA del menu. Al seleccionar un ITEM (click dentro del menu), el listener quedaba colgado en `document` para toda la vida de la pagina -> acumulacion de listeners stale por cada apertura (leak de memoria en sesiones locales largas). |
+| **Change** | `workspace.js` (`showBlockMenu`): cierre unico `closeMenu()` que desengancha SIEMPRE el listener (`if (attached) document.removeEventListener('click', onDocClick)`) en todas las vias de cierre (seleccionar item, alcanzar limite, click fuera). El attach diferido a macrotask conserva el comportamiento de que el click que abrio el menu no lo cierre; si el menu se cierra antes del timer, el flag `closed` evita enganchar (sin depender de clearTimeout). |
+| **Tests ejecutados** | Suite nueva `tests/workspace/block-menu-listener-test.mjs` 13/13 (pure; `showBlockMenu` REAL de workspace.js + stub de DOM/document/h/svgIcon/getWorkspaceConfig/toast/generateId/setTimeout/hideContextMenu/$): seleccionar un item agrega el bloque y desengancha (remove==add, sin listener vivo); click fuera tambien desengancha; 5 aperturas NO acumulan listeners (add==remove==5); limite alcanzado avisa y desengancha; no queda listener vivo en document. Registrada en el release gate. |
+| **Bug encontrado (confirmado)** | Leak de listeners `document` por cada apertura del menu de bloques (seleccionar item no desenganchaba). |
+| **Bug corregido** | `closeMenu()` desengancha en todas las vias; el `closed` flag evita enganchar tras cierre prematuro. |
+| **Tests PASS** | `block-menu-listener` 13/13 (nuevo), mas todas las suites previas. Release gate completo OK. |
+| **Tests FAIL** | 0. |
+| **Resultado** | ARCHITECTURE_IMPROVEMENT (higiene de listeners / memoria en sesion larga). |
+| **Evidence** | `workspace/workspace.js` (`showBlockMenu`), `tests/workspace/block-menu-listener-test.mjs`, `scripts/test-workspace-release.mjs`, queue/status. |
+| **Commits** | 95452fe (feature CE-099): `workspace/workspace.js`, `tests/workspace/block-menu-listener-test.mjs`, `scripts/test-workspace-release.mjs`, `CONTINUOUS-EVOLUTION-QUEUE.md`. |
+| **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`; `git push` denegado. |
+| **Regresion honesta + correccion** | La primera version de este fix usaba `clearTimeout(attachTimer)` en el cierre; eso anadio un `clearTimeout(` literal que desequilibro la verificacion estatica de CE-058 (cuenta `setTimeout` vs `clearTimeout` en workspace.js y exige `|diff|<=2`): el diff paso de -2 a -3 y `persistence-lifecycle-audit` rompio (94/1). Se reescribio usando el flag `closed` en lugar de `clearTimeout` (el callback del timer no engancha si ya se cerro), restaurando el equilibrio (diff -2) y CE-058 a 95/95; el gate completo quedo OK. |
+| **Limitaciones** | La verificacion de CE-058 es estatica (cuenta ocurrencias literales de setTimeout/clearTimeout) y frágil frente a cambios que alteren ese balance; se respeto el margen +-2. El fix no cambia el comportamiento visible del menu (abre, cierra por item o por click fuera). |
+| **Proxima prioridad** | Backlog DISCOVERED VACIO. Proximo ciclo: DISCOVERY candidato #4 (doble clon JSON del workspace por push de undo) o evolucion del runner (regla 6). |
 
 ---
 
