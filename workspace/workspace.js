@@ -1,5 +1,5 @@
 // Part 1: Imports, SVG, Helpers
-import { appStore } from './core/state.js';
+import { appStore, readJsonList } from './core/state.js';
 import { on, emit } from './core/events.js';
 import { generateId } from './core/db.js';
 import { detectSeparator, parseLocaleNumber } from './core/locale-parser.js';
@@ -4770,6 +4770,13 @@ function evaluateDataFormula(table, formula, stack = []) {
 
 const tableHistories = new WeakMap();
 
+// CE-095: el historial de deshacer de tabla no tenia limite: `commitTableEdit`
+// (se dispara en cada blur de celda) empujaba un snapshot profundo sin cap en
+// `history.past`, creciendo linealmente con ediciones rapidas en tablas grandes.
+// Se acota con el MISMO limite que `_appHistory` (50) para mantener memoria
+// acotada; se descartan las entradas mas antiguas preservando el undo reciente.
+const TABLE_HISTORY_LIMIT = 50;
+
 function snapshotDataTable(table) {
   return {
     headers: [...(table.headers || [])],
@@ -4795,6 +4802,7 @@ function commitTableEdit(table) {
   const next = snapshotDataTable(table);
   const current = history.past[history.past.length - 1];
   if (snapshotKey(current) !== snapshotKey(next)) history.past.push(next);
+  if (history.past.length > TABLE_HISTORY_LIMIT) history.past.shift();
   history.future = [];
 }
 
@@ -8832,13 +8840,17 @@ function getPaletteCommands() {
   return TOOLS_DATA.map(t => ({ label: t.name, action: () => openTool(t) }));
 }
 
-const favoriteTools = new Set(JSON.parse(localStorage.getItem('ws-favorites') || '[]'));
-const recentTools = JSON.parse(localStorage.getItem('ws-recent') || '[]');
+// CE-095: la paleta de comandos tambien leia keys de localStorage a nivel de
+// import SIN try/catch (`ws-favorites`, `ws-recent`): una clave corrupta rompia
+// el arranque igual que CE-092. Se reutiliza el helper seguro readJsonList de
+// state.js (default [] ante JSON invalido/no-array + limpieza de la clave).
+const favoriteTools = new Set(readJsonList('ws-favorites'));
+const recentTools = readJsonList('ws-recent');
 
 function toggleFavoriteTool(toolId) {
   if (favoriteTools.has(toolId)) favoriteTools.delete(toolId);
   else favoriteTools.add(toolId);
-  localStorage.setItem('ws-favorites', JSON.stringify([...favoriteTools]));
+  try { localStorage.setItem('ws-favorites', JSON.stringify([...favoriteTools])); } catch (error) {}
 }
 
 function addToRecentTools(toolId) {
@@ -8846,7 +8858,7 @@ function addToRecentTools(toolId) {
   if (idx > -1) recentTools.splice(idx, 1);
   recentTools.unshift(toolId);
   if (recentTools.length > 20) recentTools.pop();
-  localStorage.setItem('ws-recent', JSON.stringify(recentTools));
+  try { localStorage.setItem('ws-recent', JSON.stringify(recentTools)); } catch (error) {}
 }
 
 const WORKSPACE_INTERNAL_PREVIEW = window.__TOOLISTO_WORKSPACE_INTERNAL_PREVIEW__ === true;

@@ -133,6 +133,8 @@ run('undo-corruption (undo conserva type de bloques + undo de tabla via topbar, 
 run('boot-recovery (localStorage corrupto no rompe el arranque, CE-092)', 'node', ['tests/workspace/boot-recovery-test.mjs']);
 run('bundle-reference-validation (referencias cruzadas del bundle validadas pre-write, CE-093)', 'node', ['tests/workspace/bundle-reference-validation-test.mjs']);
 run('export-flush-fidelity (el export refleja la ultima edicion en memoria, CE-094)', 'node', ['tests/workspace/export-flush-fidelity-test.mjs']);
+run('palette-localstorage-recovery (preferencias de la paleta a prueba de localStorage corrupto, CE-095)', 'node', ['tests/workspace/palette-localstorage-recovery-test.mjs']);
+run('table-history-cap (historial de deshacer de tabla acotado, CE-095)', 'node', ['tests/workspace/table-history-cap-test.mjs']);
 
 // 4. Manifest de evidencia
 const evidence = {

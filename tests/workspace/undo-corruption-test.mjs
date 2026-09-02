@@ -56,6 +56,10 @@ let nextTimerId = 1;
 function manualSetTimeout(fn, _ms) { const id = nextTimerId++; manualTimers.set(id, fn); return id; }
 function manualClearTimeout(id) { if (id != null) manualTimers.delete(id); }
 
+// CE-095: commitTableEdit referencia la constante real TABLE_HISTORY_LIMIT.
+const LIMIT_MATCH = wsCode.match(/const TABLE_HISTORY_LIMIT\s*=\s*(\d+)/);
+const TABLE_HISTORY_LIMIT = LIMIT_MATCH ? Number(LIMIT_MATCH[1]) : 50;
+
 // ---------- appStore real ----------
 function buildStore() {
   let stateSrc = stateCode
@@ -185,10 +189,10 @@ console.log('\nB. El undo/redo de tabla (ahora via topbar en data-table) deshace
   let toastMsg = '';
   const fn = new Function(
     'appStore', 'saveData', 'syncDerivedCharts', 'reportError', 'toast',
-    'setTimeout', 'clearTimeout', 'WeakMap', 'Map', 'console', 'Date', 'JSON', 'String', 'Math',
+    'setTimeout', 'clearTimeout', 'WeakMap', 'Map', 'console', 'Date', 'JSON', 'String', 'Math', 'TABLE_HISTORY_LIMIT',
     js + '\nreturn { commitTableEdit, checkpointTableEdit, undoTableEdit, redoTableEdit, tableHistories };'
   );
-  const api = fn(store, persistence.saveData, () => {}, () => {}, (m) => { toastMsg = m; }, manualSetTimeout, manualClearTimeout, WeakMap, Map, console, Date, JSON, String, Math);
+  const api = fn(store, persistence.saveData, () => {}, () => {}, (m) => { toastMsg = m; }, manualSetTimeout, manualClearTimeout, WeakMap, Map, console, Date, JSON, String, Math, TABLE_HISTORY_LIMIT);
 
   const table = { id: 'tblB', name: 'B', headers: ['a', 'b'], rows: [['x', 'y']] };
   store.set({ currentProject: { id: 'p1' }, currentDataTable: table, currentView: 'data-table', isDirty: false });
@@ -250,10 +254,10 @@ console.log('\nB. El historial de tabla (WeakMap) esta separado del historial gl
   ].join('\n');
   const fn = new Function(
     'appStore', 'saveData', 'syncDerivedCharts', 'reportError', 'toast',
-    'setTimeout', 'clearTimeout', 'WeakMap', 'Map', 'console', 'Date', 'JSON', 'String', 'Math',
+    'setTimeout', 'clearTimeout', 'WeakMap', 'Map', 'console', 'Date', 'JSON', 'String', 'Math', 'TABLE_HISTORY_LIMIT',
     js + '\nreturn { commitTableEdit, checkpointTableEdit, undoTableEdit, tableHistories };'
   );
-  const api = fn(store, persistence.saveData, () => {}, () => {}, () => {}, manualSetTimeout, manualClearTimeout, WeakMap, Map, console, Date, JSON, String, Math);
+  const api = fn(store, persistence.saveData, () => {}, () => {}, () => {}, manualSetTimeout, manualClearTimeout, WeakMap, Map, console, Date, JSON, String, Math, TABLE_HISTORY_LIMIT);
   const table = { id: 'tblB2', headers: ['k'], rows: [['a']] };
   store.set({ currentProject: { id: 'p1' }, currentDataTable: table, currentView: 'data-table' });
   api.checkpointTableEdit(table); // baseline {a}
