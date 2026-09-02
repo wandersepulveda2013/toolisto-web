@@ -652,7 +652,32 @@
 | **Commits** | 56bfe39 (feature CE-093): `core/bundle.js`, `bundle-reference-validation-test.mjs`, `test-workspace-release.mjs`, `CONTINUOUS-EVOLUTION-QUEUE.md`. |
 | **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`; `git push` denegado. Working tree conserva reworks ajenos sin tocar. |
 | **Limitaciones** | La validacion es INTERNA al bundle: exige que cada destino exista entre las entidades importadas. Referencias a entidades de otros proyectos no se importan y, por tanto, un destino que apunte fuera del bundle se rechaza (comportamiento deseado: Toolisto es local y cada proyecto es autocontenido). `correctedAssetId`/`derivedIds` de assets se auditan contra el conjunto global; solo los campos restringidos exigen store concreto, igual que el auditor de huerfanos. |
-| **Proxima prioridad** | Implementar CE-094 (P3) — `exportProject` incluye `exportedAt: Date.now()` (timestamp absoluto) dentro del envelope, aunque el manifiesto ignora la moneda logico-lingüistica local-first de las evidencias de Gate. |
+| **Proxima prioridad** | Implementar CE-094 (P2) — `exportProject` lee desde IndexedDB sin flushear los autosaves pendientes en memoria: una edicion recien hecha (debounce) se exportaba con el valor ANTERIOR. |
+
+---
+
+## Cycle 159 — CE-094: el export refleja la ultima edicion en memoria
+
+| Field | Value |
+|-------|-------|
+| **Date** | 2026-09-02 |
+| **Branch** | main |
+| **HEAD inicial** | 9dfb766 (Cycle 158 docs) |
+| **HEAD final** | 064b0a5 (feature CE-094) |
+| **Task** | CE-094 (P2, DISCOVERED->DONE): `exportProject` (storage.js:272-291) lee el bundle desde IndexedDB; `exportProjectData` lo llamaba sin flushear los autosaves pendientes en memoria. Una edicion hecha dentro de la ventana del debounce (<1s) se exportaba con el valor ANTERIOR: perdida silenciosa de la ultima edicion en el snapshot. Complementario de CE-090 (alli navegacion, aqui export). |
+| **Hypothesis** | Flushear la entidad actual sucia (doc o tabla) de forma AWAITABLE antes de leer el bundle en `exportProjectData`: tras el await, la base contiene la ultima edicion y el export la refleja. |
+| **Change** | `workspace.js`: nuevo `_flushDirtyBeforeExport()` (async): con `currentProject`/`currentView`/`isDirty`/`currentDoc|currentDataTable`, limpia los timers del debounce y, si hay dirty, enqueuea un save AWAITABLE por el lock por-entidad (doc -> `saveDoc`, tabla -> `saveData` + `syncDerivedCharts`), actualiza el snapshot de autosave y marca `isDirty:false`. `exportProjectData` lo invoca con `await` ANTES de `exportProject`. `exportProjectFile` delega en `exportProjectData`, por lo que toda ruta de export queda cubierta. |
+| **Tests ejecutados** | Suite nueva `tests/workspace/export-flush-fidelity-test.mjs` 9/9 (pure; `_flushDirtyBeforeExport` REAL de workspace.js + appStore real + capa persistente fiel a saveDoc/saveData con guard _writeSeq + syncDerivedCharts inyectable + timers manuales): (control negativo) en la ventana del debounce la base aun tiene el valor ANTERIOR -> es el hueco; tras `_flushDirtyBeforeExport` el doc persistio la ultima edicion (el reload == lo que leeria exportProject); tabla editada -> se persiste la celda y se invoca syncDerivedCharts; proyecto NO sucio -> sin escritura y sin timers residuales; sin proyecto -> no crashea. Registrada en el release gate. |
+| **Bug encontrado (confirmado)** | El export no flusheaba el autosave pendiente, por lo que una edicion recien hecha (dentro del debounce) se exportaba con el valor anterior. |
+| **Bug corregido** | `exportProjectData` flushea el dirty actual (awaitable) antes de leer el bundle; el .toolisto exportado refleja la ultima edicion. |
+| **Tests PASS** | `export-flush-fidelity` 9/9; regresiones: undo-corruption (CE-091) 15/15, boot-recovery (CE-092) 10/10, bundle-reference-validation (CE-093) 14/14, doc-table-switch-flush (CE-090) 9/9, phase5-bundle-trust 53/53. Release gate completo OK. |
+| **Tests FAIL** | 0. |
+| **Resultado** | BUG_FIX (fidelidad de export). Ya no se pierde la ultima edicion al exportar dentro de la ventana del debounce. |
+| **Evidence** | `workspace/workspace.js` (`_flushDirtyBeforeExport`, `exportProjectData`), `tests/workspace/export-flush-fidelity-test.mjs`, `scripts/test-workspace-release.mjs` (registro de suite), queue/status. |
+| **Commits** | 064b0a5 (feature CE-094): `workspace.js`, `export-flush-fidelity-test.mjs`, `test-workspace-release.mjs`, `CONTINUOUS-EVOLUTION-QUEUE.md`. |
+| **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`; `git push` denegado. Working tree conserva reworks ajenos sin tocar. |
+| **Limitaciones** | El flush cubre las dos entidades editables de la vista (doc y tabla), que son las que tienen autosave con debounce. Otras superficies (workflows por snapshot, settings) no tienen debounce de escritura en memoria en la misma ventana; se conservan. El denominado timestamp `exportedAt` del envelope no se toca (es una metadato de producto, no de evidencia de gate). |
+| **Proxima prioridad** | Implementar CE-095 (P3) — `localStorage` guarda keys de favoritos/recientes y se leen sin try/catch en varios puntos: auditar cobertura y unificar con el helper de CE-092. |
 
 ---
 
