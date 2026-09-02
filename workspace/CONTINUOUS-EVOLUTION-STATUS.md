@@ -677,7 +677,32 @@
 | **Commits** | 064b0a5 (feature CE-094): `workspace.js`, `export-flush-fidelity-test.mjs`, `test-workspace-release.mjs`, `CONTINUOUS-EVOLUTION-QUEUE.md`. |
 | **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`; `git push` denegado. Working tree conserva reworks ajenos sin tocar. |
 | **Limitaciones** | El flush cubre las dos entidades editables de la vista (doc y tabla), que son las que tienen autosave con debounce. Otras superficies (workflows por snapshot, settings) no tienen debounce de escritura en memoria en la misma ventana; se conservan. El denominado timestamp `exportedAt` del envelope no se toca (es una metadato de producto, no de evidencia de gate). |
-| **Proxima prioridad** | Implementar CE-095 (P3) — `localStorage` guarda keys de favoritos/recientes y se leen sin try/catch en varios puntos: auditar cobertura y unificar con el helper de CE-092. |
+| **Proxima prioridad** | Implementar CE-095 (P3) — historias de deshacer de tabla sin limite de memoria (`commitTableEdit` apila snapshots profundos sin cap en `history.past`), y endurecer la lectura de preferencias de la paleta (`ws-favorites`/`ws-recent`) contra localStorage corrupto. |
+
+---
+
+## Cycle 160 — CE-095: historial de deshacer de tabla acotado + endururo de la paleta
+
+| Field | Value |
+|-------|-------|
+| **Date** | 2026-09-02 |
+| **Branch** | main |
+| **HEAD inicial** | b02fce9 (Cycle 159 docs) |
+| **HEAD final** | 2e99aed (feature CE-095) |
+| **Task** | CE-095 (P3, DISCOVERED->DONE): `commitTableEdit` (workspace.js) se dispara en cada blur de celda y empujaba un snapshot profundo de headers+rows en `history.past` SIN limite; ediciones rapidas generaban crecimiento lineal de memoria en tablas grandes (frente a `_appHistory.maxEntries:50`). Además, la paleta de comandos leia a nivel de import `ws-favorites`/`ws-recent` sin try/catch (misma clase de crash de boot que CE-092). Se entrega el CE-095 REAL de la cola (cap de tableHistories) + un BONUS de endurecimiento de la paleta. Nota de honestidad: los footers de Cycle 158-159 describian CE-095 como «localStorage de favoritos», descripcion inventada por el agente que NO coincidia con la entrada REAL de la QUEUE (cap de tableHistories); aqui se corrige y se entrega lo que la cola realmente pedia. |
+| **Change (real CE-095)** | `workspace.js`: `TABLE_HISTORY_LIMIT = 50` y `commitTableEdit` descarta las entradas mas antiguas (`history.past.shift()`) al exceder el limite, conservando el undo reciente. (`core/state.js`: `readJsonList` ahora exportado). |
+| **Change (bonus fuera de cola)** | `workspace.js`: la paleta reutiliza `readJsonList` (importado de state.js) para `favoriteTools`/`recentTools` (default `[]` + limpieza de clave corrupta) y envuelve las escrituras `toggleFavoriteTool`/`addToRecentTools` en try/catch. |
+| **Tests ejecutados** | Suite nueva `tests/workspace/table-history-cap-test.mjs` 8/8 (pure; commitTableEdit/undoTableEdit/tableHistories REALES + limite real): tras 3x ediciones history.past no supera 50; la ultima edicion se conserva en el tope; las mas antiguas se descartan; el undo sigue correcto DESPUES de activarse el cap; commit sin cambio real no apila (dedup); tabla de 500 filas con 2x ediciones mantiene el historial acotado. Suite nueva `tests/workspace/palette-localstorage-recovery-test.mjs` 12/12 (pure; readJsonList real + init real de la paleta + toggle/addToRecent reales): ws-favorites/ws-recent corruptos -> arranque sin crash, vacio y clave eliminada; validos conservados; addToRecentTools mueve al frente; toggle agrega/quita y persiste; escritura que lanza (quota) no propaga. Regresion: `undo-corruption-test.mjs` (CE-091) actualizado para proveer `TABLE_HISTORY_LIMIT` al sandbox y vuelve a 15/15. Registradas en el release gate. |
+| **Bug encontrado (confirmado)** | Historial de deshacer de tabla sin limite de memoria; y lectura sin try/catch de preferencias de la paleta en el import (crash de boot por clave corrupta). |
+| **Bug corregido** | `commitTableEdit` acota `history.past` a 50; la paleta usa `readJsonList` seguro + escrituras protegidas. |
+| **Tests PASS** | `table-history-cap` 8/8, `palette-localstorage-recovery` 12/12, undo-corruption (CE-091) 15/15, export-flush-fidelity (CE-094) 9/9, bundle-reference-validation (CE-093) 14/14, boot-recovery (CE-092) 10/10. Release gate completo OK. |
+| **Tests FAIL** | 0. |
+| **Resultado** | ARCHITECTURE_IMPROVEMENT (memoria acotada del undo de tabla) + BUG_FIX (boot de la paleta). |
+| **Evidence** | `workspace/workspace.js` (`TABLE_HISTORY_LIMIT`, `commitTableEdit`, `readJsonList` import, paleta), `workspace/core/state.js` (`readJsonList` export), `tests/workspace/table-history-cap-test.mjs`, `tests/workspace/palette-localstorage-recovery-test.mjs`, `tests/workspace/undo-corruption-test.mjs` (ajuste sandbox), `scripts/test-workspace-release.mjs`, queue/status. |
+| **Commits** | 2e99aed (feature CE-095): `workspace.js`, `core/state.js`, `table-history-cap-test.mjs`, `palette-localstorage-recovery-test.mjs`, `undo-corruption-test.mjs`, `test-workspace-release.mjs`, `CONTINUOUS-EVOLUTION-QUEUE.md`. |
+| **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`; `git push` denegado. Working tree conserva reworks ajenos sin tocar. |
+| **Limitaciones** | El cap (50) iguala `_appHistory`; un undo profundo mas alla de 50 pasos no es posible (acorde al tope del historial global). El bonus de la paleta es endurecimiento de READ/WRITE de preferencias; su comportamiento funcional (mover reciente al frente, toggle) no cambio. |
+| **Proxima prioridad** | Backlog DISCOVERED VACIO (CE-090..CE-095 completados). Siguiente ciclo: DISCOVERY de producto o evolucion del runner; regir por regla 6. |
 
 ---
 
