@@ -581,6 +581,31 @@
 
 ---
 
+## Cycle 156 — CE-091: undo/redo sin corrupcion de documentos y alineado con el undo de tabla
+
+| Field | Value |
+|-------|-------|
+| **Date** | 2026-09-02 |
+| **Branch** | main |
+| **HEAD inicial** | 51888c6 (Cycle 155 docs) |
+| **HEAD final** | c37d52e (feature CE-091) |
+| **Task** | CE-091 (P1, DISCOVERED->DONE): (A) `_captureWorkspaceState` guardaba cada documento de la lista como `{id,name,title,blocks:[{id,content}]}`, descartando `type`/`html`/`headers`/`rows`; al deshacer el topbar `_applyState` restauraba la lista truncada y abrir ese doc disparaba `renderBlock` con `block.type.startsWith(...)` -> TypeError (crash del editor; si se guardaba, persistia un doc sin `type`). (B) el topbar usaba el historial GLOBAL mientras las ediciones de celda de tabla se guardaban en `tableHistories` (WeakMap) -> el boton Deshacer NO deshacia la celda. |
+| **Hypothesis** | (A) Clonar los bloques COMPLETOS en `_captureWorkspaceState` (misma estrategia que `currentDoc`/`currentDataTable`, que ya eran clones profundos) elimina el crash sin tocar el pipeline de undo. (B) En la vista `data-table`, el undo/redo debe delegar a `undoTableEdit`/`redoTableEdit` (tabla-local), que es exactamente donde vive la edicion de celda; fuera de data-table se mantiene `_appHistory`. |
+| **Change** | `workspace.js`: `_captureWorkspaceState` ahora clona bloques completos (`JSON.parse(JSON.stringify(d.blocks))`) y tablas con filas/sheets/reviewStatus completos (headers/rows como copias, sheets y reviewStatus conservados); añade al snapshot `updatedAt/createdAt/projectId` de cada doc. Los botones Deshacer/Rehacer del topbar y el handler global Ctrl+Z/Ctrl+Y delegan a `undoTableEdit`/`redoTableEdit` + `rerenderTable` cuando `currentView === 'data-table'` y hay `currentDataTable`; si no, `_appHistory` (sin cambio de ruta). `_applyState` sigue re-renderizando desde el snapshot restaurado (que ahora es completo). |
+| **Tests ejecutados** | Suite nueva `tests/workspace/undo-corruption-test.mjs` 15/15 (pure; extrae `_captureWorkspaceState` real, y el primitivo real de tabla `checkpointTableEdit`/`commitTableEdit`/`undoTableEdit`/`redoTableEdit`/`restoreTableSnapshot`/`ensureTableHistory`/`snapshotDataTable`/`snapshotKey` + `_createSaveLock`/`_createEntityLockMap` + `autoSaveTable`, cableados con appStore real de state.js + capa fiel a storage.js `saveData` + timers manuales): (A) el snapshot conserva `type` y campos extra (html/headers/rows) de cada bloque y clona profundo (retira el crash), y las `dataTables` conservan filas/sheets/reviewStatus como copias independientes; (B) undo/redo real de tabla deshace la celda y rehace, el historial de tabla queda en `tableHistories` separado del global (topbar delegado en data-table). Registrada en el release gate. |
+| **Bug encontrado (confirmado)** | (A) El snapshot truncado de bloques (confirmado: `renderBlock` hacia `block.type.startsWith` con `type` undefined). (B) El boton Deshacer del topbar no deshacia la celda de tabla (historial global vs tabla-local). |
+| **Bug corregido** | Snapshot de bloques completos (sin crash) + undo/redo de tabla local cuando la vista es data-table. |
+| **Tests PASS** | `undo-corruption` 15/15; regresiones: `doc-table-switch-flush` (CE-090) 9/9, `document-editor-persistence-race` (CE-082) 23/23, `cross-entity-integrity` 55/55, storage/autosave/CE-059/060/061 OK. Release gate completo OK. |
+| **Tests FAIL** | 0. |
+| **Resultado** | BUG_FIX. Se retira el crash de `renderBlock` por bloques sin `type` y se alinea el undo/redo del topbar con el de tabla. |
+| **Evidence** | `workspace/workspace.js` (`_captureWorkspaceState`, botones topbar, handler Ctrl+Z/Y), `tests/workspace/undo-corruption-test.mjs`, `scripts/test-workspace-release.mjs` (registro de suite), queue/status. |
+| **Commits** | c37d52e (feature CE-091): `workspace.js`, `undo-corruption-test.mjs`, `test-workspace-release.mjs`, `CONTINUOUS-EVOLUTION-QUEUE.md`. |
+| **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`; `git push` denegado. Working tree conserva reworks ajenos sin tocar. |
+| **Limitaciones** | El topbar en data-table delega a la tabla-local; el historial global (`_appHistory`) sigue gobernando en el resto de vistas. El Ctrl+Z DENTRO de una celda de input lo maneja el editor de tabla (handler propio), el Ctrl+Z fuera de input en data-table delega a la tabla (igual que el boton). No se cambio la cardinalidad de `maxEntries:50` de `_appHistory` (CE-095 queda para el cap de memoria de `tableHistories`). |
+| **Proxima prioridad** | Implementar CE-092 (P2) — corrupcion de `localStorage` rompe el arranque del Workspace (parse sin try/catch en `state.js`). |
+
+---
+
 ## Cycle 128 — Fix test-debt in engine/parser/planner suites + register them in the gate (CE-065)
 
 | Field | Value |
