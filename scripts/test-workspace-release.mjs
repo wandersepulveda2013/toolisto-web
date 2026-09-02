@@ -128,6 +128,7 @@ run('storage-surface-audit (LWW stores without _writeSeq, CE-061)', 'node', ['te
 run('id-collision-serialization (ID uniqueness, roundtrip, localStorage, CE-061)', 'node', ['tests/workspace/id-collision-serialization.mjs']);
 run('document-editor-data-loss (HTML export table/chart + autosave estructural, CE-066)', 'node', ['tests/workspace/document-editor-data-loss-test.mjs']);
 run('document-editor-persistence-race (persistencia adversarial con reload y LWW logico, CE-082)', 'node', ['tests/workspace/document-editor-persistence-race-test.mjs']);
+run('doc-table-switch-flush (flush-on-switch al cambiar de doc/tabla misma vista, CE-090)', 'node', ['tests/workspace/doc-table-switch-flush-test.mjs']);
 
 // 4. Manifest de evidencia
 const evidence = {

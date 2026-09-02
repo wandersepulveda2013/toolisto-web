@@ -995,6 +995,12 @@ async function initApp() {
     updateTopbar(view, project);
   });
 
+  // CE-090 (flush-on-switch): al cambiar de documento/tabla SIN cambio de vista, el
+  // store no re-renderiza (state.js compara por referencia) y por tanto renderView
+  // NO corre, dejando un debounce pendiente del SALIENTE sin guardar hasta 5s. Aqui
+  // se registra el flusheo del saliente en el momento del cambio si su debounce sigue armado.
+  installEntitySwitchFlush(appStore);
+
   appStore.subscribe('paletteOpen', (open) => {
     const root = $('#ws-palette-root');
     if (!root) return;
@@ -1174,6 +1180,36 @@ function _flushDirtyEntity() {
         .then(() => { _lastAutosaveTableSnapshot = JSON.stringify({ headers: table.headers, rows: table.rows, sheets: table.sheets }); appStore.set({ isDirty: false, lastSaved: Date.now() }); })
         .catch(error => reportError(error, 'flush-table', {})));
     }
+  }
+}
+
+function installEntitySwitchFlush(store) {
+  store.subscribe('currentDoc', (doc, prevDoc) => {
+    if (prevDoc && doc && prevDoc.id !== doc.id && autoSaveDoc._timer != null) {
+      _flushOutgoingEntity(prevDoc, 'doc');
+    }
+  });
+  store.subscribe('currentDataTable', (table, prevTable) => {
+    if (prevTable && table && prevTable.id !== table.id && autoSaveTable._timer != null) {
+      _flushOutgoingEntity(prevTable, 'table');
+    }
+  });
+}
+
+function _flushOutgoingEntity(entity, kind) {
+  const project = appStore.get('currentProject');
+  if (!project || !entity || !entity.id) return;
+  if (kind === 'doc') {
+    clearTimeout(autoSaveDoc._timer);
+    _docLocks.getLock(entity.id).enqueue(() => saveDoc(project.id, entity)
+      .then(() => { _lastAutosaveSnapshot = JSON.stringify(entity.blocks); appStore.set({ isDirty: false, lastSaved: Date.now() }); })
+      .catch(error => reportError(error, 'flush-outgoing-doc', {})));
+  } else if (kind === 'table') {
+    clearTimeout(autoSaveTable._timer);
+    _tableLocks.getLock(entity.id).enqueue(() => saveData(project.id, entity)
+      .then(() => syncDerivedCharts(project, entity))
+      .then(() => { _lastAutosaveTableSnapshot = JSON.stringify({ headers: entity.headers, rows: entity.rows, sheets: entity.sheets }); appStore.set({ isDirty: false, lastSaved: Date.now() }); })
+      .catch(error => reportError(error, 'flush-outgoing-table', {})));
   }
 }
 
