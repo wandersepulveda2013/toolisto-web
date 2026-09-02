@@ -20,7 +20,7 @@
     "pairCountAbove005": 20311,
     "reviewBandPairs": []
   },
-  "final": "FAIL",
+  "final": "PASS",
   "guides": {
     "total": 10,
     "valid": 10
@@ -31,10 +31,10 @@
   },
   "indexable": 235,
   "links": {
-    "externalLinks": 226,
+    "externalLinks": 225,
     "internalBroken": 0,
-    "internalChecked": 10486,
-    "internalRedirectTargets": 4213,
+    "internalChecked": 10462,
+    "internalRedirectTargets": 4200,
     "samples": []
   },
   "metadata": {
@@ -48,7 +48,7 @@
   "orphans": [],
   "pagesDiscovered": 291,
   "placeholders": 0,
-  "sitemapUrls": 219,
+  "sitemapUrls": 236,
   "strictEditorial": {
     "b100_139": 86,
     "b70_99": 63,
