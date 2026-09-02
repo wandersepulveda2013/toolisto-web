@@ -569,8 +569,13 @@ function updateTopbar(view, project) {
     title: 'Deshacer · Ctrl + Z',
     disabled: !appStore.get('undoStackSize'),
     onClick: () => {
-      const restored = _appHistory.undo(_captureWorkspaceState());
-      if (restored) { _applyState(restored); toast('Deshecho', 'success'); }
+      const table = appStore.get('currentDataTable');
+      if (appStore.get('currentView') === 'data-table' && table) {
+        if (undoTableEdit(table)) { rerenderTable(); toast('Cambio deshecho', 'success'); }
+      } else {
+        const restored = _appHistory.undo(_captureWorkspaceState());
+        if (restored) { _applyState(restored); toast('Deshecho', 'success'); }
+      }
     },
   }, svgIcon('undo', 15)));
   historyControls.appendChild(h('button', {
@@ -580,8 +585,13 @@ function updateTopbar(view, project) {
     title: 'Rehacer · Ctrl + Y',
     disabled: !appStore.get('redoStackSize'),
     onClick: () => {
-      const restored = _appHistory.redo(_captureWorkspaceState());
-      if (restored) { _applyState(restored); toast('Rehecho', 'success'); }
+      const table = appStore.get('currentDataTable');
+      if (appStore.get('currentView') === 'data-table' && table) {
+        if (redoTableEdit(table)) { rerenderTable(); toast('Cambio rehecho', 'success'); }
+      } else {
+        const restored = _appHistory.redo(_captureWorkspaceState());
+        if (restored) { _applyState(restored); toast('Rehecho', 'success'); }
+      }
     },
   }, svgIcon('redo', 15)));
   actions.appendChild(historyControls);
@@ -827,8 +837,8 @@ function _captureWorkspaceState() {
     currentView: s.currentView,
     currentDoc: s.currentDoc ? JSON.parse(JSON.stringify(s.currentDoc)) : null,
     currentDataTable: s.currentDataTable ? JSON.parse(JSON.stringify(s.currentDataTable)) : null,
-    documents: (s.documents || []).map(d => ({ id: d.id, name: d.name, title: d.title, blocks: d.blocks ? d.blocks.map(b => ({ id: b.id, content: b.content })) : [] })),
-    dataTables: (s.dataTables || []).map(t => ({ id: t.id, name: t.name, headers: t.headers, rows: t.rows })),
+    documents: (s.documents || []).map(d => ({ id: d.id, name: d.name, title: d.title, blocks: d.blocks ? JSON.parse(JSON.stringify(d.blocks)) : [], updatedAt: d.updatedAt, createdAt: d.createdAt, projectId: d.projectId })),
+    dataTables: (s.dataTables || []).map(t => ({ id: t.id, name: t.name, headers: t.headers ? [...t.headers] : [], rows: t.rows ? t.rows.map(row => [...row]) : [], sheets: t.sheets ? JSON.parse(JSON.stringify(t.sheets)) : undefined, reviewStatus: t.reviewStatus })),
     captures: (s.captures || []).map(c => ({ id: c.id, name: c.name, dataUrl: c.dataUrl ? c.dataUrl.slice(0, 200) : null })),
     designConfig: s.designConfig ? JSON.parse(JSON.stringify(s.designConfig)) : null,
     flowNodes: s.flowNodes || [],
@@ -1064,6 +1074,11 @@ async function initApp() {
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z' && !e.shiftKey) {
       if (isInput) return;
       e.preventDefault();
+      const table = appStore.get('currentDataTable');
+      if (appStore.get('currentView') === 'data-table' && table) {
+        if (undoTableEdit(table)) { rerenderTable(); toast('Cambio deshecho', 'success'); }
+        return;
+      }
       const restored = _appHistory.undo(_captureWorkspaceState());
       if (restored) { _applyState(restored); toast('Deshecho', 'success'); }
       return;
@@ -1071,6 +1086,11 @@ async function initApp() {
     if ((e.ctrlKey || e.metaKey) && (e.key.toLowerCase() === 'y' || (e.key.toLowerCase() === 'z' && e.shiftKey))) {
       if (isInput) return;
       e.preventDefault();
+      const table = appStore.get('currentDataTable');
+      if (appStore.get('currentView') === 'data-table' && table) {
+        if (redoTableEdit(table)) { rerenderTable(); toast('Cambio rehecho', 'success'); }
+        return;
+      }
       const restored = _appHistory.redo(_captureWorkspaceState());
       if (restored) { _applyState(restored); toast('Rehecho', 'success'); }
       return;
