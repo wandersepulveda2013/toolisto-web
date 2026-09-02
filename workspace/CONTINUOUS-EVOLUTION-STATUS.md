@@ -702,7 +702,7 @@
 | **Commits** | 2e99aed (feature CE-095): `workspace.js`, `core/state.js`, `table-history-cap-test.mjs`, `palette-localstorage-recovery-test.mjs`, `undo-corruption-test.mjs`, `test-workspace-release.mjs`, `CONTINUOUS-EVOLUTION-QUEUE.md`. |
 | **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`; `git push` denegado. Working tree conserva reworks ajenos sin tocar. |
 | **Limitaciones** | El cap (50) iguala `_appHistory`; un undo profundo mas alla de 50 pasos no es posible (acorde al tope del historial global). El bonus de la paleta es endurecimiento de READ/WRITE de preferencias; su comportamiento funcional (mover reciente al frente, toggle) no cambio. |
-| **Proxima prioridad** | Un DISCOVERY independiente (subagente explore) encontro y descarto candidatos; el top #1 (`cleanupSessionsForProject`) es CE-096 (implementado y cerrado en Cycle 161). Backlog vuelve a quedar con DISCOVERED VACIO. Siguiente ciclo: DISCOVERY de nuevo o evolucion del runner (regla 6). |
+| **Proxima prioridad** | Un DISCOVERY independiente (subagente explore) encontro y descarto candidatos; el top #1 (`cleanupSessionsForProject`) es CE-096 (implementado y cerrado en Cycle 161). El candidato #2 (`flowNodes`/`flowEdges` aliaseados en `_captureWorkspaceState`) es CE-097 (cerrado en Cycle 162). Backlog vuelve a quedar con DISCOVERED VACIO. Siguiente ciclo: DISCOVERY de nuevo o evolucion del runner (regla 6). |
 
 ---
 
@@ -726,7 +726,32 @@
 | **Commits** | 67547cf (feature CE-096): `workspace/core/workspace-storage.js`, `tests/workspace/session-cleanup-test.mjs`, `scripts/test-workspace-release.mjs`, `CONTINUOUS-EVOLUTION-QUEUE.md`. |
 | **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`; `git push` denegado. |
 | **Limitaciones** | El barrido de entidades es global (una entidad borrada se limpia de cualquier sesion que la referencie), coherente con el objetivo de no dejar referencias huerfanas. El cambio no altera el guardado de sesion (`saveWorkspaceSession`), solo la limpieza. |
-| **Proxima prioridad** | Backlog DISCOVERED VACIO de nuevo. Proximo ciclo: DISCOVERY candidato #2 ya identificado (aliasing de `flowNodes`/`flowEdges` en `_captureWorkspaceState`, workspace.js:844-845) o evolucion del runner. |
+| **Proxima prioridad** | Backlog DISCOVERED VACIO de nuevo. Proximo ciclo: DISCOVERY de nuevo o evolucion del runner (regla 6). |
+
+---
+
+## Cycle 162 — CE-097: el snapshot de Flow clona nodos/edges (undo de Flow no aliaseado)
+
+| Field | Value |
+|-------|-------|
+| **Date** | 2026-09-02 |
+| **Branch** | main |
+| **HEAD inicial** | 9686f4e (Cycle 161 docs) |
+| **HEAD final** | 94e3974 (feature CE-097) |
+| **Task** | CE-097 (P2, DISCOVERY->DONE): `_captureWorkspaceState` (workspace.js:834-847) clonaba en profundidad todos los campos del snapshot MENOS `flowNodes`/`flowEdges`, que se pasaban por referencia. El editor de Flow muta las mismas instancias, de modo que el snapshot de historial y el estado vivo compartian identidad: el undo/redo de Flow restauraba estado ya mutado (historial aliaseado), incoherente con los demas campos clonados por CE-091. |
+| **Change** | `workspace.js`: `_captureWorkspaceState` clona ahora `flowNodes`/`flowEdges` con `JSON.parse(JSON.stringify(...))` cuando existen (default `[]`). |
+| **Tests ejecutados** | Suite nueva `tests/workspace/flow-snapshot-aliasing-test.mjs` 12/12 (pure; `_captureWorkspaceState` REAL de workspace.js + `createStore` real de state.js): snapshot.flowNodes/flowEdges no comparte referencia con el estado vivo; mutar el nodo/edge del estado despues de capturar NO cambia el snapshot (x, label anidado, source conservados); sin nodes/edges retorna `[]`; una recaptura tras mutar refleja el cambio nuevo mientras la captura antigua no se contamina; s1 y s2 no comparten nodos. Registrada en el release gate. |
+| **Bug encontrado (confirmado)** | Aliasing por referencia de `flowNodes`/`flowEdges` en el snapshot de undo; todos los demas campos se clonaban. |
+| **Bug corregido** | `_captureWorkspaceState` clona ambos campos. |
+| **Tests PASS** | `flow-snapshot-aliasing` 12/12 (nuevo), mas todas las suites previas. Release gate completo OK (ver Nota). |
+| **Tests FAIL** | 0. |
+| **Resultado** | BUG_FIX (correctitud de undo/redo de Flow). |
+| **Evidence** | `workspace/workspace.js` (`_captureWorkspaceState`), `tests/workspace/flow-snapshot-aliasing-test.mjs`, `scripts/test-workspace-release.mjs`, queue/status. |
+| **Commits** | 94e3974 (feature CE-097): `workspace/workspace.js`, `tests/workspace/flow-snapshot-aliasing-test.mjs`, `scripts/test-workspace-release.mjs`, `CONTINUOUS-EVOLUTION-QUEUE.md`. |
+| **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`; `git push` denegado. |
+| **Nota (honestidad/flake)** | En la primera corrida del gate, la suite ajena CE-060 (`stale-delete-lifecycle`) reporto un FAIL transitorio (exit 1) por timing del harness; al re-ejecutar el mismo gate quedo `RELEASE GATE: OK` (`PASS: 42, FAIL: 0`) y la suite pasa 120/120 en aislamiento. No proviene de este cambio (es CE-060, no toca `_captureWorkspaceState`). La investigacion/degradacion de ese flake transitorio queda documentada como candidato futuro en la cola (se profundiza solo si reaparece de forma repetible). |
+| **Limitaciones** | El clon dobla el coste de serializacion del grafo de Flow por push de historial (aceptable: 50 entradas max y grafo tipicamente pequeno); corrige la correctitud del undo a costa de ese coste. |
+| **Proxima prioridad** | Backlog DISCOVERED VACIO. Proximo ciclo: DISCOVERY de nuevo o evolucion del runner (regla 6). |
 
 ---
 
