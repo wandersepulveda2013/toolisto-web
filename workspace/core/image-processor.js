@@ -53,10 +53,11 @@ function loadImageFromFile(file) {
 function createThumbnail(sourceCanvas, maxSize = 400) {
   const w = sourceCanvas.width;
   const h = sourceCanvas.height;
+  if (!Number.isFinite(w) || !Number.isFinite(h) || w <= 0 || h <= 0) return null;
   const scale = Math.min(maxSize / w, maxSize / h, 1);
   const canvas = document.createElement('canvas');
-  canvas.width = Math.round(w * scale);
-  canvas.height = Math.round(h * scale);
+  canvas.width = Math.round(Math.max(1, w * scale));
+  canvas.height = Math.round(Math.max(1, h * scale));
   const ctx = canvas.getContext('2d');
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = 'high';
@@ -567,7 +568,7 @@ async function processImageCapture(dataUrl) {
     width,
     height,
     thumbnailCanvas: thumbnail,
-    thumbnailDataUrl: thumbnail.toDataURL('image/jpeg', 0.85),
+    thumbnailDataUrl: thumbnail ? thumbnail.toDataURL('image/jpeg', 0.85) : '',
   };
 }
 

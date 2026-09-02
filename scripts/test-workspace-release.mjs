@@ -143,6 +143,7 @@ run('undo-clone-once (el historial de undo clona el snapshot una sola vez, CE-10
 run('table-csv-escape (exportTableCSV escapa headers y coacciona celdas, CE-101)', 'node', ['tests/workspace/table-csv-escape-test.mjs']);
 run('query-date-to-iso (detect-type normaliza fechas sin corrimiento de zona horaria, CE-102)', 'node', ['tests/workspace/query-date-to-iso-test.mjs']);
 run('div-by-zero-formula (la division por cero da #FORMULA, no escribe 0, CE-103)', 'node', ['tests/workspace/div-by-zero-formula-test.mjs']);
+run('thumbnail-guard (createThumbnail guarda contra dimensiones degradadas 0x0, CE-104)', 'node', ['tests/workspace/thumbnail-guard-test.mjs']);
 
 // 4. Manifest de evidencia
 const evidence = {
