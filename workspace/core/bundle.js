@@ -33,6 +33,129 @@ const LABELS = {
   workflows: 'flujo',
 };
 
+/*
+ * CE-093: validación de referencias cruzadas ANTES de escribir.
+ *
+ * `importProject` remapea los IDs (old->new) y persiste. Un bundle cuyo objeto
+ * referencia un ID que NO está entre las entidades importadas (ref colgante:
+ * escritura parcial, edición manual, export de una base ya corrupta) dejaba una
+ * referencia huérfana persistida; `assertIntegrity` solo la detecta DESPUÉS del
+ * commit, como auditor.
+ *
+ * Estas dos listas replican la semántica exacta de core/integrity.js
+ * (SOURCE_FIELDS, CONFIG_FIELDS y la tipificación por campo) para auditar el
+ * MISMO conjunto de referencias que produce el auditor de huérfanos, pero sobre
+ * el bundle pre-commit: un ID referenciado que no existe entre los objetos que
+ * se van a importar rechaza el bundle con diagnóstico y no se escribe nada.
+ */
+const REF_SOURCE_FIELDS = [
+  'sourceAssetId',
+  'captureId',
+  'sourceDocId',
+  'scanDocId',
+  'sourceTableId',
+  'tableId',
+  'sourceId',
+  'resultAssetId',
+];
+
+const REF_CONFIG_FIELDS = [
+  'sourceAssetId',
+  'sourceTableId',
+  'scanDocId',
+  'captureId',
+  'sourceId',
+];
+
+/* Tipificación por campo: en qué tipo de store DEBE existir la referencia. */
+function refAllowedStoreKind(field) {
+  switch (field) {
+    case 'sourceTableId':
+    case 'tableId':
+      return 'dataTables';
+    case 'sourceDocId':
+    case 'scanDocId':
+    case 'docId':
+      return 'documents';
+    case 'captureId':
+      return 'captures';
+    default:
+      return null; /* cualquier store válido como destino */
+  }
+}
+
+/*
+ * Devuelve { ids: [{id, kind|null}] } de todas las referencias de un objeto.
+ * `kind`: tipo de store restringido para el campo, o null si admite cualquiera.
+ */
+function collectRefIds(obj) {
+  const refs = [];
+  for (const field of REF_SOURCE_FIELDS) {
+    if (obj[field] !== undefined && obj[field] !== null && obj[field] !== '') {
+      refs.push({ id: obj[field], kind: refAllowedStoreKind(field) });
+    }
+  }
+  if (Array.isArray(obj.inputAssetIds)) {
+    for (const id of obj.inputAssetIds) refs.push({ id, kind: null });
+  }
+  if (Array.isArray(obj.derivedIds)) {
+    for (const id of obj.derivedIds) refs.push({ id, kind: null });
+  }
+  if (obj.config && typeof obj.config === 'object') {
+    for (const field of REF_CONFIG_FIELDS) {
+      if (obj.config[field] !== undefined && obj.config[field] !== null && obj.config[field] !== '') {
+        refs.push({ id: obj.config[field], kind: refAllowedStoreKind(field) });
+      }
+    }
+  }
+  if (obj.metadata && typeof obj.metadata === 'object' && obj.metadata.captureId) {
+    refs.push({ id: obj.metadata.captureId, kind: 'captures' });
+  }
+  if (Array.isArray(obj.relations)) {
+    for (const rel of obj.relations) {
+      if (!rel) continue;
+      if (rel.targetId && rel.targetId !== undefined && rel.targetId !== null) refs.push({ id: rel.targetId, kind: null });
+      if (rel.from && rel.from !== undefined && rel.from !== null) refs.push({ id: rel.from, kind: null });
+      if (rel.to && rel.to !== undefined && rel.to !== null) refs.push({ id: rel.to, kind: null });
+    }
+  }
+  return refs;
+}
+
+/**
+ * Audita las referencias cruzadas del bundle pre-commit (CE-093). Devuelve
+ * errores que describen cada referencia colgante (owner, campo y destino).
+ * Ignora `projectId` porque `importProject` lo REASIGNA, no lo remapea, por lo
+ * que el `projectId` del bundle no tiene por qué existir entre las entidades.
+ */
+function validateBundleReferences(bundle) {
+  const byKind = { documents: new Set(), dataTables: new Set(), captures: new Set(), assets: new Set(), executions: new Set(), workflows: new Set() };
+  const all = new Set();
+  for (const key of OBJECT_KEYS) {
+    for (const obj of (bundle[key] || [])) {
+      if (obj && obj.id) { byKind[key].add(obj.id); all.add(obj.id); }
+    }
+  }
+  const errors = [];
+  const idLabel = id => typeof id === 'string' ? id : String(id);
+  for (const key of OBJECT_KEYS) {
+    for (const obj of (bundle[key] || [])) {
+      if (!obj || !obj.id) continue;
+      for (const ref of collectRefIds(obj)) {
+        if (ref.id === undefined || ref.id === null || ref.id === '') continue;
+        if (ref.kind) {
+          if (!byKind[ref.kind].has(ref.id)) {
+            errors.push(`${LABELS[key]} ${idLabel(obj.id)} referencia a un ${LABELS[ref.kind]} inexistente: ${idLabel(ref.id)}`);
+          }
+        } else if (!all.has(ref.id)) {
+          errors.push(`${LABELS[key]} ${idLabel(obj.id)} referencia a una entidad inexistente: ${idLabel(ref.id)}`);
+        }
+      }
+    }
+  }
+  return errors;
+}
+
 /**
  * Serialización canónica (claves ordenadas) para hashing estable e
  * independiente del orden de inserción.
@@ -197,7 +320,16 @@ async function validateManifest(bundle) {
 async function validateBundleImport(bundle, limits = IMPORT_LIMITS) {
   const limitErrors = validateImportLimits(bundle, limits);
   if (limitErrors.length) return { ok: false, legacy: false, errors: limitErrors };
-  return validateManifest(bundle);
+  const manifest = await validateManifest(bundle);
+  if (!manifest.ok) return manifest;
+
+  // CE-093: un bundle íntegro en bytes pero con referencias colgantes (apuntan a
+  // entidades que no se importan) se rechaza aquí, ANTES de escribir nada, en vez
+  // de persistir huérfanos que el auditor solo detectaría post-commit.
+  const refErrors = validateBundleReferences(bundle);
+  if (refErrors.length) return { ok: false, legacy: manifest.ok, errors: refErrors };
+
+  return manifest;
 }
 
 export {
@@ -211,4 +343,5 @@ export {
   validateManifest,
   validateImportLimits,
   validateBundleImport,
+  validateBundleReferences,
 };
