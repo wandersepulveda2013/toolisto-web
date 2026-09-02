@@ -4717,7 +4717,7 @@ function safeArithmetic(expression) {
       if (operator !== '*' && operator !== '/') break;
       position++;
       const right = parsePrimary();
-      value = operator === '*' ? value * right : (right === 0 ? 0 : value / right);
+      value = operator === '*' ? value * right : (right === 0 ? NaN : value / right);
     }
     return value;
   };
