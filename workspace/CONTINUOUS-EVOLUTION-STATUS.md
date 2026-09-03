@@ -1084,7 +1084,7 @@
 | **Tests FAIL** | 0. |
 | **Resultado** | BUG_FIX (data-loss al navegar entre vistas: flush del saliente guiado por la vista previa). |
 | **Evidence** | `workspace/workspace.js` (subscriber de currentView, `renderView`, `_flushDirtyEntity`), `tests/workspace/flush-outgoing-view-test.mjs`, `tests/workspace/{cross-entity-integrity,persistence-lifecycle-audit,storage-recovery-lifecycle}-test.mjs`, `scripts/test-workspace-release.mjs`, `CONTINUOUS-EVOLUTION-QUEUE.md`, `artifacts/deep-audit/release-gate/release-gate-4a787cf7302db04202bac609b4ee3caeeb8e24d1.json`. |
-| **Commits** | (pendiente este ciclo). |
+| **Commits** | 464ae7e (fix(ce): CE-113 flush del saliente guiado por la vista previa al navegar — 9 archivos). |
 | **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`; `git push` denegado (rama acumulada por delante de origin/main). |
 | **Limitaciones** | `renderView` tiene otros call sites directos que no pasan prevView (p.ej. `refreshCurrentView`); en esos, `_flushDirtyEntity` cae al fallback currentView (mismo comportamiento de antes, sin regresion). La candidatura del reaper/otras sigue DISCOVERED para rondas futuras. |
 | **Proxima prioridad** | DISCOVERY 10ma ronda o evolucion del runner. |
