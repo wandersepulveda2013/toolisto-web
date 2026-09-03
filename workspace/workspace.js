@@ -4209,13 +4209,7 @@ function sortDataTable(table, container) {
       const descending = direction.value === 'desc';
       checkpointTableEdit(table);
       table.rows.sort((left, right) => {
-        const a = String(left[index] ?? '');
-        const b = String(right[index] ?? '');
-        const na = Number(a.replace(',', '.'));
-        const nb = Number(b.replace(',', '.'));
-        const result = Number.isFinite(na) && Number.isFinite(nb)
-          ? na - nb
-          : a.localeCompare(b, 'es', { numeric: true, sensitivity: 'base' });
+        const result = compareTableValues(left[index], right[index]);
         return descending ? -result : result;
       });
       commitTableEdit(table);
@@ -4688,6 +4682,13 @@ function cellReferenceToPosition(reference) {
 
 function numericValue(value) {
   return parseLocaleNumber(value) ?? 0;
+}
+
+function compareTableValues(a, b) {
+  const na = parseLocaleNumber(a);
+  const nb = parseLocaleNumber(b);
+  const numeric = Number.isFinite(na) && Number.isFinite(nb);
+  return numeric ? na - nb : String(a).localeCompare(String(b), 'es', { numeric: true, sensitivity: 'base' });
 }
 
 function safeArithmetic(expression) {
@@ -5284,13 +5285,7 @@ function renderDataTableView(container) {
       const descending = e.shiftKey;
       checkpointTableEdit(table);
       table.rows.sort((left, right) => {
-        const a = String(left[ci] ?? '');
-        const b = String(right[ci] ?? '');
-        const na = Number(a.replace(',', '.'));
-        const nb = Number(b.replace(',', '.'));
-        const result = Number.isFinite(na) && Number.isFinite(nb)
-          ? na - nb
-          : a.localeCompare(b, 'es', { numeric: true, sensitivity: 'base' });
+        const result = compareTableValues(left[ci], right[ci]);
         return descending ? -result : result;
       });
       commitTableEdit(table);

@@ -3,7 +3,7 @@
 > Cada ciclo de OpenCode LEE este archivo antes de actuar y lo ACTUALIZA antes de terminar.
 > Registro historico de ciclos de la mision Evolucion Continua.
 > Modo activo SOLO despues de la transicion (cuando `workspace/PRODUCTION_READINESS_DONE` exista).
-> Updated: 2026-09-03 (Cycle 172 — CE-109)
+> Updated: 2026-09-03 (Cycle 173 — CE-110)
 
 ---
 
@@ -994,10 +994,34 @@
 | **Tests FAIL** | 0. |
 | **Resultado** | BUG_FIX (correctitud de formulas de hoja de calculo). |
 | **Evidence** | `workspace/workspace.js` (safeArithmetic parsePrimary, evaluateDataFormula cellsFromArgument), `tests/workspace/formula-unary-and-aggregates-test.mjs`, `scripts/test-workspace-release.mjs`, `CONTINUOUS-EVOLUTION-QUEUE.md`. |
-| **Commits** | (pendiente este ciclo) |
+| **Commits** | 464a14a (CE-109 commitado al cierre del ciclo 172). |
 | **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`; `git push` denegado. |
 | **Limitaciones** | El unario +/- cubre el inicio de primario (despues de un operador o parentesis); no se agregaron funciones aritmeticas nuevas ni potencias. Los agregados usan `parseLocaleNumber` sin hints de columna (comportamiento generico de miles europeos), coherente con el resto del motor. Otras candidaturas de la ronda (orden de tablas con `Number(replace(',','.'))`, guard null en `collectRelations`/`remapRefs`, `_flushDirtyEntity` lee la vista nueva, export de listas/imagenes en `exportDocument`) quedan como oportunidades DISCOVERED para rondas futuras. |
-| **Proxima prioridad** | DISCOVERY 6ta ronda o evolucion del runner. |## Cycle 128 — Fix test-debt in engine/parser/planner suites + register them in the gate (CE-065)
+| **Proxima prioridad** | DISCOVERY 6ta ronda o evolucion del runner. |
+
+---
+
+## Cycle 173 — CE-110: el orden de tablas usa el parser canonico parseLocaleNumber (DISCOVERY 6ta ronda)
+
+| Field | Value |
+|-------|-------|
+| **Date** | 2026-09-03 |
+| **Branch** | main |
+| **HEAD inicial** | 464a14a (commit CE-109, ultimo) |
+| **Task** | CE-110 (P2, DISCOVERY 6ta ronda -> DONE). Con la cola SIN todo TODO (todo DONE/DISCOVERED), el ciclo se dedico a DISCOVERY (regla 8). Se confirmaron dos candidaturas de la ronda 5 (orden de tablas con `Number(replace(',','.'))` y guard null en `collectRelations`/`remapRefs`) y se implemento la de mas valor de producto: el orden de tablas con el parser canonico, cerrando la deuda ad-hoc del contrato CE-072. |
+| **Hypothesis (confirmado leyendo el source)** | Los dos call-sites que ORDENAN una tabla (sort por columna del modal de ordenamiento ~workspace.js:4211 y sort por click en la cabecera ~workspace.js:5288) comparaban numeros con `Number(a.replace(',', '.'))` en vez de `parseLocaleNumber`. Con formato europeo de miles (`1.234,56`), `replace(',','.')` -> `1.234.56` -> `Number` = `NaN`, cayendo al fallback `localeCompare` -> la columna se ordenaba COMO TEXTO (ej. `1.200` < `1.3` lexicamente, cuando 1200 > 1.3 numericamente). Violaba el contrato documentado del repo «All modules must use [parseLocaleNumber] instead of ad-hoc parsing» (CE-072). |
+| **Bugs encontrados (confirmados)** | ![sin captura de navegador] columnas con valores europeos de miles/decimales con coma ordenaban lexicamente en ambos puntos de entrada (modal de ordenamiento y click en cabecera), resultado incorrecto para datos de hoja de calculo con formato espanol. |
+| **Change** | Nuevo helper de modulo `compareTableValues(a, b)` (workspace.js:4687, despues de `numericValue`) que compara con `parseLocaleNumber` (numerico) o, si alguno no es finito, con `localeCompare(b, 'es', { numeric:true, sensitivity:'base' })` como fallback (mismo contrato que el sort anterior). Los DOS call-sites de sort lo usan; se elimina la linea ad-hoc `Number(a.replace(',', '.'))` (verificado por anti-regresion estatica). |
+| **Bugs corregidos** | (1) El orden de tablas usa ahora `parseLocaleNumber` canonico en ambos puntos de entrada: valores europeos de miles, negativos y decimales con coma ordenan numericamente. (2) Texto puro/vacios siguen por `localeCompare` sin crash. |
+| **Tests ejecutados** | Suite nueva `tests/workspace/table-sort-locale-test.mjs` 16/16 (compareTableValues + parseLocaleNumber REALES por VM): sanity del parser (`1.234,56` -> 1234.56); simples sin regresion asc/desc (`3,1,2`, `100,20,3` -> `[3,20,100]`, `10,9,8`); decimales con coma (`2,5`,`1,5`,`3` -> `[1,5,2,5,3]`); millares europeos (`1.234,56`,`2`,`999,99` -> `[2,999,99,1.234,56]`); negativos asc/desc (`-5,-3,2,1`); texto puro asc/desc; vacio y nulo sin crash; mezcla numerico+texto; `1.200` vs `1.3` numerico (1200 > 1.3); anti-regresion estatica (helper definido y usado en 2 sitios, ad-hoc `Number(replace(',','.'))` eliminado). Registrada en el release gate tras CE-109. |
+| **Tests PASS** | 16/16 (nueva); RELEASE GATE completo 76 suites PASS (incl. CE-110) 0 fail; manifest `artifacts/deep-audit/release-gate/release-gate-464a14a8bd0de70daaac6f5fcc42eeb9cf85ebf5.json`. |
+| **Tests FAIL** | 0. |
+| **Resultado** | BUG_FIX (correctitud del orden de tablas con parser canonico). |
+| **Evidence** | `workspace/workspace.js` (compareTableValues + 2 call-sites), `tests/workspace/table-sort-locale-test.mjs`, `scripts/test-workspace-release.mjs`, `CONTINUOUS-EVOLUTION-QUEUE.md`, `artifacts/deep-audit/release-gate/release-gate-464a14a8bd0de70daaac6f5fcc42eeb9cf85ebf5.json`. |
+| **Commits** | (pendiente este ciclo) |
+| **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`; `git push` denegado. |
+| **Limitaciones** | `parseLocaleNumber` sin hints de columna (comportamiento generico de miles europeos, coherente con el resto del motor); el sort cae al `localeCompare` cuando ambos no son numericos (mismo contrato que antes). Otras candidaturas de la ronda (guard null en `collectRelations`/`remapRefs`, `_flushDirtyEntity` lee la vista nueva, export de listas/imagenes en `exportDocument`) quedan como oportunidades DISCOVERED para rondas futuras. |
+| **Proxima prioridad** | DISCOVERY 7ma ronda o evolucion del runner. |## Cycle 128 — Fix test-debt in engine/parser/planner suites + register them in the gate (CE-065)
 
 | Field | Value |
 |-------|-------|
