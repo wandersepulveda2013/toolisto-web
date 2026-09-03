@@ -1040,8 +1040,8 @@
 | **Tests FAIL** | 0. |
 | **Resultado** | BUG_FIX (fidelidad de datos del export Markdown: listas e imagenes ya no se pierden). |
 | **Evidence** | `workspace/workspace.js` (exportDocumentMarkdown + exportDocument), `tests/workspace/document-export-md-lists-test.mjs`, `tests/workspace/md-header-escape-and-replace-test.mjs`, `scripts/test-workspace-release.mjs`, `CONTINUOUS-EVOLUTION-QUEUE.md`, `artifacts/deep-audit/release-gate/release-gate-a3b79b073099089f002af2353d45c2208a11e0ed.json`. |
-| **Commits** | (pendiente este ciclo) |
-| **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`; `git push` denegado (ramas acumuladas: aun 4 commits por delante tras este). |
+| **Commits** | d893a8e (fix(ce): CE-111 exportDocument Markdown no pierde listas ni imagenes — 7 archivos). |
+| **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`; `git push` denegado (ramas acumuladas: 4 commits por delante de origin/main). |
 | **Limitaciones** | `exportDocumentMarkdown` hereda la marca de lista `1.` (sin re-contar) igual que `blocksToMarkdown`; la candidatura del guard null en `collectRelations` (bundle.js:201-212) y `remapRefs` (storage.js:325-342) queda DISCOVERED documentada para una ronda futura. |
 | **Proxima prioridad** | DISCOVERY 8va ronda o evolucion del runner; o promover la candidatura DISCOVERED del guard null de relaciones en export/import. |
 
