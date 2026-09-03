@@ -1062,7 +1062,7 @@
 | **Tests FAIL** | 0. |
 | **Resultado** | BUG_FIX (robustez del import/export ante relations con entradas null). |
 | **Evidence** | `workspace/core/bundle.js` (collectRelations), `workspace/core/storage.js` (remapRefs), `tests/workspace/relations-null-guard-test.mjs`, `scripts/test-workspace-release.mjs`, `CONTINUOUS-EVOLUTION-QUEUE.md`, `artifacts/deep-audit/release-gate/release-gate-90c13092dd5ab6d7d2482eb9c2c038ec8271a419.json`. |
-| **Commits** | (pendiente este ciclo) |
+| **Commits** | 7ec7bea (fix(ce): CE-112 export/import no crashean con una relation null en relations — 7 archivos). |
 | **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`; `git push` denegado (rama acumulada por delante de origin/main). |
 | **Limitaciones** | La otra candidatura DISCOVERED documentada (`_flushDirtyEntity` lee la vista nueva) queda pendiente para una ronda futura; no se toco `collectRefIds` (paridad preservada). |
 | **Proxima prioridad** | DISCOVERY 9na ronda o evolucion del runner; o promover la candidatura DISCOVERED `_flushDirtyEntity`. |
