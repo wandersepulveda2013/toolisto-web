@@ -1106,7 +1106,7 @@
 | **Tests FAIL** | 0. |
 | **Resultado** | BUG_FIX (corrupcion silenciosa del dataUrl de capturas por el historial de undo/redo: eliminada de raiz). |
 | **Evidence** | `workspace/workspace.js` (`_captureWorkspaceState` y `_applyState`), `tests/workspace/capture-history-dataurl-test.mjs`, `scripts/test-workspace-release.mjs`, `CONTINUOUS-EVOLUTION-QUEUE.md`, `artifacts/deep-audit/release-gate/release-gate-c10f78abf5be3d1a4b513535b93c096506773677.json`. |
-| **Commits** | (pendiente este ciclo). |
+| **Commits** | 853503a (fix(ce): CE-114 el undo ya no trunca ni restaura el dataUrl de las capturas — 6 archivos). |
 | **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`; `git push` denegado (rama acumulada por delante de origin/main). |
 | **Limitaciones** | Las capturas quedan excluidas del historial (un undo NO restaura una captura eliminada/importada recientemente en el estado del store; pero su persistencia en `saveWorkspaceSession` y el flujo de captura real las mantienen completas). Las candidaturas storage (dashboard/query `sourceId` en import y campos scanner en validation/orphan/cascade) y query (fechas puntuadas europeas) quedan DISCOVERED para rondas futuras. |
 | **Proxima prioridad** | DISCOVERY 11va ronda o evolucion del runner; o promover el candidato storage de mayor valor (dashboard/query `sourceId` sin remapear en `importProject`). |
