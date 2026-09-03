@@ -146,6 +146,7 @@ run('div-by-zero-formula (la division por cero da #FORMULA, no escribe 0, CE-103
 run('thumbnail-guard (createThumbnail guarda contra dimensiones degradadas 0x0, CE-104)', 'node', ['tests/workspace/thumbnail-guard-test.mjs']);
 run('query-column-range-guard (choose/reorder-columns descartan indices fuera de rango, CE-105)', 'node', ['tests/workspace/query-column-range-guard-test.mjs']);
 run('md-header-escape-and-replace (encabezados Markdown escapan pipe + replace-values find vacio no destruye, CE-106)', 'node', ['tests/workspace/md-header-escape-and-replace-test.mjs']);
+run('formula-unary-and-aggregates (unario negativo en formulas + agregados ignoran celdas no numericas, CE-109)', 'node', ['tests/workspace/formula-unary-and-aggregates-test.mjs']);
 
 // 4. Manifest de evidencia
 const evidence = {

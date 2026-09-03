@@ -4698,16 +4698,21 @@ function safeArithmetic(expression) {
   const skip = () => { while (/\s/.test(tokens[position] || '')) position++; };
   const parsePrimary = () => {
     skip();
+    let sign = 1;
+    while (tokens[position] === '-' || tokens[position] === '+') {
+      if (tokens[position] === '-') sign = -sign;
+      position++;
+    }
     if (tokens[position] === '(') {
       position++;
       const result = parseExpression();
       skip();
       if (tokens[position] === ')') position++;
-      return result;
+      return sign * result;
     }
     const value = Number(tokens[position]);
     position++;
-    return Number.isFinite(value) ? value : 0;
+    return Number.isFinite(value) ? sign * value : 0;
   };
   const parseTerm = () => {
     let value = parsePrimary();
@@ -4755,18 +4760,28 @@ function evaluateDataFormula(table, formula, stack = []) {
     const raw = rawCellValue(reference);
     return String(raw).trim().startsWith('=') ? numericValue(evaluateDataFormula(table, raw, [...stack, key])) : numericValue(raw);
   };
-  const valuesFromArgument = (argument) => {
+  const cellsFromArgument = (argument) => {
+    const parsedCell = (reference) => {
+      const position = cellReferenceToPosition(reference);
+      if (!position || position.row < 0 || position.col < 0) return null;
+      const key = `${position.row}:${position.col}`;
+      if (stack.includes(key)) return null;
+      const raw = rawCellValue(reference);
+      const resolved = String(raw).trim().startsWith('=') ? evaluateDataFormula(table, raw, [...stack, key]) : String(raw);
+      if (resolved === '#FORMULA') return null;
+      return parseLocaleNumber(resolved);
+    };
     const range = argument.trim().split(':').map(cellReferenceToPosition);
     if (range.length === 2 && range[0] && range[1]) {
-      const values = [];
+      const cells = [];
       for (let row = Math.min(range[0].row, range[1].row); row <= Math.max(range[0].row, range[1].row); row++) {
         for (let col = Math.min(range[0].col, range[1].col); col <= Math.max(range[0].col, range[1].col); col++) {
-          values.push(resolveCell(indexToColumnName(col) + (row + 1)));
+          cells.push(parsedCell(indexToColumnName(col) + (row + 1)));
         }
       }
-      return values;
+      return cells;
     }
-    return argument.split(',').map(item => resolveCell(item));
+    return argument.split(',').map(item => parsedCell(item));
   };
   const rawValuesFromArgument = (argument) => {
     const range = argument.trim().split(':').map(cellReferenceToPosition);
@@ -4782,11 +4797,7 @@ function evaluateDataFormula(table, formula, stack = []) {
     return argument.split(',').map(item => rawCellValue(item));
   };
   let expression = body.replace(/\b(SUM|AVERAGE|AVG|MIN|MAX|COUNT|COUNTA)\s*\(([^()]*)\)/gi, (_match, functionName, argument) => {
-    const values = valuesFromArgument(argument);
-    const numbers = values.map(value => {
-      const parsed = Number(String(value).replace(',', '.'));
-      return String(value).trim() !== '' && Number.isFinite(parsed) ? parsed : null;
-    }).filter(value => value !== null);
+    const numbers = cellsFromArgument(argument).filter(value => value !== null && Number.isFinite(value));
     const name = functionName.toUpperCase();
     if (name === 'COUNT') return String(numbers.length);
     if (name === 'COUNTA') return String(rawValuesFromArgument(argument).filter(value => String(value).trim() !== '').length);

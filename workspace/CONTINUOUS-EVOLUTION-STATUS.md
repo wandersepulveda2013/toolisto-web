@@ -3,7 +3,7 @@
 > Cada ciclo de OpenCode LEE este archivo antes de actuar y lo ACTUALIZA antes de terminar.
 > Registro historico de ciclos de la mision Evolucion Continua.
 > Modo activo SOLO despues de la transicion (cuando `workspace/PRODUCTION_READINESS_DONE` exista).
-> Updated: 2026-08-29
+> Updated: 2026-09-03 (Cycle 172 — CE-109)
 
 ---
 
@@ -977,7 +977,27 @@
 
 ---
 
-## Cycle 128 — Fix test-debt in engine/parser/planner suites + register them in the gate (CE-065)
+## Cycle 172 — CE-109: formulas de hoja de calculo soportan operador unario negativo + agregados ignoran celdas no numericas (DISCOVERY 5ta ronda)
+
+| Field | Value |
+|-------|-------|
+| **Date** | 2026-09-03 |
+| **Branch** | main |
+| **HEAD inicial** | a9a971b (commit CE-106/CE-108, ultimo) |
+| **Task** | CE-109 (P1, DISCOVERY 5ta ronda -> DONE). Con la cola SIN todo TODO (todo DONE/DISCOVERED), el ciclo se dedico a DISCOVERY (regla 8). Lanzamiento de 3 exploradores paralelos sobre (a) query/data, (b) documento/editor y (c) storage/core; de las candidaturas se promovio e implemento el par P1 de correctitud de formulas: operador unario negativo + agregados que cuentan celdas no numericas como 0. |
+| **Hypothesis (confirmado leyendo el source)** | (a) `safeArithmetic` (workspace.js:4694-4738): el tokenizer `/\d+(?:\.\d+)?|[+\-*/()]|\s+/g` separa `-` como token; `parsePrimary` hacia `Number('-')=NaN` (devuelto 0) y avanzaba, dejando el operando sin consumir -> cualquier formula con un negativo daba `''` -> `#FORMULA`. (b) En los agregados, `resolveCell` devuelve `numericValue(raw) ?? 0` por lo que `"abc"` -> 0, y el filtro posterior (`Number(String(0).replace(',','.'))`) conservaba ese 0, inchado COUNT/AVERAGE/MIN/MAX. |
+| **Bugs encontrados (confirmados)** | (a) `=A1+B1` con A1=`-5`, B1=`3` -> `#FORMULA` (esperado `-2`); `=MIN(A1:A3)` sobre negativos -> `#FORMULA`; `=5*-3`, `=3*(-1)` -> `#FORMULA`. (b) `=COUNT(A1:A3)` con abc,100,200 -> 3 (esperado 2); `=AVERAGE` -> 100 (esperado 150); `=MIN` -> 0 (esperado 100); `=MAX` sobre -5,-3 -> 0 (esperado -3). |
+| **Change** | (a) `parsePrimary` de `safeArithmetic` consume signos unarios `-`/`+` (sign flag aplicado al operando y a parentesis) antes de leer el primario: `-5`, `-5+3`, `5*-3`, `3*(-1)`, `5--3`, `+7` funcionan; la aritmetica normal y la division por cero (CE-103) intactas. (b) nuevo `cellsFromArgument` (reemplaza `valuesFromArgument`) que resuelve cada celda (formulas incluidas, respetando stack ciclico) y la parsea con `parseLocaleNumber` retornando numero o `null`; los agregados filtrar `null`/no-finito -> COUNT/AVERAGE/AVG/MIN/MAX/SUM ignoran celdas no numericas (semantica Excel/Sheets) y respetan decimales de miles europeos (1.234,56); `COUNTA` sigue contando no vacias. |
+| **Bugs corregidos** | (1) Formulas con negativos ya no devuelven `#FORMULA`. (2) Los agregados ya no cuentan/incluyen celdas no numericas como 0. |
+| **Tests ejecutados** | Suite nueva `tests/workspace/formula-unary-and-aggregates-test.mjs` 27/27 (safeArithmetic/evaluateDataFormula/helpers REALES por VM): nucleo (`safeArithmetic('-5')===-5`, `-5+3===-2`, `5*-3===-15`, `3*(-1)===-3`, `5--3===8`, `+7===7`, `2+3*4===14`, `5/0===''`); contrato (`=-5+3 -> -2`, `=MIN(A1:A2) -> -5`); agregados con texto (COUNT/AVERAGE/MIN/MAX) y negativos (MAX -3, MIN -5); europeos (`=SUM 4035.31`, `=MAX 2500`); todos no numericos -> 0 sin crash; COUNTA 3; agregado sobre celdas formula (`=SUM 6`); anti-regresion estatica. Registrada en el release gate. Regresiones: `div-by-zero-formula` 12/12 (CE-103), `query-date-to-iso` 11/11. |
+| **Tests PASS** | 27/27 (nueva) + regresiones 12/12, 11/11; RELEASE GATE completo 76 suites PASS (incl. CE-109) 0 fail. |
+| **Tests FAIL** | 0. |
+| **Resultado** | BUG_FIX (correctitud de formulas de hoja de calculo). |
+| **Evidence** | `workspace/workspace.js` (safeArithmetic parsePrimary, evaluateDataFormula cellsFromArgument), `tests/workspace/formula-unary-and-aggregates-test.mjs`, `scripts/test-workspace-release.mjs`, `CONTINUOUS-EVOLUTION-QUEUE.md`. |
+| **Commits** | (pendiente este ciclo) |
+| **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`; `git push` denegado. |
+| **Limitaciones** | El unario +/- cubre el inicio de primario (despues de un operador o parentesis); no se agregaron funciones aritmeticas nuevas ni potencias. Los agregados usan `parseLocaleNumber` sin hints de columna (comportamiento generico de miles europeos), coherente con el resto del motor. Otras candidaturas de la ronda (orden de tablas con `Number(replace(',','.'))`, guard null en `collectRelations`/`remapRefs`, `_flushDirtyEntity` lee la vista nueva, export de listas/imagenes en `exportDocument`) quedan como oportunidades DISCOVERED para rondas futuras. |
+| **Proxima prioridad** | DISCOVERY 6ta ronda o evolucion del runner. |## Cycle 128 — Fix test-debt in engine/parser/planner suites + register them in the gate (CE-065)
 
 | Field | Value |
 |-------|-------|
