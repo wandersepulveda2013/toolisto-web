@@ -992,12 +992,12 @@ async function initApp() {
     }
   });
 
-  appStore.subscribe('currentView', (view) => {
+  appStore.subscribe('currentView', (view, prevView) => {
     recordNavigation(view, appStore.get('currentProject'));
     setActiveSidebar(view);
     const project = appStore.get('currentProject');
     updateTopbar(view, project);
-    renderView(view);
+    renderView(view, prevView);
   });
 
   appStore.subscribe('currentProject', (project) => {
@@ -1185,9 +1185,9 @@ async function initApp() {
   renderView('projects');
 }
 
-function _flushDirtyEntity() {
+function _flushDirtyEntity(outgoingView) {
   const project = appStore.get('currentProject');
-  const view = appStore.get('currentView');
+  const view = outgoingView || appStore.get('currentView');
   if (!project || !appStore.get('isDirty')) return;
   if (view === 'doc-editor') {
     const doc = appStore.get('currentDoc');
@@ -1239,9 +1239,9 @@ function _flushOutgoingEntity(entity, kind) {
   }
 }
 
-function renderView(view) {
+function renderView(view, prevView) {
   _viewGeneration++;
-  _flushDirtyEntity();
+  _flushDirtyEntity(prevView);
   clearTimeout(autoSaveDoc._timer);
   clearTimeout(autoSaveTable._timer);
   if (window._workflowKeyHandler && view !== 'flujos') {

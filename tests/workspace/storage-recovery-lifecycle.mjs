@@ -819,7 +819,7 @@ console.log('\n--- Section 6: beforeunload/pagehide lifecycle ---');
   check('Autosave function exists in workspace.js',
     hasAutoSave);
 
-  const hasFlushInRenderView = wsCode.includes('_flushDirtyEntity()');
+  const hasFlushInRenderView = wsCode.includes('_flushDirtyEntity(prevView)');
   check('renderView calls _flushDirtyEntity on navigation',
     hasFlushInRenderView);
 }

@@ -187,7 +187,7 @@ console.log('--- Section 12: Fire-and-forget operations audit ---');
   fireAndForgetPaths.push({ name: '_setupAutosave/table branch', hasCatch: !!hasSetupAutosaveTableCatch, type: 'setInterval+enqueue' });
 
   // _flushDirtyEntity: lock.enqueue → saveDoc/saveData with .then.catch
-  const flushDocMatch = wsCode.match(/function _flushDirtyEntity\(\)\s*\{[\s\S]*?function renderView/m);
+  const flushDocMatch = wsCode.match(/function _flushDirtyEntity\((?:outgoingView)?\)\s*\{[\s\S]*?function renderView/m);
   const hasFlushDocCatch = flushDocMatch && /\.catch\(error\s*=>\s*reportError\(error,\s*'flush-doc'/m.test(flushDocMatch[0]);
   fireAndForgetPaths.push({ name: '_flushDirtyEntity/doc', hasCatch: !!hasFlushDocCatch, type: 'enqueue (synchronous)' });
 
@@ -214,7 +214,7 @@ console.log('--- Section 12: Fire-and-forget operations audit ---');
   fireAndForgetPaths.push({ name: 'getBrowserStorageEstimate (call site L700)', hasCatch: false, type: 'fire-and-forget .then()' });
 
   // Check: renderView → _flushDirtyEntity + clearTimeout
-  const renderViewMatch = wsCode.match(/function renderView\(view\)\s*\{[\s\S]*?_viewGeneration\+\+;[\s\S]*?_flushDirtyEntity\(\);[\s\S]*?clearTimeout\(autoSaveDoc/);
+  const renderViewMatch = wsCode.match(/function renderView\(view,\s*prevView\)\s*\{[\s\S]*?_viewGeneration\+\+;[\s\S]*?_flushDirtyEntity\(prevView\);[\s\S]*?clearTimeout\(autoSaveDoc/);
   fireAndForgetPaths.push({ name: 'renderView → flush + clearTimeout', hasCatch: false, type: 'synchronous orchestration', note: 'flush enqueues via lock, no await needed' });
 
   let withCatch = 0, withoutCatch = 0;
@@ -493,16 +493,16 @@ console.log('\n--- Section 17: Event-listener/subscription lifecycle ---');
 
 // 17b. renderView clears debounce timers
 {
-  const renderViewMatch = wsCode.match(/function renderView\(view\)\s*\{[\s\S]*?clearTimeout\(autoSaveDoc\._timer\);[\s\S]*?clearTimeout\(autoSaveTable\._timer\)/);
+  const renderViewMatch = wsCode.match(/function renderView\(view,\s*prevView\)\s*\{[\s\S]*?clearTimeout\(autoSaveDoc\._timer\);[\s\S]*?clearTimeout\(autoSaveTable\._timer\)/);
   check('renderView clears autoSaveDoc._timer', !!renderViewMatch);
 
-  const renderViewWfMatch = wsCode.match(/function renderView\(view\)\s*\{[\s\S]*?clearTimeout\(_workflowAutoSaveTimer\)/);
+  const renderViewWfMatch = wsCode.match(/function renderView\(view,\s*prevView\)\s*\{[\s\S]*?clearTimeout\(_workflowAutoSaveTimer\)/);
   check('renderView clears _workflowAutoSaveTimer when not flujos', !!renderViewWfMatch);
 }
 
 // 17c. renderView increments _viewGeneration before flush
 {
-  const genMatch = wsCode.match(/function renderView\(view\)\s*\{[\s\S]*?_viewGeneration\+\+;[\s\S]*?_flushDirtyEntity\(\)/);
+  const genMatch = wsCode.match(/function renderView\(view,\s*prevView\)\s*\{[\s\S]*?_viewGeneration\+\+;[\s\S]*?_flushDirtyEntity\(prevView\)/);
   check('renderView increments _viewGeneration before _flushDirtyEntity', !!genMatch);
 }
 
@@ -561,7 +561,7 @@ console.log('\n--- Section 17: Event-listener/subscription lifecycle ---');
 
 // 17g. renderView clears both doc and table debounce timers + workflow timer
 {
-  const renderViewFull = wsCode.match(/function renderView\(view\)\s*\{[\s\S]*?case 'design'/);
+  const renderViewFull = wsCode.match(/function renderView\(view,\s*prevView\)\s*\{[\s\S]*?case 'design'/);
   const clearsDoc = renderViewFull && /clearTimeout\(autoSaveDoc\._timer\)/.test(renderViewFull[0]);
   const clearsTable = renderViewFull && /clearTimeout\(autoSaveTable\._timer\)/.test(renderViewFull[0]);
   const clearsWorkflow = renderViewFull && /clearTimeout\(_workflowAutoSaveTimer\)/.test(renderViewFull[0]);
@@ -572,7 +572,7 @@ console.log('\n--- Section 17: Event-listener/subscription lifecycle ---');
 
 // 17h. _flushDirtyEntity clears debounce timer BEFORE enqueueing
 {
-  const flushCode = wsCode.match(/function _flushDirtyEntity\(\)\s*\{[\s\S]*?function renderView/m);
+  const flushCode = wsCode.match(/function _flushDirtyEntity\((?:outgoingView)?\)\s*\{[\s\S]*?function renderView/m);
   const clearsDocBeforeEnqueue = flushCode && /clearTimeout\(autoSaveDoc\._timer\);[\s\S]*?_docLocks\.getLock/.test(flushCode[0]);
   const clearsTableBeforeEnqueue = flushCode && /clearTimeout\(autoSaveTable\._timer\);[\s\S]*?_tableLocks\.getLock/.test(flushCode[0]);
   check('_flushDirtyEntity clears doc timer before enqueue', !!clearsDocBeforeEnqueue);

@@ -3,7 +3,7 @@
 > Cada ciclo de OpenCode LEE este archivo antes de actuar y lo ACTUALIZA antes de terminar.
 > Registro historico de ciclos de la mision Evolucion Continua.
 > Modo activo SOLO despues de la transicion (cuando `workspace/PRODUCTION_READINESS_DONE` exista).
-> Updated: 2026-09-03 (Cycle 175 — CE-112)
+> Updated: 2026-09-03 (Cycle 176 — CE-113)
 
 ---
 
@@ -1066,6 +1066,28 @@
 | **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`; `git push` denegado (rama acumulada por delante de origin/main). |
 | **Limitaciones** | La otra candidatura DISCOVERED documentada (`_flushDirtyEntity` lee la vista nueva) queda pendiente para una ronda futura; no se toco `collectRefIds` (paridad preservada). |
 | **Proxima prioridad** | DISCOVERY 9na ronda o evolucion del runner; o promover la candidatura DISCOVERED `_flushDirtyEntity`. |
+
+## Cycle 176 — CE-113: _flushDirtyEntity leia la vista NUEVA al navegar -> perdia la edicion del saliente (DISCOVERY 9na ronda)
+
+| Field | Value |
+|-------|-------|
+| **Date** | 2026-09-03 |
+| **Branch** | main |
+| **HEAD inicial** | 4a787cf (commit registro CE-112, ultimo) |
+| **Task** | CE-113 (P2, DISCOVERY 9na ronda -> DONE). Cola SIN todo TODO (todo DONE/DISCOVERED); el ciclo se dedico a DISCOVERY (regla 8). Se confirmo y promovio la candidatura DISCOVERED documentada desde CE-111/112: `_flushDirtyEntity()` lee la vista NUEVA y por eso el flush del saliente se pierde al navegar entre vistas. |
+| **Hypothesis (confirmado leyendo el source)** | `_flushDirtyEntity()` decidia QUE entidad flushear leyendo `appStore.get('currentView')`. Pero `renderView` corre a traves del subscriber de `currentView` (workspace.js:995), que se dispara DESPUES de que `navigateTo` (workspace.js:727) ya haya puesto la vista NUEVA. Asi, al salir del editor hacia una vista de tabla (o cualquier otra), `_flushDirtyEntity` leia la vista NUEVA: flusheaba la TABLA en lugar del DOC (consumiendo la bandera COMPARTIDA `isDirty` que la edicion del doc habia marcado) o NO flusheaba nada (vistas sin rama doc/table); `renderView` luego cancelaba el debounce del doc (`clearTimeout(autoSaveDoc._timer)`) y, con `isDirty` ya en false, ni el intervalo de 5s salvaba la ultima edicion del doc saliente. |
+| **Bugs encontrados (confirmados)** | ![sin captura de navegador] al editar un documento y navegar a una vista de tabla (o dashboard/documents) dentro de la ventana del debounce, la ultima edicion del documento SALIENTE puede perderse: `_flushDirtyEntity` limpia `isDirty` flusheando la entidad NUEVA (o no flushea nada) y `renderView` cancela el timer del doc. La suite CE-113 lo reproduce con CODIGO REAL y reload del almacen. |
+| **Change** | Se pasa la vista SALIENTE hasta `_flushDirtyEntity`: el subscriber de `currentView` recibe `(view, prevView)` (state.js:12 pasa `fn(v, prev[k], state)`) y lo reenvia a `renderView(view, prevView)`; `renderView(view, prevView)` llama `_flushDirtyEntity(prevView)`; `_flushDirtyEntity(outgoingView)` usa `outgoingView || appStore.get('currentView')` como fallback (callers directos tipo `refreshCurrentView` que no cambian vista siguen funcionando). |
+| **Bugs corregidos** | (1) Navegar del editor a una vista de tabla con la edicion del doc en el debounce ya no pierde la ultima edicion: el doc se flushea al salir. (2) Navegar del editor a una vista sin entidad (dashboard/documents) tambien flushea el doc (antes no hacia nada). (3) Simetrico: salir de la tabla hacia el editor conserva la celda editada de la tabla saliente. (4) La tabla/doc entrante no se contamina con la edicion ajena (ya no se consume `isDirty` con la entidad equivocada). |
+| **Tests ejecutados** | Suite nueva `tests/workspace/flush-outgoing-view-test.mjs` 20/20 (CODIGO REAL de workspace.js: `_flushDirtyEntity`, `_flushOutgoingEntity`, `autoSaveDoc`, `autoSaveTable`, locks, `installEntitySwitchFlush` + appStore real de state.js + capa persistente fiel a storage.js + shim de `renderView` que replica las 2 lineas relevantes del real: flush + cancelacion de timers + reload del almacen): escenario 1 FIX doc->tabla conserva el doc saliente y no contamina la tabla; escenario 2 CONTROL NEGATIVO sin prevView el doc saliente se PIERDE (isDirty se consume con la tabla, debounce cancelado) — prueba que el fix es necesario; escenario 3 FIX tabla->doc conserva la celda saliente; escenario 4 CONTROL NEGATIVO simetrico (tabla se pierde sin fix); escenario 5 FIX doc->dashboard (vista sin entidad) conserva el doc; escenario 6 compatibilidad `_flushDirtyEntity()` sin prevView cae a currentView (callers directos); escenario 7 anclas estaticas (subscriber reenvia prevView, renderView reenvia a `_flushDirtyEntity(prevView)`, fallback `outgoingView || currentView`). |
+| **Tests PASS** | 20/20 (nueva); anclas estaticas REACTUALIZADAS sin debilitar la asercion en suites de auditoria que matcheaban la firma antigua: `cross-entity-integrity-test` 55/55, `persistence-lifecycle-audit` 95/95, `storage-recovery-lifecycle` 69/69; CE-090 `doc-table-switch-flush` 9/9 y CE-082 `document-editor-persistence-race` 23/23 revalidadas (fallback intacto). RELEASE GATE completo 79 suites PASS 0 fail; manifest `artifacts/deep-audit/release-gate/release-gate-4a787cf7302db04202bac609b4ee3caeeb8e24d1.json`. |
+| **Tests FAIL** | 0. |
+| **Resultado** | BUG_FIX (data-loss al navegar entre vistas: flush del saliente guiado por la vista previa). |
+| **Evidence** | `workspace/workspace.js` (subscriber de currentView, `renderView`, `_flushDirtyEntity`), `tests/workspace/flush-outgoing-view-test.mjs`, `tests/workspace/{cross-entity-integrity,persistence-lifecycle-audit,storage-recovery-lifecycle}-test.mjs`, `scripts/test-workspace-release.mjs`, `CONTINUOUS-EVOLUTION-QUEUE.md`, `artifacts/deep-audit/release-gate/release-gate-4a787cf7302db04202bac609b4ee3caeeb8e24d1.json`. |
+| **Commits** | (pendiente este ciclo). |
+| **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`; `git push` denegado (rama acumulada por delante de origin/main). |
+| **Limitaciones** | `renderView` tiene otros call sites directos que no pasan prevView (p.ej. `refreshCurrentView`); en esos, `_flushDirtyEntity` cae al fallback currentView (mismo comportamiento de antes, sin regresion). La candidatura del reaper/otras sigue DISCOVERED para rondas futuras. |
+| **Proxima prioridad** | DISCOVERY 10ma ronda o evolucion del runner. |
 
 ## Cycle 128 — Fix test-debt in engine/parser/planner suites + register them in the gate (CE-065)
 

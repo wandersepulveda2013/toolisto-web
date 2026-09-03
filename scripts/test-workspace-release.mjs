@@ -150,6 +150,7 @@ run('formula-unary-and-aggregates (unario negativo en formulas + agregados ignor
 run('table-sort-locale (orden de tablas usa parseLocaleNumber canonico, no ad-hoc, CE-110)', 'node', ['tests/workspace/table-sort-locale-test.mjs']);
 run('document-export-md-lists (exportDocument Markdown no pierde listas ni imagenes, CE-111)', 'node', ['tests/workspace/document-export-md-lists-test.mjs']);
 run('relations-null-guard (export/import no crashean con relation null, CE-112)', 'node', ['tests/workspace/relations-null-guard-test.mjs']);
+run('flush-outgoing-view (flush del saliente guiado por prevView al navegar, CE-113)', 'node', ['tests/workspace/flush-outgoing-view-test.mjs']);
 
 // 4. Manifest de evidencia
 const evidence = {

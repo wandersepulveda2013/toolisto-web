@@ -368,13 +368,13 @@ console.log('\n--- 5. Flush-before-navigate (logic test) ---');
   let flushCalled = false;
   let saveEnqueued = false;
 
-  const flushSrc = wsCode.match(/function _flushDirtyEntity\(\)\s*\{[\s\S]*?^function renderView/m);
+  const flushSrc = wsCode.match(/function _flushDirtyEntity\((?:outgoingView)?\)\s*\{[\s\S]*?^function renderView/m);
   check('_flushDirtyEntity function exists in workspace.js', flushSrc !== null);
 }
 
 // 5b. Verify renderView calls _flushDirtyEntity before clearing timers
 {
-  const renderViewMatch = wsCode.match(/function renderView\(view\)\s*\{[^}]*_viewGeneration\+\+;\s*\n\s*_flushDirtyEntity\(\)/);
+  const renderViewMatch = wsCode.match(/function renderView\(view,\s*prevView\)\s*\{[^}]*_viewGeneration\+\+;\s*\n\s*_flushDirtyEntity\(prevView\)/);
   check('renderView calls _flushDirtyEntity before clearing timers', renderViewMatch !== null,
     renderViewMatch ? 'found' : 'not found');
 }
