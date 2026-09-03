@@ -3,7 +3,7 @@
 > Cada ciclo de OpenCode LEE este archivo antes de actuar y lo ACTUALIZA antes de terminar.
 > Registro historico de ciclos de la mision Evolucion Continua.
 > Modo activo SOLO despues de la transicion (cuando `workspace/PRODUCTION_READINESS_DONE` exista).
-> Updated: 2026-09-03 (Cycle 177 — CE-114)
+> Updated: 2026-09-03 (Cycle 178 — CE-115)
 
 ---
 
@@ -1110,6 +1110,28 @@
 | **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`; `git push` denegado (rama acumulada por delante de origin/main). |
 | **Limitaciones** | Las capturas quedan excluidas del historial (un undo NO restaura una captura eliminada/importada recientemente en el estado del store; pero su persistencia en `saveWorkspaceSession` y el flujo de captura real las mantienen completas). Las candidaturas storage (dashboard/query `sourceId` en import y campos scanner en validation/orphan/cascade) y query (fechas puntuadas europeas) quedan DISCOVERED para rondas futuras. |
 | **Proxima prioridad** | DISCOVERY 11va ronda o evolucion del runner; o promover el candidato storage de mayor valor (dashboard/query `sourceId` sin remapear en `importProject`). |
+
+## Cycle 178 — CE-115: el import no remapeaba el sourceId top-level de dashboard/query -> round-trip export->import desconectaba la fuente (BUG_FIX)
+
+| Field | Value |
+|-------|-------|
+| **Date** | 2026-09-03 |
+| **Branch** | main |
+| **HEAD inicial** | 7e87783 (commit registro CE-114, ultimo) |
+| **Task** | CE-115 (P2 -> DONE). Se promovio el candidato storage de mayor valor de la ronda 10 (documentado en Cycle 177, Bugs encontrados #2): `importProject` deja sin remapear el `sourceId` a nivel TOP de dashboard y query. |
+| **Hypothesis (confirmado leyendo el source)** | El shape REAL que se persiste y exporta lleva `sourceId` TOP-LEVEL: dashboard (`dashboardNormalizeConfig` lee `saved.sourceId` workspace.js:7182 y lo emite top-level en 7199; `dashboardDefaultConfig` en 7167) y query (`querySerializeModel` top-level workspace.js:5732, `queryCreateModel` 5706; `queryModelFromSaved` hace `tables.find(id === saved.sourceId)` en 5742 con fallback a `baseHeaders/baseRows` embebidos). Pero `importProject` (core/storage.js:383-388) solo remapeaba `dashboard.config.sourceId` / `query.config.sourceId` — una forma que el shape real NO usa. Como import re-crea cada tabla con un id NUEVO (`tableIdMap`), tras un round-trip el `sourceId` original (p. ej. `table-b`) ya no existe: dashboardNormalizeConfig cae a `tables[0]` (panel con datos de la tabla equivocada) y query disconnects de su tabla viva (baseRows congelados). Dados incorrectos en silencio. |
+| **Bugs encontrados (confirmados)** | (1) `importProject` deja el `sourceId` top-level de dashboard y query sin remapear -> round-trip export->import los reconecta a la fuente equivocada/desconectada. (2) `query.sheets[].sourceId` tampoco se remapeaba (modelo de hojas, si existiera). (3) El shape legacy `config.sourceId` si se remapeaba (conservar como defensivo). Siguen DISCOVERED (rondas futuras): scanner fields en guards; fechas puntuadas europeas en `queryIsDate`. |
+| **Change** | En `workspace/core/storage.js`, `importProject` remapea ahora TAMBIEN el `sourceId` a nivel TOP de `dashboard` y `query`, y `query.sheets[].sourceId` en cada hoja, con comentario explicito referenciando CE-115 y las lineas de workspace.js. Se conserva el remap defensivo `config.sourceId` existente para bundles legacy. No se toca la persistencia ni el modelo del consumidor. |
+| **Bugs corregidos** | (1) Tras export->import, el dashboard apunta al id NUEVO de su tabla fuente (ya NO a `tables[0]`). (2) La query conserva su currentSource apuntando a la tabla importada correcta (ya NO se desconecta a baseRows congelados). (3) Compatibilidad legacy `config.sourceId` intacta. |
+| **Tests ejecutados** | Suite nueva `tests/workspace/import-sourceid-remap-test.mjs` 19/19 (CODIGO REAL bundle+storage en sandbox con fake-indexeddb; reset de DB por escenario para determinismo): dashboard.sourceId remapeado al id NUEVO de la fuente correcta (ni tables[0] ni el id original), query.sourceId remapeado a la fuente correcta, control negativo (find del sourceId original falla; fallback POSICIONAL a `tables[0]`; query desconectada -> baseRows congelados), compat legacy `config.sourceId`, anclas estaticas. Se detecto y corrigio una inestabilidad de ORDEN en el control (la posicion `tables[0]` no es garantia de cual tabla es) -> el control actual es independiente del orden. |
+| **Tests PASS** | 19/19 (nueva), determinista en multiples ejecuciones. RELEASE GATE completo 80+1 suites PASS 0 fail; manifest `artifacts/deep-audit/release-gate/release-gate-7e877837245d3d0bab2a3b41eae37b7387a490bf.json`. |
+| **Tests FAIL** | 0. |
+| **Resultado** | BUG_FIX (round-trip export->import reconectaba dashboard/query a la tabla equivocada o desconectada). |
+| **Evidence** | `workspace/core/storage.js` (`importProject`), `tests/workspace/import-sourceid-remap-test.mjs`, `scripts/test-workspace-release.mjs`, `CONTINUOUS-EVOLUTION-QUEUE.md`, `artifacts/deep-audit/release-gate/release-gate-7e877837245d3d0bab2a3b41eae37b7387a490bf.json`. |
+| **Commits** | 2ca19dc (fix(ce): CE-115 el import remapea el sourceId top-level de dashboard y query — 4 archivos). |
+| **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`; `git push` denegado (rama acumulada por delante de origin/main). |
+| **Limitaciones** | El remap top-level usa `remapId` sobre el valor persistido; si un bundle contuviera un `sourceId` que apuntara a una tabla no incluida en el bundle, `remapId` lo dejaria tal cual (comportamiento defensivo, MISMO que antes; el consumidor caeria a tables[0]/desconexion como limite documentado). La reparacion de bundles YA malimportados no es retroactiva (aplica a futuros imports). |
+| **Proxima prioridad** | DISCOVERY 11va ronda o evolucion del runner; promover el candidato disquery (fechas puntuadas europeas en `queryIsDate`) o scanner fields en guards. |
 
 ## Cycle 128 — Fix test-debt in engine/parser/planner suites + register them in the gate (CE-065)
 
