@@ -3,7 +3,7 @@
 > Cada ciclo de OpenCode LEE este archivo antes de actuar y lo ACTUALIZA antes de terminar.
 > Registro historico de ciclos de la mision Evolucion Continua.
 > Modo activo SOLO despues de la transicion (cuando `workspace/PRODUCTION_READINESS_DONE` exista).
-> Updated: 2026-09-03 (Cycle 176 — CE-113)
+> Updated: 2026-09-03 (Cycle 177 — CE-114)
 
 ---
 
@@ -1088,6 +1088,28 @@
 | **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`; `git push` denegado (rama acumulada por delante de origin/main). |
 | **Limitaciones** | `renderView` tiene otros call sites directos que no pasan prevView (p.ej. `refreshCurrentView`); en esos, `_flushDirtyEntity` cae al fallback currentView (mismo comportamiento de antes, sin regresion). La candidatura del reaper/otras sigue DISCOVERED para rondas futuras. |
 | **Proxima prioridad** | DISCOVERY 10ma ronda o evolucion del runner. |
+
+## Cycle 177 — CE-114: el undo truncaba el dataUrl de las capturas -> corrupcion persistida (DISCOVERY 10ma ronda)
+
+| Field | Value |
+|-------|-------|
+| **Date** | 2026-09-03 |
+| **Branch** | main |
+| **HEAD inicial** | c10f78a (commit registro CE-113, ultimo) |
+| **Task** | CE-114 (P2, DISCOVERY 10ma ronda -> DONE). Cola SIN todo TODO (solo CE-011/CE-063 DISCOVERED, decisiones del dueno/host); el ciclo se dedico a DISCOVERY (regla 8). Se lanzaron 3 exploradores paralelos (editor/bloques, query/datos, storage/import-export) y se promovio el candidato de mayor valor/riesgo: la corrupcion silenciosa del dataUrl de las capturas por el historial de undo/redo. |
+| **Hypothesis (confirmado leyendo el source)** | `_captureWorkspaceState()` (workspace.js:842) snapshotteaba las capturas con `dataUrl: c.dataUrl ? c.dataUrl.slice(0, 200) : null`. Ese snapshot es el UNICO que alimenta `_appHistory` (undo/redo Y autosave); al deshacer, `_applyState` reescribia el store con `captures: snapshot.captures || []` -> dataUrls TRUNCADOS a 200 chars. El resto del codigo usa SIEMPRE el dataUrl completo (`saveImageCapture` 1882, `renderCaptureView` via `resolveCaptureImageDataUrl`, `extractTextFromScan` 2819, `saveWorkspaceSession` con `captures: appStore.get('captures')` 923), asi que un solo Ctrl+Z corrompia en silencio la imagen de TODA captura y la corrupcion se persistia en la sesion. |
+| **Bugs encontrados (confirmados)** | ![sin captura de navegador] (1) Candidato editor (P1): el slice(0,200) del dataUrl en `_captureWorkspaceState` corrompia cada captura almacenada al deshacer (thumbnail roto, OCR fallido, luego persistido). (2) Candidato storage (P2, no implementado): `importProject` remapea `dashboard.config.sourceId` pero el shape real tiene `sourceId` TOP-LEVEL y NO remapea `query[].sourceId` -> el dashboard/query emitido apuntaria a `tables[0]` tras un round-trip. (3) Candidato storage (P2, no implementado): `correctedAssetId`/`originalAssetId`/`scanDocumentId`/`assetId` se remapean en import pero estan AUSENTES de REF_SOURCE_FIELDS/REF_CONFIG_FIELDS (bundle.js) y SOURCE_FIELDS/CONFIG_FIELDS (integrity.js) -> referencias scanner fuera de validacion/orphan/cascade. (4) Candidato query (P3): `queryIsDate` no reconoce fechas puntuadas europeas `DD.MM.YYYY` (soporta `core/locale-parser.js`). |
+| **Change** | Las capturas se EXCLUYEN del historial de undo/redo a proposito: `_captureWorkspaceState()` ya NO incluye el campo `captures` (comentario explicito en el source) y `_applyState()` ya NO restaura `captures` desde el snapshot. Son datos anexo-apendice vivos mantenidos por su propio flujo (store + `saveWorkspaceSession`), NUNCA editados por acciones deshacibles de doc/tabla, asi que excluirlas elimina la corrupcion de raiz sin perder ningun semantic de undo. Las rutas de persistencia vivas (`saveWorkspaceSession` 923, ys `appStore.set` en 1905/2096/2199/2224/7596) no se tocan: las capturas siguen guardandose completas fuera del historial. |
+| **Bugs corregidos** | (1) Un Ctrl+Z/Ctrl+Y en el editor ya no corrompe el dataUrl de las capturas (antes las truncaba a 200 chars y la sesion guardada persistia la corrupcion). (2) El undo/redo de doc/tabla ya no toca en absoluto las capturas (aplicar un snapshot ya no las reescribe). Las candidaturas storage (dashboard/query sourceId y campos scanner en guards) y query (fechas puntuadas) quedan DISCOVERED para rondas futuras. |
+| **Tests ejecutados** | Suite nueva `tests/workspace/capture-history-dataurl-test.mjs` 12/12 (CODIGO REAL `_captureWorkspaceState` extraido + appStore real de state.js + historial fiel capture->apply + CONTROL NEGATIVO): escenario 1 el snapshot REAL ya no tiene `captures` ni dataUrl y la captura viva conserva su dataUrl completo (>200 chars); escenario 2 ciclo capture -> snapshot -> undo -> apply conserva el dataUrl completo y la captura sigue en el store; escenario 3 CONTROL NEGATIVO reimplanta el slice(0,200) anterior y aplica -> pisa el dataUrl a 200 chars roto (demuestra que el fix es necesario, no tautologico); escenario 4 anclas estaticas (no existe slice(0,200) ni restauracion de captures en `_applyState`). |
+| **Tests PASS** | 12/12 (nueva). RELEASE GATE completo 80 suites PASS 0 fail; manifest `artifacts/deep-audit/release-gate/release-gate-c10f78abf5be3d1a4b513535b93c096506773677.json`. |
+| **Tests FAIL** | 0. |
+| **Resultado** | BUG_FIX (corrupcion silenciosa del dataUrl de capturas por el historial de undo/redo: eliminada de raiz). |
+| **Evidence** | `workspace/workspace.js` (`_captureWorkspaceState` y `_applyState`), `tests/workspace/capture-history-dataurl-test.mjs`, `scripts/test-workspace-release.mjs`, `CONTINUOUS-EVOLUTION-QUEUE.md`, `artifacts/deep-audit/release-gate/release-gate-c10f78abf5be3d1a4b513535b93c096506773677.json`. |
+| **Commits** | (pendiente este ciclo). |
+| **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`; `git push` denegado (rama acumulada por delante de origin/main). |
+| **Limitaciones** | Las capturas quedan excluidas del historial (un undo NO restaura una captura eliminada/importada recientemente en el estado del store; pero su persistencia en `saveWorkspaceSession` y el flujo de captura real las mantienen completas). Las candidaturas storage (dashboard/query `sourceId` en import y campos scanner en validation/orphan/cascade) y query (fechas puntuadas europeas) quedan DISCOVERED para rondas futuras. |
+| **Proxima prioridad** | DISCOVERY 11va ronda o evolucion del runner; o promover el candidato storage de mayor valor (dashboard/query `sourceId` sin remapear en `importProject`). |
 
 ## Cycle 128 — Fix test-debt in engine/parser/planner suites + register them in the gate (CE-065)
 

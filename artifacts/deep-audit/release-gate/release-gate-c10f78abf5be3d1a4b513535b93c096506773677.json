@@ -1,0 +1,380 @@
+{
+  "sha": "c10f78abf5be3d1a4b513535b93c096506773677",
+  "fecha": "2026-09-03T20:24:21.045Z",
+  "build": {
+    "ok": true,
+    "exit": 0
+  },
+  "sync": {
+    "ok": true,
+    "exit": 0
+  },
+  "suites": [
+    {
+      "label": "workspace-test",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "phase3a-test",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "phase3b-test",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "phase11-audit",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "ocr-source-selection",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "phase3c-star-flow E2E (OCR real)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "csv-export-bom E2E (UTF-8 BOM)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "engine-idle-release (memoria Tesseract)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "workflow-export-md (Markdown/texto plano)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "text-to-document (Markdown -> bloques, CE-064)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "doc-to-table-multispace (tablas OCR multiespacio, CE-071)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "chart-series-locale (tabla -> grafico con parser canonico, CE-072)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "pdf-image-aspect (imagen ancha no se deforma en PDF, CE-073)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "pdf-table-wrap (celdas anchas y filas irregulares en PDF, CE-074)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "pdf-chart-overflow (barras de grafico siempre dentro del area, CE-075)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "pdf-text-wrap (texto y titulos dentro del area, CE-076)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "pdf-chart-layout (grafico sin solape ni hueco por altura real, CE-077)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "pdf-image-fit (imagenes encajadas en la pagina, CE-078)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "design-report-wysiwyg (preview pagina igual que el PDF, CE-087)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "pdf-images-shared (normalizacion de imagenes PDF compartida, CE-037)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "pdf-table-pagination (paginacion de tablas PDF)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "workflow-document-pdf (document.to-pdf end to end, tabla/grafico/imagen)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "instruction-parser (intenciones de texto libre)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "invoice-fields (extraccion de campos de factura, CE-081)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "instruction-parser-dest-format (formato de destino prioritario en conversiones, CE-079)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "workflow-engine (motor de flujos, recursos de ejecución)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "instruction-planner (planificador de flujos)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "workflow-ui (resultados al Workspace, CE-047/048/049)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "capture-flow-chain E2E (captura -> flujo -> OCR, CE-050)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "dist-workspace-smoke (validación del artefacto desplegado)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "autosave-lock (serialization lock, CE-057)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "cross-entity-integrity (per-entity locks, _writeSeq, flush, CE-058)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "review-status-persistence (table review status lock-based, CE-058)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "persistence-sequence-cert (_writeSeq monotonic invariant, CE-058)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "persistence-adversarial-audit (concurrency, stale-write, mutation-after-enqueue, CE-058)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "persistence-lifecycle-audit (fire-and-forget, destroy-recreate, nav stress, perf, CE-058)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "storage-failure-injection (IDB write failure, quota, closed DB, CE-059)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "storage-recovery-lifecycle (delete/resurrection, destroy/recreate, CE-059)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "storage-multicontext-migration (multi-tab _writeSeq, schema, legacy records, CE-059)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "storage-rejection-perf (unhandled rejection, atomicity, perf, CE-059)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "multi-tab-concurrency (different/same entity, _writeSeq, stale overwrite, CE-060)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "stale-delete-lifecycle (delete vs stale, recreate, reload, background tab, CE-060)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "runtime-isolation-review (review/chart cross-tab, versionchange, singletons, CE-060)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "cross-store-integrity (cascade, orphan, import atomicity, CE-061)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "storage-surface-audit (LWW stores without _writeSeq, CE-061)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "id-collision-serialization (ID uniqueness, roundtrip, localStorage, CE-061)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "document-editor-data-loss (HTML export table/chart + autosave estructural, CE-066)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "document-editor-persistence-race (persistencia adversarial con reload y LWW logico, CE-082)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "doc-table-switch-flush (flush-on-switch al cambiar de doc/tabla misma vista, CE-090)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "undo-corruption (undo conserva type de bloques + undo de tabla via topbar, CE-091)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "boot-recovery (localStorage corrupto no rompe el arranque, CE-092)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "bundle-reference-validation (referencias cruzadas del bundle validadas pre-write, CE-093)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "export-flush-fidelity (el export refleja la ultima edicion en memoria, CE-094)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "palette-localstorage-recovery (preferencias de la paleta a prueba de localStorage corrupto, CE-095)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "table-history-cap (historial de deshacer de tabla acotado, CE-095)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "session-cleanup (limpieza de entidades borradas en ws:session, CE-096)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "flow-snapshot-aliasing (snapshot de Flow clona nodos/edges, CE-097)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "block-drop-reorder (el drop de bloques valida el indice, CE-098)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "block-menu-listener (el menu de bloques desengancha su listener, CE-099)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "undo-clone-once (el historial de undo clona el snapshot una sola vez, CE-100)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "table-csv-escape (exportTableCSV escapa headers y coacciona celdas, CE-101)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "query-date-to-iso (detect-type normaliza fechas sin corrimiento de zona horaria, CE-102)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "div-by-zero-formula (la division por cero da #FORMULA, no escribe 0, CE-103)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "thumbnail-guard (createThumbnail guarda contra dimensiones degradadas 0x0, CE-104)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "query-column-range-guard (choose/reorder-columns descartan indices fuera de rango, CE-105)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "md-header-escape-and-replace (encabezados Markdown escapan pipe + replace-values find vacio no destruye, CE-106)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "formula-unary-and-aggregates (unario negativo en formulas + agregados ignoran celdas no numericas, CE-109)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "table-sort-locale (orden de tablas usa parseLocaleNumber canonico, no ad-hoc, CE-110)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "document-export-md-lists (exportDocument Markdown no pierde listas ni imagenes, CE-111)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "relations-null-guard (export/import no crashean con relation null, CE-112)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "flush-outgoing-view (flush del saliente guiado por prevView al navegar, CE-113)",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "label": "capture-history-dataurl (el undo ya no trunca dataUrl de capturas, CE-114)",
+      "ok": true,
+      "exit": 0
+    }
+  ],
+  "hashes": {
+    "workspace/workspace.js": "d4ef67159dfed4d1513418beb787462cb760e9366394cc3070802bdf5ab0588a",
+    "dist/workspace/workspace.js": "d4ef67159dfed4d1513418beb787462cb760e9366394cc3070802bdf5ab0588a"
+  },
+  "total": 72,
+  "fail": 0
+}

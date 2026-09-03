@@ -839,7 +839,13 @@ function _captureWorkspaceState() {
     currentDataTable: s.currentDataTable ? JSON.parse(JSON.stringify(s.currentDataTable)) : null,
     documents: (s.documents || []).map(d => ({ id: d.id, name: d.name, title: d.title, blocks: d.blocks ? JSON.parse(JSON.stringify(d.blocks)) : [], updatedAt: d.updatedAt, createdAt: d.createdAt, projectId: d.projectId })),
     dataTables: (s.dataTables || []).map(t => ({ id: t.id, name: t.name, headers: t.headers ? [...t.headers] : [], rows: t.rows ? t.rows.map(row => [...row]) : [], sheets: t.sheets ? JSON.parse(JSON.stringify(t.sheets)) : undefined, reviewStatus: t.reviewStatus })),
-    captures: (s.captures || []).map(c => ({ id: c.id, name: c.name, dataUrl: c.dataUrl ? c.dataUrl.slice(0, 200) : null })),
+    // NOTE: `captures` se EXCLUYE del historial de undo/redo a proposito. Las capturas
+    // (resultados de captura/import) son datos anexo-apendice vivos mantenidos por su
+    // propio flujo (NUNCA editados por acciones deshacibles de doc/tabla). Antes se
+    // snapshotteaban con `dataUrl.slice(0, 200)`, y al deshacer, `_applyState` reescribia
+    // el store con esos dataUrl TRUNCADOS -> cada undo corrompia en silencio la imagen de
+    // toda captura almacenada (thumbnail roto, OCR fallido) y la corrupcion se persistia.
+    // Excluirlas elimina la corrupcion de raiz: undo/redo ya no toca las capturas.
     designConfig: s.designConfig ? JSON.parse(JSON.stringify(s.designConfig)) : null,
     flowNodes: s.flowNodes ? JSON.parse(JSON.stringify(s.flowNodes)) : [],
     flowEdges: s.flowEdges ? JSON.parse(JSON.stringify(s.flowEdges)) : [],
@@ -1065,7 +1071,6 @@ async function initApp() {
       currentDataTable: snapshot.currentDataTable || null,
       documents: snapshot.documents || [],
       dataTables: snapshot.dataTables || [],
-      captures: snapshot.captures || [],
       designConfig: snapshot.designConfig || null,
       flowNodes: snapshot.flowNodes || [],
       flowEdges: snapshot.flowEdges || [],
