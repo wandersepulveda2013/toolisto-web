@@ -691,7 +691,7 @@ function blocksToMarkdown(blocks) {
       case 'page-break': lines.push(''); break;
       case 'table': {
         if (Array.isArray(block.headers) && Array.isArray(block.rows)) {
-          const header = '| ' + block.headers.map(String).join(' | ') + ' |';
+          const header = '| ' + block.headers.map(v => String(v ?? '').replace(/\|/g, '\\|')).join(' | ') + ' |';
           const sep = '| ' + block.headers.map(() => '---').join(' | ') + ' |';
           lines.push(header, sep);
           for (const row of block.rows) {

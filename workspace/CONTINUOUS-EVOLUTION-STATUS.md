@@ -953,6 +953,30 @@
 
 ---
 
+## Cycle 171 — CE-106/CE-108: encabezados de tabla Markdown escapan el pipe + replace-values no destruye la celda con find vacio (DISCOVERY 4ta ronda)
+
+| Field | Value |
+|-------|-------|
+| **Date** | 2026-09-03 |
+| **Branch** | main |
+| **HEAD inicial** | cc2b571 (docs adsense, ultimo commit previo) |
+| **Task** | CE-106 (P2) + CE-108 (P3), DISCOVERY 4ta ronda -> DONE. Con la cola SIN todo TODO (todo DONE/DISCOVERED), el ciclo se dedicó a DISCOVERY siguiendo la regla 8 de la cola y el patron de bugs de las rondas previas (hermanas inconsistentes / guards / corrosion de datos silenciosa). |
+| **Potential bug (DISCOVERY 4ta ronda, confirmado leyendo el source)** | Two bugs de la misma clase que CE-101/CE-105: (1) CE-106 — tanto `exportDocument` (workspace.js:4145) como `blocksToMarkdown` (workflow-operations.js:694) escapaban el pipe `|` en las CELDAS de las tablas Markdown (`replace(/\|/g,'\\|')`) pero NO en los ENCABEZADOS (`headers.map(String).join(' | ')`), rompiendo la estructura de la tabla (4 columnas en cabecera vs 2 en filas); su hermana HTML `documentBlocksToHtml` sí escapa. (2) CE-108 — `replace-values` modo `contains` con `find` vacío hacía `current.split('').join(replace)` partiendo cada celda en CARACTERES (`"Factura"` -> `"XFXaXcXtXuXrXaX"`); el modal (workspace.js:6500) no validaba find vacío. |
+| **Change** | (1) `workspace.js` `exportDocument` y `workflow-operations.js` `blocksToMarkdown`: los encabezados usan ahora la MISMA coercion+escape que las filas (`headersT.map(v => String(v ?? '').replace(/\|/g,'\\|'))`). (2) `workspace.js` `queryRunOperation` rama `replace-values`: `findStr === '' ? current : current.split(findStr).join(...)` deja la celda intacta en contains; el modal añade guard `if (config.mode === 'contains' && !config.find) { toast('Escribe un texto para buscar','warning'); return; }`. |
+| **Bugs encontrados (confirmados)** | Ambos verificados en el source (4145, 694, 6044, 6500). El candidato adicional CE-107 (dates DD/MM) se analizó y NO se implementó: la semantica MM/DD/YYYY del query path es una decision de diseno probada en `query-date-to-iso-test` (CE-102) que no debe cambiarse; queda como limitacion documentada, no como bug. |
+| **Bug corregido** | (1) Encabezados Markdown con `|` ya no rompen la tabla (rutas exportDocument + text.export). (2) find vacío en contains ya no corrompe la columna. |
+| **Tests ejecutados** | Suite nueva `tests/workspace/md-header-escape-and-replace-test.mjs` 12/12 (queryRunOperation REAL + sandbox VM de text.export REAL): CE-108 (find vacío deja la celda intacta, contains/exact no vacío conservados, números intactos, UI guard); CE-106 (header con pipe se escapa en text.export, header sin pipe regresión idéntica, exportDocument static check). Registrada en el release gate. Regresiones: `workflow-export-md` 30/30, `text-to-document` 15/15, `query-column-range-guard` 16/16, `query-date-to-iso` 11/11. |
+| **Tests PASS** | 12/12 (nueva) + regresiones 30/30, 15/15, 16/16, 11/11. |
+| **Tests FAIL** | 0. |
+| **Resultado** | BUG_FIX (correctitud de exportacion Markdown + corrosion silenciosa de datos en query). |
+| **Evidence** | `workspace/workspace.js` (exportDocument, replace-values), `workspace/core/workflow-operations.js` (blocksToMarkdown), `tests/workspace/md-header-escape-and-replace-test.mjs`, `scripts/test-workspace-release.mjs`, `CONTINUOUS-EVOLUTION-QUEUE.md`. |
+| **Commits** | (pendiente este ciclo) |
+| **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`; `git push` denegado. |
+| **Limitaciones** | CE-107 (dates `DD/MM/YYYY` en detect-type) queda documentado como decision de diseno probada (semantica US MM/DD, contrato de `query-date-to-iso-test`), no como bug a resolver; un soporte real de DD/MM requeriria re-definir el contrato. |
+| **Proxima prioridad** | DISCOVERY 5ta ronda o evolucion del runner. |
+
+---
+
 ## Cycle 128 — Fix test-debt in engine/parser/planner suites + register them in the gate (CE-065)
 
 | Field | Value |

@@ -4142,7 +4142,7 @@ async function exportDocument() {
       const headersT = Array.isArray(block.headers) ? block.headers : [];
       const rowsT = Array.isArray(block.rows) ? block.rows : [];
       if (headersT.length) {
-        md += '| ' + headersT.map(String).join(' | ') + ' |\n';
+        md += '| ' + headersT.map(v => String(v ?? '').replace(/\|/g, '\\|')).join(' | ') + ' |\n';
         md += '| ' + headersT.map(() => '---').join(' | ') + ' |\n';
       }
       rowsT.forEach(row => {
@@ -6037,12 +6037,13 @@ function queryRunOperation(shape, operation, config = {}) {
   }
 
   if (operation === 'replace-values') {
+    const findStr = String(config.find);
     result.rows = rows.map(row => row.map((value, column) => {
       if (column !== index) return value;
       const current = normalize(value);
       return config.mode === 'contains'
-        ? current.split(String(config.find)).join(String(config.replace))
-        : current === String(config.find) ? String(config.replace) : current;
+        ? (findStr === '' ? current : current.split(findStr).join(String(config.replace)))
+        : current === findStr ? String(config.replace) : current;
     }));
     return result;
   }
@@ -6500,6 +6501,10 @@ function openQueryOperation(operation, model, refresh) {
         config.find = refs.find.value;
         config.replace = refs.replace.value;
         config.mode = refs.mode.value;
+        if (config.mode === 'contains' && !config.find) {
+          toast('Escribe un texto para buscar', 'warning');
+          return;
+        }
         summary = model.headers[config.index] + ' · “' + config.find + '” → “' + config.replace + '”';
       } else if (['trim', 'clean', 'uppercase', 'lowercase', 'fill-down', 'fill-up', 'detect-type'].includes(operation)) {
         config.index = Number(refs.column.value);
