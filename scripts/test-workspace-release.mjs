@@ -152,6 +152,7 @@ run('document-export-md-lists (exportDocument Markdown no pierde listas ni image
 run('relations-null-guard (export/import no crashean con relation null, CE-112)', 'node', ['tests/workspace/relations-null-guard-test.mjs']);
 run('flush-outgoing-view (flush del saliente guiado por prevView al navegar, CE-113)', 'node', ['tests/workspace/flush-outgoing-view-test.mjs']);
 run('capture-history-dataurl (el undo ya no trunca dataUrl de capturas, CE-114)', 'node', ['tests/workspace/capture-history-dataurl-test.mjs']);
+run('import-sourceid-remap (el import remapea el sourceId top-level de dashboard y query, CE-115)', 'node', ['tests/workspace/import-sourceid-remap-test.mjs']);
 
 // 4. Manifest de evidencia
 const evidence = {

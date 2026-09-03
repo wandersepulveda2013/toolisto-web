@@ -386,6 +386,22 @@ async function importProject(bundle, options = {}) {
   if (query && query.config && typeof query.config === 'object') {
     if (query.config.sourceId) query.config.sourceId = remapId(query.config.sourceId);
   }
+  // CE-115: el shape REAL del dashboard y de la query persiste `sourceId` a nivel TOP
+  // (dashboardNormalizeConfig lee `saved.sourceId` en workspace.js:7182/7199 y la query
+  // `queryModelFromSaved` en 5742; ambos fallan a tables[0]/baseRows si no se remapea).
+  // El remap previo solo cubria `config.sourceId`, que ese shape no usa, asi que tras un
+  // round-trip lo llevaba a la tabla PRIMERA (dashboard) o desconectaba la query de su
+  // tabla viva -> datos silenciosamente incorrectos.
+  if (dashboard && typeof dashboard === 'object' && dashboard.sourceId) dashboard.sourceId = remapId(dashboard.sourceId);
+  if (query && typeof query === 'object') {
+    if (query.sourceId) query.sourceId = remapId(query.sourceId);
+    if (Array.isArray(query.sheets)) {
+      query.sheets = query.sheets.map(sheet => {
+        if (sheet && typeof sheet === 'object' && sheet.sourceId) sheet.sourceId = remapId(sheet.sourceId);
+        return sheet;
+      });
+    }
+  }
   let dataModel = null;
   if (bundle.dataModel) {
     const sourceModel = bundle.dataModel?.model && typeof bundle.dataModel.model === 'object' ? bundle.dataModel.model : bundle.dataModel;
