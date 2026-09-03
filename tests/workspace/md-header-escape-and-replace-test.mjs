@@ -132,13 +132,14 @@ assert(exportOp, 'text.export debe estar registrado');
   check('separador | --- | --- |', text.includes('| --- | --- |'), '');
 }
 
-// 9. anti-regresion estatica: exportDocument (workspace.js) tambien escapa encabezados
+// 9. anti-regresion estatica: la ruta de export Markdown de workspace.js (exportDocumentMarkdown,
+//    pura, usada por exportDocument) tambien escapa encabezados de tabla
 {
-  const idx = wsCode.indexOf('async function exportDocument');
-  assert(idx !== -1, 'exportDocument debe existir');
+  assert(wsCode.includes('function exportDocumentMarkdown'), 'exportDocumentMarkdown debe existir');
+  const idx = wsCode.indexOf('function exportDocumentMarkdown');
   const headerLine = wsCode.indexOf('headersT.map(', idx);
   const slice = wsCode.slice(headerLine, headerLine + 120);
-  check('exportDocument escapa headers con replace(\\|)', slice.includes('replace(/\\|/g'), slice.split('\n')[0]);
+  check('exportDocumentMarkdown escapa headers con replace(\\|)', slice.includes('replace(/\\|/g'), slice.split('\n')[0]);
 }
 
 console.log(`\nRESULTADO: ${pass} PASS, ${fail} FAIL`);

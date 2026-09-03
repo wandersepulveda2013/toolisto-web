@@ -4124,11 +4124,9 @@ function autoSaveDoc(doc) {
   }, 1000);
 }
 
-async function exportDocument() {
-  const doc = appStore.get('currentDoc');
-  if (!doc) return;
-  var bt = '\x60';
-  var md = '# ' + (doc.title || 'Documento') + '\n\n';
+function exportDocumentMarkdown(doc) {
+  const bt = '\x60';
+  let md = '# ' + (doc.title || 'Documento') + '\n\n';
   (doc.blocks || []).forEach(block => {
     if (block.html && /data-page-break="true"/.test(block.html)) { md += '<div style="page-break-after:always"></div>\n\n'; return; }
     if (block.type === 'divider') { md += '---\n\n'; return; }
@@ -4151,8 +4149,22 @@ async function exportDocument() {
       md += '\n';
       return;
     }
+    if (block.type === 'bullet-list') { md += '- ' + (block.content || '') + '\n\n'; return; }
+    if (block.type === 'numbered-list') { md += '1. ' + (block.content || '') + '\n\n'; return; }
+    if (block.type === 'image-block') {
+      const imgSrc = String(block.content || block.dataUrl || '').trim();
+      if (imgSrc) md += '![imagen](' + imgSrc + ')\n\n';
+      return;
+    }
     md += (block.content || '') + '\n\n';
   });
+  return md;
+}
+
+async function exportDocument() {
+  const doc = appStore.get('currentDoc');
+  if (!doc) return;
+  const md = exportDocumentMarkdown(doc);
   const blob = new Blob([md], { type: 'text/markdown' });
   const url = URL.createObjectURL(blob);
   const a = h('a', { href: url, download: (doc.title || 'documento') + '.md' });

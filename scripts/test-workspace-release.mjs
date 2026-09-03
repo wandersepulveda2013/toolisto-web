@@ -148,6 +148,7 @@ run('query-column-range-guard (choose/reorder-columns descartan indices fuera de
 run('md-header-escape-and-replace (encabezados Markdown escapan pipe + replace-values find vacio no destruye, CE-106)', 'node', ['tests/workspace/md-header-escape-and-replace-test.mjs']);
 run('formula-unary-and-aggregates (unario negativo en formulas + agregados ignoran celdas no numericas, CE-109)', 'node', ['tests/workspace/formula-unary-and-aggregates-test.mjs']);
 run('table-sort-locale (orden de tablas usa parseLocaleNumber canonico, no ad-hoc, CE-110)', 'node', ['tests/workspace/table-sort-locale-test.mjs']);
+run('document-export-md-lists (exportDocument Markdown no pierde listas ni imagenes, CE-111)', 'node', ['tests/workspace/document-export-md-lists-test.mjs']);
 
 // 4. Manifest de evidencia
 const evidence = {

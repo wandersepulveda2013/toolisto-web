@@ -3,7 +3,7 @@
 > Cada ciclo de OpenCode LEE este archivo antes de actuar y lo ACTUALIZA antes de terminar.
 > Registro historico de ciclos de la mision Evolucion Continua.
 > Modo activo SOLO despues de la transicion (cuando `workspace/PRODUCTION_READINESS_DONE` exista).
-> Updated: 2026-09-03 (Cycle 173 — CE-110)
+> Updated: 2026-09-03 (Cycle 174 — CE-111)
 
 ---
 
@@ -1021,7 +1021,31 @@
 | **Commits** | (pendiente este ciclo) |
 | **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`; `git push` denegado. |
 | **Limitaciones** | `parseLocaleNumber` sin hints de columna (comportamiento generico de miles europeos, coherente con el resto del motor); el sort cae al `localeCompare` cuando ambos no son numericos (mismo contrato que antes). Otras candidaturas de la ronda (guard null en `collectRelations`/`remapRefs`, `_flushDirtyEntity` lee la vista nueva, export de listas/imagenes en `exportDocument`) quedan como oportunidades DISCOVERED para rondas futuras. |
-| **Proxima prioridad** | DISCOVERY 7ma ronda o evolucion del runner. |## Cycle 128 — Fix test-debt in engine/parser/planner suites + register them in the gate (CE-065)
+| **Proxima prioridad** | DISCOVERY 7ma ronda o evolucion del runner. |
+
+## Cycle 174 — CE-111: el Markdown de exportDocument no pierde listas ni imagenes (DISCOVERY 7ma ronda)
+
+| Field | Value |
+|-------|-------|
+| **Date** | 2026-09-03 |
+| **Branch** | main |
+| **HEAD inicial** | a3b79b0 (commit CE-110, ultimo) |
+| **Task** | CE-111 (P2, DISCOVERY 7ma ronda -> DONE). Cola SIN todo TODO (todo DONE/DISCOVERED); el ciclo se dedico a DISCOVERY (regla 8). Se confirmaron tres candidaturas de la ronda 5 (guard null en `collectRelations`/`remapRefs`, `_flushDirtyEntity` lee la vista nueva y export de listas/imagenes en `exportDocument`) y se implemento la de mas valor de producto: la fidelidad de datos del export Markdown, asimetrica con la referencia canonica `blocksToMarkdown`. La candidatura del guard null de `collectRelations`/`remapRefs` queda DISCOVERED documentada. |
+| **Hypothesis (confirmado leyendo el source)** | `exportDocument` (workspace.js:4127) emitia los bloques `bullet-list`, `numbered-list` e `image-block` por el fallback generico `content` del texto plano: las listas perdian su marcador de lista y una imagen vertia su `dataUrl` entera como texto plano ilegible. Asimetrico con `blocksToMarkdown` (workflow-operations.js:678) que maneja `bullet-list` en 688 e `image-block` en 717 — el MISMO documento exportaba distinto segun la ruta (editor vs flujo). |
+| **Bugs encontrados (confirmados)** | ![sin captura de navegador] el export Markdown de un documento con listas o imagenes las empeoraba: `-`/`1.` perdidos (contenido plano) y `dataUrl` de imagen volcada como texto. |
+| **Change** | Se extrae `exportDocumentMarkdown(doc)` puro (workspace.js:4127-4162) de `exportDocument`, conservando TODO el comportamiento previo (page-break html, divider, heading1-3, quote, code, callout, tabla) y anadiendo: `bullet-list` -> `- content`, `numbered-list` -> `1. content`, `image-block` -> `![imagen](src)` con `String(block.content || block.dataUrl || '')` (content con precedencia, paridad `blocksToMarkdown`, sin crash si no hay fuente). `exportDocument` ahora llama a `exportDocumentMarkdown(doc)`. |
+| **Bugs corregidos** | (1) Las listas se exportan como `-`/`1.` conservando la estructura. (2) Las imagenes se exportan como `![imagen](src)` en vez de volcar la `dataUrl` como texto. (3) Paridad con `blocksToMarkdown` (content tiene precedencia sobre dataUrl). |
+| **Tests ejecutados** | Suite nueva `tests/workspace/document-export-md-lists-test.mjs` 23/23 (\`exportDocumentMarkdown\` REAL, pura, sin DOM): viñetas, listas numeradas, imagen por content y por dataUrl, precedencia content, dato sin fuente sin crash, mezcla ordenada (heading + 2 viñetas + lista numerada + imagen), quote/divider/callout/code/tabla intactos, bloque desconocido -> contenido, anti-regresion estatica (exportDocument delega en exportDocumentMarkdown; maneja los 3 tipos). NOTA de anclaje: la suite CE-106 \`md-header-escape-and-replace-test.mjs\` anclaba su anti-regresion en \`async function exportDocument\`; la refactorizacion reubico el codigo en \`exportDocumentMarkdown\` (definida antes), por lo que se actualizo el ancla a \`function exportDocumentMarkdown\` SIN debilitar la asercion (\`replace(/\\|/g\` sigue verificado) — revalida 12/12. |
+| **Tests PASS** | 23/23 (nueva); CE-106 revalidada 12/12; RELEASE GATE completo 77 suites PASS 0 fail; manifest `artifacts/deep-audit/release-gate/release-gate-a3b79b073099089f002af2353d45c2208a11e0ed.json`. |
+| **Tests FAIL** | 0. |
+| **Resultado** | BUG_FIX (fidelidad de datos del export Markdown: listas e imagenes ya no se pierden). |
+| **Evidence** | `workspace/workspace.js` (exportDocumentMarkdown + exportDocument), `tests/workspace/document-export-md-lists-test.mjs`, `tests/workspace/md-header-escape-and-replace-test.mjs`, `scripts/test-workspace-release.mjs`, `CONTINUOUS-EVOLUTION-QUEUE.md`, `artifacts/deep-audit/release-gate/release-gate-a3b79b073099089f002af2353d45c2208a11e0ed.json`. |
+| **Commits** | (pendiente este ciclo) |
+| **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`; `git push` denegado (ramas acumuladas: aun 4 commits por delante tras este). |
+| **Limitaciones** | `exportDocumentMarkdown` hereda la marca de lista `1.` (sin re-contar) igual que `blocksToMarkdown`; la candidatura del guard null en `collectRelations` (bundle.js:201-212) y `remapRefs` (storage.js:325-342) queda DISCOVERED documentada para una ronda futura. |
+| **Proxima prioridad** | DISCOVERY 8va ronda o evolucion del runner; o promover la candidatura DISCOVERED del guard null de relaciones en export/import. |
+
+## Cycle 128 — Fix test-debt in engine/parser/planner suites + register them in the gate (CE-065)
 
 | Field | Value |
 |-------|-------|
