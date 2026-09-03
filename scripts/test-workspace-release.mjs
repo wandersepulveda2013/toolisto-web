@@ -149,6 +149,7 @@ run('md-header-escape-and-replace (encabezados Markdown escapan pipe + replace-v
 run('formula-unary-and-aggregates (unario negativo en formulas + agregados ignoran celdas no numericas, CE-109)', 'node', ['tests/workspace/formula-unary-and-aggregates-test.mjs']);
 run('table-sort-locale (orden de tablas usa parseLocaleNumber canonico, no ad-hoc, CE-110)', 'node', ['tests/workspace/table-sort-locale-test.mjs']);
 run('document-export-md-lists (exportDocument Markdown no pierde listas ni imagenes, CE-111)', 'node', ['tests/workspace/document-export-md-lists-test.mjs']);
+run('relations-null-guard (export/import no crashean con relation null, CE-112)', 'node', ['tests/workspace/relations-null-guard-test.mjs']);
 
 // 4. Manifest de evidencia
 const evidence = {

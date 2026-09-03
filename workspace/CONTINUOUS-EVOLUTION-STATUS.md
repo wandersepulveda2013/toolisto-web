@@ -3,7 +3,7 @@
 > Cada ciclo de OpenCode LEE este archivo antes de actuar y lo ACTUALIZA antes de terminar.
 > Registro historico de ciclos de la mision Evolucion Continua.
 > Modo activo SOLO despues de la transicion (cuando `workspace/PRODUCTION_READINESS_DONE` exista).
-> Updated: 2026-09-03 (Cycle 174 — CE-111)
+> Updated: 2026-09-03 (Cycle 175 — CE-112)
 
 ---
 
@@ -1044,6 +1044,28 @@
 | **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`; `git push` denegado (ramas acumuladas: 4 commits por delante de origin/main). |
 | **Limitaciones** | `exportDocumentMarkdown` hereda la marca de lista `1.` (sin re-contar) igual que `blocksToMarkdown`; la candidatura del guard null en `collectRelations` (bundle.js:201-212) y `remapRefs` (storage.js:325-342) queda DISCOVERED documentada para una ronda futura. |
 | **Proxima prioridad** | DISCOVERY 8va ronda o evolucion del runner; o promover la candidatura DISCOVERED del guard null de relaciones en export/import. |
+
+## Cycle 175 — CE-112: export/import no crashean con una relation null (DISCOVERY 8va ronda)
+
+| Field | Value |
+|-------|-------|
+| **Date** | 2026-09-03 |
+| **Branch** | main |
+| **HEAD inicial** | 90c1309 (commit registro CE-111, ultimo) |
+| **Task** | CE-112 (P2, DISCOVERY 8va ronda -> DONE). Cola SIN todo TODO (todo DONE/DISCOVERED); el ciclo se dedico a DISCOVERY (regla 8). Se promovio la candidatura DISCOVERED mas antigua y de valor: el guard null en `collectRelations`/`remapRefs` para una entrada `null` en la matriz `relations` (export/import). |
+| **Hypothesis (confirmado leyendo el source)** | Dos caminos asimetricos del flujo de datos crasheaban con una entrada `null` en `relations`: IMPORT (`importProject` -> `remapRefs`, storage.js:333) con `obj.relations.map(r => ({ ...r, ... }))` reventaba `...r` sobre `null`; EXPORT (`exportProject` -> `buildManifest` -> `collectRelations`, bundle.js:201-212, que accede a `r.targetId || r.to`) reventaba con `r` null. Ambos eran asimetricos con `collectRefIds` (bundle.js:116 `if (!rel) continue;`) y `validateBundleImport` IGNORA el null (no lo rechaza), asi que el null llegaba vivo a `remapRefs`. |
+| **Bugs encontrados (confirmados)** | ![sin captura de navegador] el export de un proyecto con una relation null en la matriz `relations` lanza `TypeError: Cannot read properties of null (reading 'targetId')` y rompe el flujo estrella `documento -> informe`; el import de un bundle con ese null reventaba en `remapRefs` antes de escribir. |
+| **Change** | Guard de paridad con `collectRefIds` en los dos sitios: `collectRelations` (bundle.js) anade `if (!r) continue;` para saltar el null en el conteo/derivacion del manifiesto; `remapRefs` (storage.js) descarta las entradas null de `relations` (`.map(...).filter(r => r !== null && r !== undefined)`) de modo que una relacion valida se remapea al id nuevo y el null no se persiste. |
+| **Bugs corregidos** | (1) Exportar un proyecto con `relations:[null,...]` ya no crashea: el manifest se construye y el `relationCount` solo cuenta la relacion valida. (2) Importar tal bundle ya no crashea: la relacion valida se remapea al id nuevo y el null se descarta (no se persiste). |
+| **Tests ejecutados** | Suite nueva `tests/workspace/relations-null-guard-test.mjs` 14/14 (CODIGO REAL de bundle.js+storage.js en sandbox IDB, `fake-indexeddb/auto`): A. IMPORT con `documents[0].relations = [null, {targetId:'doc-b',type:'link'}]` — validateBundleImport no rechaza, importProject no lanza, el null se descarta y el targetId se remapea al id nuevo de DocB, tipo conservado; B. EXPORT via `buildManifest` (el mismo que llama exportProject) con relation null — no lanza, relationCount=1 solo la valida, derivation correcta; C. anti-regresion estatica (guard presente en ambos sitios, collectRefIds intacto). Registrada en el release gate tras CE-111. |
+| **Tests PASS** | 14/14 (nueva); CE-093 revalidada 14/14; RELEASE GATE completo 78 suites PASS 0 fail; manifest `artifacts/deep-audit/release-gate/release-gate-90c13092dd5ab6d7d2482eb9c2c038ec8271a419.json`. |
+| **Tests FAIL** | 0. |
+| **Resultado** | BUG_FIX (robustez del import/export ante relations con entradas null). |
+| **Evidence** | `workspace/core/bundle.js` (collectRelations), `workspace/core/storage.js` (remapRefs), `tests/workspace/relations-null-guard-test.mjs`, `scripts/test-workspace-release.mjs`, `CONTINUOUS-EVOLUTION-QUEUE.md`, `artifacts/deep-audit/release-gate/release-gate-90c13092dd5ab6d7d2482eb9c2c038ec8271a419.json`. |
+| **Commits** | (pendiente este ciclo) |
+| **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`; `git push` denegado (rama acumulada por delante de origin/main). |
+| **Limitaciones** | La otra candidatura DISCOVERED documentada (`_flushDirtyEntity` lee la vista nueva) queda pendiente para una ronda futura; no se toco `collectRefIds` (paridad preservada). |
+| **Proxima prioridad** | DISCOVERY 9na ronda o evolucion del runner; o promover la candidatura DISCOVERED `_flushDirtyEntity`. |
 
 ## Cycle 128 — Fix test-debt in engine/parser/planner suites + register them in the gate (CE-065)
 

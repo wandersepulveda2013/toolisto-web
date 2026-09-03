@@ -330,7 +330,12 @@ async function importProject(bundle, options = {}) {
       if (Array.isArray(obj[field])) obj[field] = remapIdArray(obj[field]);
     }
     if (Array.isArray(obj.relations)) {
-      obj.relations = obj.relations.map(r => ({ ...r, targetId: remapId(r.targetId), from: remapId(r.from), to: remapId(r.to) }));
+      obj.relations = obj.relations
+        .map(r => {
+          if (!r) return null;
+          return { ...r, targetId: remapId(r.targetId), from: remapId(r.from), to: remapId(r.to) };
+        })
+        .filter(r => r !== null && r !== undefined);
     }
     if (obj.config && typeof obj.config === 'object') {
       for (const field of ['sourceAssetId', 'scanDocId', 'scanDocumentId', 'sourceTableId', 'captureId', 'sourceId', 'tableId', 'sourceDocId', 'correctedAssetId', 'originalAssetId', 'assetId']) {

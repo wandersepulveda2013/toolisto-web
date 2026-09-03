@@ -203,6 +203,7 @@ function collectRelations(bundle) {
   for (const key of OBJECT_KEYS) {
     for (const obj of (bundle[key] || [])) {
       for (const r of (obj.relations || [])) {
+        if (!r) continue;
         const to = r.targetId || r.to;
         if (to) relations.push({ from: obj.id, to, type: r.type || 'relation' });
       }
