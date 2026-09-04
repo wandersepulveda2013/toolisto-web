@@ -3,7 +3,7 @@
 > Cada ciclo de OpenCode LEE este archivo antes de actuar y lo ACTUALIZA antes de terminar.
 > Registro historico de ciclos de la mision Evolucion Continua.
 > Modo activo SOLO despues de la transicion (cuando `workspace/PRODUCTION_READINESS_DONE` exista).
-> Updated: 2026-09-04 (Cycle 184 — CE-121)
+> Updated: 2026-09-04 (Cycle 185 — CE-122)
 
 ---
 
@@ -1260,6 +1260,29 @@
 | **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`; `git push` denegado (rama acumulada por delante de origin/main). |
 | **Limitaciones** | El bug era latente enmascarado por `dashboardVisibleRows` (que coacciona todo a String antes de pasar a `dashboardChartItems`). El fix protege contra refactorizaciones futuras del pipeline y es testeable directamente como funcion pura. La ancla statica de `dashboardVisibleRows` incluida en el test documenta el enmascaramiento actual. |
 | **Proxima prioridad** | DISCOVERY 17ta ronda; promover candidatos: 50 suites de test huerfanas no registradas en el gate (highest regression risk), dead code en createPdfBlob (MEDIUM), scanner preview sin feedback (LOW). |
+
+## Cycle 185 — CE-122: createPdfBlob sin scaffolding muerto + harness stale-delete-lifecycle determinista
+
+| Field | Value |
+|-------|-------|
+| **Date** | 2026-09-04 |
+| **Branch** | main |
+| **HEAD inicial** | 5765e14 (commit docs CE-121, ultimo) |
+| **HEAD final** | 3d0ea88 (2 commits de este ciclo: f19b5b6 + 3d0ea88) |
+| **Task** | CE-122 (P2, DISCOVERY 17ta ronda -> DONE). Dos entregables del mismo ciclo: (1) dead code MEDIUM en `createPdfBlob` — 23 lineas de scaffolding muerto; (2) des-flake del harness `stale-delete-lifecycle` (CE-060), que fallo 2 veces el gate completo en secciones distintas (§1.7, §3.9/3.10) pasando 120/120 en aislamiento. |
+| **Hypothesis (confirmado leyendo el source)** | (1) `createPdfBlob` (workspace/core/workflow-operations.js ~946-968) declara `header`/`body`/`offsets`/`pos`/`off1..off5`/`lines`/`objects`/`imgObj`/`imgEnd` calculados para un primer `wx.Compose` y los resultados se recalcular-embeben en el segundo `wx.Compose`; las variables intermedias son puro scaffolding muerto (ninguna se usa despues del segundo Compose). (2) `stale-delete-lifecycle` esperaba completado de operaciones asincronas con sleeps fijos `delay(30-80ms)`; bajo la carga del gate completo esos sleeps disparan tarde (una tarea que tarda 35ms se asume lista a los 30ms, pero la escritura pudo correr en un microtask posterior), produciendo un FAIL transitorio reproducido en secciones distintas entre runs. |
+| **Change** | (1) `createPdfBlob`: se retiran las 23 lineas muertas; el test de output PDF garantiza que el PDF generado es byte-identico al de la referencia (el scaffolding no afectaba el resultado). (2) `tests/workspace/stale-delete-lifecycle.mjs`: nuevo helper `waitFor(cond, timeoutMs = 3000)` (poll de 10ms, cap 3s) y se reemplazan los 9 waits de completado que usaban sleeps fijos: §1.7 (`saveCompleted`), §3.8–3.10 (`saveDone`), §4.8 (`bgQueuedDone`), §7.1 (`aSaveDone`), §9.5 (`flushDone`), §9.8 (`visFlushed`), §9.11 (`saveOrder.includes('done')`), §10.4 (`dupDone`), §10.17 (`dupDone && srcDone`). Ninguna asercion cambia; las races de negocio (en los `delay()` internos de las tareas encoladas) se conservan intactas. |
+| **Bugs confirmados** | El dead code de `createPdfBlob` (scaffolding inerte de un refactor previo). El flake de CE-060 era del HARNESS (sleeps fijos que disparan tarde bajo carga), no de la suite ni del producto — cada corrida aislada 120/120 lo demostraba; el gate lo exponia. |
+| **Bugs corregidos** | Eliminadas las 23 lineas muertas; el harness de CE-060 espera flags de completado reales en lugar de dormir un tiempo fijo. |
+| **Tests ejecutados** | `node tests/workspace/createPdfBlob-dead-code-test.mjs` (nuevo 27/27); `node tests/workspace/stale-delete-lifecycle.mjs` x3 corridas aisladas consecutivas 120/120 cada una; `node scripts/test-workspace-release.mjs` (RELEASE GATE completo PASS, fail 0 — primera corrida: FAIL transitorio en CE-060, diagnostico y fix del harness; segunda corrida: OK). |
+| **Tests PASS** | 27/27 (dead code) + 120/120 x3 (harness). RELEASE GATE completo PASS 0 fail; manifest `release-gate-f19b5b6...json` con total **79 suites** (conteo por manifest; ver Limitaciones). |
+| **Tests FAIL** | 0 (run final). Los 2 FAIL previos eran el flake de CE-060 ya diagnosticado. |
+| **Resultado** | PERFORMANCE_IMPROVEMENT (dead code) + MEANINGFUL_TEST_COVERAGE (determinismo del harness) + eliminacion de un flake del gate. |
+| **Evidence** | `workspace/core/workflow-operations.js` (`createPdfBlob` limpio), `tests/workspace/createPdfBlob-dead-code-test.mjs`, `tests/workspace/stale-delete-lifecycle.mjs` (helper `waitFor`), `scripts/test-workspace-release.mjs`. |
+| **Commits** | `f19b5b6` (fix(ce): CE-122 elimina scaffolding muerto de createPdfBlob — 23 lineas — con test de output PDF intacto); `3d0ea88` (test(ce): CE-122 — stale-delete-lifecycle espera flags de completado en vez de sleeps fijos). Publicacion de `dist/` y regeneracion de `bundle` NO se commitearon (el gate las produce como artefacto; solo se commiteo el test suite real). |
+| **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`; `git push` denegado (rama acumulada por delante de origin/main). |
+| **Limitaciones** | (1) Los conteos de suites de ciclos previos (82/83/84 en filas CE-119/120/121 de la QUEUE) NO coinciden con el total de sus manifests (`1d756e9`=77, `c6d6b08`=78); el manifest del gate es la fuente autoritativa. Para este ciclo se reporta el total del manifest (79). (2) El fix de CE-060 ataca la causa raiz estructural (sleeps fijos); no se tumbaron asserts ni se relajo el timing — quedan 3 corridas aisladas 120/120 y la corrida del gate como evidencia. (3) Las ~50 suites huerfanas siguen sin registrarse en el gate (deuda de cobertura diferida, no parte de CE-122). (4) El dead code eliminado era inerte por construccion; se protegio con test de paridad de output byte-identico para que una futura regression del flujo real del PDF la detecte. |
+| **Proxima prioridad** | DISCOVERY 18ta ronda; promover candidatos: 50 suites de test huerfanas en `tests/workspace/` sin registrar en el gate (highest regression risk — incluye arreglar el harness de `concurrency-test.mjs` que no resuelve `execution-resources.js`), helper `persistPreference` de localStorage (LOW), scanner preview sin feedback (LOW). |
 
 ## Cycle 128 — Fix test-debt in engine/parser/planner suites + register them in the gate (CE-065)
 
