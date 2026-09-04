@@ -160,6 +160,38 @@ run('swallowed-storage-errors (errores de storage ya no se tragan en silencio, C
 run('dashboard-chart-category-zero (categoria 0 no cae en "Sin categoría", CE-121)', 'node', ['tests/workspace/dashboard-chart-category-zero-test.mjs']);
 run('createPdfBlob-dead-code (createPdfBlob sin scaffolding muerto, mismo output PDF, CE-122)', 'node', ['tests/workspace/createPdfBlob-dead-code-test.mjs']);
 
+// 3.b Rescate de suites huérfanas (CE-123): no estaban registradas en el gate
+run('workflow-lifecycle (ciclo completo modelo/validación/ejecución, CE-123)', 'node', ['tests/workspace/workflow-lifecycle-test.mjs']);
+run('workflow-persistence (CRUD/export/import/schema/history, CE-123)', 'node', ['tests/workspace/workflow-persistence-test.mjs']);
+run('workflow-fase3-extended (AW-081..100 verificación profunda, CE-123)', 'node', ['tests/workspace/workflow-fase3-extended.mjs']);
+run('workflow-fase3 (productización P1..P9, CE-123)', 'node', ['tests/workspace/workflow-fase3-e2e.mjs']);
+run('workflow-templates (plantillas de flujo, CE-123)', 'node', ['tests/workspace/workflow-templates-test.mjs']);
+run('instruction-assistant-ui (UI del asistente de flujos, CE-123)', 'node', ['tests/workspace/instruction-assistant-ui-test.mjs']);
+run('workflow-model (modelo de flujos, CE-123)', 'node', ['tests/workspace/workflow-model-test.mjs']);
+run('workflow-batch-scale (lotes y concurrencia acotada, CE-123)', 'node', ['tests/workspace/workflow-batch-scale-test.mjs']);
+run('deep-regression (regresión profunda del Workspace, CE-123)', 'node', ['tests/workspace/deep-regression-test.mjs']);
+run('session-recovery (recuperación de sesión, CE-123)', 'node', ['tests/workspace/session-recovery-test.mjs']);
+run('operation-registry (registro de operaciones, CE-123)', 'node', ['tests/workspace/operation-registry-test.mjs']);
+run('locale-parser (parseo numérico/fecha/separadores canónico, CE-123)', 'node', ['tests/workspace/locale-parser-test.mjs']);
+run('innerhtml-structure (estructura innerHTML sin fugas, CE-123)', 'node', ['tests/workspace/innerhtml-structure-test.mjs']);
+run('history-manager (gestor de historial, CE-123)', 'node', ['tests/workspace/history-manager-test.mjs']);
+run('migration-compat (compatibilidad de migración, CE-123)', 'node', ['tests/workspace/migration-compat-test.mjs']);
+run('workflow-security (seguridad de flujos, CE-123)', 'node', ['tests/workspace/workflow-security-test.mjs']);
+run('workspace-storage (sesiones del workspace, CE-123)', 'node', ['tests/workspace/workspace-storage-test.mjs']);
+run('concurrency (motor: concurrencia/cancelar/reintento, CE-123)', 'node', ['tests/workspace/concurrency-test.mjs']);
+run('workflow-validator (validación de flujos, CE-123)', 'node', ['tests/workspace/workflow-validator-test.mjs']);
+run('workflow-cancel-retry (cancelar/reintentar flujos, CE-123)', 'node', ['tests/workspace/workflow-cancel-retry-test.mjs']);
+run('model-fk (integridad modelo de datos, CE-123)', 'node', ['tests/workspace/model-fk-test.mjs']);
+run('job-queue (cola de trabajos, CE-123)', 'node', ['tests/workspace/job-queue-test.mjs']);
+run('error-manager (gestor de errores, CE-123)', 'node', ['tests/workspace/error-manager-test.mjs']);
+run('workflow-lifecycle-leak (sin fugas de listeners, CE-123)', 'node', ['tests/workspace/workflow-lifecycle-leak-test.mjs']);
+run('tabular-text-parser (parser de texto tabular, CE-123)', 'node', ['tests/workspace/tabular-text-parser-test.mjs']);
+run('encoding-audit (codificación workspace.js, CE-123)', 'node', ['tests/workspace/encoding-audit.mjs']);
+run('phase3-wsp022-svg-security E2E (SVG no ejecuta scripts, CE-123)', 'node', ['tests/workspace/phase3-wsp022-svg-security-test.mjs']);
+run('workflow-builder-a11y E2E (contrato ARIA/teclado del builder, CE-123)', 'node', ['tests/workspace/workflow-builder-a11y-test.mjs']);
+run('tabular-detection E2E (detección tabular + botón Informe, CE-123)', 'node', ['tests/workspace/tabular-detection-test.mjs']);
+run('workflow-chart E2E (cadena tabular -> gráfico -> PDF, CE-123)', 'node', ['tests/workspace/workflow-chart-e2e.mjs']);
+
 // 4. Manifest de evidencia
 const evidence = {
   sha: head,

@@ -145,7 +145,7 @@ try {
     const btns = Array.from(document.querySelectorAll('[aria-label="Filtrar por categoria"] button'));
     return {
       pressed: btns.filter(b => b.getAttribute('aria-pressed') === 'true').map(b => b.textContent.trim()),
-      hasGrafico: btns.some(b => /graf/i.test(b.textContent) && b.getAttribute('aria-pressed') === 'true'),
+      hasGrafico: btns.some(b => /gr[aá]fic/i.test(b.textContent) && b.getAttribute('aria-pressed') === 'true'),
     };
   });
   if (catAfterClick.hasGrafico && catAfterClick.pressed.length === 1) {

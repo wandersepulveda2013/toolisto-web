@@ -43,7 +43,12 @@ for (const [name, pattern] of fnPatterns) {
 // Verify localStorage usage for session ID
 check('Usa localStorage para session ID', code.includes('localStorage'));
 check('Usa dbPut/dbGet de storage.js', code.includes('dbPut'));
-check('Schema version 1 definido', /version\s*:\s*1/.test(code) || /SCHEMA_VERSION\s*=\s*1/.test(code));
+
+// Verify session records carry the centralized schema version (value 1)
+const schemaSrc = readFileSync(join(ROOT, 'workspace', 'core', 'schema-versions.js'), 'utf8');
+check('Importa SESSION_SCHEMA_VERSION desde schema-versions.js', /import\s*\{[^}]*SESSION_SCHEMA_VERSION[^}]*\}\s*from\s*['"]\.\/schema-versions\.js['"]/.test(code));
+check('SESSION_SCHEMA_VERSION es 1', /SESSION_SCHEMA_VERSION\s*=\s*1\b/.test(schemaSrc));
+check('Usa schemaVersion: SESSION_SCHEMA_VERSION en el registro', code.includes('schemaVersion: SESSION_SCHEMA_VERSION'));
 check('Max 5 sesiones', code.includes('5') && (code.includes('MAX_SESSIONS') || code.includes('maxSessions')));
 
 console.log(`\nResultados: ${pass} pass, ${fail} fail, ${pass + fail} tests\n`);

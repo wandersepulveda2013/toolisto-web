@@ -11,13 +11,14 @@ const regCode = readFileSync(join(ROOT, 'workspace', 'core', 'operation-registry
 const modelCode = readFileSync(join(ROOT, 'workspace', 'core', 'workflow-model.js'), 'utf8');
 const valCode = readFileSync(join(ROOT, 'workspace', 'core', 'workflow-validator.js'), 'utf8');
 const jqCode = readFileSync(join(ROOT, 'workspace', 'core', 'job-queue.js'), 'utf8');
+const resCode = readFileSync(join(ROOT, 'workspace', 'core', 'execution-resources.js'), 'utf8');
 const engCode = readFileSync(join(ROOT, 'workspace', 'core', 'workflow-engine.js'), 'utf8');
 
 function stripImports(code) {
   return code.replace(/^import\s.*;?\s*$/gm, '').replace(/^export\s+/gm, '');
 }
 
-const combined = [regCode, modelCode, valCode, jqCode, engCode].map(stripImports).join('\n');
+const combined = [regCode, modelCode, valCode, jqCode, resCode, engCode].map(stripImports).join('\n');
 
 const fullCode = combined + '\n'
   + 'globalThis.createOperationRegistry = createOperationRegistry;\n'

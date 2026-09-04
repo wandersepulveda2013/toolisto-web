@@ -4,10 +4,19 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const SRC = join(__dirname, '..', '..', 'workspace', 'core', 'workflow-model.js');
+const ROOT = join(__dirname, '..', '..');
+const schemaCode = readFileSync(join(ROOT, 'workspace', 'core', 'schema-versions.js'), 'utf8');
+const SRC = join(ROOT, 'workspace', 'core', 'workflow-model.js');
 const code = readFileSync(SRC, 'utf8');
 
-const body = code.replace(/^import\s.*;?\s*$/gm, '').replace(/^export\s+/gm, '');
+function stripImports(cc) {
+  return cc.replace(/^import\s.*;?\s*$/gm, '').replace(/^export\s+/gm, '');
+}
+
+const body = [
+  stripImports(schemaCode),
+  stripImports(code),
+].join('\n');
 const sandbox = { console, Map, Array, Object, Error, Date, JSON, Math, Number };
 const fn = new Function('console', 'Map', 'Array', 'Object', 'Error', 'Date', 'JSON', 'Math', 'Number',
   body + '\nreturn createWorkflowModel;'
