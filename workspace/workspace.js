@@ -2464,6 +2464,7 @@ function convertDocToTable(doc) {
 function tableChartData(table, maxSeries = 30) {
   const headers = table?.headers || [];
   const rows = table?.rows || [];
+  if (headers.length < 2) return { series: [], numericIndex: null };
   const candidateIndexes = headers.slice(1).map((_, index) => index + 1);
   const numericIndex = candidateIndexes.sort((left, right) => {
     const leftScore = rows.filter(row => parseLocaleNumber(row?.[left]) !== null).length;
@@ -2514,6 +2515,7 @@ function buildTableChartSvg(chart, seriesData) {
 
 async function syncDerivedCharts(project, table) {
   if (!project?.id || !table?.id) return;
+  if ((table.headers || []).length < 2) return;
   try {
     const charts = await loadAssetsByType(project.id, 'chart');
     const derived = charts.filter(chart => chart.sourceTableId === table.id);

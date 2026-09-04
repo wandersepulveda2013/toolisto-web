@@ -155,6 +155,7 @@ run('capture-history-dataurl (el undo ya no trunca dataUrl de capturas, CE-114)'
 run('import-sourceid-remap (el import remapea el sourceId top-level de dashboard y query, CE-115)', 'node', ['tests/workspace/import-sourceid-remap-test.mjs']);
 run('scanner-refs-in-guards (campos scanner en REF_SOURCE_FIELDS/REF_CONFIG_FIELDS, CE-117)', 'node', ['tests/workspace/scanner-refs-in-guards-test.mjs']);
 run('jsonl-import-resilience (import JSONL resiliente a lineas malformadas, CE-118)', 'node', ['tests/workspace/jsonl-import-resilience-test.mjs']);
+run('table-chart-oob-guard (tableChartData con <2 headers no crashea ni corrompe, CE-119)', 'node', ['tests/workspace/table-chart-oob-guard-test.mjs']);
 
 // 4. Manifest de evidencia
 const evidence = {

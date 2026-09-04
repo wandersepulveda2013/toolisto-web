@@ -493,7 +493,7 @@ export function registerWorkflowOperations(registry) {
         const input = ctx.input.data || ctx.input;
         const headers = Array.isArray(input?.headers) ? input.headers : [];
         const rows = Array.isArray(input?.rows) ? input.rows : [];
-        if (!headers.length || !rows.length) throw new Error('Se necesita una tabla con encabezados y filas para crear un grafico');
+        if (headers.length < 2 || !rows.length) throw new Error('Se necesita una tabla con al menos 2 columnas y datos para crear un grafico');
         const { series, numericIndex } = tableChartSeries(headers, rows);
         if (!series.length) throw new Error('No se encontro una columna numerica para graficar');
         const title = ctx.options.title || 'Grafico de ' + (headers[numericIndex] || 'datos');
@@ -528,7 +528,7 @@ export function registerWorkflowOperations(registry) {
           lines.push({ type: 'paragraph', content: 'Generado: ' + new Date().toLocaleDateString('es-ES') });
         }
         lines.push({ type: 'paragraph', content: '' });
-        if (input.rows && input.headers) {
+        if (input.rows && input.headers && input.headers.length >= 2) {
           lines.push({ type: 'heading2', content: 'Datos incluidos' });
           lines.push({ type: 'paragraph', content: input.rows.length + ' filas, ' + input.headers.length + ' columnas' });
           lines.push({ type: 'paragraph', content: 'Columnas: ' + input.headers.join(', ') });
@@ -614,6 +614,7 @@ export function registerWorkflowOperations(registry) {
 function tableChartSeries(headers, rows, maxSeries = 30) {
   const safeHeaders = Array.isArray(headers) ? headers : [];
   const safeRows = Array.isArray(rows) ? rows : [];
+  if (safeHeaders.length < 2) return { series: [], numericIndex: null };
   const candidateIndexes = safeHeaders.slice(1).map((_, index) => index + 1);
   const numericIndex = candidateIndexes.sort((left, right) => {
     const leftScore = safeRows.filter(row => parseLocaleNumber(row?.[left]) !== null).length;
