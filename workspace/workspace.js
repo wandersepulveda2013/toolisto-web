@@ -6294,6 +6294,16 @@ function saveQueryResultAsTable() {
   });
 }
 
+function parseJsonlText(text) {
+  const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+  const records = [];
+  let skipped = 0;
+  for (const line of lines) {
+    try { records.push(JSON.parse(line)); } catch { skipped++; }
+  }
+  return { records, skipped };
+}
+
 function importQueryFile() {
   const project = appStore.get('currentProject');
   if (!project) {
@@ -6310,7 +6320,9 @@ function importQueryFile() {
       const text = await file.text();
       let table;
       if (/\.(jsonl|ndjson)$/i.test(file.name)) {
-        const records = text.split(/\r?\n/).map(line => line.trim()).filter(Boolean).map(line => JSON.parse(line));
+        const { records, skipped } = parseJsonlText(text);
+        if (!records.length) { toast('El archivo no contiene registros válidos', 'error'); return; }
+        if (skipped) toast(`Se omitieron ${skipped} línea(s) con formato inválido`, 'warning');
         const headers = [...new Set(records.flatMap(record => Object.keys(record || {})))];
         table = { id: 'file-' + generateId(), name: file.name.replace(/\.(jsonl|ndjson)$/i, ''), headers, rows: records.map(record => headers.map(header => record?.[header] == null ? '' : String(record[header]))) };
       } else if (/\.json$/i.test(file.name)) {
