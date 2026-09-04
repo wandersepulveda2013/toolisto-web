@@ -3,7 +3,7 @@
 > Cada ciclo de OpenCode LEE este archivo antes de actuar y lo ACTUALIZA antes de terminar.
 > Registro historico de ciclos de la mision Evolucion Continua.
 > Modo activo SOLO despues de la transicion (cuando `workspace/PRODUCTION_READINESS_DONE` exista).
-> Updated: 2026-09-04 (Cycle 186 — CE-123)
+> Updated: 2026-09-04 (Cycle 187 — CE-124)
 
 ---
 
@@ -1306,6 +1306,29 @@
 | **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`; `git push` denegado (rama acumulada por delante de origin/main). |
 | **Limitaciones** | (1) DEFERIDAS documentadas (no registradas): E2E browser pesados `phase3-integrity` (OCR real >120s), `step8-validation` (10 corridas OCR >120s), `phase4-integrity`/`phase4-migrations`/`phase5-bundle-trust`/`phase6-network-negative`, `workflow-e2e`, `instruction-e2e`, `invoice-fields-e2e`, `pdf-image-embed-e2e`, `lazy-capture-images-e2e`, `workspace-tabs-a11y`, `workspace-stability-e2e`, `phase3a-manual-verification`; diagnosticos `ocr-word-confidence`, `ocr-reliability-diagnostic`, `ocr-difficult-measurement`, `perspective-bench`, `playwright-render`; `production-validation` (exige servidor externo en :8080); helper `idb-helpers.mjs`. Los E2E pesados no usan mocks (nada que ver con la regla E2E sin mocks); se difieren por coste de runtime/O(varios minutos). (2) Una suite (`.mjs`) con 'phase' en el nombre — `phase3a-manual-verification` — es verificacion manual, no unit. (3) `tabular-detection-test.mjs` es E2E browser en :8081 (colision previa en paralelo era artefacto de ejecucion, no defecto). (4) El gate sube de 79 a 109 suites; el runtime tipo del gate crece ~1-2 min (los E2E nuevos suman ~30s). (5) `workflow-chart-e2e` SI se registro (E2E ligero ~10s); su hermano `workflow-e2e-test` quedo deferido por ser pesado. |
 | **Proxima prioridad** | DISCOVERY 19na ronda; promover candidatos: E2E huerfanos que queden con runtime aceptable (<30s) — p.ej. `invoice-fields-e2e`, `pdf-image-embed-e2e`, `workflow-e2e`, `instruction-e2e`, `workspace-tabs-a11y` — con limites de red/tiempo bien definidos por suite; de lo contrario consolidar la documentacion de los deferidos como debt de ejecucion manual. |
+
+## Cycle 187 — CE-124: rescate de 7 E2E huerfanos mas al gate de release (+3 fixes de harness honestos)
+
+| Field | Value |
+|-------|-------|
+| **Date** | 2026-09-04 |
+| **Branch** | main |
+| **HEAD inicial** | 3c2527a (commit docs CE-123, ultimo) |
+| **HEAD final** | 33fb3c3 (1 commit de este ciclo: 33fb3c3). El manifest del gate queda ligado a este SHA. |
+| **Task** | CE-124 (P3, DISCOVERY 19na ronda -> DONE). Tras el rescate de CE-123 (30 suites) quedaban E2E browser huerfanos en `tests/workspace/` con runtime presumible <30s. La ronda clasifico los 7 candidatos inmediatos en aislamiento y los rescato al gate. |
+| **Hypothesis (confirmado leyendo el source)** | (1) `workflow-e2e-test.mjs` usaba `getByRole('button', { name: /Anadir operacion/ })` SIN acentos en E2E5/E2E6 mientras que el label real del producto es «Añadir operación» (`workspace/core/workflow-ui.js:248`); es el mismo patron de expectation desactualizada de CE-123 (`Gráfico`): el regex sin acento no matcheaba el accessible name y Playwright agotaba 30s. (2) `workspace-stability-e2e-test.mjs` hacia `page.goto` sin levantar servidor propio: ningun runner lo servia (ERR_CONNECTION_REFUSED en aislamiento). (3) `lazy-capture-images-e2e.mjs` simulaba el scroll con `scrollTop = scrollHeight` repetido: el IntersectionObserver del producto (rootMargin 300px) solo dispara en posiciones asentadas, por lo que las tarjetas del medio nunca intersectaban (14/24) aunque el producto cumple el contrato (carga al pasar por la tarjeta). |
+| **Change** | 3 fixes de harness (sin tocar product code ni criterios): `workflow-e2e-test.mjs` — los 2 regex `/Anadir operacion/` -> `/Añadir operación/` (E2E1 ya usaba la forma acentuada); `workspace-stability-e2e-test.mjs` — arranca server autocontenido de `dist/` en E2E_PORT como el resto de E2Es del gate (servir recursivo con MIME completo, cierre en finally); `lazy-capture-images-e2e.mjs` — §5 pasa de salto-unico a barrido incremental con doble sentido (sube/baja), cap 3 barridos x 80 pasos x 50ms: cada tarjeta atraviesa una posicion asentada del viewport y dispara el IO. Se registran **7 suites** en `scripts/test-workspace-release.mjs` (bloque CE-124 tras CE-123): invoice-fields-e2e 16, pdf-image-embed-e2e 16, workflow-e2e 31, instruction-e2e 17, workspace-tabs-a11y 22, workspace-stability-e2e 9, lazy-capture-images 12 (suma ~120 asserts). |
+| **Bugs confirmados** | Ningun bug de producto. Los defectos eran de harness/expectation del test: regex de accessible name sin acentos, suite sin server propio, simulacion de scroll que no ejercitaba el IO de las tarjetas intermedias. |
+| **Bugs corregidos** | Los 3 harness mencionados. Las 7 suites pasan en aislamiento sin tocar product source. |
+| **Tests ejecutados** | 7 corridas en aislamiento (una por suite); 2 corridas completas del RELEASE GATE (pre-commit y ligada al SHA 33fb3c3). |
+| **Tests PASS** | 7 suites rescatadas (16+16+31+17+22+9+12 asserts). RELEASE GATE completo 116 suites PASS 0 fail; manifest `release-gate-33fb3c3...json`. |
+| **Tests FAIL** | 0 (corrida final del gate). |
+| **Resultado** | MEANINGFUL_TEST_COVERAGE. |
+| **Evidence** | `scripts/test-workspace-release.mjs` (bloque CE-124), `tests/workspace/workflow-e2e-test.mjs`, `tests/workspace/workspace-stability-e2e-test.mjs`, `tests/workspace/lazy-capture-images-e2e.mjs`. |
+| **Commits** | `33fb3c3` (test(ce): CE-124 rescata 7 E2E huerfanos al gate de release (+3 fixes de harness honestos) — 4 archivos, +61/-10). Publicacion de `dist/` y artefactos del gate NO se commitearon. |
+| **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`; `git push` denegado (rama acumulada por delante de origin/main). |
+| **Limitaciones** | (1) DEFERIDAS (se mantienen fuera del gate): E2E pesados `phase3-integrity` (OCR real >120s), `step8-validation` (10 corridas OCR >120s), `phase4-integrity`/`phase4-migrations`/`phase5-bundle-trust`/`phase6-network-negative`, `phase3a-manual-verification`; diagnosticos `ocr-word-confidence`, `ocr-reliability-diagnostic`, `ocr-difficult-measurement`, `perspective-bench`, `playwright-render`; `production-validation` (exige servidor externo en :8080); helper `idb-helpers.mjs`. (2) El gate sube de 109 a 116 suites; los E2E CE-124 suman ~25-35s al runtime total (5 de ellos en :8082, secuenciales via spawnSync). (3) El fix de workflow-e2e confirma el patron CE-123: los tests de la era Phase 3E fueron escritos asumiendo labels sin acento (es-ES correcto del producto); la expectativa del test es la que estaba desactualizada. (4) lazy-capture ejecuta 3 barridos x 80 pasos como tope, pero sale apenas llega a 24/24; el primer barrido suele bastar (~8 pasos, <500ms). |
+| **Proxima prioridad** | DISCOVERY 20ma ronda: quedan unit/VM huerfanos (`workflow-ui-test`, `workflow-engine-test`, `instruction-planner-test`, `instruction-parser-test`, `document-*`, `pdf-*`, `table-*`, `capture-*`, `phase3b`, `phase3a`, `workspace` ya estan en el gate; verificar el listado completo de `tests/workspace/*.mjs` contra el gate) y los que sigan fuera documentar el por que en la QUEUE; consolidar `ROADMAP` de ejecucion manual si no hay mas candidatos meta <30s. El gate ya cubre 116 suites; el siguiente ciclo puede atacar el proxy de calidad: `evidence-determinism`, `git diff --check` y limpieza de espacios sin seguimiento (`_tl*.log`, manifests huérfanos) como tarea de higiene. |
 
 ## Cycle 128 — Fix test-debt in engine/parser/planner suites + register them in the gate (CE-065)
 
