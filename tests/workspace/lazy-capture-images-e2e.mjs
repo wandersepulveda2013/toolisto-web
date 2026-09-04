@@ -172,11 +172,20 @@ async function main() {
     console.log('\n--- 5. Scroll hasta el final carga todas ---');
     const scrolledLoaded = await page.evaluate(async (expected) => {
       const main = document.querySelector('#ws-main-content') || document.documentElement;
-      for (let i = 0; i < 40; i++) {
-        main.scrollTop = main.scrollHeight;
-        const loaded = document.querySelectorAll('.ws-card-grid .ws-card img').length;
-        if (loaded >= expected) return { done: true, loaded };
-        await new Promise(r => setTimeout(r, 200));
+      const stepPx = () => Math.max(200, Math.floor((main.clientHeight || 800) * 0.8));
+      for (let sweep = 0; sweep < 3; sweep++) {
+        main.scrollTop = sweep % 2 === 0 ? 0 : main.scrollHeight;
+        const step = stepPx();
+        const dir = sweep % 2 === 0 ? 1 : -1;
+        for (let i = 0; i < 80; i++) {
+          const loaded = document.querySelectorAll('.ws-card-grid .ws-card img').length;
+          if (loaded >= expected) return { done: true, loaded };
+          const current = main.scrollTop;
+          const target = dir > 0 ? Math.min(current + step, main.scrollHeight) : Math.max(current - step, 0);
+          if (target === current) break;
+          main.scrollTop = target;
+          await new Promise(r => setTimeout(r, 50));
+        }
       }
       return { done: false, loaded: document.querySelectorAll('.ws-card-grid .ws-card img').length };
     }, N_CAPTURES);

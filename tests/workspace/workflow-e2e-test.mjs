@@ -266,7 +266,7 @@ try {
       await page.locator('#wf-file-input').setInputFiles([
         { name: 'resultado.png', mimeType: 'image/png', buffer: png },
       ]);
-      await page.getByRole('button', { name: /Anadir operacion/ }).click();
+      await page.getByRole('button', { name: /Añadir operación/ }).click();
       await page.locator('#wf-op-results').getByText('Convertir formato de imagen', { exact: true }).click();
       await page.getByRole('button', { name: /Ejecutar flujo/ }).click();
       await page.waitForSelector('#wf-results-section', { state: 'visible', timeout: 15000 });
@@ -346,7 +346,7 @@ try {
       await page.waitForSelector('#wf-file-input', { state: 'attached', timeout: 10000 });
       const scanPath = join(ROOT, 'tests', 'fixtures', 'star-flow', 'scan-clear.png');
       await page.locator('#wf-file-input').setInputFiles([scanPath]);
-      await page.getByRole('button', { name: /Anadir operacion/ }).click();
+      await page.getByRole('button', { name: /Añadir operación/ }).click();
       await page.locator('#wf-op-results').getByText('Extraer texto (OCR)', { exact: true }).click();
       await page.getByRole('button', { name: /Ejecutar flujo/ }).click();
       // OCR real necesita cargar Tesseract; la ejecucion puede tardar mas que un flujo de imagen.

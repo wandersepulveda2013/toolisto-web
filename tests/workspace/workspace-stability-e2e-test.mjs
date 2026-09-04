@@ -1,22 +1,54 @@
 #!/usr/bin/env node
-import { join, dirname } from 'node:path';
+import { join, dirname, extname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { mkdirSync, existsSync, statSync, readFileSync } from 'node:fs';
 import { chromium } from 'playwright';
+import { createServer } from 'node:http';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..', '..');
+const DIST = join(ROOT, 'dist');
 const ARTIFACTS = join(ROOT, 'artifacts', 'stability-e2e');
-import { mkdirSync } from 'node:fs';
 mkdirSync(ARTIFACTS, { recursive: true });
 
-const PORT = process.env.E2E_PORT || 8082;
+const PORT = Number(process.env.E2E_PORT || 8082);
 const BASE = `http://localhost:${PORT}/workspace/index.html?preview=internal`;
+
+const MIME = {
+  '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8',
+  '.js': 'application/javascript; charset=utf-8', '.mjs': 'application/javascript; charset=utf-8',
+  '.png': 'image/png', '.jpg': 'image/jpeg', '.svg': 'image/svg+xml',
+  '.json': 'application/json', '.ico': 'image/x-icon', '.wasm': 'application/wasm',
+  '.gz': 'application/gzip', '.pdf': 'application/pdf', '.txt': 'text/plain; charset=utf-8',
+};
+
+let _srv;
+function startServer() {
+  return new Promise((resolve, reject) => {
+    _srv = createServer((req, res) => {
+      let file = req.url.split('?')[0];
+      if (file === '/') file = '/index.html';
+      let fp = join(DIST, file);
+      if (existsSync(fp) && statSync(fp).isDirectory()) fp = join(fp, 'index.html');
+      if (!existsSync(fp)) fp = join(DIST, file + '.html');
+      const ext = extname(fp).toLowerCase();
+      const data = readFileSync(fp);
+      res.writeHead(200, { 'Content-Type': MIME[ext] || 'application/octet-stream' });
+      res.end(data);
+    });
+    _srv.on('error', reject);
+    _srv.listen(PORT, () => resolve());
+  });
+}
+function stopServer() { return new Promise(resolve => { if (_srv) _srv.close(() => resolve()); else resolve(); }); }
 
 let pass = 0, fail = 0;
 function assert(cond, msg) {
   if (cond) { pass++; console.log(`  PASS: ${msg}`); }
   else { fail++; console.error(`  FAIL: ${msg}`); }
 }
+
+await startServer();
 
 const browser = await chromium.launch({ headless: true });
 const context = await browser.newContext({ viewport: { width: 1366, height: 900 } });
@@ -65,6 +97,7 @@ try {
   fail++;
 } finally {
   await browser.close();
+  await stopServer();
 }
 
 console.log(`\nResultados: ${pass} pass, ${fail} fail, ${pass + fail} tests\n`);

@@ -192,6 +192,15 @@ run('workflow-builder-a11y E2E (contrato ARIA/teclado del builder, CE-123)', 'no
 run('tabular-detection E2E (detección tabular + botón Informe, CE-123)', 'node', ['tests/workspace/tabular-detection-test.mjs']);
 run('workflow-chart E2E (cadena tabular -> gráfico -> PDF, CE-123)', 'node', ['tests/workspace/workflow-chart-e2e.mjs']);
 
+// CE-124: E2E huerfanos rescatados de la DISCOVERY 19va ronda (runtime <30s, autocontenidos)
+run('invoice-fields-e2e E2E (extracción de facturas en navegador con OCR real, CE-124)', 'node', ['tests/workspace/invoice-fields-e2e.mjs']);
+run('pdf-image-embed-e2e E2E (imágenes JPEG/PNG/WebP embedidas en PDF, CE-124)', 'node', ['tests/workspace/pdf-image-embed-e2e.mjs']);
+run('workflow-e2e E2E (flujos reales: batch, fallo parcial, cancelación, persistencia, resultados al Workspace, CE-124)', 'node', ['tests/workspace/workflow-e2e-test.mjs']);
+run('instruction-e2e E2E (asistente de flujos: estructura, imports, recursos, CE-124)', 'node', ['tests/workspace/instruction-e2e-test.mjs']);
+run('workspace-tabs-a11y E2E (contrato ARIA/teclado de tablists doc/tabla/query, CE-124)', 'node', ['tests/workspace/workspace-tabs-a11y-test.mjs']);
+run('workspace-stability-e2e E2E (estabilidad: undo/redo, save indicator, toasts, navegación, CE-124)', 'node', ['tests/workspace/workspace-stability-e2e-test.mjs']);
+run('lazy-capture-images-e2e E2E (lazy-load de imágenes de capturas con barrido de scroll determinista, CE-124)', 'node', ['tests/workspace/lazy-capture-images-e2e.mjs']);
+
 // 4. Manifest de evidencia
 const evidence = {
   sha: head,
