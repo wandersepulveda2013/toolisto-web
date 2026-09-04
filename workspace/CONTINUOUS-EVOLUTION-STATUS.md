@@ -3,7 +3,7 @@
 > Cada ciclo de OpenCode LEE este archivo antes de actuar y lo ACTUALIZA antes de terminar.
 > Registro historico de ciclos de la mision Evolucion Continua.
 > Modo activo SOLO despues de la transicion (cuando `workspace/PRODUCTION_READINESS_DONE` exista).
-> Updated: 2026-09-04 (Cycle 182 — CE-119)
+> Updated: 2026-09-04 (Cycle 183 — CE-120)
 
 ---
 
@@ -1217,6 +1217,28 @@
 | **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`; `git push` denegado (rama acumulada por delante de origin/main). |
 | **Limitaciones** | `tableChartData` sin headers (`undefined`/`null`) tambien retorna serie vacia (comportamiento nuevo, coherente). `syncDerivedCharts` hace early-return para <2 headers, por lo que charts existentes NO se sobreescriben (pero tampoco se actualizan si la tabla crece de 1 a 2 headers en sesion — el sync vuelve a funcionar cuando la tabla tiene >=2 headers en la proxima edicion). |
 | **Proxima prioridad** | DISCOVERY 15ta ronda; promover candidatos: dashboard category "0" (P2 latente), swallowed storage errors (P3 real). |
+
+## Cycle 183 — CE-120: los errores de storage ya no se tragan en silencio (captures guard, modal confirm, config save)
+
+| Field | Value |
+|-------|-------|
+| **Date** | 2026-09-04 |
+| **Branch** | main |
+| **HEAD inicial** | 65a482b (commit docs CE-119, ultimo) |
+| **Task** | CE-120 (P2, DISCOVERY 15ta ronda -> DONE). Cola sin TODO; DISCOVERY con 3 exploradores paralelos (dashboard category "0", swallowed storage errors, health scan). Se promovio swallowed storage errors (mayor impacto: los 13 `.catch(() => {})` vacios + 1 try/catch en workspace.js y 1 en storage.js tragaban en silencio fallos de IndexedDB/localStorage). El health scan ademas hallo 50 suites de test huerfanas no registradas en el gate (se anoto como candidato futuro). |
+| **Hypothesis (confirmado leyendo el source)** | `renderCaptureView` (workspace.js:2228) NO tenia el guard `_viewGeneration` — sus hermanas de documentos (linea 3257) y datos (4448) SI (`if (viewGeneration !== _viewGeneration) return;` tras el await de la lectura). Una lectura lenta de IndexedDB puede resolver DESPUES de que el usuario navego y pisa `appStore.captures` con datos stale de una navegacion anterior, ademas de re-renderizar un container quizas [detached]. Peor, `showModal` (`try { await opts.onConfirm(); } catch (e) { return; }`) tragaba TODAS las fallas de almacenamiento de eliminar/renombrar/guardar config sin feedback: el usuario cerraba creyendo que se habia borrado/guardado. `saveWorkspaceConfig` (linea 183) hacia `catch (error) {}` sobre `localStorage.setItem` mientras el toast de la config decia «Configuracion guardada». En storage.js, `deleteCapture` (linea 242) tragaba el fallo de `refreshProjectCounts` dejando conteos stale persistidos. |
+| **Bugs encontrados (confirmados)** | (1) `renderCaptureView` sin guard de generacion: carrera stale-data con la navegacion (las otras vistas lo protegen). (2) `.catch(() => {})` vacio en los 3 views list (captures/documents/data). (3) `showModal` tragaba el fallo de onConfirm (delete/rename/save). (4) `saveWorkspaceConfig` tragaba el fallo de setItem con mensaje de exito falso. (5) `deleteCapture` tragaba el fallo de refreshProjectCounts. Total 13 `.catch(() => {})` + 1 try/catch en workspace.js + 1 en storage.js. |
+| **Change** | (1) `renderCaptureView`: anade `const viewGeneration = _viewGeneration;` + `if (viewGeneration !== _viewGeneration) return;` antes de tocar el store (paridad con docs/data) y su catch reporta via `reportError(error, 'capture-list-load', {})`. (2) `renderDocumentsView` y `renderDataView`: `.catch(() => {})` -> `.catch(error => reportError(error, 'document-list-load'/'data-list-load', {}))`. (3) `showModal`: `catch (e) { return; }` -> `catch (e) { reportError(e, 'modal-confirm', { action: opts.confirmText || 'confirm' }); return; }` (mantiene el modal abierto). (4) `saveWorkspaceConfig`: `catch (error) {}` -> `catch (error) { reportError(error, 'workspace-config-save', {}); }`. (5) `storage.js` `deleteCapture`: importa `reportError` y `.catch(() => {})` -> `.catch(error => reportError(error, 'capture-delete-counts', { projectId: capture.projectId }))`. Suite nueva `tests/workspace/swallowed-storage-errors-test.mjs` 24/24 (funciones REALES + behavioral): guard de captures presente, bails out en capture/documents/data, catches reportan, modal reporta y mantiene abierto, saveWorkspaceConfig reporta al fallar y NO al exito (con merged config), storage.js importa reportError y deleteCapture lo usa, 0 `.catch(() => {})` restantes en workspace.js (antes 13), claves de contexto unicas (capture-list-load, document-list-load, data-list-load, modal-confirm, workspace-config-save, capture-delete-counts). Registrada en el release gate. |
+| **Bugs corregidos** | (1) captures view ya no pisa el store con datos stale tras navegar (guard de generacion). (2) Todas las fallas de lectura de listas (captures/docs/data) se reportan al gestor de errores. (3) Las fallas de almacenamiento en modales (delete/rename/save) se reportan y el modal permanece abierto. (4) `saveWorkspaceConfig` reporta si la persistencia falla (no hay mensaje de exito falso). (5) `deleteCapture` reporta si los conteos no se refrescan. |
+| **Tests ejecutados** | `node tests/workspace/swallowed-storage-errors-test.mjs` (nuevo 24/24); `node scripts/test-workspace-release.mjs` (RELEASE GATE completo PASS, 83 suites). |
+| **Tests PASS** | 24/24 nuevos. RELEASE GATE completo 83 suites PASS 0 fail. |
+| **Tests FAIL** | 0. |
+| **Resultado** | BUG_FIX (errores de storage tragados en silencio -> ahora se reportan; captures view recupera su guard de generacion). |
+| **Evidence** | `workspace/workspace.js` (`renderCaptureView`, `renderDocumentsView`, `renderDataView`, `showModal`, `saveWorkspaceConfig`), `workspace/core/storage.js` (`deleteCapture`, import de `reportError`), `tests/workspace/swallowed-storage-errors-test.mjs`, `scripts/test-workspace-release.mjs`. |
+| **Commits** | `1d756e9` (fix(ce): CE-120 swallowed storage errors — 4 archivos). |
+| **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`; `git push` denegado (rama acumulada por delante de origin/main). |
+| **Limitaciones** | El health scan encontro 50 suites de test huerfanas no registradas en el gate (se dejaron para un ciclo futuro dedicado). Los swallows de preferencias cosmticas de localStorage (theme/density/sidebar/favorites/recent, 7 sitios LOW) NO se tocaron en este ciclo: mantenerlos como swallows por incluir `console.error` seria ruido para una perdida de preferencia menor; se deja como candidato (helper persistPreference compartido). Los swallows intencionales de boot (lineas 933-949, CE-092) y `storage.estimate` (219) se conservan deliberadamente (no romper el arranque). |
+| **Proxima prioridad** | DISCOVERY 16ta ronda; promover candidatos: dashboard category "0" (P2 latente, 1 linea), 50 suites de test huerfanas no registradas en el gate (highest regression risk), dead code en createPdfBlob (MEDIUM), scanner preview sin feedback (LOW). |
 
 ## Cycle 128 — Fix test-debt in engine/parser/planner suites + register them in the gate (CE-065)
 
