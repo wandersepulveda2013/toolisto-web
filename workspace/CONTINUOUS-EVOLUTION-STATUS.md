@@ -3,7 +3,7 @@
 > Cada ciclo de OpenCode LEE este archivo antes de actuar y lo ACTUALIZA antes de terminar.
 > Registro historico de ciclos de la mision Evolucion Continua.
 > Modo activo SOLO despues de la transicion (cuando `workspace/PRODUCTION_READINESS_DONE` exista).
-> Updated: 2026-09-04 (Cycle 183 — CE-120)
+> Updated: 2026-09-04 (Cycle 184 — CE-121)
 
 ---
 
@@ -1239,6 +1239,27 @@
 | **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`; `git push` denegado (rama acumulada por delante de origin/main). |
 | **Limitaciones** | El health scan encontro 50 suites de test huerfanas no registradas en el gate (se dejaron para un ciclo futuro dedicado). Los swallows de preferencias cosmticas de localStorage (theme/density/sidebar/favorites/recent, 7 sitios LOW) NO se tocaron en este ciclo: mantenerlos como swallows por incluir `console.error` seria ruido para una perdida de preferencia menor; se deja como candidato (helper persistPreference compartido). Los swallows intencionales de boot (lineas 933-949, CE-092) y `storage.estimate` (219) se conservan deliberadamente (no romper el arranque). |
 | **Proxima prioridad** | DISCOVERY 16ta ronda; promover candidatos: dashboard category "0" (P2 latente, 1 linea), 50 suites de test huerfanas no registradas en el gate (highest regression risk), dead code en createPdfBlob (MEDIUM), scanner preview sin feedback (LOW). |
+
+## Cycle 184 — CE-121: la categoria 0 de dashboard ya no cae en "Sin categoría" (null-check, no falsy-coalescing)
+
+| Field | Value |
+|-------|-------|
+| **Date** | 2026-09-04 |
+| **Branch** | main |
+| **HEAD inicial** | 3b527c3 (commit docs CE-120, ultimo) |
+| **Task** | CE-121 (P2, DISCOVERY 16ta ronda -> DONE). Cola sin TODO; DISCOVERY con 3 exploradores paralelos (dashboard category "0", orphan test suites, dead code en createPdfBlob). Se promovio dashboard category "0" (un latente de correctitud, 1 linea, con testable directa). |
+| **Hypothesis (confirmado leyendo el source)** | `dashboardChartItems` (workspace.js:7266) usaba `String(row[categoryIndex] || 'Sin categoría')`. Falsy-coalescing colapsa `0` (y `''`/`null`/`undefined`) a "Sin categoría": `String(0 || 'Sin categoría')` = `"Sin categoría"`. En la UI actual, `dashboardVisibleRows` (7239) coacciona todo a `String()` antes de pasar a `dashboardChartItems`, asi que un `0` numerico llega como `'0'` (truthy) y el bug no se observa. Sin embargo `dashboardChartItems` es una funcion pura con contract publico (invocada inline en el render) que podria recibir filas con ceros numericos directamente si el pipeline se refactoriza. |
+| **Change** | En `dashboardChartItems` (workspace.js:7266): reemplaza `String(row[categoryIndex] || 'Sin categoría')` con un null-check explícito: `const raw = row[categoryIndex]; const category = (raw == null ? '' : String(raw).trim()) \|\| 'Sin categoría';`. Preserva `0` (y cualquier falsy no-nulo) como label `'0'`, sigue colapsando celdas vacias/nulas/undefined a "Sin categoría". Suite nueva `tests/workspace/dashboard-chart-category-zero-test.mjs` 15/15: numeric 0 como label, empty/null/undefined a "Sin categoría", whitespace-only a "Sin categoría", count aggregate con 0, string "0" regresion, ancla statica dashboardVisibleRows y guard. Registrada en el release gate. |
+| **Bugs corregidos** | (1) `dashboardChartItems` ya no colapsa ceros numericos a "Sin categoría" (antes: `0 || 'Sin categoría'` -> "Sin categoría"; ahora: `(0 == null ? '' : '0').trim()` -> "0"). (2) Proteccion defensiva para si `dashboardChartItems` recibe celdas con ceros numericos directamente (sin pasar por `dashboardVisibleRows`). |
+| **Tests ejecutados** | `node tests/workspace/dashboard-chart-category-zero-test.mjs` (nuevo 15/15); `node scripts/test-workspace-release.mjs` (RELEASE GATE completo PASS, 84 suites). |
+| **Tests PASS** | 15/15 nuevos. RELEASE GATE completo 84 suites PASS 0 fail. |
+| **Tests FAIL** | 0. |
+| **Resultado** | BUG_FIX latente (dashboard category "0" colapsaba a "Sin categoría"). |
+| **Evidence** | `workspace/workspace.js` (`dashboardChartItems`, `dashboardVisibleRows`), `tests/workspace/dashboard-chart-category-zero-test.mjs`, `scripts/test-workspace-release.mjs`. |
+| **Commits** | `c6d6b08` (fix(ce): CE-121 la categoria 0 de dashboard ya no cae en 'Sin categoría' — 3 archivos). |
+| **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`; `git push` denegado (rama acumulada por delante de origin/main). |
+| **Limitaciones** | El bug era latente enmascarado por `dashboardVisibleRows` (que coacciona todo a String antes de pasar a `dashboardChartItems`). El fix protege contra refactorizaciones futuras del pipeline y es testeable directamente como funcion pura. La ancla statica de `dashboardVisibleRows` incluida en el test documenta el enmascaramiento actual. |
+| **Proxima prioridad** | DISCOVERY 17ta ronda; promover candidatos: 50 suites de test huerfanas no registradas en el gate (highest regression risk), dead code en createPdfBlob (MEDIUM), scanner preview sin feedback (LOW). |
 
 ## Cycle 128 — Fix test-debt in engine/parser/planner suites + register them in the gate (CE-065)
 
