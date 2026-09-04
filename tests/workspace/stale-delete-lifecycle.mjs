@@ -14,6 +14,17 @@ function check(name, ok, detail) {
   else { fail++; console.error('  FAIL: ' + name + (detail ? ' - ' + detail : '')); }
 }
 function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+function waitFor(cond, timeoutMs = 3000) {
+  const deadline = Date.now() + timeoutMs;
+  return new Promise(resolve => {
+    const poll = () => {
+      if (cond()) return resolve(true);
+      if (Date.now() > deadline) return resolve(false);
+      setTimeout(poll, 10);
+    };
+    poll();
+  });
+}
 
 console.log('=== CE-060: Stale, Delete & Lifecycle ===\n');
 
@@ -244,7 +255,7 @@ console.log('--- Section 1: Delete vs stale update ---');
   });
   await delay(5);
   await tabB.dbDelete(tabB.STORES.documents, docId);
-  await delay(60);
+  await waitFor(() => saveCompleted);
 
   check('1.7: delayed queued save completed', saveCompleted);
   const result = await freshRead(tabA, 'documents', docId);
@@ -521,7 +532,7 @@ console.log('\n--- Section 3: Reload semantics ---');
     midRead && (midRead.name === 'PreSave' || midRead.name === 'DuringSave'),
     'name=' + (midRead && midRead.name));
 
-  await delay(40);
+  await waitFor(() => saveDone);
   check('3.9: save completed', saveDone);
   const postRead = await freshRead(tabB, 'documents', docId);
   check('3.10: post-save reload reads saved state',
@@ -661,7 +672,7 @@ console.log('\n--- Section 4: Background tab / suspended tab ---');
   const seq = (await freshRead(tabB, 'documents', docId))._writeSeq;
   await tabB.saveDoc(projId, { id: docId, name: 'QV2', blocks: [], _writeSeq: seq });
 
-  await delay(50);
+  await waitFor(() => bgQueuedDone);
   check('4.8: bg queued save completed', bgQueuedDone);
 
   const final = await freshRead(tabB, 'documents', docId);
@@ -855,7 +866,7 @@ console.log('\n--- Section 7: Destroy/recreate with another active runtime ---')
   await tabC.saveDoc(projId, { id: docId, name: 'C-new-save', blocks: [],
     _writeSeq: cRead._writeSeq });
 
-  await delay(60);
+  await waitFor(() => aSaveDone);
   check('7.1: old TAB-A delayed save completed', aSaveDone);
 
   const final = await freshRead(tabC, 'documents', docId);
@@ -1090,7 +1101,7 @@ console.log('\n--- Section 9: beforeunload persistence ---');
       _writeSeq: read ? read._writeSeq : 0 });
     flushDone = true;
   });
-  await delay(40);
+  await waitFor(() => flushDone);
 
   check('9.5: flush completes when triggered manually', flushDone);
   const result = await freshRead(tabA, 'documents', docId);
@@ -1134,7 +1145,7 @@ console.log('\n--- Section 9: beforeunload persistence ---');
       _writeSeq: read ? read._writeSeq : 0 });
     visFlushed = true;
   });
-  await delay(40);
+  await waitFor(() => visFlushed);
 
   check('9.8: visibilitychange-triggered flush works', visFlushed);
   const result = await freshRead(tabA, 'documents', docId);
@@ -1167,7 +1178,7 @@ console.log('\n--- Section 9: beforeunload persistence ---');
     saveOrder.push('queued');
   });
 
-  await delay(40);
+  await waitFor(() => saveOrder.includes('done'));
   check('9.11: save ordering: start before done',
     saveOrder.indexOf('start') < saveOrder.indexOf('done'),
     'order=' + saveOrder.join(','));
@@ -1218,7 +1229,7 @@ console.log('\n--- Section 10: Duplicate/copy operations across tabs ---');
   const srcSeq = (await freshRead(tabB, 'documents', srcId))._writeSeq;
   await tabB.saveDoc(projId, { id: srcId, name: 'RaceSource-v2', blocks: [], _writeSeq: srcSeq });
 
-  await delay(30);
+  await waitFor(() => dupDone);
   check('10.4: duplicate created while source changed', dupDone);
 
   const srcFinal = await freshRead(tabA, 'documents', srcId);
@@ -1365,7 +1376,7 @@ console.log('\n--- Section 10: Duplicate/copy operations across tabs ---');
     srcDone = true;
   });
 
-  await delay(40);
+  await waitFor(() => dupDone && srcDone);
   check('10.17: concurrent dup+modify both completed', dupDone && srcDone);
 
   const srcFinal = await freshRead(tabA, 'documents', srcId);
