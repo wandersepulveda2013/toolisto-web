@@ -3,7 +3,7 @@
 > Cada ciclo de OpenCode LEE este archivo antes de actuar y lo ACTUALIZA antes de terminar.
 > Registro historico de ciclos de la mision Evolucion Continua.
 > Modo activo SOLO despues de la transicion (cuando `workspace/PRODUCTION_READINESS_DONE` exista).
-> Updated: 2026-09-03 (Cycle 179 — CE-116)
+> Updated: 2026-09-04 (Cycle 180 — CE-117)
 
 ---
 
@@ -1153,6 +1153,27 @@
 | **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`; `git push` denegado (rama acumulada por delante de origin/main). |
 | **Limitaciones** | La deteccion DD.MM.YYYY es estricta (requiere exactamente 2.2.4 digitos con puntos); formatos como `D.M.YYYY` con 1 digito pasan pero `DD.MM.YY` (2-digit year) no se soporta (consistente con el regex existente para slash/barra). La duplicacion de logica de fecha entre workspace.js y locale-parser.js se conserva intencionalmente (las funciones query son pequenas, puras y no warrantizan un import adicional). |
 | **Proxima prioridad** | DISCOVERY 12va ronda o evolucion del runner; promover candidatos: scanner fields en guards (P2, documentado), dashboard category "0" (P2), JSONL import abort (P1), tableChartData OOB (P2). |
+
+## Cycle 180 — CE-117: campos de escáner no validados en guardias de referencia (BUG_FIX)
+
+| Field | Value |
+|-------|-------|
+| **Date** | 2026-09-04 |
+| **Branch** | main |
+| **HEAD inicial** | 49d5ec4 (commit docs CE-116, ultimo) |
+| **Task** | CE-117 (P2, DISCOVERY 12va ronda -> DONE). Cola SIN todo TODO; el ciclo se dedico a DISCOVERY con 3 exploradores paralelos (scanner fields en guards, dashboard category "0", health scan). Se promovio scanner fields en guards (maximo valor: riego de data-loss silencioso al importar un bundle con referencias de escáner apuntando al store equivocado). |
+| **Hypothesis (confirmado leyendo el source)** | `validateBundleReferences` (bundle.js) y `allowedStoreForField` (integrity.js) NO validaban `correctedAssetId`, `originalAssetId`, `scanDocumentId` ni `assetId` de las referencias de escáner: los campos no estaban en `REF_SOURCE_FIELDS`/`REF_CONFIG_FIELDS` ni en `SOURCE_FIELDS`/`CONFIG_FIELDS`/`allowedStoreForField`, asi que un asset con `correctedAssetId` apuntando a un documento o tabla pasaba silencioso al importar. El bug era oculto porque `resultAssetId` y `sourceAssetId` ya estaban en `REF_SOURCE_FIELDS`/`SOURCE_FIELDS` con mapeo `null` (cualquier tienda) por su uso legitimo en docs/tablas/executions. |
+| **Change** | Los 4 campos del escaneo (`correctedAssetId`, `originalAssetId`, `scanDocumentId`, `assetId`) se anaden a `REF_SOURCE_FIELDS`/`REF_CONFIG_FIELDS` (bundle.js) y a `SOURCE_FIELDS`/`CONFIG_FIELDS` (integrity.js), con su `case` en `refAllowedStoreKind`/`allowedStoreForField` retornando `'assets'` (solo assets). `resultAssetId`/`sourceAssetId` permanecen con mapeo `null` (cualquier tienda). Suite nueva `scanner-refs-in-guards-test.mjs` 11/11: dangling refs rechazadas (4 campos), valid refs aceptadas (4 campos), anclas estaticas para ambas listas y mapping. Mirrors `SOURCE_FIELDS`/`CONFIG_FIELDS` actualizados en `storage-recovery-lifecycle`. |
+| **Bugs corregidos** | (1) `correctedAssetId`/`originalAssetId`/`scanDocumentId`/`assetId` ahora se validan contra el store `assets` al importar; un apuntador a un documento/tabla se rechaza. (2) Los 4 campos figuran en las listas de integridad para auditoria. |
+| **Tests ejecutados** | `node tests/workspace/scanner-refs-in-guards-test.mjs` (nuevo 11/11); regresion: `node scripts/test-workspace-release.mjs` (RELEASE GATE completo PASS). |
+| **Tests PASS** | 11/11 nuevos (scanner-refs-in-guards). RELEASE GATE completo PASS (sin regression). |
+| **Tests FAIL** | 0. Hallazgo critico durante el desarrollo: addir `resultAssetId`/`sourceAssetId` al caso `'assets'` rompio el star-flow E2E porque docs/tables/executions usan esos campos para referenciar IDs no-asset; se corrigio quitandolos del caso `'assets'` (solo los 4 campos scanner-specific van a assets). |
+| **Resultado** | BUG_FIX (campos de escaneo no validados en guardias de referencia). |
+| **Evidence** | `workspace/core/bundle.js` (REF_SOURCE_FIELDS, REF_CONFIG_FIELDS, refAllowedStoreKind), `workspace/core/integrity.js` (SOURCE_FIELDS, CONFIG_FIELDS, allowedStoreForField), `tests/workspace/scanner-refs-in-guards-test.mjs`, `tests/workspace/storage-recovery-lifecycle.mjs` (mirrors), `scripts/test-workspace-release.mjs`. |
+| **Commits** | `163fd8b` (test file) + `6c47aef` (source changes). |
+| **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`; `git push` denegado (rama acumulada por delante de origin/main). |
+| **Limitaciones** | La validacion de `collectRefIds` (bundle.js) no recursiona en `pages[]` sub-objetos de documents; los campos en pages no se auditan. `resultAssetId`/`sourceAssetId` quedan con mapeo null (cualquier tienda) intencionalmente: documentar su restriccion de tipo es trabajo futuro. |
+| **Proxima prioridad** | DISCOVERY 13va ronda; promover candidatos: JSONL import abort (P1), dashboard category "0" (P2), tableChartData OOB (P2), swallowed storage errors (P3). |
 
 ## Cycle 128 — Fix test-debt in engine/parser/planner suites + register them in the gate (CE-065)
 
