@@ -3,7 +3,7 @@
 > Cada ciclo de OpenCode LEE este archivo antes de actuar y lo ACTUALIZA antes de terminar.
 > Registro historico de ciclos de la mision Evolucion Continua.
 > Modo activo SOLO despues de la transicion (cuando `workspace/PRODUCTION_READINESS_DONE` exista).
-> Updated: 2026-09-03 (Cycle 178 — CE-115)
+> Updated: 2026-09-03 (Cycle 179 — CE-116)
 
 ---
 
@@ -1132,6 +1132,27 @@
 | **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`; `git push` denegado (rama acumulada por delante de origin/main). |
 | **Limitaciones** | El remap top-level usa `remapId` sobre el valor persistido; si un bundle contuviera un `sourceId` que apuntara a una tabla no incluida en el bundle, `remapId` lo dejaria tal cual (comportamiento defensivo, MISMO que antes; el consumidor caeria a tables[0]/desconexion como limite documentado). La reparacion de bundles YA malimportados no es retroactiva (aplica a futuros imports). |
 | **Proxima prioridad** | DISCOVERY 11va ronda o evolucion del runner; promover el candidato disquery (fechas puntuadas europeas en `queryIsDate`) o scanner fields en guards. |
+
+## Cycle 179 — CE-116: queryIsDate/queryDateToIso no reconocian DD.MM.YYYY -> crash RangeError + clasificacion incorrecta (BUG_FIX)
+
+| Field | Value |
+|-------|-------|
+| **Date** | 2026-09-03 |
+| **Branch** | main |
+| **HEAD inicial** | a0383e6 (commit registro CE-115, ultimo) |
+| **Task** | CE-116 (P1, DISCOVERY 11va ronda -> DONE). Cola SIN todo TODO; el ciclo se dedico a DISCOVERY con 3 exploradores paralelos (scanner fields en guards, fechas europeas, health scan del codebase). Se promovio el candidato de mayor impacto: `queryIsDate`/`queryDateToIso` no reconocian fechas europeas `DD.MM.YYYY` (P1 por crash + clasificacion incorrecta). |
+| **Hypothesis (confirmado leyendo el source)** | `queryIsDate` (workspace.js:5837-5840) usaba regex `[-/]` que excluye el punto; fechas `DD.MM.YYYY` fallan el regex Y `Date.parse` (devuelve NaN). `queryDateToIso` (5842-5855) lanzaba `RangeError` al intentar `new Date("23.08.2026").toISOString()` en el fallback (Invalid time value). Ambas funciones estaban duplicadas respecto a `core/locale-parser.js` que ya soporta DD.MM.YYYY via `classifyDate`, pero workspace.js no importaba el clasificador. `queryColumnType` clasificaba columnas de fechas europeas como `ABC` en vez de `DATE`, afectando UI, sort, detect-type y charts. |
+| **Change** | `queryIsDate` anade branch explicito para `^\d{1,2}\.\d{1,2}\.\d{4}$` con validacion de rangos (anio 1000-9999, mes 1-12, dia 1-31), ANTES del regex original `[-/]` (sin regresion). `queryDateToIso` anade branch dot-separated ANTES del fallback que crashea, reconstruyendo la fecha desde componentes (DD.MM.YYYY -> ISO) con la misma logica que usa para slash/barra. No se toca el import de locale-parser.js (se conserva la duplicacion como estas funciones son puras y pequenas). |
+| **Bugs corregidos** | (1) Fechas `DD.MM.YYYY` ahora se reconocen como tipo DATE en la columna (UI, detect-type, sort). (2) `queryDateToIso` ya no lanza RangeError con fechas con punto (antes crasheaba en el fallback `new Date(...).toISOString()`). (3) `detect-type` normaliza `23.08.2026` a `2026-08-23` correctamente. |
+| **Tests ejecutados** | Suite existente `tests/workspace/query-date-to-iso-test.mjs` ampliada de 19 a 30 checks: queryIsDate reconoce DD.MM.YYYY (3 validas + 4 invalidas + 3 conservacion de formatos existentes); queryDateToIso normaliza DD.MM.YYYY a ISO (5 casos + control negativo RangeError + 2 conservacion). Todos los checks CE-102 previos intactos. |
+| **Tests PASS** | 30/30 (ampliada). RELEASE GATE completo suites PASS 0 fail; manifest `artifacts/deep-audit/release-gate/release-gate-a0383e6dbbc776107db88cfa62efe9f1e18eb200.json`. |
+| **Tests FAIL** | 0. |
+| **Resultado** | BUG_FIX (fechas europeas DD.MM.YYYY clasificadas como texto + crash RangeError en queryDateToIso). |
+| **Evidence** | `workspace/workspace.js` (`queryIsDate`, `queryDateToIso`), `tests/workspace/query-date-to-iso-test.mjs`, `scripts/test-workspace-release.mjs`, `CONTINUOUS-EVOLUTION-QUEUE.md`, `artifacts/deep-audit/release-gate/release-gate-a0383e6dbbc776107db88cfa62efe9f1e18eb200.json`. |
+| **Commits** | e8af70d (fix(ce): CE-116 queryIsDate/queryDateToIso ahora reconocen fechas europeas DD.MM.YYYY — 2 archivos). |
+| **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`; `git push` denegado (rama acumulada por delante de origin/main). |
+| **Limitaciones** | La deteccion DD.MM.YYYY es estricta (requiere exactamente 2.2.4 digitos con puntos); formatos como `D.M.YYYY` con 1 digito pasan pero `DD.MM.YY` (2-digit year) no se soporta (consistente con el regex existente para slash/barra). La duplicacion de logica de fecha entre workspace.js y locale-parser.js se conserva intencionalmente (las funciones query son pequenas, puras y no warrantizan un import adicional). |
+| **Proxima prioridad** | DISCOVERY 12va ronda o evolucion del runner; promover candidatos: scanner fields en guards (P2, documentado), dashboard category "0" (P2), JSONL import abort (P1), tableChartData OOB (P2). |
 
 ## Cycle 128 — Fix test-debt in engine/parser/planner suites + register them in the gate (CE-065)
 
