@@ -157,6 +157,7 @@ run('scanner-refs-in-guards (campos scanner en REF_SOURCE_FIELDS/REF_CONFIG_FIEL
 run('jsonl-import-resilience (import JSONL resiliente a lineas malformadas, CE-118)', 'node', ['tests/workspace/jsonl-import-resilience-test.mjs']);
 run('table-chart-oob-guard (tableChartData con <2 headers no crashea ni corrompe, CE-119)', 'node', ['tests/workspace/table-chart-oob-guard-test.mjs']);
 run('swallowed-storage-errors (errores de storage ya no se tragan en silencio, CE-120)', 'node', ['tests/workspace/swallowed-storage-errors-test.mjs']);
+run('dashboard-chart-category-zero (categoria 0 no cae en "Sin categoría", CE-121)', 'node', ['tests/workspace/dashboard-chart-category-zero-test.mjs']);
 
 // 4. Manifest de evidencia
 const evidence = {

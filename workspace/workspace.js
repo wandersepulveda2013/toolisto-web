@@ -7263,7 +7263,8 @@ function dashboardChartItems(rows, widget) {
   const valueIndex = widget.field === '' ? '' : Number(widget.field);
   const groups = new Map();
   rows.forEach(row => {
-    const category = String(row[categoryIndex] || 'Sin categoría').trim() || 'Sin categoría';
+    const raw = row[categoryIndex];
+    const category = (raw == null ? '' : String(raw).trim()) || 'Sin categoría';
     const numeric = widget.aggregate === 'count' ? 1 : queryNumber(row[valueIndex]);
     if (widget.aggregate !== 'count' && numeric === null) return;
     const bucket = groups.get(category) || { sum: 0, count: 0, min: Infinity, max: -Infinity };
