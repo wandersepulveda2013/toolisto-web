@@ -5836,11 +5836,26 @@ function queryNumber(value) {
 
 function queryIsDate(value) {
   const text = String(value == null ? '' : value).trim();
-  return text.length > 5 && /^\d{1,4}[-/]\d{1,2}[-/]\d{1,4}/.test(text) && !Number.isNaN(Date.parse(text));
+  if (text.length <= 5) return false;
+  if (/^\d{1,2}\.\d{1,2}\.\d{4}$/.test(text)) {
+    const m = text.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/);
+    if (!m) return false;
+    const yn = +m[3], mon = +m[2], dn = +m[1];
+    return yn >= 1000 && yn <= 9999 && mon >= 1 && mon <= 12 && dn >= 1 && dn <= 31;
+  }
+  return /^\d{1,4}[-/]\d{1,2}[-/]\d{1,4}/.test(text) && !Number.isNaN(Date.parse(text));
 }
 
 function queryDateToIso(value) {
   const text = String(value == null ? '' : value).trim();
+  const dotM = text.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/);
+  if (dotM) {
+    const dn = +dotM[1], mon = +dotM[2], yn = +dotM[3];
+    if (yn >= 1000 && yn <= 9999 && mon >= 1 && mon <= 12 && dn >= 1 && dn <= 31) {
+      const iso = String(yn) + '-' + String(mon).padStart(2, '0') + '-' + String(dn).padStart(2, '0');
+      if (!Number.isNaN(Date.parse(iso))) return iso;
+    }
+  }
   const m = text.match(/^(\d{1,4})[-/](\d{1,2})[-/](\d{1,4})/);
   if (m) {
     let y, mo, d;

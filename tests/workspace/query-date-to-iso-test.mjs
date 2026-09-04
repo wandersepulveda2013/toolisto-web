@@ -22,6 +22,8 @@ function grabFn(src, name) {
 const wsCode = readFileSync(new URL('../../workspace/workspace.js', import.meta.url), 'utf8');
 const isoSrc = grabFn(wsCode, 'queryDateToIso');
 const queryDateToIso = new Function(isoSrc + '\nreturn queryDateToIso;')();
+const isDateSrc = grabFn(wsCode, 'queryIsDate');
+const queryIsDate = new Function(isDateSrc + '\nreturn queryIsDate;')();
 
 // Offset del proceso (minutos). Si != 0, la fecha via toISOString() se desplaza
 // respecto a la fecha local escrita; el fix debe devolver SIEMPRE la fecha
@@ -89,6 +91,29 @@ check('YYYY/2/7 se rellena', queryDateToIso('2024/2/7') === '2024-02-07', queryD
   check('detect-type usa queryDateToIso', dtBlock.includes('queryDateToIso'), dtBlock.split('\n')[2]?.trim() || '');
   check('detect-type ya no usa toISOString para normalizar', !dtBlock.includes('.toISOString()'), '');
 }
+
+// 7. CE-116: queryIsDate reconoce fechas con punto DD.MM.YYYY (europeo).
+check('queryIsDate DD.MM.YYYY valida 23.08.2026', queryIsDate('23.08.2026'));
+check('queryIsDate DD.MM.YYYY valida 01.01.2024', queryIsDate('01.01.2024'));
+check('queryIsDate DD.MM.YYYY valida 31.12.2025', queryIsDate('31.12.2025'));
+check('queryIsDate DD.MM.YYYY rechaza 32.01.2026 (dia invalido)', !queryIsDate('32.01.2026'));
+check('queryIsDate DD.MM.YYYY rechaza 01.13.2026 (mes invalido)', !queryIsDate('01.13.2026'));
+check('queryIsDate DD.MM.YYYY rechaza 01.01.999 (anio < 1000)', !queryIsDate('01.01.999'));
+check('queryIsDate DD.MM.YYYY rechaza texto corto', !queryIsDate('1.2.3'));
+check('queryIsDate DD.MM.YYYY rechaza formato mixto', !queryIsDate('23/08/2026'));
+check('queryIsDate conserva YYYY-MM-DD', queryIsDate('2024-12-31'));
+check('queryIsDate conserva MM/DD/YYYY', queryIsDate('12/31/2024'));
+check('queryIsDate conserva YYYY/MM/DD', queryIsDate('2024/12/31'));
+
+// 8. CE-116: queryDateToIso normaliza DD.MM.YYYY a ISO sin crash.
+check('queryDateToIso DD.MM.YYYY -> ISO', queryDateToIso('23.08.2026') === '2026-08-23', queryDateToIso('23.08.2026'));
+check('queryDateToIso 01.01.2024 -> 2024-01-01', queryDateToIso('01.01.2024') === '2024-01-01', queryDateToIso('01.01.2024'));
+check('queryDateToIso 31.12.2025 -> 2025-12-31', queryDateToIso('31.12.2025') === '2025-12-31', queryDateToIso('31.12.2025'));
+check('queryDateToIso 1.2.2024 -> 2024-02-01 (rellena ceros)', queryDateToIso('1.2.2024') === '2024-02-01', queryDateToIso('1.2.2024'));
+check('queryDateToIso DD.MM.YYYY conserva la fecha escrita (TZ-fertilizante)', queryDateToIso('15.03.2025') === '2025-03-15', queryDateToIso('15.03.2025'));
+check('queryDateToIso DD.MM.YYYY no lanza RangeError (control negativo del bug)', (() => { try { queryDateToIso('23.08.2026'); return true; } catch (e) { return false; } })());
+check('queryDateToIso conserva YYYY-MM-DD', queryDateToIso('2024-12-31') === '2024-12-31');
+check('queryDateToIso conserva MM/DD/YYYY', queryDateToIso('12/31/2024') === '2024-12-31');
 
 console.log(`\nRESULTADO: ${pass} PASS, ${fail} FAIL`);
 process.exit(fail > 0 ? 1 : 0);
