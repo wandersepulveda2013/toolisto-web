@@ -3,7 +3,7 @@
 > Cada ciclo de OpenCode LEE este archivo antes de actuar y lo ACTUALIZA antes de terminar.
 > Registro historico de ciclos de la mision Evolucion Continua.
 > Modo activo SOLO despues de la transicion (cuando `workspace/PRODUCTION_READINESS_DONE` exista).
-> Updated: 2026-09-04 (Cycle 180 — CE-117)
+> Updated: 2026-09-04 (Cycle 181 — CE-118)
 
 ---
 
@@ -1174,6 +1174,27 @@
 | **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`; `git push` denegado (rama acumulada por delante de origin/main). |
 | **Limitaciones** | La validacion de `collectRefIds` (bundle.js) no recursiona en `pages[]` sub-objetos de documents; los campos en pages no se auditan. `resultAssetId`/`sourceAssetId` quedan con mapeo null (cualquier tienda) intencionalmente: documentar su restriccion de tipo es trabajo futuro. |
 | **Proxima prioridad** | DISCOVERY 13va ronda; promover candidatos: JSONL import abort (P1), dashboard category "0" (P2), tableChartData OOB (P2), swallowed storage errors (P3). |
+
+## Cycle 181 — CE-118: importQueryFile JSONL descartaba todos los registros con una sola linea malformada (BUG_FIX)
+
+| Field | Value |
+|-------|-------|
+| **Date** | 2026-09-04 |
+| **Branch** | main |
+| **HEAD inicial** | 7c3bb4a (commit docs CE-117, ultimo) |
+| **Task** | CE-118 (P2, DISCOVERY 13va ronda -> DONE). Cola sin TODO; DISCOVERY con 4 exploradores paralelos (JSONL import, dashboard category "0", tableChartData OOB, swallowed storage errors). Se promovio JSONL import (mayor impacto: bug real de data-loss silencioso en importacion de archivos JSONL/NDJSON). |
+| **Hypothesis (confirmado leyendo el source)** | `importQueryFile` (workspace.js:6313) usaba `.map(line => JSON.parse(line))` sobre las lineas de un archivo JSONL/NDJSON; una sola linea malformada lanzaba `SyntaxError` que abortaba toda la cadena `.map()`, descartando TODOS los registros validos sin aviso parcial ni recuperacion. El catch externo (linea 6334) mostraba un toast generico y el archivo entero se perdia. Todos los demas JSONL readers del codebase (AI_AUTONOMY/history.mjs, state.mjs, cli.mjs) ya usaban try/catch por linea. |
+| **Change** | Nuevo `parseJsonlText(text)` (funcion pura, workspace.js) que itera con try/catch por linea, colecciona registros validos y cuenta lineas descartadas. `importQueryFile` delega en esta funcion. Si hay descartes se muestra toast de aviso con el conteo; si todas las lineas son invalidas se muestra toast de error y se aborta (sin importar tabla vacia). Suite nueva `tests/workspace/jsonl-import-resilience-test.mjs` 31/31 (pure, sin DOM): validos completos, 1 malformada en el medio preserva el resto, todas malformadas, input vacio, whitespace-only, mezcla, trailing comma, objetos anidados, unicode (Cordoba/Nuno), CRLF, anti-regresion de forma. Registrada en el release gate. |
+| **Bugs corregidos** | (1) `importQueryFile` ahora importa registros validos incluso cuando el archivo contiene lineas malformadas (antes descartaba todo). (2) Se muestra un toast informativo con el numero de lineas omitidas. (3) Si todas las lineas son invalidas se aborta con toast de error en lugar de importar una tabla vacia. |
+| **Tests ejecutados** | `node tests/workspace/jsonl-import-resilience-test.mjs` (nuevo 31/31); `node scripts/test-workspace-release.mjs` (RELEASE GATE completo PASS). |
+| **Tests PASS** | 31/31 nuevos. RELEASE GATE completo 81 suites PASS 0 fail. |
+| **Tests FAIL** | 0. |
+| **Resultado** | BUG_FIX (importacion JSONL descartaba todos los registros con una sola linea malformada). |
+| **Evidence** | `workspace/workspace.js` (`parseJsonlText`, `importQueryFile`), `tests/workspace/jsonl-import-resilience-test.mjs`, `scripts/test-workspace-release.mjs`. |
+| **Commits** | `2639134` (fix(ce): CE-118 JSONL import resiliente a lineas malformadas — 3 archivos). |
+| **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`; `git push` denegado (rama acumulada por delante de origin/main). |
+| **Limitaciones** | `parseJsonlText` es pura y no interactua con la UI; el toast informativo se muestra solo cuando hay al menos 1 linea descartada. El fix cubre la ruta de importacion de archivos JSONL/NDJSON del Query view; otras rutas de lectura JSON (`.json` via `JSON.parse(text)`) ya tenian su propio manejo de error. |
+| **Proxima prioridad** | DISCOVERY 14ta ronda; promover candidatos: dashboard category "0" (P2 latente), tableChartData OOB (P2 real), swallowed storage errors (P3 real). |
 
 ## Cycle 128 — Fix test-debt in engine/parser/planner suites + register them in the gate (CE-065)
 
