@@ -3,7 +3,7 @@
 > Cada ciclo de OpenCode LEE este archivo antes de actuar y lo ACTUALIZA antes de terminar.
 > Registro historico de ciclos de la mision Evolucion Continua.
 > Modo activo SOLO despues de la transicion (cuando `workspace/PRODUCTION_READINESS_DONE` exista).
-> Updated: 2026-09-04 (Cycle 181 — CE-118)
+> Updated: 2026-09-04 (Cycle 182 — CE-119)
 
 ---
 
@@ -1195,6 +1195,28 @@
 | **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`; `git push` denegado (rama acumulada por delante de origin/main). |
 | **Limitaciones** | `parseJsonlText` es pura y no interactua con la UI; el toast informativo se muestra solo cuando hay al menos 1 linea descartada. El fix cubre la ruta de importacion de archivos JSONL/NDJSON del Query view; otras rutas de lectura JSON (`.json` via `JSON.parse(text)`) ya tenian su propio manejo de error. |
 | **Proxima prioridad** | DISCOVERY 14ta ronda; promover candidatos: dashboard category "0" (P2 latente), tableChartData OOB (P2 real), swallowed storage errors (P3 real). |
+
+## Cycle 182 — CE-119: tableChartData/tableChartSeries guard para <2 headers (no OOB ni corrupcion de charts)
+
+| Field | Value |
+|-------|-------|
+| **Date** | 2026-09-04 |
+| **Branch** | main |
+| **HEAD inicial** | 8252bbf (commit docs CE-118, ultimo) |
+| **Task** | CE-119 (P2, DISCOVERY 14ta ronda -> DONE). Cola sin TODO; DISCOVERY con 4 exploradores paralelos (dashboard category "0", tableChartData OOB, swallowed storage errors, health scan). Se promovio tableChartData OOB (mayor impacto: corrupcion silenciosa de graficos derivados al tener <2 headers). |
+| **Hypothesis (confirmado leyendo el source)** | `tableChartData` (workspace.js:2464) defaultaba `numericIndex = 1` cuando `headers.length < 2`; con 1 header, la serie extraia `headers[numericIndex=1]` que es `undefined` -> serie vacia o NaN. `tableChartSeries` (workflow-operations.js:614) tenia el mismo default `numericIndex = 1` para <2 headers. `syncDerivedCharts` (workspace.js:2516) no tenia guard alguno: llamaba `tableChartData` incluso con 1 header, y la serie vacia sobreescribia el chart existente (corrompia graficos ya validos). `chart.create` y `report.create` validaban solo `!headers.length` (0 headers) pero no <2 headers, permitiendo crear charts de 1 columna. |
+| **Bugs encontrados (confirmados)** | (1) `tableChartData` con 1 header: `numericIndex=1` apunta a `undefined`, serie vacia. (2) `tableChartSeries` con 1 header: mismo default `numericIndex=1`, serie vacia. (3) `syncDerivedCharts` sin guard: sobreescribe charts existentes con serie vacia cuando la tabla tiene 1 header. (4) `chart.create`/`report.create` permiten crear charts con <2 headers. |
+| **Change** | (1) `workspace.js` `tableChartData`: cuando `headers.length < 2` retorna `{ series: [], numericIndex: null }` (antes defaultaba numericIndex=1 y construia serie vacia). (2) `workspace.js` `syncDerivedCharts`: anade `if (headers.length < 2) return` antes de tocar charts (antes re-escribia con serie vacia). (3) `workflow-operations.js` `tableChartSeries`: cuando `safeHeaders.length < 2` retorna `{ series: [], numericIndex: null }`. (4) `workflow-operations.js` `chart.create`: cambia `!headers.length` a `headers.length < 2`. (5) `workflow-operations.js` `report.create`: anade `&& input.headers.length >= 2` a la condicion. Suite nueva `tests/workspace/table-chart-oob-guard-test.mjs` 25/25: workspace tableChartData (1 header, 0, missing, null table, 2 headers regresion, 3 headers, empty rows, non-numeric), workflow tableChartSeries (1 header guard, 2 headers regresion, 1 header empty rows, 1 header numericIndex null), workspace tableChartData guard check, syncDerivedCharts guard check. Registrada en el release gate. |
+| **Bugs corregidos** | (1) `tableChartData` con <2 headers retorna serie vacia y numericIndex null (antes producia serie con undefined). (2) `syncDerivedCharts` no toca charts existentes cuando la tabla tiene <2 headers (antes los sobreescribia con serie vacia). (3) `tableChartSeries` con <2 headers retorna serie vacia (antes defaultaba numericIndex=1). (4) `chart.create` y `report.create` rechazan tablas con <2 headers (antes solo rechazaban 0 headers). |
+| **Tests ejecutados** | `node tests/workspace/table-chart-oob-guard-test.mjs` (nuevo 25/25); `node scripts/test-workspace-release.mjs` (RELEASE GATE completo PASS, 82 suites). |
+| **Tests PASS** | 25/25 nuevos. RELEASE GATE completo 82 suites PASS 0 fail. |
+| **Tests FAIL** | 0. |
+| **Resultado** | BUG_FIX (chart OOB con <2 headers + sobreescribe chart existente con serie vacia). |
+| **Evidence** | `workspace/workspace.js` (`tableChartData`, `syncDerivedCharts`), `workspace/core/workflow-operations.js` (`tableChartSeries`, `chart.create`, `report.create`), `tests/workspace/table-chart-oob-guard-test.mjs`, `scripts/test-workspace-release.mjs`. |
+| **Commits** | `a4f690d` (fix(ce): CE-119 tableChartData/tableChartSeries guard para <2 headers — 4 archivos). |
+| **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`; `git push` denegado (rama acumulada por delante de origin/main). |
+| **Limitaciones** | `tableChartData` sin headers (`undefined`/`null`) tambien retorna serie vacia (comportamiento nuevo, coherente). `syncDerivedCharts` hace early-return para <2 headers, por lo que charts existentes NO se sobreescriben (pero tampoco se actualizan si la tabla crece de 1 a 2 headers en sesion — el sync vuelve a funcionar cuando la tabla tiene >=2 headers en la proxima edicion). |
+| **Proxima prioridad** | DISCOVERY 15ta ronda; promover candidatos: dashboard category "0" (P2 latente), swallowed storage errors (P3 real). |
 
 ## Cycle 128 — Fix test-debt in engine/parser/planner suites + register them in the gate (CE-065)
 
