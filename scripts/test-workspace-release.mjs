@@ -158,6 +158,7 @@ run('jsonl-import-resilience (import JSONL resiliente a lineas malformadas, CE-1
 run('table-chart-oob-guard (tableChartData con <2 headers no crashea ni corrompe, CE-119)', 'node', ['tests/workspace/table-chart-oob-guard-test.mjs']);
 run('swallowed-storage-errors (errores de storage ya no se tragan en silencio, CE-120)', 'node', ['tests/workspace/swallowed-storage-errors-test.mjs']);
 run('dashboard-chart-category-zero (categoria 0 no cae en "Sin categoría", CE-121)', 'node', ['tests/workspace/dashboard-chart-category-zero-test.mjs']);
+run('createPdfBlob-dead-code (createPdfBlob sin scaffolding muerto, mismo output PDF, CE-122)', 'node', ['tests/workspace/createPdfBlob-dead-code-test.mjs']);
 
 // 4. Manifest de evidencia
 const evidence = {

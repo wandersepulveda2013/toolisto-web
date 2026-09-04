@@ -943,30 +943,6 @@ function createPdfBlob(imageW, imageH, jpegBytes) {
   const imgRef = '<< /Type /XObject /Subtype /Image /Width ' + w + ' /Height ' + h + ' /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ' + imgLen + ' >>';
   obj(5, imgRef + '\nstream\n' + new TextDecoder('latin1').decode(jpegBytes) + '\nendstream');
 
-  const header = '%PDF-1.4\n';
-  const body = parts.join('\n') + '\n';
-  const offsets = [0];
-
-  // Calculate byte offsets for each object
-  let pos = header.length;
-  const off1 = pos; pos += parts[0].length + 1; // \n
-  const off2 = pos; pos += parts[1].length + 1;
-  const off3 = pos; pos += parts[2].length + 1;
-  const off4 = pos; pos += parts[3].length + 1;
-  const off5 = pos; pos += parts[4].length + 1;
-
-  // Actually let me build it properly
-  const lines = [];
-  lines.push('%PDF-1.4');
-  const objects = [
-    '1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj',
-    '2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj',
-    '3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ' + ptsW + ' ' + ptsH + '] /Contents 4 0 R /Resources << /XObject << /Im0 5 0 R >> >> >>\nendobj',
-    '4 0 obj\n<< /Length ' + streamLen + ' >>\nstream\n' + stream + 'endstream\nendobj',
-  ];
-  const imgObj = '5 0 obj\n' + imgRef + '\nstream\n';
-  const imgEnd = '\nendstream\nendobj';
-
   const head = '%PDF-1.4\n';
   const obj1 = '1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n';
   const obj2 = '2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n';
