@@ -156,6 +156,7 @@ run('import-sourceid-remap (el import remapea el sourceId top-level de dashboard
 run('scanner-refs-in-guards (campos scanner en REF_SOURCE_FIELDS/REF_CONFIG_FIELDS, CE-117)', 'node', ['tests/workspace/scanner-refs-in-guards-test.mjs']);
 run('jsonl-import-resilience (import JSONL resiliente a lineas malformadas, CE-118)', 'node', ['tests/workspace/jsonl-import-resilience-test.mjs']);
 run('table-chart-oob-guard (tableChartData con <2 headers no crashea ni corrompe, CE-119)', 'node', ['tests/workspace/table-chart-oob-guard-test.mjs']);
+run('swallowed-storage-errors (errores de storage ya no se tragan en silencio, CE-120)', 'node', ['tests/workspace/swallowed-storage-errors-test.mjs']);
 
 // 4. Manifest de evidencia
 const evidence = {

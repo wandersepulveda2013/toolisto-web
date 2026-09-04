@@ -28,6 +28,7 @@ import {
 } from './models.js';
 import { STORAGE_ENVELOPE_VERSION } from './schema-versions.js';
 import { cleanupSessionsForProject } from './workspace-storage.js';
+import { reportError } from './error-manager.js';
 
 async function createProject(name, description = '') {
   const project = createProjectModel(name, description);
@@ -239,7 +240,7 @@ async function deleteCapture(id) {
   const capture = await dbGet(STORES.captures, id);
   const result = await deleteWithCascade(STORES.captures, id);
   if (capture?.projectId) {
-    await refreshProjectCounts(capture.projectId).catch(() => {});
+    await refreshProjectCounts(capture.projectId).catch(error => reportError(error, 'capture-delete-counts', { projectId: capture.projectId }));
   }
   emit('capture:deleted', id);
   return result;

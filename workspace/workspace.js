@@ -180,7 +180,7 @@ function getWorkspaceConfig() {
 
 function saveWorkspaceConfig(config) {
   const next = { ...WORKSPACE_DEFAULTS, ...config };
-  try { localStorage.setItem('toolisto-workspace-config', JSON.stringify(next)); } catch (error) {}
+  try { localStorage.setItem('toolisto-workspace-config', JSON.stringify(next)); } catch (error) { reportError(error, 'workspace-config-save', {}); }
   appStore.set({ workspaceConfig: next });
   return next;
 }
@@ -2225,13 +2225,15 @@ function renderCaptureView(container, project) {
     el.appendChild(grid);
   }
   container.appendChild(el);
+  const viewGeneration = _viewGeneration;
   loadCaptures(project.id).then(caps => {
+    if (viewGeneration !== _viewGeneration) return;
     appStore.set({ captures: caps });
     if (captures.length !== caps.length) {
       container.replaceChildren();
       renderCaptureView(container, project);
     }
-  }).catch(() => {});
+  }).catch(error => reportError(error, 'capture-list-load', {}));
 }
 
 function formatCaptureDeletionWarning(preview) {
@@ -3260,7 +3262,7 @@ function renderDocumentsView(container, project) {
       container.replaceChildren();
       renderDocumentsView(container, project);
     }
-  }).catch(() => {});
+  }).catch(error => reportError(error, 'document-list-load', {}));
 }
 
 const BLOCK_TYPES = [
@@ -4445,7 +4447,7 @@ async function renderDataView(container, project) {
       container.replaceChildren();
       renderDataView(container, project);
     }
-  }).catch(() => {});
+  }).catch(error => reportError(error, 'data-list-load', {}));
 }
 
 async function renderModelView(container, project) {
@@ -8474,7 +8476,7 @@ function showModal(opts) {
     const cancelBtn = h('button', { className: 'ws-btn ws-btn-ghost', onClick: () => _requestClose('cancel') }, opts.cancelText || 'Cancelar');
     const confirmBtn = h('button', { className: 'ws-btn ' + (opts.confirmClass || 'ws-btn-primary') + ' ws-btn-confirm', onClick: async () => {
       if (opts.onConfirm) {
-        try { await opts.onConfirm(); } catch (e) { return; }
+        try { await opts.onConfirm(); } catch (e) { reportError(e, 'modal-confirm', { action: opts.confirmText || 'confirm' }); return; }
       }
       closeModal();
     }}, opts.confirmText);
