@@ -37,6 +37,10 @@ const SOURCE_FIELDS = [
   'tableId',
   'sourceId',
   'resultAssetId',
+  'correctedAssetId',
+  'originalAssetId',
+  'scanDocumentId',
+  'assetId',
 ];
 
 const CONFIG_FIELDS = [
@@ -45,6 +49,10 @@ const CONFIG_FIELDS = [
   'scanDocId',
   'captureId',
   'sourceId',
+  'correctedAssetId',
+  'originalAssetId',
+  'scanDocumentId',
+  'assetId',
 ];
 
 function pushOrphan(orphans, ownerStore, ownerId, field, value) {
@@ -75,6 +83,11 @@ function allowedStoreForField(field) {
     case 'config.captureId':
     case 'metadata.captureId':
       return [STORES.captures];
+    case 'correctedAssetId':
+    case 'originalAssetId':
+    case 'scanDocumentId':
+    case 'assetId':
+      return [STORES.assets];
     default:
       return null;
   }

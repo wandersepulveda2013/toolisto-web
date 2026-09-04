@@ -232,9 +232,11 @@ const OBJECT_STORES = [
 const SOURCE_FIELDS = [
   'sourceAssetId', 'captureId', 'sourceDocId', 'scanDocId',
   'sourceTableId', 'tableId', 'sourceId', 'resultAssetId',
+  'correctedAssetId', 'originalAssetId', 'scanDocumentId', 'assetId',
 ];
 
-const CONFIG_FIELDS = ['sourceAssetId', 'sourceTableId', 'scanDocId', 'captureId', 'sourceId'];
+const CONFIG_FIELDS = ['sourceAssetId', 'sourceTableId', 'scanDocId', 'captureId', 'sourceId',
+  'correctedAssetId', 'originalAssetId', 'scanDocumentId', 'assetId'];
 
 function sourceRefIds(obj) {
   const ids = [];

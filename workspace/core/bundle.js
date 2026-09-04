@@ -57,6 +57,10 @@ const REF_SOURCE_FIELDS = [
   'tableId',
   'sourceId',
   'resultAssetId',
+  'correctedAssetId',
+  'originalAssetId',
+  'scanDocumentId',
+  'assetId',
 ];
 
 const REF_CONFIG_FIELDS = [
@@ -65,6 +69,10 @@ const REF_CONFIG_FIELDS = [
   'scanDocId',
   'captureId',
   'sourceId',
+  'correctedAssetId',
+  'originalAssetId',
+  'scanDocumentId',
+  'assetId',
 ];
 
 /* Tipificación por campo: en qué tipo de store DEBE existir la referencia. */
@@ -79,6 +87,11 @@ function refAllowedStoreKind(field) {
       return 'documents';
     case 'captureId':
       return 'captures';
+    case 'correctedAssetId':
+    case 'originalAssetId':
+    case 'scanDocumentId':
+    case 'assetId':
+      return 'assets';
     default:
       return null; /* cualquier store válido como destino */
   }
