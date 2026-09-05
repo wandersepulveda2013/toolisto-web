@@ -29,6 +29,7 @@ import {
 import { STORAGE_ENVELOPE_VERSION } from './schema-versions.js';
 import { cleanupSessionsForProject } from './workspace-storage.js';
 import { reportError } from './error-manager.js';
+import { colFiltersToSerializable, normalizeColFilters } from './table-helpers.js';
 
 async function createProject(name, description = '') {
   const project = createProjectModel(name, description);
@@ -274,6 +275,16 @@ async function exportProject(projectId) {
   const project = await dbGet(STORES.projects, projectId);
   const docs = await dbGetByIndex(STORES.documents, 'projectId', projectId);
   const data = await dbGetByIndex(STORES.data, 'projectId', projectId);
+  // CE-130: los filtros de columna son `Set` (no sobreviven a JSON.stringify).
+  // Se proyectan a arrays en el bundle para que el export .toolisto no corrompa
+  // `_colFilters` a `{}` (los checksums de integridad hashearian el MISMO `{}`
+  // en ambos lados y el import persistiria un filtro roto -> TypeError en la vista).
+  const dataTables = data.map(t => {
+    const tb = { ...t };
+    const serializable = colFiltersToSerializable(t);
+    if (serializable) tb._colFilters = serializable;
+    return tb;
+  });
   const caps = await dbGetByIndex(STORES.captures, 'projectId', projectId);
   const assets = await dbGetByIndex(STORES.assets, 'projectId', projectId);
   const execs = await dbGetByIndex(STORES.executions, 'projectId', projectId);
@@ -282,7 +293,7 @@ async function exportProject(projectId) {
   const query = await dbGet(STORES.settings, 'query:' + projectId);
   const dataModel = await dbGet(STORES.settings, 'model:' + projectId);
   const bundle = {
-    version: STORAGE_ENVELOPE_VERSION, project, documents: docs, dataTables: data, captures: caps,
+    version: STORAGE_ENVELOPE_VERSION, project, documents: docs, dataTables, captures: caps,
     assets, executions: execs, workflows: wfs,
     dashboard: dashboard?.value || null, query: query?.value || null,
     dataModel: dataModel?.value || null, exportedAt: Date.now(),
@@ -357,7 +368,13 @@ async function importProject(bundle, options = {}) {
 
   const documents = (bundle.documents || []).map(d => remapRefs(migrateObject({ ...d, id: docIdMap.get(d.id), projectId })));
   const captures = (bundle.captures || []).map(c => remapRefs(migrateObject({ ...c, id: capIdMap.get(c.id), projectId })));
-  const dataTables = (bundle.dataTables || []).map(t => remapRefs(migrateObject({ ...t, id: tableIdMap.get(t.id), projectId })));
+  const dataTables = (bundle.dataTables || []).map(t => {
+    // CE-130: los filtros de columna vuelven del JSON como arrays (export nuevo)
+    // o como `{}` corruptos (export viejo). `normalizeColFilters` los reconstruye
+    // a `Set` (los `{}` se descartan en vez de crashear el render).
+    const tbl = remapRefs(migrateObject({ ...t, id: tableIdMap.get(t.id), projectId }));
+    return normalizeColFilters(tbl);
+  });
   const assets = (bundle.assets || []).map(a => remapRefs(migrateObject({ ...a, id: assetIdMap.get(a.id), projectId })));
   const executions = (bundle.executions || []).map(e => remapRefs(migrateObject({ ...e, id: execIdMap.get(e.id), projectId })));
   const workflows = (bundle.workflows || []).map(w => {

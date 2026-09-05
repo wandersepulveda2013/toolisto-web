@@ -4,6 +4,7 @@ import { on, emit } from './core/events.js';
 import { generateId } from './core/db.js';
 import { detectSeparator, parseLocaleNumber } from './core/locale-parser.js';
 import { parseTabularText } from './core/tabular-text-parser.js';
+import { colFilterHas } from './core/table-helpers.js';
 import {
   createProject, updateProject, deleteProject, loadProjects as _loadProjects,
   selectProject, saveDoc, loadDocs, deleteDoc, saveData, loadData, deleteData, saveCapture,
@@ -5367,7 +5368,7 @@ function renderDataTableView(container) {
         lbl.style.cssText = 'display:flex;align-items:center;gap:6px;padding:3px 4px;border-radius:3px;cursor:pointer';
         const cb = document.createElement('input');
         cb.type = 'checkbox';
-        cb.checked = !activeFilters || activeFilters.has(val);
+        cb.checked = colFilterHas(activeFilters, val);
         cb.dataset.filterVal = val;
         lbl.appendChild(cb);
         lbl.appendChild(document.createTextNode((val || '(vacío)') + ' (' + count + ')'));
@@ -5431,7 +5432,7 @@ function renderDataTableView(container) {
     if (hasFilters) {
       for (const fci in colFilters) {
         const fVal = String(row[fci] ?? '').trim();
-        if (!colFilters[fci].has(fVal)) return;
+        if (!colFilterHas(colFilters[fci], fVal)) return;
       }
     }
     const tr = h('tr');

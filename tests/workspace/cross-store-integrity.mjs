@@ -36,6 +36,7 @@ const codeEvents = readFileSync(join(ROOT, 'workspace', 'core', 'events.js'), 'u
 const codeIntegrity = readFileSync(join(ROOT, 'workspace', 'core', 'integrity.js'), 'utf8');
 const codeWstorage = readFileSync(join(ROOT, 'workspace', 'core', 'workspace-storage.js'), 'utf8');
 const codeStorage = readFileSync(join(ROOT, 'workspace', 'core', 'storage.js'), 'utf8');
+const codeTableHelpers = readFileSync(join(ROOT, 'workspace', 'core', 'table-helpers.js'), 'utf8');
 
 function stripModuleSyntax(code) {
   let result = code;
@@ -49,7 +50,7 @@ function stripModuleSyntax(code) {
 }
 
 const combined = [
-  codeVersions, codeDb, codeState, codeEvents, codeModels,
+  codeVersions, codeDb, codeState, codeEvents, codeModels, codeTableHelpers,
   codeBundle, codeMigrations, codeIntegrity, codeWstorage, codeStorage,
 ].map(stripModuleSyntax).join('\n');
 
