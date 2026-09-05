@@ -27,7 +27,7 @@ import { createHistoryManager } from './core/history-manager.js';
 import { saveWorkspaceSession, hasRecoverableSession, loadWorkspaceSession, deleteWorkspaceSession, getWorkspaceSessionInfo } from './core/workspace-storage.js';
 import { setToastHandler, showUserError, showWarning, showSuccess, setupGlobalErrorHandling, withErrorHandling, reportError, classifyError } from './core/error-manager.js';
 import { createOperationRegistry } from './core/operation-registry.js';
-import { registerWorkflowOperations, documentBlocksToHtml } from './core/workflow-operations.js';
+import { registerWorkflowOperations, documentBlocksToHtml, documentBlocksToSections } from './core/workflow-operations.js';
 import { createWorkflowUI } from './core/workflow-ui.js';
 import { createWorkflowPersistence, WORKFLOW_SCHEMA_VERSION } from './core/workflow-persistence.js';
 import { WORKFLOW_TEMPLATES, getTemplateById } from './core/workflow-templates.js';
@@ -3758,9 +3758,8 @@ function renderDocumentToolbar(doc, metrics) {
   }
   ribbonGroup(insertPanel, 'Salida',
     h('button', { className: 'ws-btn ws-btn-ghost ws-btn-sm', title: 'Crear informe desde este documento', onClick: () => {
-      const docText = (doc.blocks || []).map(b => b.content || '').join('\n');
       const config = createReportConfig({ title: 'Informe: ' + (doc.title || 'Documento') });
-      config.sections = [createReportSection('text', docText || '')];
+      config.sections = documentBlocksToReportSections(doc.blocks);
       appStore.set({ designConfig: config, currentView: 'design' });
       renderView('design');
       toast('Informe creado desde el documento', 'success');
@@ -3778,9 +3777,8 @@ function renderDocumentToolbar(doc, metrics) {
     makeDocToolbarButton('Exportar HTML', 'download', exportDocumentHtml, 'Exportar HTML'),
     makeDocToolbarButton('Exportar Markdown', 'download', exportDocument, 'Exportar Markdown'),
     makeDocToolbarButton('Crear informe', 'file', () => {
-      const docText = (doc.blocks || []).map(b => b.content || '').join('\n');
       const config = createReportConfig({ title: 'Informe: ' + (doc.title || 'Documento') });
-      config.sections = [createReportSection('text', docText || '')];
+      config.sections = documentBlocksToReportSections(doc.blocks);
       appStore.set({ designConfig: config, currentView: 'design' });
       renderView('design');
       toast('Informe creado desde el documento', 'success');
@@ -4120,6 +4118,17 @@ function showBlockMenu(anchor, doc, renderBlocks) {
   // cierre de inmediato (la propagacion del mismo evento llegaria a document).
   // Si el menu se cierra antes de este timer (via item), 'closed' evita enganchar.
   setTimeout(() => { if (closed) return; document.addEventListener('click', onDocClick); attached = true; }, 0);
+}
+
+function documentBlocksToReportSections(blocks) {
+  return documentBlocksToSections(Array.isArray(blocks) ? blocks : []).map(section => {
+    const out = createReportSection(section.type, section.content ?? '');
+    if (section.data) out.data = section.data;
+    if (section.dataUrl) out.dataUrl = section.dataUrl;
+    if (section.width != null) out.width = section.width;
+    if (section.height != null) out.height = section.height;
+    return out;
+  });
 }
 
 function autoSaveDoc(doc) {

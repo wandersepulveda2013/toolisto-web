@@ -219,6 +219,9 @@ run('col-filters-roundtrip (Set de filtros de columna viajan bien por el round-t
 // CE-128: exportDocumentMarkdown perdia los graficos (sin case 'chart'); paridad blocksToMarkdown
 run('export-md-chart (el Markdown del toolbar emite los graficos como bloque ```charts, CE-128)', 'node', ['tests/workspace/export-md-chart-test.mjs']);
 
+// CE-127: el boton Informe del documento preserva la estructura (documentBlocksToSections a secciones)
+run('report-info-from-doc (el informe creado desde el documento conserva tablas/graficos/imagenes, CE-127)', 'node', ['tests/workspace/report-info-from-doc-test.mjs']);
+
 // 4. Manifest de evidencia
 const evidence = {
   sha: head,

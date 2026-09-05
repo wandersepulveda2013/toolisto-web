@@ -628,7 +628,7 @@ function tableChartSeries(headers, rows, maxSeries = 30) {
   return { series, numericIndex };
 }
 
-function documentBlocksToSections(blocks, options = {}) {
+export function documentBlocksToSections(blocks, options = {}) {
   const sections = [];
   const includeTitle = options.includeTitle !== false;
   let titleSent = !includeTitle;
