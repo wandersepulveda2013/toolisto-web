@@ -216,6 +216,9 @@ run('table-sort-confidence (sort reordena rows + cellConfidence juntas; snapshot
 // CE-130: colFilters como Set no sobreviven a JSON (export/import los corrompia a {} -> TypeError)
 run('col-filters-roundtrip (Set de filtros de columna viajan bien por el round-trip .toolisto, CE-130)', 'node', ['tests/workspace/col-filters-roundtrip-test.mjs']);
 
+// CE-128: exportDocumentMarkdown perdia los graficos (sin case 'chart'); paridad blocksToMarkdown
+run('export-md-chart (el Markdown del toolbar emite los graficos como bloque ```charts, CE-128)', 'node', ['tests/workspace/export-md-chart-test.mjs']);
+
 // 4. Manifest de evidencia
 const evidence = {
   sha: head,

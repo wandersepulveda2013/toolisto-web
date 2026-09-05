@@ -4166,6 +4166,18 @@ function exportDocumentMarkdown(doc) {
       if (imgSrc) md += '![imagen](' + imgSrc + ')\n\n';
       return;
     }
+    if (block.type === 'chart') {
+      md += bt + bt + bt + 'charts\n' + (block.content || 'Grafico') + '\n';
+      if (Array.isArray(block.series) && block.series.length) {
+        md += '| Etiqueta | Valor |\n';
+        md += '| --- | --- |\n';
+        block.series.forEach(item => {
+          md += '| ' + String(item?.label ?? '').replace(/\|/g, '\\|') + ' | ' + String(item?.value ?? '') + ' |\n';
+        });
+      }
+      md += bt + bt + bt + '\n\n';
+      return;
+    }
     md += (block.content || '') + '\n\n';
   });
   return md;
