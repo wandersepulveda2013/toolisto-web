@@ -16,6 +16,12 @@ artifacts/release-toolisto-com-20260813-dist/
 _toolisto_autopilot/
 _toolisto_preview/
 
+# Runtime/debug logs de ciclos (nunca se commitean)
+_tl*.log
+
+# Manifests del release gate (generados por corrida; la QUEUE/STATUS los referencian por SHA)
+artifacts/deep-audit/release-gate/
+
 # Generated scripts
 INICIAR-*
 REPARAR-*

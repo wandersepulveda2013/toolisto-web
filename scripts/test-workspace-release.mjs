@@ -201,6 +201,10 @@ run('workspace-tabs-a11y E2E (contrato ARIA/teclado de tablists doc/tabla/query,
 run('workspace-stability-e2e E2E (estabilidad: undo/redo, save indicator, toasts, navegación, CE-124)', 'node', ['tests/workspace/workspace-stability-e2e-test.mjs']);
 run('lazy-capture-images-e2e E2E (lazy-load de imágenes de capturas con barrido de scroll determinista, CE-124)', 'node', ['tests/workspace/lazy-capture-images-e2e.mjs']);
 
+// CE-125: censo de huérfanas con guard permanente (DISCOVERY 20ma ronda) + 1 suite rescatada
+run('phase3a-manual-verification E2E (10 escenarios scanner + behavioral Canvas, CE-125)', 'node', ['tests/workspace/phase3a-manual-verification.mjs']);
+run('orphan-suites-audit (censo: toda suite registrada o con razon documentada, CE-125)', 'node', ['scripts/audit-orphan-suites.mjs']);
+
 // 4. Manifest de evidencia
 const evidence = {
   sha: head,
