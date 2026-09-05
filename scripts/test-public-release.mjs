@@ -110,5 +110,8 @@ check(contentSimilarityScopedResult.status === 0, 'Content similarity/originalit
 const adsenseDodResult = spawnSync(process.execPath, [join(ROOT, 'tests', 'adsense-remediation-dod.mjs')], { cwd: ROOT, stdio: 'inherit' });
 check(adsenseDodResult.status === 0, 'AdSense remediation DoD (tests/adsense-remediation-dod.mjs) — 11 PASS, 0 FAIL');
 
+const netNegResult = spawnSync(process.execPath, [join(ROOT, 'tests', 'public-site-network-negative.mjs')], { cwd: ROOT, stdio: 'inherit' });
+check(netNegResult.status === 0, 'Public network-negative gate (tests/public-site-network-negative.mjs) — cero egress externo en todas las herramientas y el flujo real (CE-011)');
+
 console.log(`\n=== Resultado: ${passed} PASS, ${failed} FAIL ===`);
 process.exit(failed ? 1 : 0);

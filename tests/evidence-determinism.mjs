@@ -43,6 +43,7 @@ const MIGRATED = new Set([
   'TLT-responsive-matrix-evidence.json',
   'TLT-seo-production-audit-evidence.json',
   'TLT-toolisto-domain-gate-evidence.json',
+  'TLT-workspace-network-negative-evidence.json',
 ]);
 
 let failures = 0;

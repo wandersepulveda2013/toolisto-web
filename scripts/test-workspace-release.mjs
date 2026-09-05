@@ -205,6 +205,11 @@ run('lazy-capture-images-e2e E2E (lazy-load de imágenes de capturas con barrido
 run('phase3a-manual-verification E2E (10 escenarios scanner + behavioral Canvas, CE-125)', 'node', ['tests/workspace/phase3a-manual-verification.mjs']);
 run('orphan-suites-audit (censo: toda suite registrada o con razon documentada, CE-125)', 'node', ['scripts/audit-orphan-suites.mjs']);
 
+// CE-011: red negativa del Workspace como regresión permanente (local-first, sin OCR)
+run('workspace-network-negative E2E (cero egress externo en el runtime del Workspace, CE-011)', 'node', ['tests/workspace/workspace-network-negative-test.mjs'], {
+  env: { ...process.env, E2E_PORT: '8082' },
+});
+
 // 4. Manifest de evidencia
 const evidence = {
   sha: head,
