@@ -4063,7 +4063,7 @@ function renderBlock(block, index, doc, renderBlocks, updateMetrics = () => {}) 
             { label: 'Titulo', type: 'heading1', desc: 'Encabezado grande' },
             { label: 'Subtitulo', type: 'heading2', desc: 'Encabezado mediano' },
             { label: 'Parrafo', type: 'paragraph', desc: 'Texto normal' },
-            { label: 'Lista', type: 'list', desc: 'Lista con viñetas' },
+            { label: 'Lista', type: 'bullet-list', desc: 'Lista con viñetas' },
             { label: 'Cita', type: 'callout', desc: 'Bloque destacado' },
             { label: 'Separador', type: 'divider', desc: 'Linea horizontal' },
           ];

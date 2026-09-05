@@ -231,6 +231,9 @@ run('duplicate-entities (Duplicar en las tarjetas de documento/tabla/captura reu
 // CE-133: widgets de dashboard editables + refs de columna clampeadas (field/category/columns contra headers.length)
 run('dashboard-widget-edit (editar visual del dashboard en sitio + clamp de field/category/columns, CE-133)', 'node', ['tests/workspace/dashboard-widget-edit-test.mjs']);
 
+// CE-132: el slash-menu "/" crea bloques bullet-list validos (nunca el tipo invalido "list")
+run('slash-menu-bullet-list (el slash-menu inserta bullet-list y no degrada la lista a texto plano, CE-132)', 'node', ['tests/workspace/slash-menu-bullet-list-test.mjs']);
+
 // 4. Manifest de evidencia
 const evidence = {
   sha: head,
