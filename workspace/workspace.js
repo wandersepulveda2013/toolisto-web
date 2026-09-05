@@ -7426,18 +7426,13 @@ function dashboardNormalizeConfig(project, tables, saved) {
   const source = tables.find(table => table.id === saved.sourceId) || tables[0];
   const headers = source?.headers || [];
   const validWidgets = Array.isArray(saved.widgets) && saved.widgets.length ? saved.widgets : defaults.widgets;
-  const widgets = validWidgets.map((widget, index) => ({
+  const widgets = validWidgets.map((widget, index) => dashboardClampWidgetColumns({
     ...widget,
     id: widget.id || generateId(),
     type: DASHBOARD_WIDGET_TYPES.some(item => item.value === widget.type) ? widget.type : 'kpi',
     title: String(widget.title || DASHBOARD_WIDGET_TYPES.find(item => item.value === widget.type)?.label || 'Visual ' + (index + 1)),
-    field: widget.field === '' || widget.field == null ? '' : Number(widget.field),
-    category: Number.isInteger(Number(widget.category)) ? Number(widget.category) : 0,
     aggregate: DASHBOARD_AGGREGATES.some(item => item.value === widget.aggregate) ? widget.aggregate : 'count',
-    columns: Array.isArray(widget.columns)
-      ? widget.columns.map(Number).filter(column => Number.isInteger(column) && column >= 0 && column < headers.length)
-      : headers.map((_, column) => column).slice(0, 5),
-  }));
+  }, headers.length));
   return {
     title: String(saved.title || defaults.title),
     sourceId: source?.id || '',
@@ -7469,6 +7464,23 @@ function dashboardAggregate(rows, field, aggregate) {
 
 function dashboardFormatNumber(value) {
   return Number(value || 0).toLocaleString('es', { maximumFractionDigits: 2 });
+}
+
+// CE-133: refs de columna de un widget (field/category/columns) acotadas contra
+// headers.length para que un indice fuera de rango no apunte a celdas inexistentes.
+// NO muta el widget de entrada: devuelve un clon. field fuera de rango -> '' (conteo),
+// category fuera de rango -> 0, columns filtradas (y derivadas si no vienen).
+function dashboardClampWidgetColumns(widget, headersLength) {
+  const width = Number.isFinite(Number(headersLength)) ? Math.max(0, Number(headersLength)) : 0;
+  const fieldNumber = Number.isInteger(Number(widget.field)) && Number(widget.field) >= 0 && Number(widget.field) < width ? Number(widget.field) : '';
+  return {
+    ...widget,
+    field: widget.field === '' || widget.field == null ? '' : fieldNumber,
+    category: Number.isInteger(Number(widget.category)) && Number(widget.category) >= 0 && Number(widget.category) < width ? Number(widget.category) : 0,
+    columns: Array.isArray(widget.columns)
+      ? widget.columns.map(Number).filter(column => Number.isInteger(column) && column >= 0 && column < width)
+      : Array.from({ length: width }, (_, column) => column).slice(0, 5),
+  };
 }
 
 function dashboardChartItems(rows, widget) {
@@ -7600,6 +7612,7 @@ function renderDashboardWidget(widget, source, rows, config, index, commitConfig
     ...(disabled ? { disabled: 'true' } : {}),
     onClick: action,
   }, svgIcon(icon, 13));
+  actions.appendChild(actionButton('Editar visual', 'edit', () => openDashboardWidgetModal(source, commitConfig, widget)));
   actions.appendChild(actionButton('Subir visual', 'chevronUp', () => commitConfig(next => {
     if (index > 0) [next.widgets[index - 1], next.widgets[index]] = [next.widgets[index], next.widgets[index - 1]];
   }, 'Visual reordenado'), index === 0));
@@ -7655,18 +7668,23 @@ async function saveDashboardConfig(project, config) {
   appStore.set({ dashboardConfig: config, isDirty: false, lastSaved: Date.now() });
 }
 
-function openDashboardWidgetModal(source, commitConfig) {
+function openDashboardWidgetModal(source, commitConfig, existing) {
   const headers = source.headers || [];
-  const title = h('input', { className: 'ws-input', type: 'text', value: 'Nuevo visual' });
+  const editing = Boolean(existing);
+  const title = h('input', { className: 'ws-input', type: 'text', value: existing ? (existing.title || 'Nuevo visual') : 'Nuevo visual' });
   const type = h('select', { className: 'ws-input' }, ...DASHBOARD_WIDGET_TYPES.map(item => h('option', { value: item.value }, item.label)));
+  if (existing) type.value = existing.type;
   const category = h('select', { className: 'ws-input' }, ...headers.map((header, index) => h('option', { value: index }, header)));
+  if (existing) category.value = String(existing.category == null ? 0 : existing.category);
   const field = h('select', { className: 'ws-input' },
     h('option', { value: '' }, 'Conteo de filas'),
     ...headers.map((header, index) => h('option', { value: index }, header))
   );
+  if (existing) field.value = existing.field === '' || existing.field == null ? '' : String(existing.field);
   const aggregate = h('select', { className: 'ws-input' }, ...DASHBOARD_AGGREGATES.map(item => h('option', { value: item.value }, item.label)));
+  if (existing) aggregate.value = existing.aggregate || 'count';
   showModal({
-    title: 'Añadir visual al dashboard',
+    title: editing ? 'Editar visual' : 'Añadir visual al dashboard',
     body: [
       queryFormField('Nombre del visual', title, 'Usa un nombre que explique qué estás midiendo.'),
       queryFormField('Tipo de visual', type),
@@ -7674,21 +7692,36 @@ function openDashboardWidgetModal(source, commitConfig) {
       queryFormField('Campo de valores', field),
       queryFormField('Agregación', aggregate),
     ],
-    confirmText: 'Añadir visual',
+    confirmText: editing ? 'Guardar cambios' : 'Añadir visual',
     size: 'wide',
     onConfirm: async () => {
       const widgetType = type.value;
+      const defaultColumns = editing && widgetType === 'table'
+        ? (existing.columns || headers.map((_, index) => index).slice(0, 5))
+        : headers.map((_, index) => index).slice(0, 5);
       await commitConfig(next => {
-        next.widgets.push({
-          id: generateId(),
-          type: widgetType,
-          title: title.value.trim() || 'Nuevo visual',
-          category: Number(category.value) || 0,
-          field: field.value === '' ? '' : Number(field.value),
-          aggregate: aggregate.value,
-          columns: headers.map((_, index) => index).slice(0, 5),
-        });
-      }, 'Visual añadido');
+        if (editing) {
+          const widget = next.widgets.find(w => w.id === existing.id);
+          if (widget) {
+            widget.type = widgetType;
+            widget.title = title.value.trim() || 'Nuevo visual';
+            widget.category = Number(category.value) || 0;
+            widget.field = field.value === '' ? '' : Number(field.value);
+            widget.aggregate = aggregate.value;
+            if (widgetType === 'table') widget.columns = defaultColumns;
+          }
+        } else {
+          next.widgets.push({
+            id: generateId(),
+            type: widgetType,
+            title: title.value.trim() || 'Nuevo visual',
+            category: Number(category.value) || 0,
+            field: field.value === '' ? '' : Number(field.value),
+            aggregate: aggregate.value,
+            columns: defaultColumns,
+          });
+        }
+      }, editing ? 'Visual actualizado' : 'Visual añadido');
     },
   });
 }

@@ -228,6 +228,9 @@ run('table-remove-column-row (eliminar fila/columna de la vista de tabla re-inde
 // CE-131: duplicar entidades en sitio (documento/tabla/captura) sin duplicar la imagen (reusa correctedAssetId)
 run('duplicate-entities (Duplicar en las tarjetas de documento/tabla/captura reusa assets y clona metadatos, CE-131)', 'node', ['tests/workspace/duplicate-entities-test.mjs']);
 
+// CE-133: widgets de dashboard editables + refs de columna clampeadas (field/category/columns contra headers.length)
+run('dashboard-widget-edit (editar visual del dashboard en sitio + clamp de field/category/columns, CE-133)', 'node', ['tests/workspace/dashboard-widget-edit-test.mjs']);
+
 // 4. Manifest de evidencia
 const evidence = {
   sha: head,
