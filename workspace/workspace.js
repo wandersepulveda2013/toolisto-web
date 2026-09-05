@@ -1452,6 +1452,92 @@ function renameCaptureCard(cap) {
   });
 }
 
+// CE-131: duplicar entidades en sitio (documento, tabla o captura) generando
+// un id nuevo por copia. Solo se copian metadatos editable: para capturas se
+// REUSA correctedAssetId (la imagen vive una sola vez en el asset; copiarla
+// duplicaria un PNG potencialmente grande en IndexedDB).
+function cloneDocEntity(doc, projectId) {
+  const name = (doc.title || doc.name || 'Documento') + ' (copia)';
+  return {
+    id: generateId(),
+    projectId,
+    name,
+    title: name,
+    type: doc.type,
+    blocks: (doc.blocks || []).map(block => ({ ...block, id: generateId() })),
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+  };
+}
+
+function cloneDataTableEntity(table, projectId) {
+  return {
+    id: generateId(),
+    projectId,
+    workbookId: table.workbookId,
+    name: (table.name || 'Tabla') + ' (copia)',
+    headers: [...(table.headers || [])],
+    rows: (table.rows || []).map(row => [...row]),
+    columnTypes: table.columnTypes ? { ...table.columnTypes } : undefined,
+    cellConfidence: Array.isArray(table.cellConfidence) ? table.cellConfidence.map(row => [...row]) : undefined,
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+  };
+}
+
+function cloneCaptureEntity(capture, projectId) {
+  const copy = {
+    id: generateId(),
+    projectId,
+    type: capture.type || 'scan',
+    timestamp: Date.now(),
+    name: (capture.name || 'Captura') + ' (copia)',
+    correctedAssetId: capture.correctedAssetId,
+    sourceAssetId: capture.sourceAssetId,
+    scanDocumentId: capture.scanDocumentId,
+    ocrSource: capture.ocrSource,
+  };
+  if (capture.scannerMetadata) copy.scannerMetadata = { ...capture.scannerMetadata };
+  if (capture.correctedAssetId) addRelation(copy, capture.correctedAssetId, 'asset');
+  return copy;
+}
+
+async function duplicateDocCard(doc) {
+  const project = appStore.get('currentProject');
+  if (!project || !doc) return;
+  const copy = cloneDocEntity(doc, project.id);
+  await saveDoc(project.id, copy);
+  await refreshProjectCounts(project.id);
+  const docs = await loadDocs(project.id);
+  appStore.set({ documents: docs });
+  renderView('documents');
+  toast('Documento duplicado: ' + copy.name, 'success');
+}
+
+async function duplicateDataTableCard(table) {
+  const project = appStore.get('currentProject');
+  if (!project || !table) return;
+  const copy = cloneDataTableEntity(table, project.id);
+  await saveData(project.id, copy);
+  await refreshProjectCounts(project.id);
+  const tables = await loadData(project.id);
+  appStore.set({ dataTables: tables });
+  renderView('data');
+  toast('Tabla duplicada: ' + copy.name, 'success');
+}
+
+async function duplicateCaptureCard(capture) {
+  const project = appStore.get('currentProject');
+  if (!project || !capture) return;
+  const copy = cloneCaptureEntity(capture, project.id);
+  await saveCapture(project.id, copy);
+  await refreshProjectCounts(project.id);
+  const caps = await loadCaptures(project.id);
+  appStore.set({ captures: caps });
+  renderView('capture');
+  toast('Captura duplicada: ' + copy.name, 'success');
+}
+
 // CE-094: exportar debe reflejar la ULTIMA edicion en memoria, no la fila
 // persistida por el debounce. `exportProject` lee el estado desde IndexedDB; si
 // un autosave esta pendiente en la ventana del debounce (edicion recien hecha y
@@ -2212,6 +2298,10 @@ function renderCaptureView(container, project) {
         e.stopPropagation();
         extractTextFromScan(project, cap);
       } }, svgIcon('doc'), ' Extraer texto');
+      const dupBtn = h('button', { className: 'ws-btn ws-btn-ghost ws-btn-sm', onClick: (e) => {
+        e.stopPropagation();
+        duplicateCaptureCard(cap);
+      } }, svgIcon('copy'), ' Duplicar');
       const flowBtn = h('button', { className: 'ws-btn ws-btn-ghost ws-btn-sm', onClick: (e) => {
         e.stopPropagation();
         startWorkflowFromWorkspace({ id: 'capture-' + cap.id, name: cap.name || 'Captura', kind: 'image' });
@@ -2220,7 +2310,7 @@ function renderCaptureView(container, project) {
         e.stopPropagation();
         renameCaptureCard(cap);
       } }, svgIcon('edit'), ' Renombrar');
-      card.appendChild(h('div', { style: 'margin-top:6px;display:flex;gap:4px;flex-wrap:wrap' }, extractBtn, flowBtn, renameBtn, delBtn));
+      card.appendChild(h('div', { style: 'margin-top:6px;display:flex;gap:4px;flex-wrap:wrap' }, extractBtn, dupBtn, flowBtn, renameBtn, delBtn));
       grid.appendChild(card);
     });
     el.appendChild(grid);
@@ -3241,6 +3331,10 @@ function renderDocumentsView(container, project) {
           },
         });
       } }, svgIcon('trash'));
+      const dupBtn = h('button', { className: 'ws-btn ws-btn-ghost ws-btn-sm', onClick: (e) => {
+        e.stopPropagation();
+        duplicateDocCard(doc);
+      } }, svgIcon('copy'), ' Duplicar');
       const flowBtn = h('button', { className: 'ws-btn ws-btn-ghost ws-btn-sm', onClick: (e) => {
         e.stopPropagation();
         startWorkflowFromWorkspace({ id: 'doc-' + doc.id, name: doc.title || doc.name || 'Documento', kind: 'document' });
@@ -3249,7 +3343,7 @@ function renderDocumentsView(container, project) {
         e.stopPropagation();
         renameDocCard(doc);
       } }, svgIcon('edit'), ' Renombrar');
-      card.appendChild(h('div', { style: 'margin-top:6px;display:flex;gap:4px' }, flowBtn, renameBtn, delBtn));
+      card.appendChild(h('div', { style: 'margin-top:6px;display:flex;gap:4px' }, dupBtn, flowBtn, renameBtn, delBtn));
       grid.appendChild(card);
     });
     el.appendChild(grid);
@@ -4458,6 +4552,10 @@ async function renderDataView(container, project) {
           },
         });
       } }, svgIcon('trash'));
+      const dupBtn = h('button', { className: 'ws-btn ws-btn-ghost ws-btn-sm', onClick: (e) => {
+        e.stopPropagation();
+        duplicateDataTableCard(table);
+      } }, svgIcon('copy'), ' Duplicar');
       const chartBtn = h('button', { className: 'ws-btn ws-btn-ghost ws-btn-sm', onClick: (e) => {
         e.stopPropagation();
         createChartFromTable(project, table);
@@ -4470,7 +4568,7 @@ async function renderDataView(container, project) {
         e.stopPropagation();
         renameDataTableCard(table);
       } }, svgIcon('edit'), ' Renombrar');
-      card.appendChild(h('div', { style: 'margin-top:8px;display:flex;gap:4px' }, chartBtn, flowBtn, renameBtn, delBtn));
+      card.appendChild(h('div', { style: 'margin-top:8px;display:flex;gap:4px' }, dupBtn, chartBtn, flowBtn, renameBtn, delBtn));
       grid.appendChild(card);
     });
     el.appendChild(grid);

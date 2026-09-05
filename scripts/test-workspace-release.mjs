@@ -225,6 +225,9 @@ run('report-info-from-doc (el informe creado desde el documento conserva tablas/
 // CE-129: la vista de tabla puede eliminar filas y columnas (helpers puros + undo con _colFilters/columnTypes)
 run('table-remove-column-row (eliminar fila/columna de la vista de tabla re-indexa filtros y conserva undo, CE-129)', 'node', ['tests/workspace/table-remove-column-row-test.mjs']);
 
+// CE-131: duplicar entidades en sitio (documento/tabla/captura) sin duplicar la imagen (reusa correctedAssetId)
+run('duplicate-entities (Duplicar en las tarjetas de documento/tabla/captura reusa assets y clona metadatos, CE-131)', 'node', ['tests/workspace/duplicate-entities-test.mjs']);
+
 // 4. Manifest de evidencia
 const evidence = {
   sha: head,
