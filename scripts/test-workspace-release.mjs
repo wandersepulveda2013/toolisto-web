@@ -234,6 +234,9 @@ run('dashboard-widget-edit (editar visual del dashboard en sitio + clamp de fiel
 // CE-132: el slash-menu "/" crea bloques bullet-list validos (nunca el tipo invalido "list")
 run('slash-menu-bullet-list (el slash-menu inserta bullet-list y no degrada la lista a texto plano, CE-132)', 'node', ['tests/workspace/slash-menu-bullet-list-test.mjs']);
 
+// CE-135: descarga individual de captura como imagen desde su tarjeta
+run('capture-download (boton Descargar por tarjeta de captura + nombre de archivo seguro por MIME, CE-135)', 'node', ['tests/workspace/capture-download-test.mjs']);
+
 // 4. Manifest de evidencia
 const evidence = {
   sha: head,

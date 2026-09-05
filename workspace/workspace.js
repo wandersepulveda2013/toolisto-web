@@ -2213,6 +2213,16 @@ function renderScannerView(container, project) {
 }
 
 // Part 4: Capture View, Documents, Doc Editor
+// CE-135: nombre de archivo seguro para descargar una captura, con extension
+// derivada del MIME del dataUrl (jpeg->jpg, png/webp/gif/avif tal cual; default png)
+function captureDownloadFileName(capture, dataUrl) {
+  const raw = String((capture && (capture.name || 'captura-' + (capture.id || ''))) || 'captura').replace(/[\\/:*?"<>|]/g, '-').trim();
+  const base = (raw || 'captura').replace(/-+$/, '') || 'captura';
+  const mime = String(dataUrl || '').match(/^data:image\/([a-z0-9+.]+);/);
+  const extMap = { jpeg: 'jpg', jpg: 'jpg', png: 'png', webp: 'webp', gif: 'gif', avif: 'avif' };
+  return base + '.' + (extMap[mime ? mime[1] : ''] || 'png');
+}
+
 function renderCaptureView(container, project) {
   const captures = appStore.get('captures');
   const el = h('div', { className: 'ws-start', style: 'animation:fadeIn 0.3s ease' });
@@ -2306,11 +2316,29 @@ function renderCaptureView(container, project) {
         e.stopPropagation();
         startWorkflowFromWorkspace({ id: 'capture-' + cap.id, name: cap.name || 'Captura', kind: 'image' });
       } }, svgIcon('flow'), ' Encadenar');
+      const downloadBtn = h('button', { className: 'ws-btn ws-btn-ghost ws-btn-sm', onClick: async (e) => {
+        e.stopPropagation();
+        try {
+          const imageUrl = await resolveCaptureImageDataUrl(cap, loadAsset);
+          if (!imageUrl) { toast('Esta captura no tiene imagen que descargar', 'warning'); return; }
+          const blob = await (await fetch(imageUrl)).blob();
+          const url = URL.createObjectURL(blob);
+          const a = h('a', { href: url, download: captureDownloadFileName(cap, imageUrl) });
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          URL.revokeObjectURL(url);
+          toast('Captura descargada', 'success');
+        } catch (error) {
+          reportError(error, 'capture-download', { captureId: cap.id });
+          toast('No se pudo descargar la captura', 'error');
+        }
+      } }, svgIcon('download'), ' Descargar');
       const renameBtn = h('button', { className: 'ws-btn ws-btn-ghost ws-btn-sm', onClick: (e) => {
         e.stopPropagation();
         renameCaptureCard(cap);
       } }, svgIcon('edit'), ' Renombrar');
-      card.appendChild(h('div', { style: 'margin-top:6px;display:flex;gap:4px;flex-wrap:wrap' }, extractBtn, dupBtn, flowBtn, renameBtn, delBtn));
+      card.appendChild(h('div', { style: 'margin-top:6px;display:flex;gap:4px;flex-wrap:wrap' }, extractBtn, dupBtn, flowBtn, downloadBtn, renameBtn, delBtn));
       grid.appendChild(card);
     });
     el.appendChild(grid);
