@@ -4207,6 +4207,21 @@ async function createNewDataTable() {
   toast('Tabla creada', 'success');
 }
 
+// CE-126: reordena las filas de la tabla manteniendo ALINEADA la matriz
+// `cellConfidence` (mismo orden de filas) para que la revision de celdas con
+// confianza baja siga apuntando a la celda correcta tras un sort.
+function sortTableRows(table, compareRows) {
+  const rows = Array.isArray(table.rows) ? table.rows : [];
+  if (!rows.length) return rows;
+  const confidence = Array.isArray(table.cellConfidence) && table.cellConfidence.length === rows.length ? table.cellConfidence : null;
+  const order = rows.map((_, index) => index);
+  order.sort((a, b) => compareRows(rows[a], rows[b]));
+  const sorted = order.map(index => rows[index]);
+  table.rows = sorted;
+  if (confidence) table.cellConfidence = order.map(index => confidence[index]);
+  return sorted;
+}
+
 function sortDataTable(table, container) {
   if (!table.headers?.length) {
     toast('La tabla no tiene columnas para ordenar', 'warning');
@@ -4229,7 +4244,7 @@ function sortDataTable(table, container) {
       const index = Number(column.value);
       const descending = direction.value === 'desc';
       checkpointTableEdit(table);
-      table.rows.sort((left, right) => {
+      sortTableRows(table, (left, right) => {
         const result = compareTableValues(left[index], right[index]);
         return descending ? -result : result;
       });
@@ -4846,6 +4861,7 @@ function snapshotDataTable(table) {
   return {
     headers: [...(table.headers || [])],
     rows: (table.rows || []).map(row => [...row]),
+    cellConfidence: (table.cellConfidence || []).map(row => [...row]),
   };
 }
 
@@ -4874,6 +4890,7 @@ function commitTableEdit(table) {
 function restoreTableSnapshot(table, snapshot) {
   table.headers = [...snapshot.headers];
   table.rows = snapshot.rows.map(row => [...row]);
+  if (Array.isArray(snapshot.cellConfidence)) table.cellConfidence = snapshot.cellConfidence.map(row => [...row]);
   autoSaveTable(table);
 }
 
@@ -5305,7 +5322,7 @@ function renderDataTableView(container) {
       if (e.target.tagName === 'INPUT' || e.target.classList.contains('ws-col-filter-btn')) return;
       const descending = e.shiftKey;
       checkpointTableEdit(table);
-      table.rows.sort((left, right) => {
+      sortTableRows(table, (left, right) => {
         const result = compareTableValues(left[ci], right[ci]);
         return descending ? -result : result;
       });

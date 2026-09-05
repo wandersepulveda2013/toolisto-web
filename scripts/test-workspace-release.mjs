@@ -210,6 +210,9 @@ run('workspace-network-negative E2E (cero egress externo en el runtime del Works
   env: { ...process.env, E2E_PORT: '8082' },
 });
 
+// CE-126: sort de tabla mantiene alineada cellConfidence (BUG_FIX de la revision de celdas)
+run('table-sort-confidence (sort reordena rows + cellConfidence juntas; snapshot/restore la cubren, CE-126)', 'node', ['tests/workspace/table-sort-confidence-test.mjs']);
+
 // 4. Manifest de evidencia
 const evidence = {
   sha: head,
