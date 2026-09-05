@@ -4884,7 +4884,18 @@ function snapshotDataTable(table) {
     headers: [...(table.headers || [])],
     rows: (table.rows || []).map(row => [...row]),
     cellConfidence: (table.cellConfidence || []).map(row => [...row]),
+    columnTypes: Array.isArray(table.columnTypes) ? [...table.columnTypes] : undefined,
+    colFilters: table._colFilters ? cloneColFilterMap(table._colFilters) : undefined,
   };
+}
+
+function cloneColFilterMap(colFilters) {
+  const cloned = {};
+  Object.keys(colFilters || {}).forEach(key => {
+    const value = colFilters[key];
+    cloned[key] = value instanceof Set ? new Set(value) : Array.isArray(value) ? [...value] : value;
+  });
+  return cloned;
 }
 
 function snapshotKey(snapshot) {
@@ -4913,6 +4924,8 @@ function restoreTableSnapshot(table, snapshot) {
   table.headers = [...snapshot.headers];
   table.rows = snapshot.rows.map(row => [...row]);
   if (Array.isArray(snapshot.cellConfidence)) table.cellConfidence = snapshot.cellConfidence.map(row => [...row]);
+  if (Array.isArray(snapshot.columnTypes)) table.columnTypes = [...snapshot.columnTypes];
+  if (snapshot.colFilters !== undefined) table._colFilters = cloneColFilterMap(snapshot.colFilters);
   autoSaveTable(table);
 }
 
@@ -5141,6 +5154,40 @@ function renderDataTableView(container) {
   toolbarGroup('Añadir', ['Datos', 'Insertar'],
     h('button', { className: 'ws-btn ws-btn-secondary ws-btn-sm ws-data-command', onClick: () => addColumn(table, renderDataTableView, container) }, svgIcon('plus'), ' Columna'),
     h('button', { className: 'ws-btn ws-btn-secondary ws-btn-sm ws-data-command', onClick: () => addRow(table, renderDataTableView, container) }, svgIcon('plus'), ' Fila')
+  );
+  toolbarGroup('Eliminar', ['Datos'],
+    h('button', { className: 'ws-btn ws-btn-ghost ws-btn-sm ws-data-command', title: 'Eliminar la fila de la celda seleccionada. Se puede deshacer con Ctrl Z.', onClick: () => {
+      if (!selection.hasValue) { toast('Selecciona una celda de la fila que quieras eliminar', 'info'); return; }
+      const ri = selection.focusRow;
+      if (ri < 0 || ri >= (table.rows || []).length) return;
+      showModal({
+        title: 'Eliminar fila',
+        body: [`Se eliminará la fila ${ri + 1} de ${(table.rows || []).length}. Puedes deshacerla con Ctrl Z.`],
+        confirmText: 'Eliminar',
+        onConfirm: async () => {
+          checkpointTableEdit(table);
+          if (removeTableRow(table, ri)) { commitTableEdit(table); autoSaveTable(table); rerenderTable(); toast('Fila eliminada', 'success'); }
+          else { toast('No se pudo eliminar la fila: la tabla necesita al menos una fila', 'warning'); }
+        },
+        size: 'small',
+      });
+    } }, svgIcon('trash'), ' Eliminar fila'),
+    h('button', { className: 'ws-btn ws-btn-ghost ws-btn-sm ws-data-command', title: 'Eliminar la columna de la celda seleccionada. Se puede deshacer con Ctrl Z.', onClick: () => {
+      if (!selection.hasValue) { toast('Selecciona una celda de la columna que quieras eliminar', 'info'); return; }
+      const ci = selection.focusCol;
+      if (ci < 0 || ci >= (table.headers || []).length) return;
+      showModal({
+        title: 'Eliminar columna',
+        body: [`Se eliminará la columna «${(table.headers[ci] || '').trim() || 'Sin título'}». Puedes deshacerla con Ctrl Z.`],
+        confirmText: 'Eliminar',
+        onConfirm: async () => {
+          checkpointTableEdit(table);
+          if (removeTableColumn(table, ci)) { commitTableEdit(table); autoSaveTable(table); rerenderTable(); toast('Columna eliminada', 'success'); }
+          else { toast('No se pudo eliminar la columna: la tabla necesita al menos una columna', 'warning'); }
+        },
+        size: 'small',
+      });
+    } }, svgIcon('trash'), ' Eliminar columna')
   );
   toolbarGroup('Salida', ['Insertar'],
     h('button', { className: 'ws-btn ws-btn-ghost ws-btn-sm ws-data-command', title: 'Abrir esta tabla en Query', onClick: sendDataTableToQuery }, svgIcon('flow'), ' Query'),
@@ -5619,6 +5666,35 @@ function addRow(table, renderFn, container) {
   autoSaveTable(table);
   container.replaceChildren();
   renderFn(container);
+}
+
+function removeTableColumn(table, index) {
+  if (!table || !Array.isArray(table.headers) || !Array.isArray(table.rows)) return false;
+  const ci = Number(index);
+  if (!Number.isInteger(ci) || ci < 0 || ci >= table.headers.length || table.headers.length <= 1) return false;
+  table.headers.splice(ci, 1);
+  table.rows.forEach(row => { if (Array.isArray(row) && row.length > ci) row.splice(ci, 1); });
+  if (Array.isArray(table.cellConfidence)) table.cellConfidence.forEach(row => { if (Array.isArray(row) && row.length > ci) row.splice(ci, 1); });
+  if (Array.isArray(table.columnTypes) && table.columnTypes.length > ci) table.columnTypes.splice(ci, 1);
+  if (table._colFilters && typeof table._colFilters === 'object') {
+    const next = {};
+    Object.keys(table._colFilters).forEach(key => {
+      const k = Number(key);
+      if (k === ci) return;
+      next[k > ci ? String(k - 1) : key] = table._colFilters[key];
+    });
+    table._colFilters = next;
+  }
+  return true;
+}
+
+function removeTableRow(table, index) {
+  if (!table || !Array.isArray(table.rows)) return false;
+  const ri = Number(index);
+  if (!Number.isInteger(ri) || ri < 0 || ri >= table.rows.length || table.rows.length <= 1) return false;
+  table.rows.splice(ri, 1);
+  if (Array.isArray(table.cellConfidence) && table.cellConfidence.length > ri) table.cellConfidence.splice(ri, 1);
+  return true;
 }
 
 function autoSaveTable(table) {

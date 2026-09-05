@@ -222,6 +222,9 @@ run('export-md-chart (el Markdown del toolbar emite los graficos como bloque ```
 // CE-127: el boton Informe del documento preserva la estructura (documentBlocksToSections a secciones)
 run('report-info-from-doc (el informe creado desde el documento conserva tablas/graficos/imagenes, CE-127)', 'node', ['tests/workspace/report-info-from-doc-test.mjs']);
 
+// CE-129: la vista de tabla puede eliminar filas y columnas (helpers puros + undo con _colFilters/columnTypes)
+run('table-remove-column-row (eliminar fila/columna de la vista de tabla re-indexa filtros y conserva undo, CE-129)', 'node', ['tests/workspace/table-remove-column-row-test.mjs']);
+
 // 4. Manifest de evidencia
 const evidence = {
   sha: head,
