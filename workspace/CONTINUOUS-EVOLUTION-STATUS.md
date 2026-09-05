@@ -3,7 +3,7 @@
 > Cada ciclo de OpenCode LEE este archivo antes de actuar y lo ACTUALIZA antes de terminar.
 > Registro historico de ciclos de la mision Evolucion Continua.
 > Modo activo SOLO despues de la transicion (cuando `workspace/PRODUCTION_READINESS_DONE` exista).
-> Updated: 2026-09-05 (Cycle 191 — CE-130)
+> Updated: 2026-09-05 (Cycle 192 — CE-128)
 
 ---
 
@@ -1421,6 +1421,27 @@
 | **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`; `git push` denegado (rama acumulada por delante de origin/main). |
 | **Limitaciones** | (1) Los filtros ya PERSISTIDOS como `{}` se descartan silenciosamente en el import (el valor original del filtro no es recuperable del JSON), comportamiento Intencional y documentado en la suite legacy. (2) El modelo en memoria sigue usando `Set`; un filtro creado por una ruta que NO pase por `exportProject`/`importProject` no se normaliza (solo el round-trip de proyecto se beneficia). (3) Los harnesses VM actualizados quedan acoplados al orden de dependencias de `storage.js` (codigo duplicado de la cadena de imports); si storage.js crece otra dependencia, el sandwich debe crecer de nuevo. |
 | **Proxima prioridad** | La cola sigue SIN tareas `TODO`; DISCOVERED P1-P3 de la 21va ronda (CE-127/CE-128 — informes y export Markdown pierden estructura/graficos; CE-131 — duplicar entidades con imagen compartida; CE-129 — borrar filas/columnas en tabla; CE-132 `list` invalido; CE-133 widgets dashboard; CE-134 switch proyecto; CE-135 descarga captura). Candidato natural del proximo ciclo: CE-127 o CE-128 (P2, flujo estrella informe/export) o una FEATURE promocionable. El despliegue del HEAD certificado depende del canal autorizado de GitHub. |
+
+## Cycle 192 — CE-128: `exportDocumentMarkdown` ya emite los graficos (case 'chart', paridad blocksToMarkdown)
+
+| Field | Value |
+|-------|-------|
+| **Date** | 2026-09-05 |
+| **Branch** | main |
+| **HEAD inicial** | 9b24cee (commit codigo CE-128) |
+| **HEAD final** | 9b24cee + docs pending (commit docs en curso) |
+| **Task** | CE-128 (P2, BUG_FIX): corregir la asimetria entre las dos rutas de exportacion Markdown: `blocksToMarkdown` (Flujos) maneja `chart` → bloque ```` ```charts ```` con tabla `Etiqueta|Valor`; `exportDocumentMarkdown` (toolbar Documentos) no tenia `case 'chart'` y los bloques de grafico caian al fallback de texto plano (`block.content`) perdiendo la tabla de series y la estructura. |
+| **Hypothesis (confirmado)** | `exportDocumentMarkdown` (workspace.js:4137-4172) emitia los bloques `chart` por el fallback generico `content` del texto plano; la tabla de series (`block.series`) se perdia por completo. `blocksToMarkdown` (workflow-operations.js:706-717) ya cubria el case `chart` con fence ```` ```charts ```` + titulo + tabla; el fix es replicar el case en `exportDocumentMarkdown` (no delegar el documento entero a `blocksToMarkdown`, porque `exportDocumentMarkdown` tiene su propio formato: `<div>` page-break, callout como `> **Nota:**`, code triple backtick, separadores `\n\n`). |
+| **Change** | `workspace/workspace.js` `exportDocumentMarkdown`: añadido `if (block.type === 'chart')` entre `image-block` y el fallback default; replica exacta de `blocksToMarkdown` chart case: `bt+bt+bt+'charts\n' + (block.content || 'Grafico') + '\n'`, si `Array.isArray(block.series) && block.series.length` emite `| Etiqueta | Valor |`, `| --- | --- |`, y por cada item `| label (escape \\|) | value |`, cierra fence `\n\n`. `tests/workspace/export-md-chart-test.mjs`: suite nueva 26/26, REAL pura (VM grabFn, sin DOM), incluye paridad directa contra `blocksToMarkdown` REAL (con fence/fenceEnd via VM). Bloque CE-128 registrado en `scripts/test-workspace-release.mjs` tras CE-130. |
+| **Bugs corregidos** | (1) Los bloques `chart` ahora se exportan como bloque ```` ```charts ```` con tabla `| Etiqueta | Valor |` (antes solo texto plano del titulo). (2) Paridad entre rutas: toolbar Documentos y Flujos producen el mismo Markdown para bloques chart. (3) Title por defecto usa `'Grafico'` (paridad con canonical). (4) Pipe en etiquetas se escapa (paridad con filas de tabla). |
+| **Tests ejecutados** | Suite nueva `tests/workspace/export-md-chart-test.mjs` 26/26 (section 1 chart con series: fence/titulo/header/separador/A=10/B=20/cierre/no-fallback; section 2 pipe escapado; section 3 default 'Grafico'; section 4 sin series sin crash ni tabla; section 5 value ausente y numerico; section 6 mezcla ordenada; section 7 paridad directa blocksToMarkdown REAL; section 8 anti-regresion: exportDocument delega, chart vivio, chart entre image-block y fallback). Regresiones relacionadas: `document-export-md-lists` 23/23, `workflow-export-md` 30/30, `md-header-escape-and-replace` 12/12, `text-to-document` 15/15. Censo CE-125 OK (133 archivos = 120 registradas + 13 deferidas; CE-128 registrada). |
+| **Tests PASS** | RELEASE GATE completo **122 suites** PASS 0 fail; manifest `release-gate-9b24cee...json` (determinista, ligado al SHA final de codigo). Total acumulado: 2344 workspace (2225 + 119 suites historicas) + 548 performance; el gate suma 122 suites (121 tras CE-130 + CE-128, segun el manifest). |
+| **Tests FAIL** | 0. |
+| **Resultado** | BUG_FIX (P2, paridad de export Markdown, flujo estrella documento → informe). |
+| **Evidence** | `workspace/workspace.js` (exportDocumentMarkdown + chart), `tests/workspace/export-md-chart-test.mjs`, `scripts/test-workspace-release.mjs` (bloque CE-128), `artifacts/deep-audit/release-gate/release-gate-9b24cee...json`. |
+| **Commits** | `9b24cee` (fix(ce): CE-128 exportDocumentMarkdown emite chart como fence ```` ```charts ```` + tabla Etiqueta|Valor, paridad blocksToMarkdown; suite 26 asserts). Evidencia regenerada NO commiteada (anti-churn). |
+| **Limitaciones** | `exportDocumentMarkdown` NO hereda el formato exacto de `blocksToMarkdown` (diferencias de formato deliberadas: page-break HTML, callout como `> **Nota:**`, separadores `\n\n`), por lo que la paridad es SEMANTICA para chart (mismo contenido estructurado, diferente whitespace). Un chart sin series produce solo el titulo dentro del fence; `blocksToMarkdown` hace lo mismo. |
+| **Proxima prioridad** | La cola sigue SIN tareas `TODO`; DISCOVERED P1-P3 de la 21va ronda (CE-127 — botón Informe aplasta bloques a una seccion; CE-129 — borrar filas/columnas en tabla; CE-131 — duplicar entidades; CE-132 — slash-menu crea bloque `list` invalido; CE-133 — widgets dashboard inmutables; CE-134 — sin switch rapido de proyecto; CE-135 — sin descarga individual de captura). Candidato natural del proximo ciclo: CE-127 (P2, documento → informe preservando estructura) o FEATURE promocionable. |
 
 ## Cycle 128 — Fix test-debt in engine/parser/planner suites + register them in the gate (CE-065)
 
