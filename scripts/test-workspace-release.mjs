@@ -243,6 +243,10 @@ run('page-break-text-preserved (splitHtmlAtPageBreak conserva el texto de un blo
 // CE-138: bloques chart de data.to-chart/report.create visibles en el editor (render SVG canonico en renderBlock)
 run('editor-chart-block (el bloque chart del editor renderiza el SVG canonico, no texto plano, CE-138)', 'node', ['tests/workspace/editor-chart-block-test.mjs']);
 
+// CE-139: rerenderTable reinstala solo el grid (thead+tbody) via renderGrid, sin reconstruir
+// toolbar/ribbon/formula/sheet-tabs; los listeners de tabla y la seleccion se preservan
+run('data-table-rerender-scope (el re-render de la vista de tabla no reconstruye el layout completo, CE-139)', 'node', ['tests/workspace/data-table-rerender-scope-test.mjs']);
+
 // 4. Manifest de evidencia
 const evidence = {
   sha: head,

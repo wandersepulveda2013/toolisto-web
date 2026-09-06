@@ -5328,7 +5328,29 @@ function renderDataTableView(container) {
     'data-ribbon-group': label,
     'data-ribbon-pages': pages.join(' ')
   }, h('span', { className: 'ws-data-tool-group-label' }, label), h('div', { className: 'ws-data-tool-group-items' }, ...items)));
-  const rerenderTable = () => { container.replaceChildren(); renderDataTableView(container); };
+  const rerenderTable = () => {
+    const mounted = renderGrid();
+    const existingHead = tableEl.querySelector('thead');
+    const existingBody = tableEl.querySelector('tbody');
+    if (existingHead) {
+      const ariaSorts = [];
+      existingHead.querySelectorAll('th[role="columnheader"]').forEach(th => ariaSorts.push(th.getAttribute('aria-sort') || 'none'));
+      existingHead.replaceWith(mounted.head);
+      mounted.head.querySelectorAll('th[role="columnheader"]').forEach((th, i) => {
+        if (ariaSorts[i] && ariaSorts[i] !== 'none') th.setAttribute('aria-sort', ariaSorts[i]);
+      });
+    } else {
+      tableEl.appendChild(mounted.head);
+    }
+    if (existingBody) existingBody.replaceWith(mounted.body);
+    else tableEl.appendChild(mounted.body);
+    const context = el.querySelector('.ws-data-toolbar-context');
+    if (context) context.textContent = (table.rows || []).length.toLocaleString('es') + ' filas · ' + (table.headers || []).length + ' columnas';
+    const capacity = el.querySelector('.ws-table-capacity');
+    if (capacity) capacity.textContent = (table.rows || []).length.toLocaleString('es') + ' / ' + config.maxTableRows.toLocaleString('es') + ' filas · ' + (table.headers || []).length + ' / ' + config.maxTableColumns + ' columnas';
+    formulaInput.value = selection.hasValue ? String(table.rows[selection.focusRow]?.[selection.focusCol] ?? '') : '';
+    if (selection.hasValue) markTableSelection(tableEl, selection);
+  };
   toolbarGroup('Portapapeles', ['Inicio'],
     h('button', { className: 'ws-btn ws-btn-ghost ws-btn-sm ws-data-command', title: 'Deshacer · Ctrl Z', onClick: () => { if (undoTableEdit(table)) { rerenderTable(); toast('Cambio deshecho', 'success'); } } }, svgIcon('undo'), ' Deshacer'),
     h('button', { className: 'ws-btn ws-btn-ghost ws-btn-sm ws-data-command', title: 'Rehacer · Ctrl Y', onClick: () => { if (redoTableEdit(table)) { rerenderTable(); toast('Cambio rehecho', 'success'); } } }, svgIcon('redo'), ' Rehacer'),
@@ -5564,6 +5586,7 @@ function renderDataTableView(container) {
       startCellEdit(table, selection.focusRow, selection.focusCol, tableEl, selection, container, rerenderTable, event.key);
     }
   });
+  const renderGrid = () => {
   const thead = h('thead');
   const headerRow = h('tr');
   headerRow.appendChild(h('th', { className: 'row-number' }, '#'));
@@ -5722,7 +5745,11 @@ function renderDataTableView(container) {
     });
     tbody.appendChild(tr);
   });
-  tableEl.appendChild(tbody);
+  return { head: thead, body: tbody };
+};
+  const mountedGrid = renderGrid();
+  tableEl.appendChild(mountedGrid.head);
+  tableEl.appendChild(mountedGrid.body);
   gridContainer.appendChild(tableEl);
   el.appendChild(gridContainer);
   const sheetTabs = h('div', { className: 'ws-sheet-tabs' });
