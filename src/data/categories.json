@@ -469,7 +469,7 @@
     "id": "spreadsheets",
     "name": "Hojas de cálculo y datos",
     "slug": "hojas-de-calculo",
-    "description": "Convierte, limpia y organiza CSV, Excel, JSON y XML sin salir del navegador: CSV a XLSX, Excel a CSV, uniones, comparaciones, normalización de delimitadores y codificación, OCR de tablas imagen a Excel y más. La solución de hojas de cálculo 100% local.",
+    "description": "Convierte, limpia y organiza CSV, Excel, JSON y XML sin salir del navegador. La solución de hojas de cálculo 100% local.",
     "toolIds": [
       "csvToExcel",
       "excelToCsv",
@@ -637,7 +637,7 @@
     "id": "qrcodes",
     "name": "QR y códigos",
     "slug": "qr-codigos",
-    "description": "Genera y lee códigos QR y de barras en tu navegador: QR de texto, URL, WiFi, tarjetas de contacto, códigos de barras, lectura desde imágenes y generación por lotes desde CSV. Con colores, tamaños y niveles de corrección ajustables.",
+    "description": "Genera y lee códigos QR y de barras en tu navegador: QR de texto, URL, WiFi y tarjetas, lectura desde imágenes y generación por lotes desde CSV.",
     "toolIds": [
       "qrGenerate",
       "qrWifi",
@@ -691,7 +691,7 @@
     "id": "video",
     "name": "Video",
     "slug": "video",
-    "description": "Herramientas de video en tu navegador: comprime un video para enviarlo por correo o WhatsApp, recorta el fragmento que necesitas, une varios archivos, extrae el audio y convierte video a GIF. Sin subir archivos a servidores.",
+    "description": "Comprime, recorta, une y convierte video en tu navegador; extrae audio y crea GIF. Sin subir archivos a servidores.",
     "toolIds": [
       "compressVideo",
       "trimVideo",
