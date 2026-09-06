@@ -102,6 +102,7 @@ console.log('(cloneDocEntity / cloneDataTableEntity / cloneCaptureEntity REALES 
   check('tabla: no hereda _colFilters (limite documentado: el clon nace sin filtros)', copy._colFilters === undefined);
   check('tabla: cellConfidence presente en el clon', Array.isArray(copy.cellConfidence) && copy.cellConfidence.length === 2);
   check('tabla: columnTypes presente en el clon', copy.columnTypes !== undefined);
+  check('tabla: columnTypes es ARRAY (CE-144: shape real, no objeto)', Array.isArray(copy.columnTypes) && copy.columnTypes.length === 2);
 }
 
 // TABLA sin filas ni metadatos opcionales
@@ -164,6 +165,9 @@ const cloneCapStart = wsCode.indexOf('function cloneCaptureEntity(');
 const cloneCapBody = wsCode.slice(cloneCapStart, wsCode.indexOf('\n}', cloneCapStart));
 check('anti-regresion: duplicar captura NO crea un asset nuevo', (wsCode.match(/duplicateCaptureCard/g) || []).length === 2 && !/createImageAsset|saveAsset|dataUrl|blob:/.test(cloneCapBody));
 check('anti-regresion: la copia de captura reusa correctedAssetId de la fuente', /correctedAssetId: capture\.correctedAssetId/s.test(wsCode));
+check('anti-regresion CE-144: cloneDataTableEntity clona columnTypes con Array.isArray (no spread sobre array)', wsCode.includes('columnTypes: Array.isArray(table.columnTypes) ? [...table.columnTypes] : undefined'));
+check('anti-regresion CE-144: duplicateDataSheet clona columnTypes con Array.isArray (no spread sobre array)', wsCode.includes('columnTypes: Array.isArray(sheet.columnTypes) ? [...sheet.columnTypes] : undefined'));
+check('anti-regresion CE-144: ningun clon de columna usa spread {...} sobre columnTypes', !wsCode.includes('columnTypes: table.columnTypes ? { ...table.columnTypes }') && !wsCode.includes('columnTypes: sheet.columnTypes ? { ...sheet.columnTypes }'));
 
 console.log(`\n=== TOTALS: ${pass} PASS, ${fail} FAIL ===`);
 if (fail > 0) process.exit(1);
