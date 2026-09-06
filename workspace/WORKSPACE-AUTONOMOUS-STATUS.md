@@ -103,13 +103,35 @@ en la malla de validacion de APLUNO.)
 - **Commit**: `7b6d9f1` (workspace.js + suite).
 - **Next**: seleccionar el siguiente CE de impacto; candidatos P1/L: CE-139 (rerenderTable grid) y CE-140 (deep-clones + stringify); P2: CE-137 (dead code faithfulOcrText) y CE-145; P3: CE-142/CE-143. Tras varios CE cerrados (ya 2 + el mini W2), ejecutar la product review completa del flujo (launcher->creacion->extraccion->documento->edicion->guardado->cierre->reapertura; loader/errores/modales/doble clic/reload/responsive).
 
+## Ciclo W5 -- "CE-140 dedup del historial de tabla sin JSON.stringify total" (Categoria: PERFORMANCE_IMPROVEMENT Workspace)
+- **Selected**: P1/L priorizado por coste real por edicion (2 deep-clones + 4 stringify en el ganglio commit/checkpoint de la tabla).
+- **Severity**: P1 (9.9x medido en el ganglio de edicion; la comparacion de snapshots via JSON.stringify era el coste dominante y, con Set de colFilters, JSON.stringify(Set) producia {} -> dedup corrupto).
+- **Evidence**: `commitTableEdit`/`checkpointTableEdit` clonaban el store entero y stringificaban la tabla completa para comparar; `snapshotKey` (stringify total) era el ganglio.
+- **Fix**: `snapshotsEqual` (comparacion estructural fija: headers/rows/cellConfidence/columnTypes, y `_colFilters` como Set POR CONTENIDO) + `snapshotDataTable` ligero de solo-tabla; ambos llamanouts ya NO llaman JSON.stringify; `snapshotKey` eliminado.
+- **Tests**: suite `tests/workspace/table-history-cap-test.mjs` ampliada 8->22/22 (igualdad estructural, Set por contenido, anti-regresion stringify).
+- **Regression**: node relacionadas verdes; certificacion conjunta con CE-139 en el gate (64c64b1 fallo-solo-tamano -> 5a3629f OK, ver W6).
+- **Commit**: `ca1fb03`.
+
+## Ciclo W6 -- "CE-139 rerenderTable sin reconstruir el layout + recuperacion del presupuesto de dist" (Categoria: PERFORMANCE_IMPROVEMENT Workspace)
+- **Selected**: P1/L (el re-render de la vista de tabla reconstruia toolbar/ribbon/formula/sheet-tabs y revinculaba listeners del grid por cada edicion).
+- **Severity**: P1 (el grid entero ~250k `<td>` se repintaba; reconstruccion inutil del layout por edicion).
+- **Fix**: `rerenderTable` ahora delega en `renderGrid()` y reemplaza SOLO `thead`/`tbody` in-place con `existingHead.replaceWith(mounted.head)` / `existingBody.replaceWith(mounted.body)` (preservando seleccion, formula bar, pestañas, grupos de ribbon y listeners tableEl.copy/cut/paste/keydown suscritos exactamente una vez). Compactado ademas para quitar referencias redundantes.
+- **Tests**: suite nueva `tests/workspace/data-table-rerender-scope-test.mjs` 35/35 (anclas estructurales + 4 listeners con conteo de suscripcion) registrada en el gate.
+- **Presupuesto**: en `64c64b1` el unico FAIL del gate completo fue `Total workspace dist size: 1202KB` (limite `<1200`, umbral estricto `productSize <= 1228287 B`). Correccion HONESTA en `5a3629f`: dead code eliminado (`faithfulOcrText` CE-137, `actionIcon` + banner §81, `visibleRowIndex`; 0 referencias verificadas en repo/tests), compactacion de `rerenderTable` y dedup de CSS: 5 lineas de reglas top-level byte-identicas a su copia posterior (p.ej. linea 234 == 4536 == 7981 del cluster `.ws-data-toolbar`; se conserva la ULTIMA ocurrencia -> cascada identica; -10.2KB). Dist final 1219134 B -> **1191KB** (margen ~9KB).
+- **Validation**: escaneres de dead-code (funciones), SVG-icons y CSS-huerfanos sin mas blancos reales; `showToast`/`setupKeyboardShortcuts`/`enqueue`/`validateFlow`/etc. verificados VIVOS (tests/HTML/core/addEventListener). `verify-workspace-sync` SYNC OK 42 publicos; `encoding-audit` OK. Node relacionadas (data-table-rerender-scope 35/35, workspace-test 157/157 incl. size, innerhtml 27/27, undo-corruption 15/15, table-history-cap 22/22, table-sort-confidence 27/27, table-remove-column-row 51/51, col-filters-roundtrip 38/38).
+- **Regression**: gate completo `scripts/test-workspace-release.mjs` en `5a3629f`: **157 suites PASS** (build limpio + sync + todos los E2E de navegador + E2E OCR real) -> manifest `release-gate-5a3629fc7538245043ef7713a5c99e0e24754a3c.json`.
+- **Deferred**: CE-141/CE-142/CE-143/CE-145 intactos; CE-137 cerrado (dead code eliminado); AW-003 BLOCKED (sin definicion formal).
+- **Commit**: `64c64b1` (CE-139) + `5a3629f` (presupuesto).
+- **Next**: product review completa del flujo estrella en navegador real; luego continuar backlog (CE-145 P2/M o CE-141 P3 design). Nuevo DISCOVERED pendiente de clasificar: keydown global -> `rerenderTable` como closure (ver QUEUE D-14).
+
 ## Pendientes para el owner
 - Despliegue a produccion (main) autorizado via GitHub API `gh`; actualmente
   `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`.
 
 ## Metricas acumuladas
-- Ciclos completos: 4 (W1..W4: W1 OCR-PDF, W1.1 tests, W2 SEO, W3 CE-138, W4 CE-144).
-- Gate Workspace: 130 suites PASS en cada ciclo (manifests 0257354/b8e151e/7b6d9f1).
+- Ciclos completos: 6 (W1..W6: W1 OCR-PDF, W1.1 tests, W2 SEO, W3 CE-138, W4 CE-144, W5 CE-140, W6 CE-139+presupuesto).
+- Gate Workspace: 157 suites PASS en `5a3629f` (manifests 0257354/b8e151e/7b6d9f1/5a3629fc).
 - Suites run-all: 48/57 -> 54/57 (W1). Restantes: D-01 (DEFERRED, launcher), D-02 (DEFERRED_EXTERNAL, AdSense).
-- Producto Workspace: CE-138 y CE-144 cerrados; CE-137/139/140/141/142/143/145 en backlog; AW-003 BLOCKED (sin definicion formal).
+- Producto Workspace: CE-137/138/139/140/144 cerrados; CE-141/142/143/145 en backlog; AW-003 BLOCKED (sin definicion formal).
+- Presupuesto dist workspace: 1229371 B -> 1219134 B (1191KB) tras W6, con limite `<1200KB` certificado en el gate.
 - Documentacion: QUEUE/STATUS actualizados; reporte final pendiente (se escribira con WORKSPACE-AUTONOMOUS-FINAL-REPORT.md al cerrar el stack).
