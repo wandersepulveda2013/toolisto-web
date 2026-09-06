@@ -9,6 +9,41 @@
 
 window.PdfOcrEngine = (function () {
 
+  // Garantiza pdfjsLib disponible en el sitio público (scripts clásicos).
+  // En el Workspace ya lo define workspace/lazy-loader.js; aquí se autodefine
+  // sin pisarlo para que el adaptador público sea autocontenido y no dependa
+  // del lazy-loader del Workspace.
+  if (!window.__lazyScriptCache) window.__lazyScriptCache = {};
+  if (!window.__lazyLoadScript) {
+    window.__lazyLoadScript = function (src) {
+      if (window.__lazyScriptCache[src]) return window.__lazyScriptCache[src];
+      const p = new Promise((resolve, reject) => {
+        const existing = document.querySelector('script[data-src="' + src + '"]');
+        if (existing) {
+          if (existing.dataset.loaded === 'true') { resolve(); return; }
+          existing.addEventListener('load', resolve);
+          existing.addEventListener('error', reject);
+          return;
+        }
+        const s = document.createElement('script');
+        s.src = src;
+        s.dataset.src = src;
+        s.dataset.loaded = 'false';
+        s.onload = () => { s.dataset.loaded = 'true'; resolve(); };
+        s.onerror = () => reject(new Error('Failed to load ' + src));
+        document.head.appendChild(s);
+      });
+      window.__lazyScriptCache[src] = p;
+      return p;
+    };
+  }
+  if (!window.__ensurePdfJs) {
+    window.__ensurePdfJs = function () {
+      if (window.pdfjsLib) return Promise.resolve();
+      return window.__lazyLoadScript('./vendor/pdfjs/pdf.min.js');
+    };
+  }
+
   function loadPdf(arrayBuffer) {
     return window.__ensurePdfJs().then(function() {
       return window.pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer.slice(0)) }).promise;
