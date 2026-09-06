@@ -240,6 +240,9 @@ run('capture-download (boton Descargar por tarjeta de captura + nombre de archiv
 // CE-136: bloque con salto de pagina mezclado no pierde su texto (informe/PDF/Markdown)
 run('page-break-text-preserved (splitHtmlAtPageBreak conserva el texto de un bloque con salto de pagina, CE-136)', 'node', ['tests/workspace/page-break-text-preserved-test.mjs']);
 
+// CE-138: bloques chart de data.to-chart/report.create visibles en el editor (render SVG canonico en renderBlock)
+run('editor-chart-block (el bloque chart del editor renderiza el SVG canonico, no texto plano, CE-138)', 'node', ['tests/workspace/editor-chart-block-test.mjs']);
+
 // 4. Manifest de evidencia
 const evidence = {
   sha: head,

@@ -3992,6 +3992,11 @@ function renderBlock(block, index, doc, renderBlocks, updateMetrics = () => {}) 
       } }, svgIcon('imageBlock'), ' Seleccionar imagen');
       contentEl.appendChild(imgBtn);
     }
+  } else if (block.type === 'chart') {
+    contentEl = h('div', { style: 'flex:1;overflow-x:auto;padding:8px 0', role: 'img', ariaLabel: block.content || 'Gráfico' });
+    const series = (Array.isArray(block.series) ? block.series : []).filter(item => item && typeof item.value === 'number' && Number.isFinite(item.value));
+    const svgRoot = new DOMParser().parseFromString(buildTableChartSvg({ config: { title: block.content || 'Gráfico' } }, series), 'image/svg+xml').documentElement;
+    if (svgRoot) contentEl.appendChild(document.importNode(svgRoot, true));
   } else if (block.type === 'table') {
     contentEl = h('div', { style: 'flex:1;overflow-x:auto' });
     const headersA = Array.isArray(block.headers) ? block.headers : [];
