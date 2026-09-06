@@ -5035,8 +5035,69 @@ function cloneColFilterMap(colFilters) {
   return cloned;
 }
 
-function snapshotKey(snapshot) {
-  return JSON.stringify(snapshot);
+// CE-140: comparar dos snapshots de tabla sin construir cadenas JSON enteras.
+// commitTableEdit/checkpointTableEdit dedicaban 2-3 `JSON.stringify` de TODA la
+// tabla por edicion de celda (coldigo ~MB en tablas grandes). Este comparador
+// estructural sale temprano en la primera diferencia; para colFilters compara los
+// Set por contenido (JSON.stringify colapsaba Set<> a {} y la dedup no detectaba
+// cambios de filtro). Los snapshots con filtros distintos AHORA si generan undo.
+function snapshotsEqual(a, b) {
+  if (a === b) return true;
+  if (!a || !b) return false;
+  const aHeaders = a.headers, bHeaders = b.headers;
+  if (aHeaders !== bHeaders) {
+    if (!aHeaders || !bHeaders || aHeaders.length !== bHeaders.length) return false;
+    for (let i = 0; i < aHeaders.length; i++) if (aHeaders[i] !== bHeaders[i]) return false;
+  }
+  const aRows = a.rows, bRows = b.rows;
+  if (aRows !== bRows) {
+    if (!aRows || !bRows || aRows.length !== bRows.length) return false;
+    for (let r = 0; r < aRows.length; r++) {
+      const ar = aRows[r], br = bRows[r];
+      if (ar !== br) {
+        if (!ar || !br || ar.length !== br.length) return false;
+        for (let c = 0; c < ar.length; c++) if (ar[c] !== br[c]) return false;
+      }
+    }
+  }
+  const aConf = a.cellConfidence, bConf = b.cellConfidence;
+  if (aConf !== bConf) {
+    if (!aConf || !bConf || aConf.length !== bConf.length) return false;
+    for (let r = 0; r < aConf.length; r++) {
+      const ar = aConf[r], br = bConf[r];
+      if (ar !== br) {
+        if (!ar || !br || ar.length !== br.length) return false;
+        for (let c = 0; c < ar.length; c++) if (ar[c] !== br[c]) return false;
+      }
+    }
+  }
+  const aTypes = a.columnTypes, bTypes = b.columnTypes;
+  if (aTypes !== bTypes) {
+    if (!aTypes || !bTypes || aTypes.length !== bTypes.length) return false;
+    for (let i = 0; i < aTypes.length; i++) if (aTypes[i] !== bTypes[i]) return false;
+  }
+  const aCols = a.colFilters, bCols = b.colFilters;
+  if (aCols !== bCols) {
+    if (!aCols || !bCols) return false;
+    const aKeys = Object.keys(aCols), bKeys = Object.keys(bCols);
+    if (aKeys.length !== bKeys.length) return false;
+    for (let i = 0; i < aKeys.length; i++) {
+      const key = aKeys[i];
+      if (!Object.prototype.hasOwnProperty.call(bCols, key)) return false;
+      const av = aCols[key], bv = bCols[key];
+      if (av === bv) continue;
+      if (av instanceof Set && bv instanceof Set) {
+        if (av.size !== bv.size) return false;
+        for (const item of av) if (!bv.has(item)) return false;
+      } else if (Array.isArray(av) && Array.isArray(bv)) {
+        if (av.length !== bv.length) return false;
+        for (let j = 0; j < av.length; j++) if (av[j] !== bv[j]) return false;
+      } else {
+        return false;
+      }
+    }
+  }
+  return true;
 }
 
 function ensureTableHistory(table) {
@@ -5052,7 +5113,7 @@ function commitTableEdit(table) {
   const history = ensureTableHistory(table);
   const next = snapshotDataTable(table);
   const current = history.past[history.past.length - 1];
-  if (snapshotKey(current) !== snapshotKey(next)) history.past.push(next);
+  if (!snapshotsEqual(current, next)) history.past.push(next);
   if (history.past.length > TABLE_HISTORY_LIMIT) history.past.shift();
   history.future = [];
 }
@@ -5142,7 +5203,7 @@ async function copyTableSelection(table, selection, cut = false) {
 function checkpointTableEdit(table) {
   const history = ensureTableHistory(table);
   const current = snapshotDataTable(table);
-  if (snapshotKey(history.past[history.past.length - 1]) !== snapshotKey(current)) history.past.push(current);
+  if (!snapshotsEqual(history.past[history.past.length - 1], current)) history.past.push(current);
   history.future = [];
 }
 

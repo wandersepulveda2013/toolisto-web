@@ -14,7 +14,7 @@
  * entradas mas antiguas al exceder, preservando el undo reciente.
  *
  * Este test carga el CODIGO REAL de workspace.js (commitTableEdit,
- * ensureTableHistory, snapshotDataTable, snapshotKey, tableHistories) en un
+ * ensureTableHistory, snapshotDataTable, snapshotsEqual, tableHistories) en un
  * sandbox y verifica:
  *   1. Tras N=EJEMPLOS ediciones distintas (muy por encima del limite), el
  *      historial NO supera el limite.
@@ -47,7 +47,7 @@ function grabFn(src, name) {
 }
 
 const snapshotDataSrc = grabFn(wsCode, 'snapshotDataTable');
-const snapshotKeySrc = grabFn(wsCode, 'snapshotKey');
+const snapshotsEqualSrc = grabFn(wsCode, 'snapshotsEqual');
 const ensureSrc = grabFn(wsCode, 'ensureTableHistory');
 const commitSrc = grabFn(wsCode, 'commitTableEdit');
 const restoreSrc = grabFn(wsCode, 'restoreTableSnapshot');
@@ -62,13 +62,13 @@ const TABLE_HISTORY_LIMIT = LIMIT_MATCH ? Number(LIMIT_MATCH[1]) : 50;
 // siga siendo CORRECTO (semantica) despues de activarse el limite.
 function buildApi() {
   const js = [
-    snapshotDataSrc, snapshotKeySrc, ensureSrc, commitSrc, restoreSrc, undoTableEditSrc,
+    snapshotDataSrc, snapshotsEqualSrc, ensureSrc, commitSrc, restoreSrc, undoTableEditSrc,
     'const autoSaveTable = () => {};',
     'const toast = () => {};',
     'const tableHistories = new WeakMap();',
   ].join('\n');
   const fn = new Function('WeakMap', 'JSON', 'String', 'Math', 'TABLE_HISTORY_LIMIT',
-    js + '\nreturn { commitTableEdit, undoTableEdit, tableHistories };');
+    js + '\nreturn { commitTableEdit, undoTableEdit, tableHistories, snapshotsEqual };');
   return fn(WeakMap, JSON, String, Math, TABLE_HISTORY_LIMIT);
 }
 
@@ -139,6 +139,44 @@ console.log('\n4. Tabla grande: el cap tambien protege el historial (memoria aco
   const hist = api.tableHistories.get(table);
   check('tabla de 500 filas: history.past acotado al limite', hist.past.length <= TABLE_HISTORY_LIMIT, 'past=' + hist.past.length);
   check('memoria acotada: no crecio con 2x ediciones', hist.past.length === TABLE_HISTORY_LIMIT);
+}
+
+// ---------- 5. snapshotsEqual (CE-140): dedup sin JSON.stringify, con Sets reales ----------
+console.log('\n5. snapshotsEqual (CE-140): comparacion estructural sin stringify de toda la tabla');
+{
+  const api = buildApi();
+  const eq = api.snapshotsEqual;
+  const sample = { headers: ['A', 'B'], rows: [['1', '2'], ['3', '4']], cellConfidence: [[90, 85], [95, 88]], columnTypes: ['text', 'number'], colFilters: { '0': new Set(['1']) } };
+  check('igual a si misma', eq(sample, sample));
+  const deepCopy = {
+    headers: [...sample.headers],
+    rows: sample.rows.map(r => [...r]),
+    cellConfidence: sample.cellConfidence.map(r => [...r]),
+    columnTypes: [...sample.columnTypes],
+    colFilters: { '0': new Set(sample.colFilters['0']) },
+  };
+  check('copia profunda identica -> iguales', eq(deepCopy, sample));
+  const diffCell = { headers: ['A', 'B'], rows: [['1', 'X'], ['3', '4']], cellConfidence: [[90, 85], [95, 88]], columnTypes: ['text', 'number'], colFilters: { '0': new Set(['1']) } };
+  check('una celda distinta -> desigual', !eq(diffCell, sample));
+  check('header distinto -> desigual', !eq({ headers: ['A', 'C'], rows: sample.rows }, sample));
+  check('fila extra -> desigual', !eq({ headers: ['A', 'B'], rows: [['1', '2'], ['3', '4'], ['5', '6']], cellConfidence: [[90, 85], [95, 88]] }, sample));
+  check('columnTypes distinto -> desigual', !eq({ ...sample, columnTypes: ['date', 'number'] }, sample));
+  const filtroDistinto = { headers: ['A', 'B'], rows: sample.rows, colFilters: { '0': new Set(['2']) } };
+  check('Set de colFilters con contenido distinto -> desigual (bug del JSON.stringify(Set)={} corregido)', !eq(filtroDistinto, sample));
+  check('Set de colFilters identico -> iguales', eq({ ...sample }, sample));
+  check('sin colFilters ambos -> iguales', eq({ headers: ['A'] }, { headers: ['A'] }));
+  check('colFilters solo en uno -> desigual', !eq({ headers: ['A'], colFilters: { '0': new Set(['x']) } }, { headers: ['A'] }));
+}
+
+// ---------- 6. Anti-regresion CE-140: el hot-path ya no stringifica la tabla ----------
+console.log('\n6. Anti-regresion CE-140: commit/checkpoint usan snapshotsEqual, no JSON.stringify');
+{
+  check('commitTableEdit compara con snapshotsEqual', wsCode.includes('if (!snapshotsEqual(current, next)) history.past.push(next);'));
+  check('checkpointTableEdit compara con snapshotsEqual', wsCode.includes('if (!snapshotsEqual(history.past[history.past.length - 1], current)) history.past.push(current);'));
+  check('snapshotKey (stringify total) eliminado', !wsCode.includes('snapshotKey'));
+  const commitBody = wsCode.slice(wsCode.indexOf('function commitTableEdit('), wsCode.indexOf('function restoreTableSnapshot('));
+  const checkpointBody = wsCode.slice(wsCode.indexOf('function checkpointTableEdit('), wsCode.indexOf('function parseClipboardGrid('));
+  check('ni commit ni checkpoint llaman JSON.stringify', !commitBody.includes('JSON.stringify') && !checkpointBody.includes('JSON.stringify'));
 }
 
 console.log('\nRESULTADO: ' + pass + ' PASS, ' + fail + ' FAIL');

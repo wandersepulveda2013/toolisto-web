@@ -162,7 +162,7 @@ console.log('\nB. El undo/redo de tabla (ahora via topbar en data-table) deshace
   const lockSrc = grabFn(wsCode, '_createSaveLock');
   const lockMapSrc = grabFn(wsCode, '_createEntityLockMap');
   const snapshotDataSrc = grabFn(wsCode, 'snapshotDataTable');
-  const snapshotKeySrc = grabFn(wsCode, 'snapshotKey');
+  const snapshotsEqualSrc = grabFn(wsCode, 'snapshotsEqual');
   const ensureSrc = grabFn(wsCode, 'ensureTableHistory');
   const commitSrc = grabFn(wsCode, 'commitTableEdit');
   const checkpointSrc = grabFn(wsCode, 'checkpointTableEdit');
@@ -176,7 +176,7 @@ console.log('\nB. El undo/redo de tabla (ahora via topbar en data-table) deshace
     'const _tableLocks = _createEntityLockMap();',
     'let _lastAutosaveTableSnapshot = "";',
     snapshotDataSrc,
-    snapshotKeySrc,
+    snapshotsEqualSrc,
     ensureSrc,
     commitSrc,
     checkpointSrc,
@@ -234,7 +234,7 @@ console.log('\nB. El historial de tabla (WeakMap) esta separado del historial gl
 {
   wire();
   const snapshotDataSrc = grabFn(wsCode, 'snapshotDataTable');
-  const snapshotKeySrc = grabFn(wsCode, 'snapshotKey');
+  const snapshotsEqualSrc = grabFn(wsCode, 'snapshotsEqual');
   const ensureSrc = grabFn(wsCode, 'ensureTableHistory');
   const commitSrc = grabFn(wsCode, 'commitTableEdit');
   const checkpointSrc = grabFn(wsCode, 'checkpointTableEdit');
@@ -249,7 +249,7 @@ console.log('\nB. El historial de tabla (WeakMap) esta separado del historial gl
     lockMapSrc,
     'const _tableLocks = _createEntityLockMap();',
     'let _lastAutosaveTableSnapshot = "";',
-    snapshotDataSrc, snapshotKeySrc, ensureSrc, commitSrc, checkpointSrc, restoreSrc, undoSrc, redoSrc, autoSaveSrc,
+    snapshotDataSrc, snapshotsEqualSrc, ensureSrc, commitSrc, checkpointSrc, restoreSrc, undoSrc, redoSrc, autoSaveSrc,
     'const tableHistories = new WeakMap();',
   ].join('\n');
   const fn = new Function(
