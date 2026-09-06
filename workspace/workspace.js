@@ -1870,17 +1870,6 @@ function renderDashboardView(container, project) {
   container.appendChild(el);
 }
 
-/* §81 — Common action icon primitive */
-function actionIcon(icon, size, label, onClick) {
-  return h('button', {
-    className: 'ws-action-icon',
-    type: 'button',
-    title: label,
-    ariaLabel: label,
-    onClick,
-  }, svgIcon(icon, size || 16));
-}
-
 /* §82 — Continuous flow guide (7-step breadcrumb path) */
 const FLOW_STEPS = [
   { id: 'capture', label: 'Capturar', icon: 'camera', view: 'intake', altViews: ['capture', 'scanner'] },
@@ -3048,22 +3037,7 @@ function cleanOcrText(text) {
   return cleaned;
 }
 
-function faithfulOcrText(text, words) {
-  if (!words || !words.length) return text;
-  const lines = text.split(/\r?\n/);
-  const wordList = words.filter(w => w.confidence < 70);
-  if (!wordList.length) return text;
-  return lines.map(line => {
-    let result = line;
-    wordList.forEach(w => {
-      if (result.includes(w.text)) {
-        const low = '<span class="ws-ocr-low-confidence" title="Confianza: ' + Math.round(w.confidence) + '%">' + w.text + '</span>';
-        result = result.replace(w.text, low);
-      }
-    });
-    return result;
-  }).join('\n');
-}
+
 
 function buildExtractionSummary(text, confidence) {
   const words = text.trim().split(/\s+/).filter(Boolean);
@@ -5311,7 +5285,8 @@ function renderDataTableView(container) {
     title: 'Revisar tabla, celdas con confianza baja y ver el origen',
     onClick: () => { const stats = tableReviewStats(table); if (stats.lowCount > 0) showTableReviewModal(table, stats); else openTableImageCompare(table); }
   }, svgIcon('eye'), ' Revisar'));
-  toolbarTop.appendChild(h('span', { className: 'ws-data-toolbar-context' }, `${(table.rows || []).length.toLocaleString('es')} filas · ${(table.headers || []).length} columnas`));
+  const contextSpan = h('span', { className: 'ws-data-toolbar-context' }, `${(table.rows || []).length.toLocaleString('es')} filas · ${(table.headers || []).length} columnas`);
+  toolbarTop.appendChild(contextSpan);
   toolbar.appendChild(toolbarTop);
   const ribbonTabs = h('div', { className: 'ws-data-ribbon-tabs', role: 'tablist', ariaLabel: 'Pestañas de tabla' },
     h('span', { className: 'ws-data-ribbon-kicker' }, 'TABLA / LOCAL'),
@@ -5330,24 +5305,20 @@ function renderDataTableView(container) {
   }, h('span', { className: 'ws-data-tool-group-label' }, label), h('div', { className: 'ws-data-tool-group-items' }, ...items)));
   const rerenderTable = () => {
     const mounted = renderGrid();
+    const rn = (table.rows || []).length;
+    const cn = (table.headers || []).length;
     const existingHead = tableEl.querySelector('thead');
-    const existingBody = tableEl.querySelector('tbody');
     if (existingHead) {
       const ariaSorts = [];
       existingHead.querySelectorAll('th[role="columnheader"]').forEach(th => ariaSorts.push(th.getAttribute('aria-sort') || 'none'));
       existingHead.replaceWith(mounted.head);
-      mounted.head.querySelectorAll('th[role="columnheader"]').forEach((th, i) => {
-        if (ariaSorts[i] && ariaSorts[i] !== 'none') th.setAttribute('aria-sort', ariaSorts[i]);
-      });
-    } else {
-      tableEl.appendChild(mounted.head);
-    }
+      mounted.head.querySelectorAll('th[role="columnheader"]').forEach((th, i) => { const a = ariaSorts[i]; if (a && a !== 'none') th.setAttribute('aria-sort', a); });
+    } else tableEl.appendChild(mounted.head);
+    const existingBody = tableEl.querySelector('tbody');
     if (existingBody) existingBody.replaceWith(mounted.body);
     else tableEl.appendChild(mounted.body);
-    const context = el.querySelector('.ws-data-toolbar-context');
-    if (context) context.textContent = (table.rows || []).length.toLocaleString('es') + ' filas · ' + (table.headers || []).length + ' columnas';
-    const capacity = el.querySelector('.ws-table-capacity');
-    if (capacity) capacity.textContent = (table.rows || []).length.toLocaleString('es') + ' / ' + config.maxTableRows.toLocaleString('es') + ' filas · ' + (table.headers || []).length + ' / ' + config.maxTableColumns + ' columnas';
+    contextSpan.textContent = rn.toLocaleString('es') + ' filas · ' + cn + ' columnas';
+    capacitySpan.textContent = rn.toLocaleString('es') + ' / ' + config.maxTableRows.toLocaleString('es') + ' filas · ' + cn + ' / ' + config.maxTableColumns + ' columnas';
     formulaInput.value = selection.hasValue ? String(table.rows[selection.focusRow]?.[selection.focusCol] ?? '') : '';
     if (selection.hasValue) markTableSelection(tableEl, selection);
   };
@@ -5434,7 +5405,8 @@ function renderDataTableView(container) {
     h('button', { className: 'ws-btn ws-btn-ghost ws-btn-sm ws-data-command', title: 'Ir a la ultima columna', onClick: () => { if (table.rows.length > 0) setSelection(selection.focusRow, table.headers.length - 1); } }, svgIcon('chevronRightDouble'), ' Ultima col.'),
     h('button', { className: 'ws-btn ws-btn-ghost ws-btn-sm ws-data-command', title: 'Seleccionar toda la tabla', onClick: () => { selection.anchorRow = 0; selection.anchorCol = 0; selection.focusRow = table.rows.length - 1; selection.focusCol = table.headers.length - 1; selection.hasValue = true; markTableSelection(tableEl, selection); } }, svgIcon('grid'), ' Seleccionar todo')
   );
-  ribbonPanel.appendChild(h('span', { className: 'ws-table-capacity' }, `${(table.rows || []).length.toLocaleString('es')} / ${config.maxTableRows.toLocaleString('es')} filas · ${(table.headers || []).length} / ${config.maxTableColumns} columnas`));
+  const capacitySpan = h('span', { className: 'ws-table-capacity' }, `${(table.rows || []).length.toLocaleString('es')} / ${config.maxTableRows.toLocaleString('es')} filas · ${(table.headers || []).length} / ${config.maxTableColumns} columnas`);
+  ribbonPanel.appendChild(capacitySpan);
   const setRibbonPage = (page) => {
     ribbonPanel.querySelectorAll('.ws-data-tool-group').forEach((group) => {
       const pages = String(group.dataset.ribbonPages || '').split(' ');
@@ -5716,7 +5688,6 @@ function renderDataTableView(container) {
   const tbody = h('tbody');
   const colFilters = table._colFilters || {};
   const hasFilters = Object.keys(colFilters).length > 0;
-  let visibleRowIndex = 0;
   (table.rows || []).forEach((row, ri) => {
     if (hasFilters) {
       for (const fci in colFilters) {
@@ -5726,7 +5697,6 @@ function renderDataTableView(container) {
     }
     const tr = h('tr');
     tr.appendChild(h('td', { className: 'row-number' }, String(ri + 1)));
-    visibleRowIndex++;
     row.forEach((cell, ci) => {
       const rawCell = cell == null ? '' : String(cell);
       const displayCell = rawCell.trim().startsWith('=') ? evaluateDataFormula(table, rawCell) : rawCell;
