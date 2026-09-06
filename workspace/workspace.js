@@ -27,7 +27,7 @@ import { createHistoryManager } from './core/history-manager.js';
 import { saveWorkspaceSession, hasRecoverableSession, loadWorkspaceSession, deleteWorkspaceSession, getWorkspaceSessionInfo } from './core/workspace-storage.js';
 import { setToastHandler, showUserError, showWarning, showSuccess, setupGlobalErrorHandling, withErrorHandling, reportError, classifyError } from './core/error-manager.js';
 import { createOperationRegistry } from './core/operation-registry.js';
-import { registerWorkflowOperations, documentBlocksToHtml, documentBlocksToSections } from './core/workflow-operations.js';
+import { registerWorkflowOperations, documentBlocksToHtml, documentBlocksToSections, splitHtmlAtPageBreak, htmlFragmentToText } from './core/workflow-operations.js';
 import { createWorkflowUI } from './core/workflow-ui.js';
 import { createWorkflowPersistence, WORKFLOW_SCHEMA_VERSION } from './core/workflow-persistence.js';
 import { WORKFLOW_TEMPLATES, getTemplateById } from './core/workflow-templates.js';
@@ -4269,7 +4269,13 @@ function exportDocumentMarkdown(doc) {
   const bt = '\x60';
   let md = '# ' + (doc.title || 'Documento') + '\n\n';
   (doc.blocks || []).forEach(block => {
-    if (block.html && /data-page-break="true"/.test(block.html)) { md += '<div style="page-break-after:always"></div>\n\n'; return; }
+    if (block.html && /data-page-break="true"/.test(block.html)) {
+      for (const seg of splitHtmlAtPageBreak(block.html)) {
+        if (seg.type === 'page-break') md += '<div style="page-break-after:always"></div>\n\n';
+        else { const text = htmlFragmentToText(seg.html); if (text) md += text + '\n\n'; }
+      }
+      return;
+    }
     if (block.type === 'divider') { md += '---\n\n'; return; }
     if (block.type === 'heading1') { md += '# ' + (block.content || '') + '\n\n'; return; }
     if (block.type === 'heading2') { md += '## ' + (block.content || '') + '\n\n'; return; }

@@ -20,14 +20,16 @@ function grabFn(src, name) {
 }
 
 const wsCode = readFileSync(new URL('../../workspace/workspace.js', import.meta.url), 'utf8');
-const src = grabFn(wsCode, 'exportDocumentMarkdown');
-const md = new Function(src + '\nreturn exportDocumentMarkdown;')();
-
 const woCode = readFileSync(new URL('../../workspace/core/workflow-operations.js', import.meta.url), 'utf8');
+const splitSrc = grabFn(woCode, 'splitHtmlAtPageBreak').replace(/^export function/, 'function');
+const textSrc = grabFn(woCode, 'htmlFragmentToText').replace(/^export function/, 'function');
+const src = grabFn(wsCode, 'exportDocumentMarkdown');
+const md = new Function(splitSrc + '\n' + textSrc + '\n' + src + '\nreturn exportDocumentMarkdown;')();
+
 const btmSrc = grabFn(woCode, 'blocksToMarkdown');
 const fenceSrc = grabFn(woCode, 'fence');
 const fenceEndSrc = grabFn(woCode, 'fenceEnd');
-const blocksToMarkdownReal = new Function(fenceSrc + '\n' + fenceEndSrc + '\n' + btmSrc + '\nreturn blocksToMarkdown;')();
+const blocksToMarkdownReal = new Function(fenceSrc + '\n' + fenceEndSrc + '\n' + splitSrc + '\n' + textSrc + '\n' + btmSrc + '\nreturn blocksToMarkdown;')();
 
 const doc = (blocks, title) => ({ title: title || 'Documento', blocks });
 const fenceOpen = '```' + 'charts';

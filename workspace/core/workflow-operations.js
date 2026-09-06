@@ -628,6 +628,39 @@ function tableChartSeries(headers, rows, maxSeries = 30) {
   return { series, numericIndex };
 }
 
+// Divide el HTML de un bloque por los divisores `data-page-break="true"`
+// conservando el texto anterior y posterior. Un bloque mezclado (texto + salto
+// de pagina en el mismo contentEditable) no debe perder su contenido en los
+// artefactos generados.
+export function splitHtmlAtPageBreak(html) {
+  const parts = [];
+  let remaining = String(html ?? '').trim();
+  while (remaining) {
+    const match = /<div\b[^>]*data-page-break="true"[^>]*>\s*<\/div>/i.exec(remaining);
+    if (!match) {
+      if (htmlFragmentToText(remaining)) parts.push({ type: 'text', html: remaining });
+      break;
+    }
+    const before = remaining.slice(0, match.index).trim();
+    if (before && htmlFragmentToText(before)) parts.push({ type: 'text', html: before });
+    parts.push({ type: 'page-break', html: '' });
+    remaining = remaining.slice(match.index + match[0].length).trim();
+  }
+  return parts;
+}
+
+export function htmlFragmentToText(html) {
+  return String(html ?? '')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 export function documentBlocksToSections(blocks, options = {}) {
   const sections = [];
   const includeTitle = options.includeTitle !== false;
@@ -648,7 +681,14 @@ export function documentBlocksToSections(blocks, options = {}) {
     if (block.type === 'heading2') { sections.push({ type: 'subtitle', content }); continue; }
     if (block.type === 'heading3') { sections.push({ type: 'text', content }); continue; }
     if (block.type === 'divider') { sections.push({ type: 'divider', content: '' }); continue; }
-    if (block.type === 'page-break' || (block.html && /data-page-break="true"/.test(block.html))) { sections.push({ type: 'page-break', content: '' }); continue; }
+    if (block.type === 'page-break') { sections.push({ type: 'page-break', content: '' }); continue; }
+    if (block.html && /data-page-break="true"/.test(block.html)) {
+      for (const seg of splitHtmlAtPageBreak(block.html)) {
+        if (seg.type === 'page-break') sections.push({ type: 'page-break', content: '' });
+        else sections.push({ type: 'text', content: htmlFragmentToText(seg.html) });
+      }
+      continue;
+    }
     if (block.type === 'bullet-list') { sections.push({ type: 'text', content: '• ' + content }); continue; }
     if (block.type === 'quote') { sections.push({ type: 'text', content: '> ' + content }); continue; }
     if (block.type === 'table' && Array.isArray(block.headers) && Array.isArray(block.rows)) {
@@ -682,6 +722,13 @@ function blocksToMarkdown(blocks) {
   for (const block of list) {
     if (!block) continue;
     const content = String(block.content || '').trim();
+    if (block.html && /data-page-break="true"/.test(block.html)) {
+      for (const seg of splitHtmlAtPageBreak(block.html)) {
+        if (seg.type === 'page-break') lines.push('');
+        else { const t = htmlFragmentToText(seg.html); if (t) lines.push(t); }
+      }
+      continue;
+    }
     switch (block.type) {
       case 'heading1': lines.push('# ' + content); break;
       case 'heading2': lines.push('## ' + content); break;

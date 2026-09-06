@@ -23,7 +23,9 @@ const wsCode = readFileSync(new URL('../../workspace/workspace.js', import.meta.
 const woCode = readFileSync(new URL('../../workspace/core/workflow-operations.js', import.meta.url), 'utf8');
 const drCode = readFileSync(new URL('../../workspace/core/design-report.js', import.meta.url), 'utf8');
 
-const blocksToSectionsReal = new Function(grabFn(woCode, 'documentBlocksToSections').replace(/^export function/, 'function') + '\nreturn documentBlocksToSections;')();
+const splitSrc = grabFn(woCode, 'splitHtmlAtPageBreak').replace(/^export function/, 'function');
+const textSrc = grabFn(woCode, 'htmlFragmentToText').replace(/^export function/, 'function');
+const blocksToSectionsReal = new Function(splitSrc + '\n' + textSrc + '\n' + grabFn(woCode, 'documentBlocksToSections').replace(/^export function/, 'function') + '\nreturn documentBlocksToSections;')();
 const createReportSectionReal = new Function(grabFn(drCode, 'createReportSection') + '\nreturn createReportSection;')();
 const helperSrc = grabFn(wsCode, 'documentBlocksToReportSections');
 const helper = new Function('documentBlocksToSections', 'createReportSection', helperSrc + '\nreturn documentBlocksToReportSections;')(

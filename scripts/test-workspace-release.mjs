@@ -237,6 +237,9 @@ run('slash-menu-bullet-list (el slash-menu inserta bullet-list y no degrada la l
 // CE-135: descarga individual de captura como imagen desde su tarjeta
 run('capture-download (boton Descargar por tarjeta de captura + nombre de archivo seguro por MIME, CE-135)', 'node', ['tests/workspace/capture-download-test.mjs']);
 
+// CE-136: bloque con salto de pagina mezclado no pierde su texto (informe/PDF/Markdown)
+run('page-break-text-preserved (splitHtmlAtPageBreak conserva el texto de un bloque con salto de pagina, CE-136)', 'node', ['tests/workspace/page-break-text-preserved-test.mjs']);
+
 // 4. Manifest de evidencia
 const evidence = {
   sha: head,

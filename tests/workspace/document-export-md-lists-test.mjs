@@ -20,8 +20,11 @@ function grabFn(src, name) {
 }
 
 const wsCode = readFileSync(new URL('../../workspace/workspace.js', import.meta.url), 'utf8');
+const woCode = readFileSync(new URL('../../workspace/core/workflow-operations.js', import.meta.url), 'utf8');
+const splitSrc = grabFn(woCode, 'splitHtmlAtPageBreak').replace(/^export function/, 'function');
+const textSrc = grabFn(woCode, 'htmlFragmentToText').replace(/^export function/, 'function');
 const src = grabFn(wsCode, 'exportDocumentMarkdown');
-const md = new Function(src + '\nreturn exportDocumentMarkdown;')();
+const md = new Function(splitSrc + '\n' + textSrc + '\n' + src + '\nreturn exportDocumentMarkdown;')();
 
 const doc = (blocks, title) => ({ title: title || 'Documento', blocks });
 
