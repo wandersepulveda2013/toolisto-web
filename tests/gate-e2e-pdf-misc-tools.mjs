@@ -466,16 +466,6 @@ async function run() {
     const photoJpeg = buildJpegWithExif(baseJpegBody);
     ok(photoJpeg.length > 400 && photoJpeg[0] === 0xFF && photoJpeg[1] === 0xD8, 'fixture foto.jpg con EXIF GPS generado', photoJpeg.length + ' bytes');
 
-    // Verificación previa: el fixture JPEG se abre con EXIF en el propio navegador.
-    const exifCheck = await page.evaluate(async ({ b64 }) => {
-      const bin = atob(b64);
-      const u = new Uint8Array(bin.length);
-      for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i);
-      const r = await window.PhotoLocation.extractFromJpeg(u.buffer);
-      return r.success ? { success: true, lat: r.data.gps.lat, lng: r.data.gps.lng, make: r.data.camera.make, datetime: r.data.datetime } : { success: false, error: r.error };
-    }, { b64: toBase64(photoJpeg) });
-    ok(exifCheck.success && exifCheck.lat !== undefined, 'fixture JPEG: PhotoLocation extrae GPS', JSON.stringify(exifCheck));
-
     /* ── 1. pdfTablesToExcel ───────────────────────────────────────────── */
     console.log('\n--- pdfTablesToExcel (extraer-tablas-pdf-excel) ---');
     await gotoPage(page, url, 'extraer-tablas-pdf-excel');
@@ -611,6 +601,17 @@ async function run() {
     /* ── 6. photoLocationExtractor ─────────────────────────────────────── */
     console.log('\n--- photoLocationExtractor (extraer-ubicacion-foto) ---');
     await gotoPage(page, url, 'extraer-ubicacion-foto');
+
+    // Verificación del fixture JPEG dentro del contexto real del tool (photo-location.js).
+    const exifCheck = await page.evaluate(async ({ b64 }) => {
+      const bin = atob(b64);
+      const u = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i);
+      const r = await window.PhotoLocation.extractFromJpeg(u.buffer);
+      return r.success ? { success: true, lat: r.data.gps.lat, lng: r.data.gps.lng, make: r.data.camera.make, datetime: r.data.datetime } : { success: false, error: r.error };
+    }, { b64: toBase64(photoJpeg) });
+    ok(exifCheck.success && exifCheck.lat !== undefined, 'fixture JPEG: PhotoLocation extrae GPS', JSON.stringify(exifCheck));
+
     await upload(page, [{ name: 'foto.jpg', mimeType: 'image/jpeg', buffer: photoJpeg }]);
     await runTool(page);
     const plMsg = await page.$eval('#resultMessage', (el) => el.textContent);

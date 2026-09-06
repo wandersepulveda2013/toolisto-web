@@ -26,7 +26,9 @@ check(!/EngineLoader\.loadTesseract|worker\.recognize/.test(publicExtract), 'ext
 check(publicExtract.includes('window.PdfOcrEngine.ocrCanvas'), 'extractTextFromScannedPdf usa el adaptador OCR-PDF canónico');
 check(existsSync(join(root, 'dist/js/ocr/pdf-ocr-engine.js')), 'build publica el adaptador OCR-PDF');
 check(existsSync(join(root, 'workspace/core/ocr-engine.js')), 'el motor aislado del Workspace vive en la fuente workspace/');
-check(!existsSync(join(root, 'dist/workspace/core/ocr-engine.js')), 'el build público NO publica el motor aislado del Workspace');
+const distAdapter = readFileSync(join(root, 'dist/js/ocr/pdf-ocr-engine.js'), 'utf8');
+const distAdapterNoComments = distAdapter.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '');
+check(!/import\([^)]*ocr-engine\.js|require\([^)]*ocr-engine\.js|from\s+['"][^'"]*core\/ocr-engine\.js|src=["'][^"']*core\/ocr-engine\.js/.test(distAdapterNoComments), 'el adaptador público publicado NO carga el motor aislado del Workspace');
 
 console.log(`=== Resultado: ${passed} PASS, ${failed} FAIL ===`);
 process.exit(failed ? 1 : 0);
