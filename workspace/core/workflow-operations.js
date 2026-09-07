@@ -690,7 +690,10 @@ export function documentBlocksToSections(blocks, options = {}) {
       continue;
     }
     if (block.type === 'bullet-list') { sections.push({ type: 'text', content: '• ' + content }); continue; }
+    if (block.type === 'numbered-list') { sections.push({ type: 'text', content: '1. ' + content }); continue; }
     if (block.type === 'quote') { sections.push({ type: 'text', content: '> ' + content }); continue; }
+    if (block.type === 'code') { sections.push({ type: 'text', content: content }); continue; }
+    if (block.type === 'callout') { sections.push({ type: 'text', content: '> Nota: ' + content }); continue; }
     if (block.type === 'table' && Array.isArray(block.headers) && Array.isArray(block.rows)) {
       sections.push({ type: 'table', data: { headers: block.headers, rows: block.rows } });
       continue;
