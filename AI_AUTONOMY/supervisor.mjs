@@ -8,8 +8,12 @@
 // commits, loops, crashes, or exits cleanly) so the whole launcher/runtime
 // contract is certified without live OpenCode or network.
 //
-// Verified progress comes from REAL signals (HEAD moved, owned file changed) —
-// NEVER from stdout text alone. Narration is only fed to the loop guard.
+// Verified progress comes from REAL signals (HEAD moved, owned file changed) and
+// from REAL tool executions reported by the CLI activity channel (stderr records
+// like `→ Read`, `? Glob/Grep`, `$ shell`, `Edit`): execution is not narration,
+// so those markers count as verified for the loop guard (they interleave intent
+// lines and break false CONSECUTIVE_INTENTS during legit investigation phases).
+// Narration (stdout) is only fed to the loop guard as intent candidates.
 
 import { spawn, execFileSync } from 'child_process';
 import * as guard from './guard.mjs';
@@ -17,6 +21,23 @@ import * as runtime from './runtime.mjs';
 
 const POLL_INTERVAL_MS = 1000;
 const STDOUT_FLUSH_MS = 300;
+
+// From an activity-channel line (opencode CLI prints tool executions on stderr),
+// return a short verified marker when a REAL tool ran, or null for narration/noise.
+export function toolMarker(line) {
+  const t = String(line || '')
+    .replace(/\u001b\[[0-9;]*m/g, '')
+    .replace(/\r/g, '')
+    .trim();
+  if (!t) return null;
+  if (/^[\u2192\u2794]/.test(t) && /\s/.test(t)) return 'tool:read';
+  if (/^[\u2726\u2731]/.test(t) && /\s/.test(t)) return 'tool:search';
+  if (/^\$/.test(t)) return 'tool:shell';
+  if (/^Edit\b/.test(t)) return 'tool:edit';
+  if (/^Wrote\b|^Write\b/.test(t)) return 'tool:write';
+  if (/^Bash\b/.test(t)) return 'tool:bash';
+  return null;
+}
 
 // Force-kill the whole process tree rooted at `pid` (Windows-safe via taskkill /T /F).
 // This is the HARD path, used only after a graceful interrupt fails to stop the
@@ -227,6 +248,11 @@ export function superviseChild(r, opts) {
         const t = line.trim();
         if (!t) continue;
         onLine(t, true);
+        // A REAL tool execution record (activity channel) counts as verified:
+        // it interleaves intent lines so legit investigation (repeated reads/
+        // greps before the first commit) never looks like a narration loop.
+        const mk = toolMarker(t);
+        if (mk) detector.onVerified(mk);
       }
     });
 

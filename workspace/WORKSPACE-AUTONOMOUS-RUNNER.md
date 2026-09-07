@@ -54,6 +54,14 @@
 - Verdictos: 0 supervisor `SUCCESS`; no-cero y cerrado solo = `CRASH`; vivo sin progreso verificado
   (HEAD/owned) al llegar `phaseTimeoutMs` = `STALL`; spawn fallido = `CONFIG_ERROR`; guard de
   narracion = `LOOP_INTERRUPTED`.
+- **Guard de bucles (corregido el 2026-09-07)**: las ejecuciones reales de herramientas que opencode
+  reporta en el canal de actividad (stderr: `→ Read`, `? Glob/Grep`, `$ shell`, `Edit`, `Wrote`) se
+  alimentan al detector como marcadores `verified`. Antes solo contaba HEAD/owned, asi que 5 intents
+  de narracion entre greps/reads legitimos (antes del primer commit) disparaban
+  `CONSECUTIVE_INTENTS` por falso positivo; eso produjo 3 `LOOP_INTERRUPTED` consecutivos (ciclos
+  5-6-7 del run de produccion) y SAFE_MODE por crash-loop (streak 3). Los umbrales del guard NO se
+  bajaron; se corrigio el suministro de senal (ejecucion != narracion). Aun asi, 5 intents seguidos
+  sin NINGUNA tool-call intercalada siguen siendo `CONSECUTIVE_INTENTS` (loop real).
 - Tras un `LOOP_INTERRUPTED`, `STALL` o `CRASH`, el runner antepone al siguiente prompt el contexto
   de recovery compacto (ciclo, tarea, motivo, ultimo HEAD verificado, proxima accion del runtime).
 - El runner corre el supervisor como proceso hijo y muestra un **heartbeat de consola** cada 60 s
@@ -110,6 +118,12 @@ anterior `opencode/deepseek-v4-flash-free` devuelve `Unexpected server error` de
    → `-Encoding UTF8`.
 6. `MaxCycles` default ilimitado → default finito 20 (con `-Unlimited`/0 para sin limite).
 7. `Write-CycleHistory` registraba `--commits 0 --files-changed 0` ficticios → reales.
+8. Falso positivo del guard → SAFE_MODE (2026-09-07): solo HEAD/owned contaban como `verified`, asi
+   que investigacion legitima (greps/reads antes del primer commit) parecia NARRATION_LOOP. Corregido
+   alimentando al guard las tool-calls reales del canal de actividad. **Desbloqueo de SAFE_MODE
+   (intervencion humana prevista por diseno)**: limpiar `AI_AUTONOMY/runtime.json` (`safeMode:false`,
+   `crashLoopStreak:0`) y relanzar `.\RUN-OPENCODE-AUTONOMOUS.ps1 -Resume`. El boot devuelve
+   `RECOVERY` y el siguiente ciclo arranca con contexto de recovery.
 
 ## Limitaciones documentadas
 
