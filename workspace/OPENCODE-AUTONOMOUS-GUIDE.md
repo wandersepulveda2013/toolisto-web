@@ -131,7 +131,9 @@ entre ciclos, logs, metricas y `workspace-runner-state.json` (PASS, 2 ciclos).
    el agente se controla via `default_agent` de `opencode.json` y el `model:` del frontmatter).
    El supervisor spawn con stdin cerrado (`stdio: ['ignore','pipe','pipe']`); si quedara abierto,
    `opencode run` se bloquea leyendolo en silencio (STALL).
-4. Guarda el log completo y el exit code; ante fallo aplica backoff 1/5/15/30 min.
+4. Guarda el log completo y el exit code; ante fallo aplica backoff 1/5/15/30 min. Mientras un
+   ciclo corre, la consola muestra un latido cada 60 s (`[en marcha] Cycle N: X min | log ... | HEAD ...`)
+   para que no parezca congelada; el detalle vive en el log del ciclo.
 5. Registra metricas (resultado, bucket, HEAD, duracion) en `metrics.tsv`.
 6. Comprueba STOP y la transicion PR->CE (DONE). Espera `PauseSeconds` y lanza el siguiente.
 7. El sistema termina SOLO con `AUTONOMOUS_STOP`, limite de ciclos explicito o fallo grave.

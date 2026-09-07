@@ -616,12 +616,38 @@ OUTPUT:
     try { $null = New-Item -ItemType Directory -Force -Path (Split-Path -Parent $promptFile) } catch { }
     try { Set-Content -LiteralPath $promptFile -Value $prompt -Encoding UTF8 } catch { }
 
-    $supArgs = @('supervise', '--cmd', $OcCommand, '--args', $ocArgs, '--prompt-file', $promptFile, '--stdout-log', $logFile, '--cycle', ($cycle.ToString()))
-    if ($PhaseTimeoutMinutes -gt 0) { $supArgs += @('--phase-timeout-ms', ([string]($PhaseTimeoutMinutes * 60 * 1000))) }
-    if ($taskId) { $supArgs += @('--task', $taskId) }
+    # Start-Process en PS 5.1 NO cita los elementos del array; entrecomillamos a mano
+    # los valores (--args, comando, rutas) para que node reciba argv sin romper.
+    $spArgs = @('supervise', '--cmd', ('"' + $OcCommand + '"'), '--args', ('"' + $ocArgs + '"'),
+                '--prompt-file', ('"' + $promptFile + '"'), '--stdout-log', ('"' + $logFile + '"'),
+                '--cycle', ([string]$cycle))
+    if ($PhaseTimeoutMinutes -gt 0) { $spArgs += @('--phase-timeout-ms', ([string]($PhaseTimeoutMinutes * 60 * 1000))) }
+    if ($taskId) { $spArgs += @('--task', $taskId) }
     $supResp = $null
+    $supJsonFile = Join-Path $ProjectRoot "_toolisto_autopilot\tmp\cycle-$cycle.supervise.out.json"
+    $supErrFile = Join-Path $ProjectRoot "_toolisto_autopilot\tmp\cycle-$cycle.supervise.err.txt"
+    try { $null = New-Item -ItemType Directory -Force -Path (Split-Path -Parent $supJsonFile) } catch { }
+    try { Set-Content -LiteralPath $supJsonFile -Value '' -Encoding UTF8 } catch { }
     try {
-      $supResp = Invoke-Runtime $supArgs
+      $sp = Start-Process -FilePath "node" -ArgumentList $spArgs -PassThru -NoNewWindow `
+        -RedirectStandardOutput $supJsonFile -RedirectStandardError $supErrFile
+      # Heartbeat: para que la consola no parezca detenida durante un ciclo largo sin
+      # cambiar, mostramos periodicamente la duracion, el crecimiento del log del ciclo
+      # y el HEAD actual. Todo el progreso detallado vive en el log del ciclo.
+      $hbLast = 0
+      $hbStart = Get-Date
+      while (-not $sp.HasExited) {
+        Start-Sleep -Seconds 60
+        $logSize = 0
+        try { $logSize = (Get-Item -LiteralPath $logFile -ErrorAction Stop).Length } catch { }
+        $deltaKB = [Math]::Round(($logSize - $hbLast) / 1KB, 1)
+        $min = [Math]::Round(((Get-Date) - $hbStart).TotalMinutes, 1)
+        $headNow = git rev-parse --short HEAD 2>$null
+        Write-Log ("  [en marcha] Cycle {0}: {1} min | log {2} KB (+{3} KB) | HEAD {4}" -f $cycle, $min, [Math]::Round($logSize / 1KB, 1), $deltaKB, $headNow)
+        $hbLast = $logSize
+      }
+      $supJsonRaw = Get-Content -LiteralPath $supJsonFile -Raw -ErrorAction SilentlyContinue
+      if ($supJsonRaw) { try { $supResp = $supJsonRaw | ConvertFrom-Json } catch { $supResp = $null } }
     } catch {
       $supResp = $null
       Write-Log "FALLO GRAVE de infraestructura del runner al invocar el supervisor: $($_.Exception.Message)"

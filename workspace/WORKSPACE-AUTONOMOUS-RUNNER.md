@@ -56,6 +56,13 @@
   narracion = `LOOP_INTERRUPTED`.
 - Tras un `LOOP_INTERRUPTED`, `STALL` o `CRASH`, el runner antepone al siguiente prompt el contexto
   de recovery compacto (ciclo, tarea, motivo, ultimo HEAD verificado, proxima accion del runtime).
+- El runner corre el supervisor como proceso hijo y muestra un **heartbeat de consola** cada 60 s
+  mientras el ciclo vive (duracion, tamano del log del ciclo y su delta, HEAD actual) para que una
+  consola con inherit del ciclo no parezca congelada. El veredicto JSON del supervisor se captura
+  de `_toolisto_autopilot\tmp\cycle-N.supervise.out.json`.
+- `Start-Process` en PowerShell 5.1 no cita los elementos de `-ArgumentList`; los valores (comando,
+  `--args`, rutas) se entrecomillan a mano para que node reciba argv sin romper (verificado: `--args`
+  llega como un solo token `run --model ... --title ...`).
 
 ### Modelo del agente
 
