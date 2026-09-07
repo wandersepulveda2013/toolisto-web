@@ -130,6 +130,15 @@ anterior `opencode/deepseek-v4-flash-free` devuelve `Unexpected server error` de
    `$spArgs` empieza por `"<rutas>/AI_AUTONOMY/cli.mjs"`. Validado con argv-probe (tokens intactos)
    y sonda supervisada real: veredicto `SUCCESS` (exit 0). Ademas, cuando el supervisor muere sin
    veredicto, el runner vuelca las primeras lineas de su stderr para diagnosticar sin adivinar.
+10. Fallo de infraestructura sin freno (2026-09-07): `CONFIG_ERROR` (supervisor interno: p. ej.
+    `MODULE_NOT_FOUND`) NO contaba para el crash-loop, asi que un supervisor que no podia arrancar
+    reintentaba cada ~1 min INDEFINIDAMENTE (ciclos 8-173 quemados en el incidente del bug 9).
+    Corregido en `AI_AUTONOMY/runtime.mjs`: `CONFIG_ERROR` entra en el crash-loop; tercer fallo
+    consecutivo ⇒ `SAFE_MODE` (intervencion humana), retries intermedios de 1 y 2 min segun
+    `BACKOFF_MINUTES`. El runner ya trataba `SAFE_MODE` tras SUPERVISOR FAILURE (para inmediato,
+    `FinalStatus=safe_mode`). Regresion anadida en `tests/ai-autonomy-runtime-policy-test.mjs`
+    (CONFIG_ERROR×3 ⇒ SAFE_MODE; success resetea). Suites tras el cambio: policy 51, CE-068 36,
+    orchestrator 85, resilience 17, CE-069 66, CE-070 117 — 0 fail.
 
 ## Limitaciones documentadas
 

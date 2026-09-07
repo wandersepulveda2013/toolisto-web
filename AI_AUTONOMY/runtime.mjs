@@ -151,7 +151,10 @@ export function failureFingerprint(outcome, reason) {
 // Register a failure; returns updated runtime + a recommended next step:
 //   { next: 'RETRY_DIRECT' | 'STRATEGY_SWITCH' | 'CONTEXT_RESET' | 'DEFER_TASK' | 'SAFE_MODE', ... }
 // A failed start (crash) increases crashLoopStreak; a crash loop beyond the
-// threshold forces SAFE_MODE with progressive backoff.
+// threshold forces SAFE_MODE with progressive backoff. CONFIG_ERROR (an
+// infrastructure failure: supervisor could not start/could not supervise) is
+// also crash-loop material: a supervisor that persistently cannot launch must
+// halt in SAFE_MODE for human intervention instead of retrying forever.
 export function onFailure(r, seq, { outcome = 'CRASH', reason = null } = {}) {
   const fp = failureFingerprint(outcome, reason);
   const same = r.retryBudget.lastFailureFingerprint === fp;
@@ -169,7 +172,10 @@ export function onFailure(r, seq, { outcome = 'CRASH', reason = null } = {}) {
   }
   let next;
   // Crash-loop protection: repeated rapid crashes escalate to SAFE_MODE.
-  if (outcome === 'CRASH' || outcome === 'LOOP_INTERRUPTED' || outcome === 'TIMEOUT') {
+  // CONFIG_ERROR is included: an infrastructure failure (supervisor internal
+  // error / supervisor could not start) repeated 3 times is a persistent
+  // infra failure and must stop the runner for human intervention.
+  if (outcome === 'CRASH' || outcome === 'LOOP_INTERRUPTED' || outcome === 'TIMEOUT' || outcome === 'CONFIG_ERROR') {
     const streak = (r.crashLoopStreak || 0) + 1;
     const backoffLevel = Math.min(streak - 1, BACKOFF_MINUTES.length - 1);
     if (streak >= RETRY_BUDGET.crashLoopThreshold) {

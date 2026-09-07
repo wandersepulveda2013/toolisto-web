@@ -74,6 +74,23 @@ function ok(c, m) { assert(Boolean(c), m); }
   eq(r.safeMode, true, 'third crash triggers SAFE_MODE');
 }
 
+// --- CONFIG_ERROR is infrastructure crash-loop material (mission §14: a
+// supervisor that persistently cannot start must halt for human intervention).---
+{
+  let r = rt.newRuntime(1, 1, null, 'h0');
+  r = rt.onFailure(r, 2, { outcome: 'CONFIG_ERROR', reason: 'supervisor internal: boom' });
+  eq(r.crashLoopStreak, 1, 'first CONFIG_ERROR -> streak 1');
+  eq(r.safeMode, false, 'first CONFIG_ERROR not SAFE_MODE yet');
+  r = rt.onFailure(r, 3, { outcome: 'CONFIG_ERROR', reason: 'supervisor internal: boom' });
+  eq(r.crashLoopStreak, 2, 'second CONFIG_ERROR -> streak 2');
+  r = rt.onFailure(r, 4, { outcome: 'CONFIG_ERROR', reason: 'supervisor internal: boom' });
+  eq(r.crashLoopStreak, 3, 'third CONFIG_ERROR -> streak 3');
+  eq(r.safeMode, true, 'third CONFIG_ERROR => SAFE_MODE (infra failure halts for human)');
+  // a success after infra failure resets the streak
+  r = rt.onSuccess(r, 5);
+  eq(r.crashLoopStreak, 0, 'success resets streak after CONFIG_ERROR');
+}
+
 // --- backoff escalation (driven by backoffLevel, 0-indexed) ---
 {
   let r = rt.newRuntime(1, 1, null, 'h0');
