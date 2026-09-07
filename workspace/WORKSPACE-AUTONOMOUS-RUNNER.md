@@ -124,6 +124,12 @@ anterior `opencode/deepseek-v4-flash-free` devuelve `Unexpected server error` de
    (intervencion humana prevista por diseno)**: limpiar `AI_AUTONOMY/runtime.json` (`safeMode:false`,
    `crashLoopStreak:0`) y relanzar `.\RUN-OPENCODE-AUTONOMOUS.ps1 -Resume`. El boot devuelve
    `RECOVERY` y el siguiente ciclo arranca con contexto de recovery.
+9. `Start-Process node` sin script (2026-09-07): el launcher supervisado arrancaba `node supervise
+   --args ...` SIN `AI_AUTONOMY/cli.mjs` como primer argumento → `MODULE_NOT_FOUND` instantaneo,
+   out.json vacio, infinito `CONFIG_ERROR` con `no JSON` cada minuto (ciclos 8-27). Corregido:
+   `$spArgs` empieza por `"<rutas>/AI_AUTONOMY/cli.mjs"`. Validado con argv-probe (tokens intactos)
+   y sonda supervisada real: veredicto `SUCCESS` (exit 0). Ademas, cuando el supervisor muere sin
+   veredicto, el runner vuelca las primeras lineas de su stderr para diagnosticar sin adivinar.
 
 ## Limitaciones documentadas
 

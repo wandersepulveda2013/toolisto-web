@@ -617,8 +617,11 @@ OUTPUT:
     try { Set-Content -LiteralPath $promptFile -Value $prompt -Encoding UTF8 } catch { }
 
     # Start-Process en PS 5.1 NO cita los elementos del array; entrecomillamos a mano
-    # los valores (--args, comando, rutas) para que node reciba argv sin romper.
-    $spArgs = @('supervise', '--cmd', ('"' + $OcCommand + '"'), '--args', ('"' + $ocArgs + '"'),
+    # los valores (--args, comando, rutas) para que node reciba argv sin romper. El
+    # PRIMER argumento debe ser el script node (AI_AUTONOMY/cli.mjs); sin el, node
+    # interpreta `supervise` como modulo y muere con MODULE_NOT_FOUND (out.json vacio).
+    $supCli = Join-Path $ProjectRoot "AI_AUTONOMY\cli.mjs"
+    $spArgs = @(('"' + $supCli + '"'), 'supervise', '--cmd', ('"' + $OcCommand + '"'), '--args', ('"' + $ocArgs + '"'),
                 '--prompt-file', ('"' + $promptFile + '"'), '--stdout-log', ('"' + $logFile + '"'),
                 '--cycle', ([string]$cycle))
     if ($PhaseTimeoutMinutes -gt 0) { $spArgs += @('--phase-timeout-ms', ([string]($PhaseTimeoutMinutes * 60 * 1000))) }
@@ -659,6 +662,14 @@ OUTPUT:
     # y dejamos que el runtime decida el retry seguro.
     if (-not $supResp -or -not $supResp.ok) {
       $supReason = if ($supResp -and $supResp.reason) { $supResp.reason } else { 'supervisor internal failure (no JSON)' }
+      # Diagnostico: si el supervisor murio sin veredicto, volcar su stderr (p.ej.
+      # MODULE_NOT_FOUND o un stack trace) para no adivinar la causa.
+      try {
+        if (Test-Path -LiteralPath $supErrFile) {
+          $errSnippet = (Get-Content -LiteralPath $supErrFile -TotalCount 6 -ErrorAction SilentlyContinue | Where-Object { $_ -and $_.Trim() }) -join ' | '
+          if ($errSnippet) { Write-Log "Supervisor stderr: $errSnippet" }
+        }
+      } catch { }
       Write-Log "SUPERVISOR FAILURE en el ciclo ${cycle}: $supReason. Preservando checkpoint; el runtime decide el retry seguro (sin volver al modo no supervisado)."
       Write-WatchLog "SUPERVISOR FAILURE ciclo ${cycle}: $supReason. Checkpoint preservado."
       $null = Invoke-Runtime @('fail', '--outcome', 'CONFIG_ERROR', '--reason', $supReason)
