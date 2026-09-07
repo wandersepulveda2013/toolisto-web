@@ -3,7 +3,26 @@
 > Cada ciclo de OpenCode LEE este archivo antes de actuar y lo ACTUALIZA antes de terminar.
 > Registro historico de ciclos de la mision Evolucion Continua.
 > Modo activo SOLO despues de la transicion (cuando `workspace/PRODUCTION_READINESS_DONE` exista).
-> Updated: 2026-09-05 (Cycle 199 — CE-136 + DISCOVERY 22va ronda)
+> Updated: 2026-09-06 (TestCycles T1 — verificacion del estado del runner + commit de infraestructura)
+
+---
+
+## TestCycles T1 — Runner test-mode verificado y consolidado (estado de `artifacts/autonomous-runs` + infra coherencia)
+
+| Field | Value |
+|-------|-------|
+| **Date** | 2026-09-06 (prueba controlada del orquestador, <= 15 min) |
+| **Branch** | main |
+| **HEAD inicial** | 7e9a271 |
+| **HEAD final** | b73c2a2 (commit de este ciclo) |
+| **Task** | TestCycles (verificacion + commit): certificar la consistencia/determinismo del estado del runner en `artifacts/autonomous-runs` y consolidar los cambios de infraestructura del harness que quedaban sin commitear como progreso verificado. Sin tocar producto, sin modulos nuevos, sin regresion integral. |
+| **Verificacion realizada** | (1) `artifacts/autonomous-runs/workspace-runner-state.json`: JSON valido, gitignored (artefacto de ejecucion correcto), internamente consistente — `run_id` presente, `last_exit_code: 0` coherente con el seed `$lastExit = 0` previo al primer ciclo, `current_head` == `git rev-parse --short HEAD` (7e9a271). (2) `RUN-OPENCODE-AUTONOMOUS.ps1`: 0 errores de parse (Parser.ParseFile); ciclo se incrementa via `$cycle++` sobre `$startCycle`; los paths de break (AUTONOMOUS_STOP, SAFE_MODE, BLOCKED_OWNER, git-invalido, ciclo normal) fijan `$FinalStatus`; `Write-RunnerState` se invoca al inicio y al cierre de cada ciclo y al final del run. (3) `AI_AUTONOMY/supervisor.mjs`: cambio minimo `stdio: ['ignore','pipe','pipe']` en el spawn del hijo (cierra stdin, captura stdout/stderr por pipe). (4) `.opencode/agents/toolisto-autonomous.md`: modelo del agente alineado al entorno (`opencode/big-pickle`). (5) Log de ciclo `workspace-cycle-001.log`: el runner ejecuta la ruta NUEVA del harness (TestCycles + binario real resuelto + titulo sin espacios), confirmando que el codigo verificado es el que corre en produccion. |
+| **Commits** | b73c2a2 (infra(ce): runner TestCycles verificado y consolidado — 3 archivos, 147+/14-: `RUN-OPENCODE-AUTONOMOUS.ps1`, `AI_AUTONOMY/supervisor.mjs`, `.opencode/agents/toolisto-autonomous.md`). |
+| **Tests PASS** | Parse-AST de ambos `.ps1` (0 errores) + consistencia estado-runner vs git HEAD. Sin suites de producto (scope TestCycles; no hay regresion integral). |
+| **Tests FAIL** | 0. |
+| **Bloqueos** | Mismos de siempre: despliegue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL`; sin push. Evidencia/PNG regenerados del working tree quedaron SIN commitear (anti-churn, sin cambio funcional). |
+| **Limitaciones** | Ciclo de prueba del orquestador: no produce mejora de producto; solo verifica/consolida la infraestructura del runner. El evidence churn presente en el working tree (PNGs, JSONs de evidencia) no se limpio (prohibido borrar por politica; se deja intacto para el flujo normal). |
+| **Proxima prioridad** | Flujo normal de Evolucion Continua (proximo TODO/DISCOVERED de la QUEUE, p. ej. D-14 keydown global -> rerenderTable, o CE-145/CE-141 segun el backfill de la sesion W6). |
 
 ---
 
