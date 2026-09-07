@@ -3,7 +3,27 @@
 > Cada ciclo de OpenCode LEE este archivo antes de actuar y lo ACTUALIZA antes de terminar.
 > Registro historico de ciclos de la mision Evolucion Continua.
 > Modo activo SOLO despues de la transicion (cuando `workspace/PRODUCTION_READINESS_DONE` exista).
-> Updated: 2026-09-06 (TestCycles T1 — verificacion del estado del runner + commit de infraestructura)
+> Updated: 2026-09-06 (TestCycles T2 — cierre del paso pendiente de T1 + validacion en produccion de LOOP_INTERRUPTED)
+
+---
+
+## TestCycles T2 — Recovery del ciclo interrumpido y primera validacion en produccion de la deteccion de bucle (CE-069)
+
+| Field | Value |
+|-------|-------|
+| **Date** | 2026-09-06 (prueba controlada del orquestador, <= 15 min) |
+| **Branch** | main |
+| **HEAD inicial** | b73c2a2 |
+| **HEAD final** | 62c7182 (commit de este ciclo) |
+| **Task** | TestCycles (recovery + verifica determinismo): cerrar el paso pendiente del ciclo 1 interrumpido (`LOOP_INTERRUPTED` con commit b73c2a2 ya hecho pero STATUS/QUEUE de T1 sin commitear) y registrar la observacion honesta de valor: la deteccion de bucle de narracion y el recovery del supervisor se validaron por PRIMERA VEZ en produccion. |
+| **Verificacion realizada** | (1) Estado del runner `artifacts/autonomous-runs/workspace-runner-state.json`: JSON valido, gitignored, consistente — `run_id` RUN-20260906201438-18664 estable, `current_cycle: 2` == `max_cycles: 2` (ultimo ciclo del run de prueba controlada), `last_exit_code: 2` == LOOP_INTERRUPTED del ciclo 1 (coherente con el log `workspace-cycle-001.log` que termina en `SUPERVISOR OUTCOME: LOOP_INTERRUPTED / EXIT CODE: 2`), `current_head` == `git rev-parse --short HEAD` en cada punto (7e9a271 → b73c2a2 → 62c7182). (2) Parse-AST 0 errores de `RUN-OPENCODE-AUTONOMOUS.ps1` y `WATCHDOG-OPENCODE-AUTONOMOUS.ps1`. |
+| **Observacion honesta (valor)** | La cadena CE-069 (deteccion NARRATION_LOOP live + `terminateTree` + recovery prompt compacto de un solo uso + relanzamiento automatico) quedo certificada en CE-132 con subprocesos controlados `fake-opencode`; en este run de prueba se valido EN PRODUCCION sobre opencode real: el supervisor interrumpio el ciclo 1 por `NARRATION_LOOP(CONSECUTIVE_INTENTS)`, limpió el arbol (`treeCleaned=true`), la semilla del dia siguiente recibio el contexto compacto de RECOVERY, y el paso pendiente (docs de T1) se cerro en este ciclo sin repetir trabajo ya completado. El estado del runner persistio exactamente la historia real (exit 2 + heads reales). |
+| **Commits** | 62c7182 (docs(ce): cierra TestCycles T1 en STATUS/QUEUE — paso pendiente del ciclo interrumpido). Pendiente acumulado del working tree NO commitado: evidencia/PNG regenerados (anti-churn, sin cambio funcional). |
+| **Tests PASS** | Parse-AST de ambos `.ps1` (0 errores) + consistencia estado-runner vs git HEAD. Sin suites de producto (scope TestCycles; no hay regresion integral). |
+| **Tests FAIL** | 0. |
+| **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL` (harness niega `git push*`); sin push. |
+| **Limitaciones** | Ciclo de prueba del orquestador: sin mejora de producto (limitado por el scope del run controlado). El evidence churn del working tree se deja intacto por politica. El run de prueba termina en este ciclo (max_cycles=2); el flujo normal de Evolucion Continua queda para el proximo run completo. |
+| **Proxima prioridad** | Flujo normal de Evolucion Continua (proximo TODO/DISCOVERED de la QUEUE, p. ej. D-14 keydown global -> rerenderTable, o CE-145/CE-141 segun el backfill de la sesion W6). |
 
 ---
 
