@@ -6,7 +6,8 @@
 > Regla: la siguiente tarea ejecutable es la de mayor prioridad con estado `TODO`.
 > Regla de salud: si >50% de los ultimos 10 ciclos fueron AUDIT_ONLY, el siguiente ciclo (salvo
 > P0/P1) debe ser una mejora de producto.
-> Updated: 2026-09-06 (TestCycles T2: cierre del paso pendiente de T1 — commit 62c7182; primera validacion en produccion de la deteccion de bucle de narracion CE-069; sin cambios de estado de tareas)
+> Updated: 2026-09-07 (D-14 DONE: undo/redo global no rompe el scope de rerenderTable — fix 8e8c79c + suite data-table-undo-scope 10/10; progreso parcial CE-143 commiteado en fca56a4 sin cerrar la tarea; gate 132 suites PASS)
+> Previo: 2026-09-06 (TestCycles T2: cierre del paso pendiente de T1 — commit 62c7182; primera validacion en produccion de la deteccion de bucle de narracion CE-069; sin cambios de estado de tareas)
 > Previo: 2026-09-06 (TestCycles T1: verificacion del estado del runner `artifacts/autonomous-runs` + commit de infraestructura b73c2a2; sin cambios de estado de tareas)
 > Previo: 2026-09-05 (Cycle 199: DISCOVERY 22va ronda (3 exploradores: producto/calidad/rendimiento) cerrada con 11 hallazgos DISCOVERED (CE-137..CE-147, P1x2/P2x5/P3x4); CE-136 DONE — un bloque con salto de página mezclado ya no pierde su texto en informe/PDF/Markdown; gate 129 suites PASS 0 fail por manifest release-gate-72d1015...json)
 

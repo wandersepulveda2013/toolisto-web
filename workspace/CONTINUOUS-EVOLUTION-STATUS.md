@@ -3,7 +3,29 @@
 > Cada ciclo de OpenCode LEE este archivo antes de actuar y lo ACTUALIZA antes de terminar.
 > Registro historico de ciclos de la mision Evolucion Continua.
 > Modo activo SOLO despues de la transicion (cuando `workspace/PRODUCTION_READINESS_DONE` exista).
-> Updated: 2026-09-06 (TestCycles T2 — cierre del paso pendiente de T1 + validacion en produccion de LOOP_INTERRUPTED)
+> Updated: 2026-09-07 (D-14 fijado — undo/redo global no rompe el scope de rerenderTable)
+
+---
+
+## Cycle D-14 — Bug fix: keydown global y topbar ya no lanzan ReferenceError al deshacer/rehacer en la vista de tabla
+
+| Field | Value |
+|-------|-------|
+| **Date** | 2026-09-07 |
+| **Branch** | main |
+| **HEAD inicial** | 41cdd52 |
+| **HEAD final** | fca56a4 (docs de este ciclo; tras 8e8c79c fix y fca56a4 CE-143 parcial) |
+| **Task** | D-14 (BUG_FIX, P2): `document.addEventListener('keydown', ...)` a nivel de modulo (~L575/591/1091/1103) llamaba `rerenderTable()` pero esa funcion es un closure dentro de `renderDataTableView` (L5306). En la vista data-table, pulsar Ctrl+Z/Ctrl+Y o los botones Deshacer/Rehacer del topbar ejecutaba `undoTableEdit/redoTableEdit` (que SI muta la tabla) y luego `rerenderTable()` lanzaba `ReferenceError` — la edicion se deshacia en el modelo pero la grilla no se re-renderizaba y quedaba un error no controlado en consola. Bug latente pre-existente desde el cambio que introdujo el undo de tabla (CE-091, commit c37d52e); NO fijado por anti-scope-creep del ciclo W6 (CE-139). |
+| **Hypothesis** | Si `renderDataTableView` registra su closure de rerender en un holder de modulo (`_activeTableRerender`) y los call sites externos (topbar + keydown) invocan un helper con guarda (`rerenderActiveTable()`), el re-render de la tabla activa sigue siendo el grid-only de CE-139 pero ya no depende del scope lexico del closure. |
+| **Change** | `workspace/workspace.js`: (1) nuevo holder de modulo `let _activeTableRerender = null;` (junto a los otros estados de modulo); (2) nuevo helper `rerenderActiveTable()` que solo invoca el closure si es funcion (no-op seguro); (3) `renderDataTableView` registra `_activeTableRerender = rerenderTable;` justo tras la definicion del closure (mantiene el patrón `const rerenderTable = () => {` exigido por el test de anclas CE-139); (4) `renderView` limpia `_activeTableRerender = null;` tras `main.replaceChildren()` para que un keydown no re-renderice el closure de una vista ya desmontada; (5) los CUATRO call sites fuera de scope pasan de `rerenderTable()` a `rerenderActiveTable()` (topbar undo/redo en `updateTopbar`, keydown Ctrl+Z/Ctrl+Y en `initApp`). Los call sites DENTRO del closure (botones de la ribbon de la tabla) siguen llamando `rerenderTable()` directo, que es correcto. |
+| **Bugs encontrados** | (1) El defecto de producto D-14 (ReferenceError latente). (2) En la investigacion se hallo un cambio sin commitear pre-existente en `workspace/core/workflow-operations.js` (`documentBlocksToSections` ya anade `numbered-list`→`1. `, `code`→contenido y `callout`→`> Nota: ` — progreso parcial de CE-143). Validado por el gate (132 suites PASS) y commiteado por separado como progreso honesto de CE-143, sin marcar la tarea como cerrada (le falta su suite dedicada). |
+| **Tests ejecutados** | Suite nueva `tests/workspace/data-table-undo-scope-test.mjs` 10/10 (test de anclas estaticas estilo CE-139: helper de modulo con guarda, holder inicializado a null, los 2 call sites de undo y los 2 de redo usan el helper, CERO referencias a `rerenderTable()` fuera del closure localizadas por rango de funcion, registro dentro de renderDataTableView, limpieza en renderView ANTES de la funcion, y el closure conserva el contrato CE-139 grid-only). Regresion enfocada: `data-table-rerender-scope` (CE-139) 35/35 y `undo-corruption` (CE-091) 15/15. Sintaxis ESM verificada (`node --check` sobre copia .mjs). RELEASE GATE completo `node scripts/test-workspace-release.mjs` 132/132 suites PASS 0 fail (build + sync source→dist OK). |
+| **Tests PASS** | 10 (D-14) + 35 (CE-139) + 15 (CE-091) + RELEASE GATE 132/132 suites = 0 fail. |
+| **Tests FAIL** | 0. |
+| **Commits** | (1) `8e8c79c` fix(ce): D-14 undo/redo global (workspace.js + suite 10/10 + registro gate); (2) `fca56a4` feat(ce): `documentBlocksToSections` conserva numbered-list/code/callout (progreso CE-143 parcial). Evidence churn regenerada por el gate (PNGs/JSONs) NO se commitea (anti-churn). |
+| **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL` (harness niega `git push*`); sin push. |
+| **Limitaciones** | El test D-14 es de anclas estaticas (mismo estilo que CE-139): fija el contrato de scope pero no presiona teclas reales en navegador; el comportamiento queda cubierto por el analisis de call sites + el E2E de estabilidad existente (`workspace-stability-e2e` 84/84 en el gate, incluye undo/redo/save indicator). El cambio de `workflow-operations.js` (CE-143) queda registrado como progreso parcial SIN suite dedicada (la tarea D-10/CE-143 sigue abierta). |
+| **Proxima prioridad** | Proximo TODO de la WORKSPACE-AUTONOMOUS-QUEUE: D-11 (CE-145, P2 — barrido triple + markTableSelection O(N) en la vista de tabla) o D-13 (CE-141, P3 — exportTableCSV vierte formulas en bruto), o cerrar CE-143 con su suite dedicada. |
 
 ---
 
