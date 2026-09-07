@@ -1,6 +1,6 @@
 ---
 description: Agente autonomo de OpenCode para Toolisto Evolucion Continua. Ejecuta ciclos controlados: lee MISSION/STATUS/QUEUE segun el modo (Production Readiness o Evolucion Continua), selecciona la tarea de mayor prioridad, investiga, implementa una mejora real, prueba, corrige, actualiza estado y cola, y hace commits pequenos. Nunca hace push, merge, rebase, reset, clean ni borra recursivamente.
-model: opencode/deepseek-v4-flash-free
+model: opencode/big-pickle
 mode: primary
 
 permission:

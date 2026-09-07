@@ -192,7 +192,7 @@ export function superviseChild(r, opts) {
     // Spawn the child.
     let child;
     try {
-      child = spawn(cmd, args, { cwd: root, windowsHide: true, shell: false });
+      child = spawn(cmd, args, { cwd: root, windowsHide: true, shell: false, stdio: ['ignore', 'pipe', 'pipe'] });
     } catch (e) {
       finish({
         outcome: 'CONFIG_ERROR',

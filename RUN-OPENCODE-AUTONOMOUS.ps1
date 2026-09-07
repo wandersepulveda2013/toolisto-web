@@ -33,12 +33,17 @@
 #>
 [CmdletBinding()]
 param(
-  [int]$MaxCycles = 0,
+  [int]$MaxCycles = 20,
   [switch]$Unlimited,
   [int]$PauseSeconds = 60,
   [int[]]$BackoffMinutes = (1, 5, 15, 30),
   [switch]$Resume,
   [switch]$DryRun,
+  [switch]$TestCycles,
+  [int]$PhaseTimeoutMinutes = 120,
+  [string]$Agent = "",
+  [string]$Model = "opencode/big-pickle",
+  [string]$OcCommand = "",
   [string]$LogDir = "",
   [int]$StaleMinutes = 180
 )
@@ -60,6 +65,42 @@ $BackoffFile = Join-Path $LogDir "runner.backoff"
 $LockFile    = Join-Path $LogDir "runner.lock"
 $MetricsFile = Join-Path $LogDir "metrics.tsv"
 $WatchLog    = Join-Path $LogDir "watchdog.log"
+
+# Artefactos del runner por ciclo y estado (los lee STATUS y la entrega final):
+# artifacts/autonomous-runs/workspace-cycle-NNN.log + workspace-runner-state.json
+$RunDir      = Join-Path $ProjectRoot "artifacts\autonomous-runs"
+$RunState    = Join-Path $RunDir "workspace-runner-state.json"
+$RunId       = "RUN-$((Get-Date -Format 'yyyyMMddHHmmss'))-$PID"
+
+# Estado del runner (spec de la validez del orquestador): unica fuente de verdad
+# legible para STATUS/verificacion. Se reescribe entero en cada punto del ciclo.
+function Write-RunnerState {
+  param(
+    [string]$Status = "running",
+    [int]$Cycle = 0,
+    [string]$StartedAt = "",
+    [string]$FinishedAt = "",
+    [int]$Exit = -1,
+    [string]$HeadTo = ""
+  )
+  try {
+    $null = New-Item -ItemType Directory -Force -Path $RunDir
+    if (-not $RunnerStartedTs) { $script:RunnerStartedTs = Get-Date -Format "yyyy-MM-dd HH:mm:ss" }
+    $state = [ordered]@{
+      run_id                 = $RunId
+      current_cycle          = $Cycle
+      max_cycles             = $MaxCycles
+      started_at             = $RunnerStartedTs
+      last_cycle_started_at  = $StartedAt
+      last_cycle_finished_at = $FinishedAt
+      last_exit_code         = $Exit
+      status                 = $Status
+      initial_head           = $InitialHead
+      current_head           = $HeadTo
+    }
+    Set-Content -LiteralPath $RunState -Value ($state | ConvertTo-Json) -Encoding UTF8 -ErrorAction SilentlyContinue
+  } catch { }
+}
 
 function Write-Log {
   param([string]$Msg)
@@ -111,11 +152,11 @@ function Get-CoarseBucket {
   }
 }
 
-# Lee el marcador RESULTADO_CICLO del log (la salida de opencode se anade como UTF-16).
+# Lee el marcador RESULTADO_CICLO del log (escrito como UTF-8).
 function Get-CycleResult {
   param([string]$LogPath)
   try {
-    $content = Get-Content -LiteralPath $LogPath -Encoding Unicode -Raw -ErrorAction Stop
+    $content = Get-Content -LiteralPath $LogPath -Encoding UTF8 -Raw -ErrorAction Stop
   } catch {
     return "SIN_MARCA"
   }
@@ -162,12 +203,14 @@ function Write-CycleHistory {
     [string]$HeadTo,
     [int]$PromptChars,
     [int]$RecoveryChars,
+    [int]$Commits = 0,
+    [int]$Files = 0,
     [switch]$SafeMode,
     [switch]$EnvFailure
   )
   $hArgs = @('history', '--record', '--cycle', ([string]$Cycle), '--ce', $ModeShort, '--task', $TaskId,
              '--task-type', $Result, '--outcome', $Outcome, '--verdicts', $Outcome,
-             '--duration-s', ([string]$DurationS), '--commits', '0', '--files-changed', '0',
+             '--duration-s', ([string]$DurationS), '--commits', ([string]$Commits), '--files-changed', ([string]$Files),
              '--retries', '0', '--crashes', '0', '--loops', '0', '--stalls', '0', '--recoveries', '0',
              '--prompt-size', ([string]$PromptChars), '--recovery-size', ([string]$RecoveryChars),
              '--from-state', 'TODO', '--to-state', ($(if ($Exit -eq 0) { 'DONE' } else { 'FAILED' })))
@@ -212,6 +255,28 @@ if (-not (Get-Command opencode -ErrorAction SilentlyContinue)) {
   Write-Error "opencode no esta en el PATH. Instala OpenCode y reintenta."
   exit 1
 }
+# Resolucion del binario REAL de opencode. El CLI se lanza supervisado con
+# shell:false (node) y NUNCA ejecuta un .cmd/.bat del shim de npm (ENOENT).
+# Preferimos el exe real de la instalacion y permitimos override (-OcCommand).
+if (-not $OcCommand) {
+  $ocG = Get-Command opencode -ErrorAction SilentlyContinue
+  if ($ocG) { $OcCommand = $ocG.Source }
+  # Un shim .cmd/.bat/.ps1/.sh de npm NUNCA es ejecutable por node (shell:false).
+  # Si resuelve a un script, buscamos SIEMPRE el exe real de la instalacion.
+  if ($OcCommand -match '\.(cmd|bat|ps1|sh)$') {
+    $cand = ($OcCommand -replace '\.(cmd|bat|ps1|sh)$', '.exe')
+    if (-not (Test-Path -LiteralPath $cand)) {
+      $npmRoot = (& npm root -g 2>$null | Select-Object -First 1)
+      if ($npmRoot) {
+        $cand = Join-Path $npmRoot "opencode-ai\bin\opencode.exe"
+        if (-not (Test-Path -LiteralPath $cand)) { $cand = Join-Path $npmRoot "opencode-windows-x64\bin\opencode.exe" }
+      }
+    }
+    if (Test-Path -LiteralPath $cand) { $OcCommand = $cand }
+  }
+  if (-not $OcCommand) { $OcCommand = "opencode" }
+}
+Write-Log "Ruta del binario opencode: $OcCommand"
 $head = git rev-parse --short HEAD 2>$null
 if (-not $head) {
   Write-Error "$ProjectRoot no parece ser un repositorio git."
@@ -258,6 +323,12 @@ if (-not $createdNew) {
   Write-Host "Usa .\STATUS-OPENCODE-AUTONOMOUS.ps1 para ver el PID o .\STOP-OPENCODE-AUTONOMOUS.ps1 para detenerla."
   exit 1
 }
+
+# Marca de referencia del run (estado del runner).
+$InitialHead = $head
+$RunnerStartedTs = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+$FinalStatus = "running"
+
 try {
   Set-Content -LiteralPath $LockFile -Value ("PID=$PID Timestamp=$((Get-Date -Format 'yyyy-MM-dd HH:mm:ss')) Root=$ProjectRoot") -Encoding UTF8
 } catch { }
@@ -320,6 +391,7 @@ try {
 
     if (Test-Path -LiteralPath $StopFlag) {
       Write-Log "AUTONOMOUS_STOP detectado antes del ciclo $cycle. Deteniendo (solo el humano detiene el sistema)."
+      $FinalStatus = "stopped"
       break
     }
     if ($Mode -eq "PRODUCTION_READINESS" -and (Test-Path -LiteralPath $PrDoneFile)) {
@@ -329,11 +401,26 @@ try {
       try { Set-Content -LiteralPath $ModeFile -Value $Mode -Encoding UTF8 } catch { }
     }
 
+    # Parada critica por seguridad: si el directorio dejo de ser un repositorio
+    # git valido no se lanza ningun ciclo mas (condicion de parada del orquestador).
+    $treeOk = git rev-parse --is-inside-work-tree 2>$null
+    if ($treeOk -ne "true") {
+      Write-Log "CRITICO: el directorio dejo de ser un repositorio git valido. Deteniendo el runner por seguridad."
+      Write-WatchLog "CRITICO: git no valido al inicio del ciclo $cycle; stop por seguridad."
+      $FinalStatus = "critical_error"
+      break
+    }
+
     $modeShort = if ($Mode -eq "CONTINUOUS_EVOLUTION") { "CE" } else { "PR" }
-    $titleArg = "Toolisto $modeShort Cycle $cycle"
+    $titleArg = "Toolisto-$modeShort-Cycle-$cycle"
     $missionF = $mf.Mission
     $statusF  = $mf.Status
     $queueF   = $mf.Queue
+
+    # Estado del runner: ciclo en curso.
+    $headFrom = git rev-parse --short HEAD 2>$null
+    $startedTs = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+    Write-RunnerState -Status "running" -Cycle $cycle -StartedAt $startedTs -Exit $lastExit -HeadTo $headFrom
 
     # CE-068: el runtime gobierna este ciclo. Consulta persistente de estado antes
     # de lanzar opencode. SAFE_MODE / BLOCKED_OWNER detienen el runner (no se lanza).
@@ -341,11 +428,13 @@ try {
     if ($boot -and $boot.action -eq "SAFE_MODE") {
       Write-Log "RUNTIME SAFE_MODE en ciclo $cycle ($($boot.reason)). El estado persistente manda SAFE_MODE; deteniendo el runner (requiere intervencion humana)."
       Write-WatchLog "SAFE_MODE en ciclo ${cycle}: $($boot.reason)"
+      $FinalStatus = "safe_mode"
       break
     }
     if ($boot -and $boot.action -eq "BLOCKED_OWNER") {
       Write-Log "RUNTIME BLOCKED_OWNER en ciclo ${cycle}: otra instancia activa tiene el estado persistente. Deteniendo (single-instance)."
       Write-WatchLog "BLOCKED_OWNER en ciclo $cycle"
+      $FinalStatus = "blocked_owner"
       break
     }
     # CE-069: identidad estable del ciclo desde el runtime (boot -> start-cycle).
@@ -370,6 +459,7 @@ Lee obligatoriamente, en orden:
 2. workspace/CONTINUOUS-EVOLUTION-MISSION.md
 3. workspace/CONTINUOUS-EVOLUTION-STATUS.md
 4. workspace/CONTINUOUS-EVOLUTION-QUEUE.md
+5. Si existe workspace/WORKSPACE-AUTONOMOUS-NIGHT-REPORT.md, leelo al final: resume la productividad reciente del sistema autonomo (ultimo reporte nocturno).
 
 Despues revisa: git status, git rev-parse HEAD, git log --oneline -5, y los tests relacionados con la tarea seleccionada.
 
@@ -459,6 +549,21 @@ Al terminar, cierra tu respuesta final con una linea exacta: RESULTADO_CICLO: <T
 "@
     }
 
+    # Scope de PRUEBA del orquestador: ciclos acotados que NO tocan producto; solo
+    # trabajo real minimo de la infraestructura autonomia (docs/estado/verificacion)
+    # para certificar el relanzamiento sin intervencion. Sistema NO productivo.
+    if ($TestCycles) {
+      $prompt += @"
+
+=== MODO PRUEBA DEL ORQUESTADOR (TestCycles) ===
+Este run es la PRUEBA CONTROLADA del runner autonomo (relanzamiento automatico entre ciclos, logs, estado, lock, exit-code). Objetivo exclusivo de este ciclo:
+- NO modifiques producto, NO anadas modulos/herramientas, NO ejecutes regresion integral.
+- Produce una mejora minima REAL y verificable del sistema autonomo o del estado: verifica determinismo/consistencia del estado del runner (artifacts/autonomous-runs), corrige un documento de mision/estado/cola si hay algo factualmente incorrecto, o registra una observacion honesta con valor; con un commit local pequeno que acredite el progreso verificado.
+- Tiempo objetivo: <= 15 minutos. Cierra rapido y limpio.
+- Cierra tu respuesta final con la linea exacta RESULTADO_CICLO: <TIPO>
+"@
+    }
+
     # CE-069 §11/§12: si el ciclo anterior fallo bajo supervision, anteponemos el
     # contexto de RECOVERY compacto al prompt de ESTE intento (un solo uso) y lo
     # limpiamos de inmediato para no contaminar ciclos posteriores.
@@ -470,10 +575,16 @@ Al terminar, cierra tu respuesta final con una linea exacta: RESULTADO_CICLO: <T
     }
 
     $ts = Get-Date -Format "yyyyMMdd-HHmmss"
-    $startedTs = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
     $logFile = Join-Path $LogDir ("cycle-{0:D3}-{1}.log" -f $cycle, $ts)
     $headFrom = git rev-parse --short HEAD 2>$null
-    $cmdLine = "opencode run --agent build --model opencode/deepseek-v4-flash-free --title `"$titleArg`" <prompt> (supervisado cli supervise)"
+    # Invocacion real: sin --agent (flag no soportado en esta CLI; el agente se
+    # resuelve por default_agent de opencode.json), titulo sin espacios (el
+    # puente cli supervise divide --args por whitespace).
+    $ocArgs = "run"
+    if ($Agent) { $ocArgs += " --agent $Agent" }
+    if ($Model) { $ocArgs += " --model $Model" }
+    $ocArgs += " --title $titleArg"
+    $cmdLine = "$OcCommand $ocArgs <prompt> (supervisado cli supervise)"
     $header = @"
 ================================================================
 Cycle: $cycle
@@ -505,8 +616,8 @@ OUTPUT:
     try { $null = New-Item -ItemType Directory -Force -Path (Split-Path -Parent $promptFile) } catch { }
     try { Set-Content -LiteralPath $promptFile -Value $prompt -Encoding UTF8 } catch { }
 
-    $ocArgs = "run --agent build --model opencode/deepseek-v4-flash-free --title `"$titleArg`""
-    $supArgs = @('supervise', '--cmd', 'opencode', '--args', $ocArgs, '--prompt-file', $promptFile, '--stdout-log', $logFile, '--cycle', ($cycle.ToString()))
+    $supArgs = @('supervise', '--cmd', $OcCommand, '--args', $ocArgs, '--prompt-file', $promptFile, '--stdout-log', $logFile, '--cycle', ($cycle.ToString()))
+    if ($PhaseTimeoutMinutes -gt 0) { $supArgs += @('--phase-timeout-ms', ([string]($PhaseTimeoutMinutes * 60 * 1000))) }
     if ($taskId) { $supArgs += @('--task', $taskId) }
     $supResp = $null
     try {
@@ -536,6 +647,7 @@ OUTPUT:
       if ($nextAction -eq 'SAFE_MODE') {
         Write-Log "RUNTIME SAFE_MODE tras SUPERVISOR FAILURE del ciclo $cycle. Deteniendo (requiere intervencion humana)."
         Write-WatchLog "SAFE_MODE tras SUPERVISOR FAILURE ciclo $cycle."
+        $FinalStatus = "safe_mode"
         break
       }
       $nextRetry = (Get-Date).AddMinutes($delayMin).ToString("yyyy-MM-dd HH:mm:ss")
@@ -575,11 +687,24 @@ OUTPUT:
     Add-Content -LiteralPath $logFile -Value "`n================================================================`nSUPERVISOR OUTCOME: $outcome`nEXIT CODE: $exit`nRESULTADO CICLO: $result (bucket $bucket) HEAD $headFrom -> $headTo`n================================================================`n" -Encoding UTF8
     Remove-Item -LiteralPath $CycleFile -Force -ErrorAction SilentlyContinue
 
+    # Artefactos por ciclo: copia del log completo + actualizacion del estado del runner.
+    $cycleLogCopy = Join-Path $RunDir ("workspace-cycle-{0:D3}.log" -f $cycle)
+    try { $null = New-Item -ItemType Directory -Force -Path $RunDir; Copy-Item -LiteralPath $logFile -Destination $cycleLogCopy -Force -ErrorAction Stop } catch { }
+    Write-RunnerState -Status "running" -Cycle $cycle -StartedAt $startedTs -FinishedAt $finishedTs -Exit $exit -HeadTo $headTo
+
     # CE-070: registrar el ciclo terminado en la historia estructurada del
-    # runtime (policy evidence). Envio determinista de las metricas reales del
-    # ciclo mas las de supervision (ignorando la transicion de modo).
+    # runtime (policy evidence). Metricas reales del ciclo (commits y archivos
+    # tocados entre HEAD inicial y final) mas las de supervision.
+    $commitCount = 0
+    $filesCount = 0
+    if ($headFrom -and $headTo -and $headFrom -ne $headTo) {
+      $cc = & git rev-list --count "$headFrom..$headTo" 2>$null
+      if ($cc -match '^\d+$') { $commitCount = [int]$cc }
+      $fc = (& git diff --name-only $headFrom $headTo 2>$null | Measure-Object).Count
+      if ($fc) { $filesCount = [int]$fc }
+    }
     if ($modeShort -and $taskId) {
-      Write-CycleHistory -Cycle $cycle -ModeShort $modeShort -TaskId $taskId -Outcome $outcome -Result $result -NextAction '' -Exit $exit -DurationS $durSec -HeadFrom $headFrom -HeadTo $headTo -PromptChars $prompt.Length -RecoveryChars $recoveryPromptChars -SafeMode:($nextAction -eq 'SAFE_MODE')
+      Write-CycleHistory -Cycle $cycle -ModeShort $modeShort -TaskId $taskId -Outcome $outcome -Result $result -NextAction '' -Exit $exit -DurationS $durSec -HeadFrom $headFrom -HeadTo $headTo -PromptChars $prompt.Length -RecoveryChars $recoveryPromptChars -Commits $commitCount -Files $filesCount -SafeMode:($nextAction -eq 'SAFE_MODE')
     }
 
     # CE-068/069: el resultado del ciclo YA se persistio en el runtime dentro de
@@ -604,6 +729,7 @@ OUTPUT:
       if ($nextAction -eq "SAFE_MODE") {
         Write-Log "RUNTIME SAFE_MODE tras fallo supervisado del ciclo $cycle (outcome $outcome). Crash-loop persistido alcanzado; deteniendo el runner (requiere intervencion humana)."
         Write-WatchLog "SAFE_MODE tras ciclo $cycle (outcome $outcome). Crash-loop persistido."
+        $FinalStatus = "safe_mode"
         break
       }
       if ($nextAction -eq "DEFER_TASK" -or $nextAction -eq "CONTEXT_RESET" -or $nextAction -eq "STRATEGY_SWITCH") {
@@ -628,6 +754,7 @@ OUTPUT:
 
     if (Test-Path -LiteralPath $StopFlag) {
       Write-Log "AUTONOMOUS_STOP detectado tras el ciclo $cycle. Deteniendo (solo el humano detiene el sistema)."
+      $FinalStatus = "stopped"
       break
     }
     if ($Mode -eq "PRODUCTION_READINESS" -and (Test-Path -LiteralPath $PrDoneFile)) {
@@ -648,6 +775,12 @@ OUTPUT:
   if (Test-Path -LiteralPath $StopFlag) {
     Write-Log "Razon de parada: AUTONOMOUS_STOP (orden humana). Para reanudar: .\RUN-OPENCODE-AUTONOMOUS.ps1 -Resume"
   }
+  if ($FinalStatus -eq "running") {
+    $FinalStatus = if ($lastExit -eq 0) { "completed_ok" } else { "completed_failed" }
+  }
+  $finalHead = git rev-parse --short HEAD 2>$null
+  Write-RunnerState -Status $FinalStatus -Cycle $cycle -StartedAt $startedTs -FinishedAt (Get-Date -Format "yyyy-MM-dd HH:mm:ss") -Exit $lastExit -HeadTo $finalHead
+  Write-Log "Estado persistido: $RunState (status=$FinalStatus, ciclo=$cycle, head=$finalHead)"
 } finally {
   Remove-Item -LiteralPath $CycleFile -Force -ErrorAction SilentlyContinue
   if ($mutex) {
