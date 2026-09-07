@@ -65,6 +65,11 @@ const h = (tag, attrs, ...children) => {
 let _operationRegistry = null;
 let workflowUI = null;
 let workflowUIContainer = null;
+// D-14: holder del rerender de la tabla activa. `rerenderTable` es un closure
+// dentro de renderDataTableView; los botones del topbar y el keydown global
+// (Ctrl+Z/Y) lo invocan desde scope de modulo, donde no existe. renderDataTableView
+// registra el closure aqui al montar la vista y renderView lo limpia al salir.
+let _activeTableRerender = null;
 const sv = (tag, attrs, ...children) => {
   const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
   if (attrs) Object.entries(attrs).forEach(([k, v]) => el.setAttribute(k, String(v)));
@@ -281,6 +286,16 @@ function refreshCurrentView() {
   renderView(view);
   updateTopbar(view, appStore.get('currentProject'));
   toast('Vista actualizada', 'success');
+}
+
+// D-14: re-render de la tabla activa desde fuera de renderDataTableView.
+// `rerenderTable` vive dentro del closure de renderDataTableView, asi que los
+// botones del topbar y el keydown global (Ctrl+Z/Y) no pueden llamarlo directo.
+// renderDataTableView registra el closure en _activeTableRerender al montar la
+// vista y renderView lo limpia al navegar fuera. Guarda el no-op para que un
+// Ctrl+Z/Y sin tabla activa nunca lance ReferenceError.
+function rerenderActiveTable() {
+  if (typeof _activeTableRerender === 'function') _activeTableRerender();
 }
 
 async function saveCurrentWorkspaceItem() {
@@ -572,7 +587,7 @@ function updateTopbar(view, project) {
     onClick: () => {
       const table = appStore.get('currentDataTable');
       if (appStore.get('currentView') === 'data-table' && table) {
-        if (undoTableEdit(table)) { rerenderTable(); toast('Cambio deshecho', 'success'); }
+        if (undoTableEdit(table)) { rerenderActiveTable(); toast('Cambio deshecho', 'success'); }
       } else {
         const restored = _appHistory.undo(_captureWorkspaceState());
         if (restored) { _applyState(restored); toast('Deshecho', 'success'); }
@@ -588,7 +603,7 @@ function updateTopbar(view, project) {
     onClick: () => {
       const table = appStore.get('currentDataTable');
       if (appStore.get('currentView') === 'data-table' && table) {
-        if (redoTableEdit(table)) { rerenderTable(); toast('Cambio rehecho', 'success'); }
+        if (redoTableEdit(table)) { rerenderActiveTable(); toast('Cambio rehecho', 'success'); }
       } else {
         const restored = _appHistory.redo(_captureWorkspaceState());
         if (restored) { _applyState(restored); toast('Rehecho', 'success'); }
@@ -1088,7 +1103,7 @@ async function initApp() {
       e.preventDefault();
       const table = appStore.get('currentDataTable');
       if (appStore.get('currentView') === 'data-table' && table) {
-        if (undoTableEdit(table)) { rerenderTable(); toast('Cambio deshecho', 'success'); }
+        if (undoTableEdit(table)) { rerenderActiveTable(); toast('Cambio deshecho', 'success'); }
         return;
       }
       const restored = _appHistory.undo(_captureWorkspaceState());
@@ -1100,7 +1115,7 @@ async function initApp() {
       e.preventDefault();
       const table = appStore.get('currentDataTable');
       if (appStore.get('currentView') === 'data-table' && table) {
-        if (redoTableEdit(table)) { rerenderTable(); toast('Cambio rehecho', 'success'); }
+        if (redoTableEdit(table)) { rerenderActiveTable(); toast('Cambio rehecho', 'success'); }
         return;
       }
       const restored = _appHistory.redo(_captureWorkspaceState());
@@ -1260,6 +1275,9 @@ function renderView(view, prevView) {
   }
   const main = $('#ws-main-content');
   main.replaceChildren();
+  // D-14: al navegar, la tabla anterior deja de ser la activa; el keydown global
+  // y el topbar no deben re-renderizar un closure de una vista ya desmontada.
+  _activeTableRerender = null;
   const project = appStore.get('currentProject');
   const isProjectView = project && !['projects', 'intake', 'tools', 'flujos'].includes(view);
   if (isProjectView) renderFlowPath(main);
@@ -5322,6 +5340,8 @@ function renderDataTableView(container) {
     formulaInput.value = selection.hasValue ? String(table.rows[selection.focusRow]?.[selection.focusCol] ?? '') : '';
     if (selection.hasValue) markTableSelection(tableEl, selection);
   };
+  // D-14: registra el closure para los botones del topbar y el keydown global.
+  _activeTableRerender = rerenderTable;
   toolbarGroup('Portapapeles', ['Inicio'],
     h('button', { className: 'ws-btn ws-btn-ghost ws-btn-sm ws-data-command', title: 'Deshacer · Ctrl Z', onClick: () => { if (undoTableEdit(table)) { rerenderTable(); toast('Cambio deshecho', 'success'); } } }, svgIcon('undo'), ' Deshacer'),
     h('button', { className: 'ws-btn ws-btn-ghost ws-btn-sm ws-data-command', title: 'Rehacer · Ctrl Y', onClick: () => { if (redoTableEdit(table)) { rerenderTable(); toast('Cambio rehecho', 'success'); } } }, svgIcon('redo'), ' Rehacer'),

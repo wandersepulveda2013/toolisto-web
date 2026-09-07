@@ -247,6 +247,10 @@ run('editor-chart-block (el bloque chart del editor renderiza el SVG canonico, n
 // toolbar/ribbon/formula/sheet-tabs; los listeners de tabla y la seleccion se preservan
 run('data-table-rerender-scope (el re-render de la vista de tabla no reconstruye el layout completo, CE-139)', 'node', ['tests/workspace/data-table-rerender-scope-test.mjs']);
 
+// D-14: el keydown global y el topbar (Ctrl+Z/Y, botones undo/redo) no referencian
+// rerenderTable fuera de su closure; usan el helper de modulo rerenderActiveTable()
+run('data-table-undo-scope (undo/redo global no rompe el scope de rerenderTable, D-14)', 'node', ['tests/workspace/data-table-undo-scope-test.mjs']);
+
 // 4. Manifest de evidencia
 const evidence = {
   sha: head,
