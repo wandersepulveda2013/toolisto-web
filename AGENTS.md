@@ -118,8 +118,10 @@ Archivos canónicos:
 - `workspace/CONTINUOUS-EVOLUTION-MISSION.md` / `-STATUS.md` / `-QUEUE.md` — misión permanente,
   memoria persistente y backlog (TODO/ACTIVE/BLOCKED/DONE/DISCOVERED/DEFERRED; P0>P1>P2>P3).
 - `workspace/PRODUCTION-READINESS-MISSION.md` / `-STATUS.md` / `-QUEUE.md` — etapa previa (PR).
-- `RUN-OPENCODE-AUTONOMOUS.ps1` — runner v2 (`-Unlimited`/`MaxCycles 0` = sin límite, backoff
-  1/5/15/30 min, métricas por ciclo, transición PR→CE, logs en `artifacts/autonomous-logs/`).
+- `RUN-OPENCODE-AUTONOMOUS.ps1` — runner v2 (default `-MaxCycles 20` finito; `-Unlimited`/`0` =
+  sin límite, backoff 1/5/15/30 min, métricas por ciclo, transición PR→CE, `-TestCycles`, logs en
+  `artifacts/autonomous-logs/` y estado por run en `artifacts/autonomous-runs/workspace-runner-state.json`).
+- `workspace/WORKSPACE-AUTONOMOUS-RUNNER.md` — estado verificado del runner y validación controlada (2-CYCLE TEST).
 - `STATUS-OPENCODE-AUTONOMOUS.ps1` / `STOP-OPENCODE-AUTONOMOUS.ps1` — estado (modo, uptime,
   productividad, regla de salud) y parada suave.
 - `WATCHDOG-OPENCODE-AUTONOMOUS.ps1` / `INSTALL-OPENCODE-AUTO-START.ps1` — vigilancia de ciclos

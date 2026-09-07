@@ -11,8 +11,9 @@
 .\RUN-OPENCODE-AUTONOMOUS.ps1 -Unlimited
 ```
 
-`-Unlimited` / `MaxCycles 0` = sin limite artificial de ciclos. Al aparecer
-`workspace/PRODUCTION_READINESS_DONE`, el runner transiciona solo a CONTINUOUS_EVOLUTION y sigue.
+`-Unlimited` / `MaxCycles 0` = sin limite artificial de ciclos. **Default finito: `-MaxCycles 20`**
+(controlado, no infinuito). Al aparecer `workspace/PRODUCTION_READINESS_DONE`, el runner transiciona
+solo a CONTINUOUS_EVOLUTION y sigue.
 
 ## Iniciar con limites
 
@@ -79,6 +80,17 @@ LIMITACION real: si el PC se suspende, OpenCode deja de trabajar mientras dure l
 Construye y muestra el modo/mision/queue del proximo ciclo sin adquirir el mutex ni lanzar
 OpenCode. Puede usarse con un runner activo.
 
+## Prueba controlada del orquestador
+
+```powershell
+.\RUN-OPENCODE-AUTONOMOUS.ps1 -MaxCycles 2 -PauseSeconds 5 -PhaseTimeoutMinutes 45 -TestCycles
+```
+
+`-TestCycles` limita cada ciclo a <= 15 min, prohibe tocar producto y exige una mejora minima real
+(estado del runner, mision/status/queue o observacion con valor) + commit pequeno que acredite
+progreso, cerrando con `RESULTADO_CICLO: <TIPO>`. Verificado 2026-09-06: relanzamiento automatico
+entre ciclos, logs, metricas y `workspace-runner-state.json` (PASS, 2 ciclos).
+
 ## Recuperacion automatica (auto-recovery)
 
 - Fallo de proveedor/red (exit code != 0): backoff 1/5/15/30 min y reintento automatico.
@@ -91,11 +103,12 @@ OpenCode. Puede usarse con un runner activo.
 
 | Archivo | Funcion |
 |---------|---------|
-| `RUN-OPENCODE-AUTONOMOUS.ps1` | Runner v2: lock, modos PR/CE, transicion DONE->CE, backoff, metricas, logs |
+| `RUN-OPENCODE-AUTONOMOUS.ps1` | Runner v2: lock, modos PR/CE, transicion DONE->CE, backoff, metricas, estado por run |
 | `STOP-OPENCODE-AUTONOMOUS.ps1` | Crea `AUTONOMOUS_STOP` (parada suave, solo humano) |
 | `STATUS-OPENCODE-AUTONOMOUS.ps1` | Estado: modo, PID+uptime, ciclo, backoff, productividad, cola |
 | `WATCHDOG-OPENCODE-AUTONOMOUS.ps1` | Vigila runner/ciclo colgado y lock stale (sin matar procesos sanos) |
 | `INSTALL-OPENCODE-AUTO-START.ps1` | Tarea programada opcional al iniciar sesion |
+| `workspace/WORKSPACE-AUTONOMOUS-RUNNER.md` | Estado verificado del runner, controles, esquema de estado y 2-CYCLE TEST |
 | `workspace/PRODUCTION-READINESS-MISSION/STATUS/QUEUE.md` | Etapa PR (se cierra con DONE) |
 | `workspace/CONTINUOUS-EVOLUTION-MISSION/STATUS/QUEUE.md` | Mision permanente CE |
 | `workspace/PRODUCTION_READINESS_DONE` | Senal de transicion PR->CE (no es senal de parada) |
@@ -103,6 +116,8 @@ OpenCode. Puede usarse con un runner activo.
 | `artifacts/autonomous-logs/cycle-*.log` | Output completo de cada ciclo |
 | `artifacts/autonomous-logs/metrics.tsv` | Resultado/HEAD/duracion por ciclo (productividad) |
 | `artifacts/autonomous-logs/watchdog.log` | Hallazgos del watchdog |
+| `artifacts/autonomous-runs/workspace-runner-state.json` | Estado persistido del run (run_id, ciclo, status, heads) |
+| `artifacts/autonomous-runs/workspace-cycle-NNN.log` | Copia del log del ciclo (numeracion continua) |
 | `.opencode/agents/toolisto-autonomous.md` | Agente con permisos (deny destructivo) |
 | `.opencode/commands/toolisto-cycle.md` | Comando manual `/toolisto-cycle` |
 | `opencode.json` | Config: default_agent, instructions, permisos globales |
@@ -111,7 +126,11 @@ OpenCode. Puede usarse con un runner activo.
 
 1. El runner comprueba lock (mutex Windows + lock file), STOP y modo.
 2. Construye el prompt del ciclo segun el modo (MISSION/STATUS/QUEUE de PR o CE).
-3. Lanza `opencode run --agent toolisto-autonomous --title "Toolisto PR/CE Cycle N" <prompt>`.
+3. Lanza `opencode run --model opencode/big-pickle --title Toolisto-CE-Cycle-N <prompt>` con el
+   binario real (`node_modules\opencode-ai\bin\opencode.exe`; `--agent` no es valido en CLI 1.18.18,
+   el agente se controla via `default_agent` de `opencode.json` y el `model:` del frontmatter).
+   El supervisor spawn con stdin cerrado (`stdio: ['ignore','pipe','pipe']`); si quedara abierto,
+   `opencode run` se bloquea leyendolo en silencio (STALL).
 4. Guarda el log completo y el exit code; ante fallo aplica backoff 1/5/15/30 min.
 5. Registra metricas (resultado, bucket, HEAD, duracion) en `metrics.tsv`.
 6. Comprueba STOP y la transicion PR->CE (DONE). Espera `PauseSeconds` y lanza el siguiente.
