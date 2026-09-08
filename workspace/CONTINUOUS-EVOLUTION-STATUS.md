@@ -3,9 +3,29 @@
 > Cada ciclo de OpenCode LEE este archivo antes de actuar y lo ACTUALIZA antes de terminar.
 > Registro historico de ciclos de la mision Evolucion Continua.
 > Modo activo SOLO despues de la transicion (cuando `workspace/PRODUCTION_READINESS_DONE` exista).
-> Updated: 2026-09-07 (D-14 fijado — undo/redo global no rompe el scope de rerenderTable)
+> Updated: 2026-09-08 (D-15 fijado — markTableSelection incremental O(celdas cambiadas), CE-145 R4)
 
 ---
+
+## Cycle D-15 — Perf: markTableSelection ya NO barre toda la grilla en cada tecla (CE-145 R4)
+
+| Field | Value |
+|-------|-------|
+| **Date** | 2026-09-08 |
+| **Branch** | main |
+| **HEAD inicial** | 3caaf0a |
+| **HEAD final** | 01c0765 (fix CE-145 R4 + suite + registro gate) |
+| **Task** | D-15 (PERFORMANCE_IMPROVEMENT, P2): CE-145 R4 — `markTableSelection` (workspace.js) recorria TODAS las celdas `td[data-row][data-col]` (hasta ~250k) en cada pulsacion de tecla (flechas/Tab/Home/End pasan por `setSelection` en el keydown de la tabla); la vista de tabla se volvia pesada al navegar la seleccion en tablas grandes. La parte R3 del hallazgo original (barrido triple de `queryRunOperation`) queda como CE-149. |
+| **Hypothesis** | Si `markTableSelection` guarda el ultimo rectangulo marcado por tableEl (WeakMap) junto con el tbody al que pertenecio, y cuando el tbody es el mismo y el rectangulo cambio aplica la diferencia simetrica en bandas disjuntas (`tableSelectionDiff`) mas la transicion de foco, cada tecla solo toca las celdas cuyo estado cambia (O(perimetro del cambio)), reservando el barrido completo al primer marcado o a un tbody recien reinstalado. Un indice fila→`<tr>` por tbody (registrado por `renderGrid`) hace la localizacion O(1) por fila. |
+| **Change** | `workspace/workspace.js` (+87/−7): (1) nuevos WeakMaps de modulo `_tableSelectionMarks` y `_gridRowIndex`; (2) helpers puros `sameSelectionRect`, `tableSelectionDiff` (8 bandas max: 4 off de prev + 4 on de curr sobre la interseccion; caso disjunto = 2 bandas; invarianza area(on)−area(off)==area(curr)−area(prev)), `gridRowLookup`, `gridCellAt` y `forEachGridCellInRect`; (3) `markTableSelection` usa la ruta incremental cuando `prev && prev.body === tbody && !sameSelectionRect(prev.bounds, bounds)` — `tableSelectionDiff` solo toca `selected` y la transicion de foco mueve `selected-focus` — y deja el barrido completo `$$(...)` como fallback (primer marcado / tbody reinstalado); (4) `renderGrid` registra `gridRowMap.set(ri, tr)` y `_gridRowIndex.set(tbody, gridRowMap)`. Sin cambio de la firma ni de los callers (keydown, click, rerenderTable, select-all). |
+| **Bugs encontrados** | (1) Registrado como CE-148 (DISCOVERED, P2): Ctrl+A en la vista de tabla solo marca la celda (0,0) — el handler hace `setSelection(0,0,false)` (anchor Y focus en la esquina) y luego rellena `selection.endRow/endCol`, pero `tableSelectionBounds` solo lee anchor/focus; el Ctrl+C posterior copia 1 celda en vez de toda la tabla. Bug pre-existente, NO introducido por el fix (el comportamiento se preserva); se registra para ciclo dedicado. |
+| **Tests ejecutados** | Suite nueva `tests/workspace/table-selection-incremental-test.mjs` 28/28 (16 anclas estaticas: WeakMaps, helpers, ruta incremental, fallback; + 11 checks de comportamiento de `tableSelectionDiff`/`sameSelectionRect` REALES extraidos con grabFn y ejecutados: mover celda 2 bandas, shift-extend 1 banda, crecer/encoger por bandas, salto disjunto, identicos 0 trabajo, crecer en 2 dimensiones, invariante de area; + 1 ancla keydown). Regresion enfocada: data-table-rerender-scope 35/35, data-table-undo-scope 10/10, table-history-cap 22/22, table-remove-column-row 51/51, workspace-test 157/157 (dist 1192KB < 1200KB), workspace-stability-e2e 9/9. RELEASE GATE completo `node scripts/test-workspace-release.mjs` **133 suites PASS 0 fail** (build + sync source→dist OK; manifest `release-gate-01c0765...json` — gitignored). Censo CE-125 OK: 144 archivos = 131 registradas + 13 deferidas documentadas. |
+| **Tests PASS** | 28 (D-15) + 35 + 10 + 22 + 51 + 157 + 9 + RELEASE GATE 133/133 suites = 0 fail. |
+| **Tests FAIL** | 0. |
+| **Commits** | `01c0765` perf(ce): markTableSelection incremental O(celdas cambiadas) (workspace.js + suite 28/28 + registro en el gate). Evidence churn (PNGs/JSONs de artifacts y screenshots) NO se commitea (anti-churn). |
+| **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL` (harness niega `git push*`); sin push. |
+| **Limitaciones** | El test es de anclas estaticas + comportamiento puro de los helpers (sin presionar teclas reales en navegador); la semantica de la vista queda cubierta por data-table-rerender-scope + workspace-stability-e2e (84 checks en el gate). Ruta incremental solo cuando tbody igual y rectangulo distinto; rectangulo identico (p. ej. flecha contra el borde, click repetido en la misma celda) sigue usando el barrido completo (comportamiento previo, sin regresion). CE-145 queda dividida: R4 cerrada; R3 (`queryRunOperation` hasta 3 barridos) como CE-149 (TODO). |
+| **Proxima prioridad** | TODO mas alto de la QUEUE: CE-149 (P2, R3 de CE-145 — barrido triple de `queryRunOperation`), o CE-148 (P2, Ctrl+A selecciona toda la tabla), o CE-137 (P2, `faithfulOcrText` muerto / resaltado de baja confianza), o CE-143 (cerrar con suite dedicada). |
 
 ## Cycle D-14 — Bug fix: keydown global y topbar ya no lanzan ReferenceError al deshacer/rehacer en la vista de tabla
 
