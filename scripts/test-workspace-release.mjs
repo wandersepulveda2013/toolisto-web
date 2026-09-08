@@ -261,6 +261,11 @@ run('data-table-undo-scope (undo/redo global no rompe el scope de rerenderTable,
 // como fallback para primera seleccion o tbody recien reinstalado
 run('table-selection-incremental (seleccion de tabla incremental sin barrido O(N) por tecla, CE-145 D-15)', 'node', ['tests/workspace/table-selection-incremental-test.mjs']);
 
+// CE-148: Ctrl+A en la vista de tabla selecciona TODA la tabla (anchor (0,0) +
+// focus real al final) y el Ctrl+C posterior copia todo el grid; el mecanismo
+// muerto selection.endRow/endCol (que tableSelectionBounds nunca leia) se elimina
+run('table-select-all (Ctrl+A selecciona y copia toda la tabla, CE-148)', 'node', ['tests/workspace/table-select-all-test.mjs']);
+
 // 4. Manifest de evidencia
 const evidence = {
   sha: head,

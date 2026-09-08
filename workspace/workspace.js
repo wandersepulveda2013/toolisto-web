@@ -5626,10 +5626,16 @@ function renderDataTableView(container) {
     }
     if (meta && event.key.toLowerCase() === 'a') {
       event.preventDefault();
+      // CE-148: seleccionar TODA la tabla. setSelection(0,0,false) ancla la
+      // esquina y setSelection(rows-1, cols-1, true) mueve el focus REAL al
+      // final (anchor == (0,0), focus == ultima celda) -> tableSelectionBounds
+      // cubre la grilla completa y el Ctrl+C posterior copia toda la tabla.
+      // Antes se llenaban selection.endRow/endCol (campos que tableSelectionBounds
+      // nunca lee), asi que el barrido solo pintaba la celda (0,0).
       setSelection(0, 0, false);
-      selection.endRow = table.rows.length - 1;
-      selection.endCol = table.headers.length - 1;
-      markTableSelection(tableEl, selection, table);
+      if (table.rows.length >= 1 && table.headers.length >= 1) {
+        setSelection(table.rows.length - 1, table.headers.length - 1, true);
+      }
       return;
     }
     if (event.key === 'Home') {
