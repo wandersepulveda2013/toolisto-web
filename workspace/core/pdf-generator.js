@@ -100,6 +100,11 @@ function estimateSectionH(section, contentW, usableH) {
     const titleLines = wrapText(chartTitle, contentW, 'text');
     return Math.max(150, 30 + (titleLines.length - 1) * 16.8 + 120);
   }
+  if (section.type === 'code') {
+    const fontSize = 9.5;
+    const lines = codeLinesForWidth(section.content || '', contentW, fontSize);
+    return Math.max(24, fontSize + Math.max(0, lines.length - 1) * (fontSize * 1.4) + 8);
+  }
   return Math.max(24, estimateTextSectionH(section, contentW));
 }
 
@@ -300,6 +305,7 @@ function renderSectionPDF(parts, section, x0, y0, contentW, context = {}) {
     case 'subtitle': renderTextLines(parts, section.content || '', x0, y0, contentW, 16, '/F2'); break;
     case 'date': renderTextLines(parts, section.content || '', x0, y0, contentW, 10, '/F1'); break;
     case 'text': renderTextLines(parts, section.content || '', x0, y0, contentW, 12, '/F1'); break;
+    case 'code': renderCodeLines(parts, section.content || '', x0, y0, contentW); break;
     case 'footer': renderTextLines(parts, section.content || '', x0, y0, contentW, 10, '/F1', 'center'); break;
     case 'divider': {
       const lineY = y0 - 8;
@@ -324,6 +330,31 @@ function renderTextLines(parts, text, x0, y0, contentW, fontSize, fontRef, align
       tx = x0 + (contentW - approxW) / 2;
     }
     parts.push(`BT ${fontRef} ${fontSize} Tf ${tx} ${ly} Td ${pdfString(line)} Tj ET`);
+  });
+}
+
+// Bloque de codigo: conserva los saltos de linea intencionales (a diferencia de
+// `wrapText`, que colapsa /\\s+/): cada linea fuente se envuelve por ancho y las
+// lineas vacias se cuentan como tales. Compartida por estimacion y render para
+// que la preview (CE-087) coincida con el PDF exportado.
+function codeLinesForWidth(content, contentW, fontSize) {
+  if (!content) return [''];
+  const out = [];
+  String(content).split('\n').forEach(raw => {
+    if (!raw) { out.push(''); return; }
+    const wrapped = wrapText(raw, contentW, null, fontSize);
+    out.push.apply(out, wrapped.length ? wrapped : ['']);
+  });
+  return out.length ? out : [''];
+}
+
+function renderCodeLines(parts, text, x0, y0, contentW) {
+  const fontSize = 9.5;
+  const lineH = fontSize * 1.4;
+  const lines = codeLinesForWidth(text, contentW, fontSize);
+  lines.forEach((line, li) => {
+    const ly = y0 - fontSize - li * lineH;
+    parts.push(`BT /F1 ${fontSize} Tf ${x0} ${ly} Td ${pdfString(line)} Tj ET`);
   });
 }
 

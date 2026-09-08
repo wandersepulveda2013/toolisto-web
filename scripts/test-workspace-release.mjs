@@ -270,6 +270,12 @@ run('table-select-all (Ctrl+A selecciona y copia toda la tabla, CE-148)', 'node'
 // doc.ocrWords -> ocrWordConfidenceMap -> buildCellConfidenceMatrix -> cellConfidence
 // queda cableada (la confianza por palabra alimenta la matriz de revision de la tabla)
 run('ocr-low-confidence-dead-code (CE-137 D-18: codigo muerto eliminado + cadena de confianza viva)', 'node', ['tests/workspace/ocr-low-confidence-dead-code-test.mjs']);
+// CE-143 D-19: documentBlocksToSections ya NO degrada numbered-list/code/callout a texto
+// plano en el informe/PDF; numbered-list se numera de forma secuencial (reset entre listas),
+// code pasa a una seccion dedicada {type:'code'} que conserva saltos de linea en el PDF y
+// la preview, el resto de rutas (blocksToMarkdown/blocksToPlainText/exportDocumentMarkdown)
+// ganan paridad para los 3 tipos.
+run('document-blocks-sections-semantics (CE-143 D-19: numbered-list secuencial + code/callout conservan su semantica)', 'node', ['tests/workspace/document-blocks-sections-semantics-test.mjs']);
 
 // 4. Manifest de evidencia
 const evidence = {

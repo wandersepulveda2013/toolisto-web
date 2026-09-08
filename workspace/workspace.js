@@ -4264,7 +4264,9 @@ function autoSaveDoc(doc) {
 function exportDocumentMarkdown(doc) {
   const bt = '\x60';
   let md = '# ' + (doc.title || 'Documento') + '\n\n';
+  let olSeq = 0;
   (doc.blocks || []).forEach(block => {
+    if (block.type !== 'numbered-list') olSeq = 0;
     if (block.html && /data-page-break="true"/.test(block.html)) {
       for (const seg of splitHtmlAtPageBreak(block.html)) {
         if (seg.type === 'page-break') md += '<div style="page-break-after:always"></div>\n\n';
@@ -4293,7 +4295,7 @@ function exportDocumentMarkdown(doc) {
       return;
     }
     if (block.type === 'bullet-list') { md += '- ' + (block.content || '') + '\n\n'; return; }
-    if (block.type === 'numbered-list') { md += '1. ' + (block.content || '') + '\n\n'; return; }
+    if (block.type === 'numbered-list') { olSeq += 1; md += olSeq + '. ' + (block.content || '') + '\n\n'; return; }
     if (block.type === 'image-block') {
       const imgSrc = String(block.content || block.dataUrl || '').trim();
       if (imgSrc) md += '![imagen](' + imgSrc + ')\n\n';
@@ -9251,6 +9253,7 @@ function renderDesignEditor(container) {
         else if (section.type === 'subtitle') sectionEl.appendChild(h('div', { style: 'font-size:16px;color:#666;font-family:Inter,sans-serif' }, section.content || ''));
         else if (section.type === 'date') sectionEl.appendChild(h('div', { style: 'font-size:12px;color:#999;font-family:Inter,sans-serif' }, section.content || new Date().toLocaleDateString('es-CL')));
         else if (section.type === 'text') sectionEl.appendChild(h('div', { style: 'font-size:12px;color:#333;line-height:1.6;font-family:Inter,sans-serif;white-space:pre-wrap' }, section.content || ''));
+        else if (section.type === 'code') sectionEl.appendChild(h('div', { style: 'font-size:11px;color:#1a1a1a;font-family:Consolas,monospace;background:#f6f8fa;border:1px solid #ddd;border-radius:4px;padding:8px;white-space:pre-wrap' }, section.content || ''));
         else if (section.type === 'divider') sectionEl.appendChild(h('div', { style: 'width:100%;height:1px;background:#ddd;margin:8px 0' }));
         else if (section.type === 'footer') sectionEl.appendChild(h('div', { style: 'font-size:10px;color:#999;text-align:center;font-family:Inter,sans-serif;border-top:1px solid #eee;padding-top:8px' }, section.content || ''));
         else if (section.type === 'page-break') sectionEl.appendChild(h('div', { style: 'font-size:10px;color:#ccc;text-align:center;border:1px dashed #ddd;padding:4px;margin:4px 0' }, '--- Salto de página ---'));

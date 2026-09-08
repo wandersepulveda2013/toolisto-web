@@ -665,10 +665,12 @@ export function documentBlocksToSections(blocks, options = {}) {
   const sections = [];
   const includeTitle = options.includeTitle !== false;
   let titleSent = !includeTitle;
+  let olSeq = 0;
   const blocksList = Array.isArray(blocks) ? blocks : [];
   for (const block of blocksList) {
     if (!block) continue;
     const content = String(block.content || '').trim();
+    if (block.type === 'numbered-list') olSeq += 1; else olSeq = 0;
     if (block.type === 'heading1') {
       if (!titleSent) {
         sections.push({ type: 'title', content });
@@ -690,9 +692,9 @@ export function documentBlocksToSections(blocks, options = {}) {
       continue;
     }
     if (block.type === 'bullet-list') { sections.push({ type: 'text', content: '• ' + content }); continue; }
-    if (block.type === 'numbered-list') { sections.push({ type: 'text', content: '1. ' + content }); continue; }
+    if (block.type === 'numbered-list') { sections.push({ type: 'text', content: olSeq + '. ' + content }); continue; }
     if (block.type === 'quote') { sections.push({ type: 'text', content: '> ' + content }); continue; }
-    if (block.type === 'code') { sections.push({ type: 'text', content: content }); continue; }
+    if (block.type === 'code' && content) { sections.push({ type: 'code', content }); continue; }
     if (block.type === 'callout') { sections.push({ type: 'text', content: '> Nota: ' + content }); continue; }
     if (block.type === 'table' && Array.isArray(block.headers) && Array.isArray(block.rows)) {
       sections.push({ type: 'table', data: { headers: block.headers, rows: block.rows } });
@@ -722,9 +724,11 @@ export function documentBlocksToSections(blocks, options = {}) {
 function blocksToMarkdown(blocks) {
   const list = Array.isArray(blocks) ? blocks : [];
   const lines = [];
+  let olSeq = 0;
   for (const block of list) {
     if (!block) continue;
     const content = String(block.content || '').trim();
+    if (block.type === 'numbered-list') olSeq += 1; else olSeq = 0;
     if (block.html && /data-page-break="true"/.test(block.html)) {
       for (const seg of splitHtmlAtPageBreak(block.html)) {
         if (seg.type === 'page-break') lines.push('');
@@ -737,7 +741,13 @@ function blocksToMarkdown(blocks) {
       case 'heading2': lines.push('## ' + content); break;
       case 'heading3': lines.push('### ' + content); break;
       case 'bullet-list': lines.push('- ' + content); break;
+      case 'numbered-list': lines.push(olSeq + '. ' + content); break;
       case 'quote': lines.push('> ' + content); break;
+      case 'code': {
+        if (content) { lines.push(fence(block.lang || '', content)); lines.push(fenceEnd(block.lang || '')); }
+        break;
+      }
+      case 'callout': lines.push('> **Nota:** ' + content); break;
       case 'divider': lines.push('---'); break;
       case 'page-break': lines.push(''); break;
       case 'table': {
@@ -839,15 +849,20 @@ export function documentBlocksToHtml(blocks, opts = {}) {
 function blocksToPlainText(blocks) {
   const list = Array.isArray(blocks) ? blocks : [];
   const lines = [];
+  let olSeq = 0;
   for (const block of list) {
     if (!block) continue;
     const content = String(block.content || '').trim();
+    if (block.type === 'numbered-list') olSeq += 1; else olSeq = 0;
     switch (block.type) {
       case 'heading1': lines.push(content); lines.push(''); break;
       case 'heading2': lines.push(content); break;
       case 'heading3': lines.push(content); break;
       case 'bullet-list': lines.push('• ' + content); break;
+      case 'numbered-list': lines.push(olSeq + '. ' + content); break;
       case 'quote': lines.push('> ' + content); break;
+      case 'code': if (content) lines.push(content); break;
+      case 'callout': lines.push('Nota: ' + content); break;
       case 'divider': lines.push('————————————————'); break;
       case 'table':
         if (Array.isArray(block.headers) && Array.isArray(block.rows)) {
