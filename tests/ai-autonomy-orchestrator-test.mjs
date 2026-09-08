@@ -93,6 +93,27 @@ const lock = await importFrom(join(ROOT, 'AI_AUTONOMY/lock.mjs'));
   ok(!s.loopTriggered, 'healthy cycle is not flagged as a loop');
   eq(s.verified, 3, 'three verified events counted');
   eq(s.intents, 3, 'three intents counted');
+
+  // Deliberation precision: a long analysis that pauses to think BETWEEN intent
+  // declarations (with real tools at both ends) is REAL work, not a loop. A
+  // per-line CONSECUTIVE_INTENTS counter (pre-CE-069 fix) would count every
+  // intent-bearing line across the deliberation and interrupt it (cycle 192).
+  const d4 = guard.createLoopDetector();
+  d4.onVerified('shell:git-status');
+  d4.onNarration('Let me look at the working tree to understand what is pending.');
+  d4.onNarration('There is an uncommitted change to the QUEUE file related to CE-149.');
+  d4.onNarration('Let me check the diff of the QUEUE and STATUS files.');
+  d4.onNarration('The diff shows only a marker change, nothing more.');
+  d4.onNarration('Let me re-read the recovery context of the interrupted cycle.');
+  d4.onNarration('It says to retake only the pending step and make a real commit.');
+  d4.onNarration('Let me find queryRunOperation in workspace.js.');
+  d4.onNarration('It lives in the runtime of the query pipeline.');
+  d4.onNarration('Let me implement the queryRunOperation optimization.');
+  d4.onNarration('The change must keep the same shape and only touch the booleans.');
+  d4.onNarration('Let me run the workspace table tests afterwards.');
+  d4.onVerified('shell:select-string');
+  s = d4.summary();
+  ok(!s.loopTriggered, 'deliberation with analysis between intents + tools is NOT a loop');
 }
 
 // ---------------------------------------------------------------------------

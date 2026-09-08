@@ -139,6 +139,19 @@ anterior `opencode/deepseek-v4-flash-free` devuelve `Unexpected server error` de
     `FinalStatus=safe_mode`). Regresion anadida en `tests/ai-autonomy-runtime-policy-test.mjs`
     (CONFIG_ERROR×3 ⇒ SAFE_MODE; success resetea). Suites tras el cambio: policy 51, CE-068 36,
     orchestrator 85, resilience 17, CE-069 66, CE-070 117 — 0 fail.
+11. Falso positivo por deliberacion larga (2026-09-08): `CONSECUTIVE_INTENTS` contaba los intents
+    de stdout adyacentes (las lineas no-intent se descartaban). Una deliberacion real de ~24 lineas
+    ("Let me look/check/investigate..." con analisis intercalado y 2 tool-calls, ciclo 192)
+    acumulaba >=5 intents consecutivos SIN tool-call intercalada y disparaba `LOOP_INTERRUPTED`
+    falso (ciclos 190-192, streak 3 => SAFE_MODE). Corregido en `guard.mjs`: las lineas no-intent
+    actuan como SEPARADORES que rompen la racha consecutiva (deliberar no es un "machine-gun" de
+    planes sin ejecutar); la repeticion del MISMO intent (arm REPETITION) sigue contando aunque
+    haya analisis intercalado, y las tool-calls siguen contando como verified. Umbrales intactos.
+    Evidencia determinista: replay del log real del ciclo 192 (artifacts/autonomous-logs/
+    cycle-192-20260908-081421.log) con la semantica HEAD 8c02cbd -> triggerea CONSECUTIVE_INTENTS;
+    con el fix -> peak 3 consecutivos, sin loop. Regresion en
+    `tests/ai-autonomy-orchestrator-test.mjs` (deliberacion con analisis entre intents + tools a
+    ambos lados NO es loop; intents adyacentes sin tool siguen siendo loop).
 
 ## Limitaciones documentadas
 

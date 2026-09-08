@@ -70,15 +70,23 @@ export function createLoopDetector(opts = {}) {
   // Feed one narration line (model output).
   function onNarration(text) {
     if (loopTriggered) return;
-    if (!classifyIntent(text)) return;
     const n = normalizeNarration(text);
-    if (n === lastNarration) {
-      repeatCount += 1;
-    } else {
-      lastNarration = n;
-      repeatCount = 1;
+    const isIntent = classifyIntent(text);
+    // Repetition is tracked per intent DECLARATION, even when other analysis
+    // lines interleave: a recurring identical declared intent IS "I will do X"
+    // forever. Separators (non-intent analysis) do not move lastNarration.
+    if (isIntent) {
+      if (n === lastNarration) {
+        repeatCount += 1;
+      } else {
+        lastNarration = n;
+        repeatCount = 1;
+      }
     }
-    events.push({ type: 'intent', token: n });
+    // Push the stream: intent declarations and analysis lines. Non-intent lines
+    // act as SEPARATORS for CONSECUTIVE_INTENTS (deliberation is not a machine
+    // gun of adjacent unverified plans), but never as intents themselves.
+    events.push({ type: isIntent ? 'intent' : 'narration', token: n });
     evaluate();
   }
 
@@ -95,11 +103,16 @@ export function createLoopDetector(opts = {}) {
       loopReason = 'REPETITION';
       return;
     }
-    // 2) Consecutive intents with no interleaved verified event.
+    // 2) Consecutive intents with no interleaved verified event AND no analysis
+    //    line between them. A run of adjacent "I will do X / I will do Y"
+    //    declarations with no tool is a machine-gun of unverified plans; a
+    //    deliberation that PAUSES to analyze between intents is NOT (the
+    //    separator breaks the run). Repetition of the same intent is caught
+    //    independently by arm 1 even across separators.
     let consec = 0;
     for (let i = events.length - 1; i >= 0; i--) {
-      if (events[i].type === 'verified') break;
-      if (events[i].type === 'intent') consec += 1;
+      if (events[i].type !== 'intent') break;
+      consec += 1;
     }
     if (consec >= limits.consecutiveIntentsWithoutVerified) {
       loopTriggered = true;
@@ -134,8 +147,8 @@ export function createLoopDetector(opts = {}) {
       consecutiveIntentsWithoutVerified: (() => {
         let c = 0;
         for (let i = events.length - 1; i >= 0; i--) {
-          if (events[i].type === 'verified') break;
-          if (events[i].type === 'intent') c += 1;
+          if (events[i].type !== 'intent') break;
+          c += 1;
         }
         return c;
       })(),
