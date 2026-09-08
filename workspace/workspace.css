@@ -1283,152 +1283,6 @@ html.theme-dark .ws-topbar {
   color: var(--ws-text-tertiary);
 }
 
-.ws-capture-layout {
-  display: flex;
-  height: 100%;
-  gap: 0;
-}
-
-.ws-capture-thumbs {
-  width: calc(160px * var(--ws-density-scale));
-  min-width: calc(160px * var(--ws-density-scale));
-  overflow-y: auto;
-  background: var(--ws-surface);
-  border-right: 1px solid var(--ws-border);
-  padding: calc(8px * var(--ws-density-scale));
-  display: flex;
-  flex-direction: column;
-  gap: calc(8px * var(--ws-density-scale));
-}
-
-.ws-capture-thumb {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 3/4;
-  border-radius: var(--ws-radius-md);
-  border: 2px solid transparent;
-  overflow: hidden;
-  cursor: pointer;
-  background: var(--ws-surface-active);
-  transition: border-color 0.12s, box-shadow 0.12s;
-}
-
-.ws-capture-thumb img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.ws-capture-thumb:hover {
-  border-color: var(--ws-border);
-}
-
-.ws-capture-thumb.active {
-  border-color: var(--ws-primary);
-  box-shadow: 0 0 0 2px var(--ws-primary-light);
-}
-
-.ws-capture-thumb .thumb-num {
-  position: absolute;
-  top: 4px;
-  left: 4px;
-  width: calc(18px * var(--ws-density-scale));
-  height: calc(18px * var(--ws-density-scale));
-  border-radius: 50%;
-  background: rgba(0,0,0,0.55);
-  color: #fff;
-  font-size: calc(10px * var(--ws-density-scale));
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.ws-capture-preview {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #1A1A1E;
-  padding: calc(16px * var(--ws-density-scale));
-  overflow: hidden;
-}
-
-.ws-capture-preview img {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
-}
-
-.ws-capture-stages {
-  display: flex;
-  align-items: center;
-  gap: calc(2px * var(--ws-density-scale));
-  padding: calc(10px * var(--ws-density-scale)) calc(16px * var(--ws-density-scale));
-  background: var(--ws-surface);
-  border-bottom: 1px solid var(--ws-border-light);
-}
-
-.ws-capture-stage {
-  display: flex;
-  align-items: center;
-  gap: calc(6px * var(--ws-density-scale));
-  padding: calc(5px * var(--ws-density-scale)) calc(10px * var(--ws-density-scale));
-  border-radius: var(--ws-radius-md);
-  font-size: calc(12px * var(--ws-density-scale));
-  color: var(--ws-text-tertiary);
-  cursor: pointer;
-  transition: background 0.12s, color 0.12s;
-}
-
-.ws-capture-stage:hover {
-  background: var(--ws-surface-hover);
-  color: var(--ws-text-secondary);
-}
-
-.ws-capture-stage .stage-num {
-  width: calc(20px * var(--ws-density-scale));
-  height: calc(20px * var(--ws-density-scale));
-  border-radius: 50%;
-  border: 1.5px solid var(--ws-border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px * var(--ws-density-scale));
-  font-weight: 600;
-}
-
-.ws-capture-stage.active {
-  background: var(--ws-primary-light);
-  color: var(--ws-primary);
-  font-weight: 500;
-}
-
-.ws-capture-stage.active .stage-num {
-  background: var(--ws-primary);
-  color: #fff;
-  border-color: var(--ws-primary);
-}
-
-.ws-capture-stage.done {
-  color: var(--ws-success);
-}
-
-.ws-capture-stage.done .stage-num {
-  background: var(--ws-success);
-  color: #fff;
-  border-color: var(--ws-success);
-}
-
-.ws-capture-actions {
-  display: flex;
-  align-items: center;
-  gap: calc(4px * var(--ws-density-scale));
-  padding: calc(8px * var(--ws-density-scale)) calc(16px * var(--ws-density-scale));
-  background: var(--ws-surface);
-  border-bottom: 1px solid var(--ws-border-light);
-}
-
 .ws-data-layout {
   display: flex;
   flex-direction: column;
@@ -2516,43 +2370,6 @@ html.theme-dark .ws-status-limited { color: #b7c3ff; background: rgba(120, 135, 
 .ws-invoice-confidence.is-mid { color: #8a5a00; background: #fff4d8; }
 .ws-invoice-confidence.is-low { color: #9d2d2d; background: #fde9e9; }
 
-.ws-invoice-fields-table {
-  width: 100%;
-  border-collapse: collapse;
-  border: 1px solid var(--ws-border);
-  border-radius: var(--ws-radius-md);
-  overflow: hidden;
-  font-size: 12px;
-}
-
-.ws-invoice-fields-table th,
-.ws-invoice-fields-table td {
-  padding: 8px 9px;
-  border-bottom: 1px solid var(--ws-border-light);
-  text-align: left;
-  vertical-align: middle;
-}
-
-.ws-invoice-fields-table tr:last-child th,
-.ws-invoice-fields-table tr:last-child td {
-  border-bottom: 0;
-}
-
-.ws-invoice-fields-table thead th {
-  background: var(--ws-surface-active);
-  color: var(--ws-text-secondary);
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: .06em;
-  text-transform: uppercase;
-}
-
-.ws-invoice-fields-table tbody th {
-  width: 25%;
-  color: var(--ws-text);
-  font-size: 11px;
-}
-
 .ws-invoice-field-input {
   width: 100%;
   min-width: 120px;
@@ -2870,13 +2687,7 @@ html.theme-dark .ws-status-limited { color: #b7c3ff; background: rgba(120, 135, 
   .ws-card-grid {
     grid-template-columns: 1fr;
   }
-  .ws-capture-thumbs {
-    width: calc(100px * var(--ws-density-scale));
-    min-width: calc(100px * var(--ws-density-scale));
-  }
   .ws-invoice-upload-row { grid-template-columns: 1fr; }
-  .ws-invoice-fields-table { display: block; overflow-x: auto; }
-  .ws-invoice-fields-table tbody th { width: auto; min-width: 150px; }
 }
 
 @media (max-width: 480px) {
@@ -3630,26 +3441,6 @@ Extraction mode chooser ──────────────────�
 .ws-project-hero-compact h1 { font-size: clamp(20px, 2.5vw, 28px) !important; margin: 0 0 8px !important; }
 .ws-project-hero-compact p { display: none; }
 .ws-project-hero-compact .ws-project-context { display: none; }
-
-/* ── §81 — Action icon primitive ─────────────────────────────────── */
-.ws-action-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  padding: 0;
-  border: 1px solid transparent;
-  border-radius: var(--ws-radius-sm, 4px);
-  background: transparent;
-  color: var(--ws-text-secondary);
-  cursor: pointer;
-  transition: background .12s, color .12s, border-color .12s;
-  flex-shrink: 0;
-}
-.ws-action-icon:hover { background: var(--ws-surface-hover); color: var(--ws-text); border-color: var(--ws-border); }
-.ws-action-icon:focus-visible { outline: 2px solid var(--ws-primary); outline-offset: 1px; }
-.ws-action-icon svg { pointer-events: none; }
 
 /* ── §82 — Continuous flow breadcrumb path ───────────────────────── */
 .ws-flow-path {
@@ -5449,30 +5240,6 @@ html.theme-dark .ws-art-index {
 .ws-doc-tool,
 .ws-doc-format {
   height: 27px;
-}
-
-.ws-capture-thumbs {
-  width: 136px;
-  min-width: 136px;
-  padding: 6px;
-  gap: 6px;
-}
-
-.ws-capture-preview {
-  padding: 12px;
-}
-
-.ws-capture-stages,
-.ws-capture-actions {
-  padding-inline: 12px;
-}
-
-.ws-capture-stages {
-  padding-block: 7px;
-}
-
-.ws-capture-actions {
-  padding-block: 6px;
 }
 
 .ws-data-toolbar {
@@ -8093,17 +7860,14 @@ html.theme-auto {
     min-width: 44px;
   }
 }
-.ws-query-header-compact,
-.ws-dashboard-header-compact {
+.ws-query-header-compact {
   padding: 12px 0 8px;
 }
-.ws-query-header-compact h1,
-.ws-dashboard-header-compact h1 {
+.ws-query-header-compact h1 {
   font-size: 22px;
   margin-bottom: 4px;
 }
-.ws-query-header-compact p,
-.ws-dashboard-header-compact p {
+.ws-query-header-compact p {
   font-size: 13px;
   margin: 0;
 }
