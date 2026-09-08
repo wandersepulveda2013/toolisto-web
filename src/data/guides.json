@@ -269,6 +269,34 @@
       "faq": [
         { "q": "¿Por qué mi CSV se abre mal en Excel?", "a": "Suele ser por la codificación o el delimitador. Verifica que el archivo use UTF-8 y el separador correcto (coma o punto y coma), o normaliza el archivo antes de abrirlo." }
       ]
+    },
+    {
+      "slug": "convertir-escaneado-imagen-en-texto-excel",
+      "title": "Cómo convertir un PDF o una foto escaneados en texto o tablas editables",
+      "description": "Cuándo funciona el OCR, cómo pasar de un escaneado o una fotografía a texto o a una tabla editable en Excel, y qué hacer cuando el documento está poco nítido.",
+      "category": "pdf",
+      "lastModified": "2026-09-08",
+      "lead": "Tienes un PDF que solo es una foto de sus páginas, o la fotografía de un recibo, y necesitas el texto: copiarlo, buscarlo o ponerlo en una hoja de cálculo. El mecanismo que lo hace posible se llama OCR, y su resultado depende de una sola realidad: que el texto dentro de la imagen sea lo bastante claro.",
+      "sections": [
+        {
+          "heading": "Qué es el OCR y cuándo funciona",
+          "body": "<p><strong>OCR</strong> (reconocimiento óptico de caracteres) es la técnica que convierte la imagen de un texto en texto real editable. Un PDF creado desde un programa ya contiene texto; un PDF <em>escaneado</em> es solo una imagen: puedes verlo, pero no seleccionar, buscar ni editar sus palabras.</p><p>El OCR funciona bien cuando el texto está nítido, bien iluminado y sin elementos decorativos encima. Rinde más con tipografía impresa que con manuscritos. Con la foto de una página impresa clara el resultado suele ser muy bueno; con imágenes torcidas, sombreadas o de baja resolución empeora.</p><p>Si no sabes si tu PDF ya tiene texto, la herramienta <a href=\"/detectar-ocr-pdf\">Detectar si el PDF necesita OCR</a> te lo dice antes de perder tiempo.</p>"
+        },
+        {
+          "heading": "De la imagen al texto o la tabla editable",
+          "body": "<ol><li>Si necesitas el texto plano de un escaneado, usa <a href=\"/extraer-texto-pdf-escaneado\">Extraer texto de PDF escaneado</a>.</li><li>Si lo que quieres son los datos en columnas, <a href=\"/extraer-tabla-imagen-excel\">Tabla de imagen a Excel</a> reconstruye la tabla a partir de la imagen.</li><li>Si solo necesitas que el PDF sea buscable manteniendo la apariencia del escaneado, <a href=\"/pdf-escaneado-a-pdf-buscable\">PDF escaneado a PDF buscable</a> añade la capa de texto invisible.</li></ol><p>Después de extraer, revisa siempre las cifras: el OCR puede confundir caracteres parecidos (una «1» con una «l», un punto decimal mal leído). Para cálculos o datos importantes, compara el resultado con el original.</p>"
+        },
+        {
+          "heading": "Escaneado ilegible: mejora la imagen antes de extraer",
+          "body": "<p>Si la extracción devuelve errores, el problema suele estar en la imagen, no en el OCR. Prueba primero <a href=\"/mejorar-documento-escaneado\">Mejorar documento escaneado</a>, que ajusta contraste y nitidez, o <a href=\"/escanear-documento-camara\">Escanear documento con cámara</a> para fotografiar la página en plano y con buena luz.</p><p>Una página doblada o fotografiada con la cámara torcida conviene enderezarla antes, y si la foto capturó dos páginas a la vez, divídela primero. Espera peores resultados con manuscritos: el OCR de texto escrito a mano rinde mucho menos que el de texto impreso.</p>"
+        }
+      ],
+      "relatedToolSlugs": ["extraer-texto-pdf-escaneado", "extraer-tabla-imagen-excel", "pdf-escaneado-a-pdf-buscable", "detectar-ocr-pdf", "mejorar-documento-escaneado"],
+      "relatedGuideSlugs": ["hojas-calculo-datos-ordenados", "convertir-documentos-sin-perder-formato"],
+      "faq": [
+        { "q": "¿El OCR es exacto al 100%?", "a": "No. Con texto impreso claro el resultado es muy bueno, pero puede tener errores con mala calidad o manuscritos. Revisa cifras y nombres propios antes de usar el resultado en un contexto importante." },
+        { "q": "¿Qué diferencia hay entre un PDF escaneado y uno buscable?", "a": "Un PDF escaneado es una imagen sin texto. Un PDF buscable conserva la apariencia del escaneado pero añade texto invisible encima: puedes buscar, copiar y seleccionar el contenido." }
+      ]
     }
   ]
 }
