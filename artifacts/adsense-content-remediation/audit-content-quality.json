@@ -31,10 +31,10 @@
   },
   "indexable": 235,
   "links": {
-    "externalLinks": 225,
+    "externalLinks": 226,
     "internalBroken": 0,
-    "internalChecked": 10462,
-    "internalRedirectTargets": 4200,
+    "internalChecked": 10485,
+    "internalRedirectTargets": 4213,
     "samples": []
   },
   "metadata": {
@@ -48,7 +48,7 @@
   "orphans": [],
   "pagesDiscovered": 291,
   "placeholders": 0,
-  "sitemapUrls": 236,
+  "sitemapUrls": 224,
   "strictEditorial": {
     "b100_139": 86,
     "b70_99": 63,

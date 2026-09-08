@@ -727,6 +727,11 @@ function buildSitemap() {
   const urls = [
     { loc: `${site.siteUrl}/`, changefreq: 'weekly', priority: '1.0' },
     { loc: catalogUrl, changefreq: 'weekly', priority: '0.9' },
+    { loc: `${site.siteUrl}/guia/`, changefreq: 'weekly', priority: '0.8' },
+    { loc: `${site.siteUrl}/about/`, changefreq: 'monthly', priority: '0.4' },
+    { loc: `${site.siteUrl}/contact/`, changefreq: 'monthly', priority: '0.3' },
+    { loc: `${site.siteUrl}/privacy/`, changefreq: 'monthly', priority: '0.2' },
+    { loc: `${site.siteUrl}/terms/`, changefreq: 'monthly', priority: '0.2' },
     { loc: `${site.siteUrl}/privacidad`, changefreq: 'monthly', priority: '0.3' },
     { loc: `${site.siteUrl}/condiciones`, changefreq: 'monthly', priority: '0.3' },
     { loc: `${site.siteUrl}/apoyar`, changefreq: 'monthly', priority: '0.4' }
