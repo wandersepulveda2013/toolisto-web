@@ -3164,7 +3164,6 @@ async function finalizeExtraction(project, capture, rawText, words, confidence, 
     doc.sourceAssetId = capture.id;
     doc.ocrConfidence = Number(confidence || 0);
     doc.extractionMode = mode;
-    if (mode === 'faithful' && words && words.length) doc.ocrWords = words;
     if (words && words.length) doc.ocrWords = words;
     addRelation(doc, capture.id, 'source-capture');
     statusEl.textContent = 'Guardando en almacenamiento local...';

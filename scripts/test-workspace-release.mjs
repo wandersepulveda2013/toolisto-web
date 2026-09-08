@@ -265,6 +265,11 @@ run('table-selection-incremental (seleccion de tabla incremental sin barrido O(N
 // focus real al final) y el Ctrl+C posterior copia todo el grid; el mecanismo
 // muerto selection.endRow/endCol (que tableSelectionBounds nunca leia) se elimina
 run('table-select-all (Ctrl+A selecciona y copia toda la tabla, CE-148)', 'node', ['tests/workspace/table-select-all-test.mjs']);
+// CE-137 D-18: la funcion muerta faithfulOcrText y la clase .ws-ocr-low-confidence
+// ya no existen en el bundle fuente (cero ocurrencias) y la cadena viva
+// doc.ocrWords -> ocrWordConfidenceMap -> buildCellConfidenceMatrix -> cellConfidence
+// queda cableada (la confianza por palabra alimenta la matriz de revision de la tabla)
+run('ocr-low-confidence-dead-code (CE-137 D-18: codigo muerto eliminado + cadena de confianza viva)', 'node', ['tests/workspace/ocr-low-confidence-dead-code-test.mjs']);
 
 // 4. Manifest de evidencia
 const evidence = {
