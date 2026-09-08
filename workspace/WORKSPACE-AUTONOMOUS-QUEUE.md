@@ -26,7 +26,7 @@ Estado: TODO / ACTIVE / BLOCKED / DONE / DISCOVERED / DEFERRED.
 | D-14 | DONE | P2 | Bug latente pre-existente: `document.addEventListener('keydown', ...)` a nivel de modulo (~L575/591/1091/1103) llama `rerenderTable()` pero es closure dentro de `renderDataTableView` (L5306) | Fix en ciclos CE: holder de modulo `_activeTableRerender` + `rerenderActiveTable()`; los 4 call sites fuera de scope (topbar undo/redo + keydown Ctrl+Z/Y) usan el helper; suite data-table-undo-scope 10/10; gate 132 suites PASS |
 | D-13 | TODO | P3 | CE-141: `exportTableCSV` vierte formulas en bruto mientras la vista muestra el valor evaluado | design; P3 |
 | D-05 | TODO | P3 | CE-142 (etiqueta corregida): undo de documento no persiste en storage (`_applyState` solo restaura appStore) | P3/S |
-| D-10 | TODO | P3 | CE-143: numbered-list/code/callout degradados en el informe (bullet/quote si se marcan) | P3 |
+| D-10 | DONE | P3 | CE-143: numbered-list/code/callout degradados en el informe (bullet/quote si se marcan) | Cerrado en Cycle D-19: workflow-operations.js conserva la semantica (li→`1. `, code crudo, callout `> Nota: `) + suite document-blocks-sections-semantics 39/39 + pdf-generator/workspace coherentes; gate 136 suites PASS; dist 1194KB tras recorte CSS |
 | D-11 | TODO | P2 | CE-145: barrido triple + `markTableSelection` O(N) en la vista de tabla | P2/M |
 
 ## DEFERRED (solo con plan concreto)
@@ -48,8 +48,9 @@ cerrado (3059/3059). W3: CE-138 cerrado. W4: CE-144 cerrado. W5: CE-140 cerrado.
 W6: CE-139 cerrado + presupuesto dist recuperado (1202KB -> 1191KB; gate 157 suites
 PASS en 5a3629f; CE-137 dead code resuelto de paso; D-14 nuevo candidato latente).
 D-14: cerrado en ciclo CE (8e8c79c; suite data-table-undo-scope 10/10; gate 132 suites
-PASS). CE-143: progreso parcial commiteado (fca56a4) sin suite dedicada — tarea abierta.
+PASS). CE-143: cerrado en Cycle D-19 (fix + suite document-blocks-sections-semantics
+39/39; gate 136 suites PASS; dist 1194KB tras recorte de 11 clases CSS muertas).
 Restantes run-all: D-01 (DEFERRED, launcher) y D-02 (DEFERRED_EXTERNAL, AdSense).
-Producto Workspace: CE-137/138/139/140/144 cerrados; CE-141/142/143/145 pendientes;
-AW-003 BLOCKED. Proxima seleccion declarada en STATUS (ciclo D-14): D-11 (CE-145, P2/M)
-o D-13 (CE-141, P3/design), o cerrar CE-143 con su suite dedicada.
+Producto Workspace: CE-137/138/139/140/143/144 cerrados; CE-141/142 pendientes.
+AW-003 BLOCKED. Proxima seleccion declarada en STATUS (ciclo D-19): D-13 (CE-141, P3/design)
+o DISCOVERY nuevo (regla de salud de producto activa).
