@@ -215,6 +215,21 @@ function renderHome() {
       </div>
       <p class="apluno-launcher-all" data-launcher-all><a href="/toolisto">Ver las ${enabledTools.length} herramientas disponibles</a></p>
     </section>
+    <section class="apluno-section apluno-home-categories" aria-labelledby="home-categories-title">
+      <div class="apluno-section-heading" data-reveal>
+        <p class="apluno-eyebrow">Explorar por categoría</p>
+        <h2 id="home-categories-title">Todas las utilidades, agrupadas por formato.</h2>
+        <p>Cada grupo reúne herramientas para un tipo de archivo: PDF, imágenes, hojas de cálculo, documentos y más.</p>
+      </div>
+      <div class="apluno-home-cat-grid">
+        ${enabledCategories.map((category) => `
+        <a class="apluno-home-cat" href="/${escapeHtml(category.slug)}">
+          <span class="apluno-home-cat-name">${escapeHtml(LAUNCHER_CATEGORY_LABELS[category.id] || category.name)}</span>
+          <span class="apluno-home-cat-desc">${escapeHtml(category.description || '')}</span>
+        </a>`).join('')}
+      </div>
+      <p class="apluno-home-cat-foot">¿Buscas algo concreto? <a href="/toolisto">Revisar las ${enabledTools.length} herramientas</a> o <a href="/guia/">leer las guías</a>.</p>
+    </section>
     <section class="apluno-section apluno-home-editorial" aria-label="Qué es Apluno">
       <div class="apluno-home-editorial-copy">
         <p class="apluno-eyebrow">Qué es Apluno</p>

@@ -2271,6 +2271,52 @@ svg {
 
 
 /* ===== Homepage editorial ===== */
+.apluno-home-categories {
+  padding-top: 48px;
+}
+.apluno-home-categories .apluno-section-heading {
+  margin-bottom: 24px;
+}
+.apluno-home-cat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 14px;
+}
+.apluno-home-cat {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 20px 22px;
+  border: 1px solid var(--apluno-line);
+  border-radius: var(--apluno-radius);
+  text-decoration: none;
+  color: inherit;
+  background: var(--apluno-paper);
+  transition: border-color .2s var(--apluno-ease), transform .2s var(--apluno-ease);
+}
+.apluno-home-cat:hover {
+  border-color: var(--apluno-accent);
+  transform: translateY(-2px);
+}
+.apluno-home-cat-name {
+  font-weight: 700;
+  color: var(--apluno-accent-dark);
+  font-size: 1.02rem;
+}
+.apluno-home-cat-desc {
+  color: var(--apluno-muted);
+  font-size: .9rem;
+  line-height: 1.45;
+}
+.apluno-home-cat-foot {
+  margin: 22px 0 0;
+  color: var(--apluno-muted);
+  font-size: .95rem;
+}
+.apluno-home-cat-foot a {
+  color: var(--apluno-accent-dark);
+  font-weight: 600;
+}
 .apluno-home-editorial {
   border-top: 1px solid var(--apluno-line);
   padding-top: 48px;

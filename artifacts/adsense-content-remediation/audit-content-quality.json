@@ -16,7 +16,7 @@
   "duplicateContent": {
     "HIGH_DUP": 0.7,
     "highValuePairs": [],
-    "maxSimilarity": 0.296,
+    "maxSimilarity": 0.25,
     "pairCountAbove005": 20313,
     "reviewBandPairs": []
   },
@@ -33,8 +33,8 @@
   "links": {
     "externalLinks": 225,
     "internalBroken": 0,
-    "internalChecked": 10506,
-    "internalRedirectTargets": 4205,
+    "internalChecked": 10520,
+    "internalRedirectTargets": 4206,
     "samples": []
   },
   "metadata": {
@@ -50,21 +50,21 @@
   "placeholders": 0,
   "sitemapUrls": 237,
   "strictEditorial": {
-    "b100_139": 86,
-    "b70_99": 63,
-    "ge140": 27,
-    "lt70": 26,
+    "b100_139": 89,
+    "b70_99": 56,
+    "ge140": 34,
+    "lt70": 23,
     "max": 361,
     "metric": "instructions + limitations + faq (sin chrome: capability strip, formatos, privacidad, related-tools)",
     "min": 63,
-    "p10": 68,
-    "p25": 79,
-    "p50": 106,
-    "p75": 123,
-    "p90": 153,
-    "tierLT": 89,
+    "p10": 69,
+    "p25": 83,
+    "p50": 112,
+    "p75": 127,
+    "p90": 164,
+    "tierLT": 79,
     "tierT1": 20,
-    "tierT2": 93,
+    "tierT2": 103,
     "totalTools": 202
   },
   "structuredData": {
@@ -79,13 +79,6 @@
         "mainWords": 63,
         "mainWordsTotal": 134,
         "page": "/decodificar-url",
-        "sections": 4,
-        "tier": "TOOL_LT"
-      },
-      {
-        "mainWords": 63,
-        "mainWordsTotal": 134,
-        "page": "/ordenar-csv",
         "sections": 4,
         "tier": "TOOL_LT"
       },
@@ -217,13 +210,6 @@
       },
       {
         "mainWords": 68,
-        "mainWordsTotal": 138,
-        "page": "/recortar-video",
-        "sections": 4,
-        "tier": "TOOL_LT"
-      },
-      {
-        "mainWords": 68,
         "mainWordsTotal": 140,
         "page": "/tablas-html-a-excel",
         "sections": 4,
@@ -233,13 +219,6 @@
         "mainWords": 69,
         "mainWordsTotal": 141,
         "page": "/cambiar-delimitador-csv",
-        "sections": 4,
-        "tier": "TOOL_LT"
-      },
-      {
-        "mainWords": 69,
-        "mainWordsTotal": 139,
-        "page": "/comprimir-video",
         "sections": 4,
         "tier": "TOOL_LT"
       },
@@ -399,13 +378,6 @@
       },
       {
         "mainWords": 79,
-        "mainWordsTotal": 150,
-        "page": "/filtrar-csv",
-        "sections": 4,
-        "tier": "TOOL_LT"
-      },
-      {
-        "mainWords": 79,
         "mainWordsTotal": 159,
         "page": "/generar-codigo-barras",
         "sections": 4,
@@ -532,22 +504,8 @@
       },
       {
         "mainWords": 89,
-        "mainWordsTotal": 163,
-        "page": "/excel-a-json",
-        "sections": 4,
-        "tier": "TOOL_LT"
-      },
-      {
-        "mainWords": 89,
         "mainWordsTotal": 160,
         "page": "/extraer-tablas-pdf-excel",
-        "sections": 4,
-        "tier": "TOOL_LT"
-      },
-      {
-        "mainWords": 90,
-        "mainWordsTotal": 162,
-        "page": "/ods-a-xlsx",
         "sections": 4,
         "tier": "TOOL_LT"
       },
@@ -601,13 +559,6 @@
         "tier": "TOOL_LT"
       },
       {
-        "mainWords": 93,
-        "mainWordsTotal": 165,
-        "page": "/xlsx-a-ods",
-        "sections": 4,
-        "tier": "TOOL_LT"
-      },
-      {
         "mainWords": 94,
         "mainWordsTotal": 169,
         "page": "/contar-palabras",
@@ -629,13 +580,6 @@
         "tier": "TOOL_LT"
       },
       {
-        "mainWords": 94,
-        "mainWordsTotal": 167,
-        "page": "/xml-a-json",
-        "sections": 4,
-        "tier": "TOOL_LT"
-      },
-      {
         "mainWords": 95,
         "mainWordsTotal": 173,
         "page": "/encriptar-pdf-avanzado",
@@ -653,20 +597,6 @@
         "mainWords": 95,
         "mainWordsTotal": 169,
         "page": "/quitar-fondo-imagen",
-        "sections": 4,
-        "tier": "TOOL_LT"
-      },
-      {
-        "mainWords": 96,
-        "mainWordsTotal": 171,
-        "page": "/jpg-a-pdf",
-        "sections": 4,
-        "tier": "TOOL_LT"
-      },
-      {
-        "mainWords": 96,
-        "mainWordsTotal": 168,
-        "page": "/xls-a-xlsx",
         "sections": 4,
         "tier": "TOOL_LT"
       },

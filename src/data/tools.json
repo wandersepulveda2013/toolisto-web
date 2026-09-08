@@ -2011,7 +2011,7 @@
         "title": "Convertir JPG a PDF online gratis | Toolisto",
         "description": "Convierte imágenes JPG a un documento PDF. Directamente en tu navegador.",
         "h1": "Convertir JPG a PDF",
-        "summary": "Convierte una o varias imágenes JPG a un archivo PDF.",
+        "summary": "Une varias fotos JPG (de cámara o escaneos) en un PDF, con tamaño de página y orientación configurables.",
         "inputFormats": [
             "JPEG"
         ],
@@ -2038,31 +2038,35 @@
         "enabledInSitemap": true,
         "faq": [
             {
-                "q": "¿Cuántas imágenes puedo convertir?",
-                "a": "No hay límite estricto. Cada imagen se convierte en una página del PDF."
+                "q": "¿Cuántas fotos puedo incluir?",
+                "a": "Las que necesites: cada JPG se convierte en una página y se respeta el orden de selección."
             },
             {
-                "q": "¿Qué tamaño de página se genera?",
-                "a": "Puedes elegir entre A4, Carta o ajustar al tamaño de la imagen original."
+                "q": "¿Pierde calidad la conversión?",
+                "a": "No. Las imágenes se insertan tal cual, sin volver a comprimirlas, conservando su calidad original."
             },
             {
-                "q": "¿Se conserva la calidad original?",
-                "a": "Sí. Las imágenes se insertan sin re-codificar, manteniendo su resolución y calidad original."
+                "q": "¿Sirve para enviar escaneos por correo?",
+                "a": "Sí: agrupa varias páginas escaneadas en un único PDF para adjuntar un solo archivo."
+            },
+            {
+                "q": "¿Se suben mis imágenes a un servidor?",
+                "a": "No. La conversión se realiza por completo en tu navegador."
             }
         ],
         "instructions": [
-            "Selecciona una o varias imágenes JPG.",
-            "Configura el tamaño de página y orientación.",
+            "Selecciona una o varias imágenes JPG/JPEG, típicamente fotos o escaneos.",
+            "Elige el tamaño de página (A4, Carta o ajustar a la imagen) y la orientación.",
             "Haz clic en Crear PDF.",
-            "Descarga el PDF generado."
+            "Descarga el PDF: cada imagen ocupa una página centrada."
         ],
         "limitations": [
-            "Solo acepta archivos JPG/JPEG",
-            "No agrega texto al PDF",
-            "Las imágenes se colocan centradas en la página"
+            "Solo acepta imágenes JPG/JPEG; los PNG transparentes se gestionan mejor con la herramienta PNG a PDF.",
+            "El PDF resultante es una colección de imágenes sin texto buscable.",
+            "Las imágenes se insertan sin re-codificar, por lo que se mantiene su resolución original."
         ],
         "ogImage": "/assets/icon-512.png",
-        "lastModified": "2026-07-24",
+        "lastModified": "2026-09-08",
         "keywords": [
             "jpg",
             "pdf",
@@ -2081,7 +2085,7 @@
         "title": "Convertir PNG a PDF online gratis | Toolisto",
         "description": "Convierte imágenes PNG a un documento PDF. Directamente en tu navegador.",
         "h1": "Convertir PNG a PDF",
-        "summary": "Convierte una o varias imágenes PNG a un archivo PDF.",
+        "summary": "Convierte capturas, logotipos y diagramas PNG en un PDF, pintando las zonas transparentes de blanco automáticamente.",
         "inputFormats": [
             "PNG"
         ],
@@ -2110,31 +2114,35 @@
         "enabledInSitemap": true,
         "faq": [
             {
-                "q": "¿Se conserva la transparencia de PNG?",
-                "a": "No. El formato PDF no soporta transparencia de la misma manera. Las áreas transparentes se muestran sobre fondo blanco."
+                "q": "¿Se conserva la transparencia de un PNG?",
+                "a": "No como canal alfa: las zonas transparentes se pintan de blanco para que la imagen sea visible en el PDF."
             },
             {
-                "q": "¿Qué tamaño de página se genera?",
-                "a": "Puedes elegir entre A4, Carta o ajustar al tamaño de la imagen original."
+                "q": "¿Para qué se usa sobre todo?",
+                "a": "Para reunir capturas de pantalla, diagramas o logotipos en un único documento y compartirlo sin adjuntos sueltos."
             },
             {
-                "q": "¿Funciona con imágenes grandes?",
-                "a": "Sí. Las imágenes se escalan para ajustarse al tamaño de página seleccionado manteniendo la proporción."
+                "q": "¿Se deforma la imagen?",
+                "a": "No. Cada imagen se escala para caber en la página elegida manteniendo su proporción."
+            },
+            {
+                "q": "¿Mis archivos salen de mi equipo?",
+                "a": "No. Todo el procesado ocurre en tu navegador."
             }
         ],
         "instructions": [
-            "Selecciona una o varias imágenes PNG.",
-            "Configura el tamaño de página y orientación.",
+            "Selecciona una o varias imágenes PNG (capturas de pantalla, logotipos, diagramas).",
+            "Configura el tamaño de página y la orientación.",
             "Haz clic en Crear PDF.",
-            "Descarga el PDF generado."
+            "Descarga el PDF: cada PNG ocupa una página y se adapta sin deformarse."
         ],
         "limitations": [
-            "Solo acepta archivos PNG",
-            "La transparencia de PNG se pierde en el PDF",
-            "No agrega texto al PDF"
+            "Solo acepta PNG; para fotos JPG se debe usar la herramienta JPG a PDF.",
+            "Las áreas transparentes se muestran sobre fondo blanco porque el PDF no conserva el canal alfa.",
+            "El resultado es un documento de imágenes, sin capa de texto buscable."
         ],
         "ogImage": "/assets/icon-512.png",
-        "lastModified": "2026-07-24",
+        "lastModified": "2026-09-08",
         "keywords": [
             "png",
             "pdf",
@@ -2153,7 +2161,7 @@
         "title": "Convertir PDF a JPG online gratis | Toolisto",
         "description": "Convierte cada página de un PDF en una imagen JPG. Directamente en tu navegador.",
         "h1": "Convertir PDF a JPG",
-        "summary": "Convierte las páginas de un PDF en imágenes JPG.",
+        "summary": "Convierte cada página de un PDF en una imagen JPG, con escala ajustable entre 50% y 300%.",
         "inputFormats": [
             "PDF"
         ],
@@ -2183,35 +2191,34 @@
         "faq": [
             {
                 "q": "¿Qué resolución tienen las imágenes?",
-                "a": "Se renderiza cada página a la resolución del PDF original. Puedes ajustar la escala entre 50% y 300%."
+                "a": "Se renderiza cada página a la resolución del PDF original; puedes escalarla entre el 50% y el 300% antes de convertir."
             },
             {
                 "q": "¿Cuántas imágenes se generan?",
-                "a": "Una imagen por cada página del PDF. Un PDF de 5 páginas genera 5 imágenes."
+                "a": "Una por página: un PDF de 5 páginas produce 5 JPG."
             },
             {
                 "q": "¿Cómo se descargan?",
-                "a": "Haz clic en una página para descargarla individualmente, o usa el botón para descargar todas en un ZIP."
+                "a": "Puedes descargar una página individual o todas juntas como ZIP."
             },
             {
-                "q": "¿Extrae imágenes embebidas o renderiza?",
-                "a": "Renderiza cada página completa como imagen. No extrae imágenes internas del PDF."
+                "q": "¿Sirve para publicar el documento como imagen?",
+                "a": "Sí: conviene para previsualizar o compartir el contenido del PDF en redes y correos."
             }
         ],
         "instructions": [
             "Sube un archivo PDF.",
-            "Selecciona formato de salida (JPG).",
-            "Ajusta la escala si lo deseas.",
+            "Selecciona la escala de renderizado (50% a 300%).",
             "Haz clic en Convertir.",
-            "Descarga las imágenes."
+            "Descarga cada página por separado o todas juntas en un ZIP."
         ],
         "limitations": [
-            "Solo acepta un archivo PDF",
-            "Renderiza páginas completas, no extrae imágenes internas",
-            "PDFs protegidos no se pueden procesar"
+            "Solo acepta un PDF por ejecución.",
+            "Se renderiza la página completa como imagen; no se extraen las imágenes embebidas.",
+            "Los PDFs protegidos por contraseña no se pueden procesar."
         ],
         "ogImage": "/assets/icon-512.png",
-        "lastModified": "2026-07-24",
+        "lastModified": "2026-09-08",
         "keywords": [
             "pdf",
             "jpg",
@@ -2230,7 +2237,7 @@
         "title": "Convertir PDF a PNG online gratis | Toolisto",
         "description": "Convierte cada página de un PDF en una imagen PNG de alta calidad. Directamente en tu navegador.",
         "h1": "Convertir PDF a PNG",
-        "summary": "Convierte las páginas de un PDF en imágenes PNG.",
+        "summary": "Convierte cada página de un PDF en una imagen PNG sin pérdida, con escala ajustable.",
         "inputFormats": [
             "PDF"
         ],
@@ -2259,32 +2266,35 @@
         "enabledInSitemap": true,
         "faq": [
             {
-                "q": "¿Por qué elegir PNG sobre JPG?",
-                "a": "PNG es sin pérdida, ideal para documentos con texto, gráficos o cuando necesitas máxima fidelidad. JPG es más ligero pero con pérdida."
+                "q": "¿Cuándo conviene PNG en vez de JPG?",
+                "a": "Cuando necesitas máxima fidelidad (texto, gráficos, diagramas) o quieres conservar calidad para editar después desde una herramienta de imagen."
             },
             {
-                "q": "¿Qué resolución tienen las imágenes?",
-                "a": "Se renderiza cada página a la resolución del PDF original. Puedes ajustar la escala entre 50% y 300%."
+                "q": "¿Qué resolución obtengo?",
+                "a": "La del PDF original, con escala configurable del 50% al 300%."
             },
             {
-                "q": "¿Los archivos son muy grandes?",
-                "a": "PNG produce archivos más grandes que JPG. Un PDF de 5 páginas puede generar 20-50MB en PNG a 100% de escala."
+                "q": "¿Los archivos son grandes?",
+                "a": "Sí, PNG es sin pérdida: un PDF de 5 páginas puede generar 20-50 MB al 100% de escala."
+            },
+            {
+                "q": "¿Se suben mis archivos?",
+                "a": "No. La conversión ocurre íntegramente en tu navegador."
             }
         ],
         "instructions": [
             "Sube un archivo PDF.",
-            "Selecciona formato de salida (PNG).",
-            "Ajusta la escala si lo deseas.",
+            "Escoge la escala de renderizado (50% a 300%).",
             "Haz clic en Convertir.",
-            "Descarga las imágenes."
+            "Descarga las imágenes resultantes, una por página."
         ],
         "limitations": [
-            "Solo acepta un archivo PDF",
-            "PNG produce archivos más grandes que JPG",
-            "PDFs protegidos no se pueden procesar"
+            "Solo acepta un PDF por ejecución.",
+            "Los PNG pesan más que los JPG, sobre todo en documentos con muchas páginas.",
+            "Los PDFs protegidos por contraseña no se pueden procesar."
         ],
         "ogImage": "/assets/icon-512.png",
-        "lastModified": "2026-07-24",
+        "lastModified": "2026-09-08",
         "keywords": [
             "pdf",
             "png",
@@ -4929,7 +4939,7 @@
         "title": "Exportar Excel a CSV online gratis | Toolisto",
         "description": "Exporta hojas de cálculo Excel a CSV con separador y codificación configurables.",
         "h1": "Exportar Excel a CSV",
-        "summary": "Exporta archivos Excel a formato CSV con configuración de separador y codificación.",
+        "summary": "Exporta un libro Excel a CSV plano con separador y codificación configurables.",
         "inputFormats": [
             "XLSX",
             "XLS"
@@ -4953,31 +4963,35 @@
         "enabledInSitemap": true,
         "faq": [
             {
-                "q": "¿Puedo elegir el separador?",
-                "a": "Sí. Puedes usar coma, punto y coma, tabulación o personalizar el separador."
+                "q": "¿Para qué se usa Excel a CSV?",
+                "a": "Los CSV se importan en casi cualquier sistema (CRMs, bases de datos, hojas de otras suites) y pesan menos que un libro de Excel."
             },
             {
-                "q": "¿Qué pasa con varias hojas?",
-                "a": "Si el archivo tiene varias hojas, se exporta la primera por defecto."
+                "q": "¿Qué codificación elijo?",
+                "a": "UTF-8 para herramientas modernas; ANSI si el programa de destino es antiguo y no interpreta UTF-8."
             },
             {
-                "q": "¿Mis archivos se suben a un servidor?",
-                "a": "No. Todo el procesamiento ocurre en tu navegador. Los archivos nunca salen de tu dispositivo."
+                "q": "¿Y si el libro tiene varias hojas?",
+                "a": "Solo se exporta la primera. Para el resto, conviene dividir el libro o convertirlo por hojas."
+            },
+            {
+                "q": "¿Se sube mi archivo?",
+                "a": "No. El procesado ocurre localmente en tu navegador."
             }
         ],
         "instructions": [
-            "Selecciona o arrastra un archivo Excel (.xlsx o .xls).",
-            "Configura el separador si lo deseas.",
+            "Selecciona un archivo Excel (.xlsx o .xls).",
+            "Configura el separador (coma, punto y coma, tabulación o personalizado) y la codificación.",
             "Haz clic en Procesar.",
-            "Descarga el archivo CSV resultante."
+            "Descarga el CSV resultante."
         ],
         "limitations": [
-            "Solo exporta la primera hoja del libro",
-            "Formatos avanzados de celdas (colores, fórmulas complejas) se pierden al convertir a CSV",
-            "Los valores de celdas muy largos pueden truncarse"
+            "Se exporta únicamente la primera hoja del libro.",
+            "Los formatos visuales y las fórmulas no se guardan: el CSV solo conserva valores.",
+            "Celdas con texto muy extenso pueden truncarse en algunos lectores de CSV."
         ],
         "ogImage": "/assets/icon-512.png",
-        "lastModified": "2026-07-24",
+        "lastModified": "2026-09-08",
         "keywords": [
             "excel",
             "csv",
@@ -4995,7 +5009,7 @@
         "title": "Convertir Excel a JSON online gratis | Toolisto",
         "description": "Convierte filas de Excel en objetos JSON con detección automática de tipos de datos.",
         "h1": "Convertir Excel a JSON",
-        "summary": "Convierte archivos Excel a JSON con detección automática de tipos de datos.",
+        "summary": "Exporta la primera hoja de un libro Excel a JSON detectando tipos de datos por celda.",
         "inputFormats": [
             "XLSX",
             "XLS"
@@ -5019,30 +5033,30 @@
         "enabledInSitemap": true,
         "faq": [
             {
-                "q": "¿Cómo detecta los tipos?",
-                "a": "Analiza cada celda y determina si es número, booleano, fecha o texto."
+                "q": "¿Cómo detecta los tipos de datos?",
+                "a": "Analiza cada celda y la clasifica como número, booleano, fecha o texto; las fechas personalizadas se emiten como texto."
             },
             {
-                "q": "¿Puedo elegir qué hoja convertir?",
-                "a": "Actualmente convierte la primera hoja del libro."
+                "q": "¿Qué se usa como nombre de propiedades?",
+                "a": "La primera fila de la hoja se convierte en las claves de cada objeto del JSON."
             },
             {
-                "q": "¿Mis archivos se suben a un servidor?",
-                "a": "No. Todo el procesamiento ocurre en tu navegador. Los archivos nunca salen de tu dispositivo."
+                "q": "¿Sube mi archivo?",
+                "a": "No. Todo el procesamiento ocurre en tu navegador."
             }
         ],
         "instructions": [
-            "Selecciona o arrastra un archivo Excel.",
-            "Haz clic en Procesar.",
-            "Descarga el archivo JSON resultante."
+            "Selecciona un archivo Excel (.xlsx o .xls).",
+            "Haz clic en Procesar para extraer la primera hoja como JSON.",
+            "Descarga el .json o copia el resultado para usarlo desde tu código."
         ],
         "limitations": [
-            "Solo convierte la primera hoja del libro",
-            "Celdas fusionadas pueden producir valores nulos",
-            "Formatos de fecha personalizados se convierten en strings"
+            "Se exporta únicamente la primera hoja del libro.",
+            "Las celdas fusionadas se representan como valores nulos.",
+            "Ideal para alimentar aplicaciones: las fórmulas se calculan a su valor y se exportan como dato."
         ],
         "ogImage": "/assets/icon-512.png",
-        "lastModified": "2026-07-24",
+        "lastModified": "2026-09-08",
         "keywords": [
             "excel",
             "json",
@@ -5060,7 +5074,7 @@
         "title": "Convertir JSON a Excel online gratis | Toolisto",
         "description": "Convierte datos JSON en hojas de cálculo Excel editables.",
         "h1": "Convertir JSON a Excel",
-        "summary": "Convierte archivos JSON en hojas de cálculo Excel (.xlsx) editables.",
+        "summary": "Convierte un array de objetos JSON en un libro Excel (XLSX) con cada clave como columna.",
         "inputFormats": [
             "JSON"
         ],
@@ -5083,30 +5097,34 @@
         "enabledInSitemap": true,
         "faq": [
             {
-                "q": "¿Qué estructuras JSON soporta?",
-                "a": "Arrays de objetos donde cada objeto tiene las mismas claves (se usan como columnas)."
+                "q": "¿Qué diferencia hay con JSON a CSV?",
+                "a": "JSON a Excel genera un libro real con tipos y celdas editables; JSON a CSV produce texto plano sin formato."
             },
             {
-                "q": "¿Qué pasa con objetos anidados?",
-                "a": "Los objetos anidados se serializan como JSON en una celda."
+                "q": "¿Qué pasa con los objetos anidados?",
+                "a": "Se serializan como JSON dentro de la celda para no perder información."
             },
             {
-                "q": "¿Mis archivos se suben a un servidor?",
-                "a": "No. Todo el procesamiento ocurre en tu navegador. Los archivos nunca salen de tu dispositivo."
+                "q": "¿Puedo elegir las columnas?",
+                "a": "En esta versión no: las columnas salen directamente de las claves del JSON."
+            },
+            {
+                "q": "¿Se suben mis archivos?",
+                "a": "No. El procesado ocurre en tu navegador."
             }
         ],
         "instructions": [
-            "Selecciona o arrastra un archivo JSON (array de objetos).",
+            "Selecciona un archivo JSON formado por un array de objetos.",
             "Haz clic en Procesar.",
-            "Descarga el archivo Excel resultante."
+            "Descarga el .xlsx: las claves son las columnas y cada objeto una fila."
         ],
         "limitations": [
-            "Requiere que el JSON sea un array de objetos con claves consistentes",
-            "Objetos anidados se guardan como texto JSON en celdas",
-            "Arrays anidados dentro de objetos no se expanden en columnas"
+            "Requiere que los objetos compartan las mismas claves; las columnas que falten quedan vacías.",
+            "Los objetos anidados se guardan como texto JSON dentro de una celda.",
+            "Los arrays internos no se expanden en columnas adicionales."
         ],
         "ogImage": "/assets/icon-512.png",
-        "lastModified": "2026-07-24",
+        "lastModified": "2026-09-08",
         "keywords": [
             "json",
             "excel",
@@ -5190,7 +5208,7 @@
         "title": "Convertir JSON a CSV online gratis | Toolisto",
         "description": "Convierte archivos JSON en CSV con separador configurable.",
         "h1": "Convertir JSON a CSV",
-        "summary": "Convierte archivos JSON a formato CSV con separador configurable.",
+        "summary": "Convierte un array de objetos JSON en una tabla CSV eligiendo el separador.",
         "inputFormats": [
             "JSON"
         ],
@@ -5213,31 +5231,35 @@
         "enabledInSitemap": true,
         "faq": [
             {
-                "q": "¿Qué estructura JSON acepta?",
-                "a": "Arrays de objetos. Las claves del primer objeto se usan como encabezados."
+                "q": "¿Qué separador me conviene?",
+                "a": "Coma para herramientas internacionales; punto y coma suele funcionar mejor con hojas de cálculo de locales con coma decimal."
             },
             {
-                "q": "¿Puedo elegir el separador?",
-                "a": "Sí. Coma, punto y coma o tabulación."
+                "q": "¿Conserva los tipos de dato?",
+                "a": "El CSV es texto plano: los números se escriben sin comillas, pero pierden el tipo al abrirlos en una hoja de cálculo."
             },
             {
-                "q": "¿Mis archivos se suben a un servidor?",
-                "a": "No. Todo el procesamiento ocurre en tu navegador. Los archivos nunca salen de tu dispositivo."
+                "q": "¿Sirve para datos de una API?",
+                "a": "Sí: guarda la respuesta JSON de una API y conviértela a CSV para leerla en Excel o en una herramienta de análisis."
+            },
+            {
+                "q": "¿Sube mi archivo?",
+                "a": "No. El procesamiento ocurre en tu dispositivo."
             }
         ],
         "instructions": [
-            "Selecciona o arrastra un archivo JSON (array de objetos).",
-            "Configura el separador si lo deseas.",
+            "Selecciona un archivo JSON compuesto por un array de objetos.",
+            "Elige el separador de columnas (coma, punto y coma o tabulación).",
             "Haz clic en Procesar.",
-            "Descarga el archivo CSV resultante."
+            "Descarga el CSV resultante."
         ],
         "limitations": [
-            "Requiere que el JSON sea un array de objetos",
-            "Objetos anidados se serializan como texto en el CSV",
-            "Los caracteres especiales en valores se escapan con comillas"
+            "La entrada debe ser un array de objetos; las claves del primer objeto definen las columnas.",
+            "Los objetos anidados se serializan como texto JSON dentro de la celda.",
+            "Los valores con separador, comillas o saltos de línea se escapan según el estándar CSV."
         ],
         "ogImage": "/assets/icon-512.png",
-        "lastModified": "2026-07-24",
+        "lastModified": "2026-09-08",
         "keywords": [
             "convertir",
             "csv",
@@ -5256,7 +5278,7 @@
         "title": "Convertir XML a JSON online gratis | Toolisto",
         "description": "Convierte archivos XML a JSON conservando jerarquía y atributos.",
         "h1": "Convertir XML a JSON",
-        "summary": "Convierte archivos XML a formato JSON conservando la jerarquía y atributos.",
+        "summary": "Traduce documentos XML a JSON conservando la jerarquía y convirtiendo los atributos en propiedades.",
         "inputFormats": [
             "XML"
         ],
@@ -5279,30 +5301,34 @@
         "enabledInSitemap": true,
         "faq": [
             {
-                "q": "¿Cómo maneja los atributos?",
-                "a": "Los atributos XML se guardan como propiedades con prefijo '@' en el objeto JSON."
+                "q": "¿Cómo maneja los atributos XML?",
+                "a": "Cada atributo se convierte en una propiedad JSON con prefijo @, por ejemplo @id."
             },
             {
                 "q": "¿Conserva la jerarquía?",
-                "a": "Sí. Los elementos anidados se convierten en objetos JSON anidados."
+                "a": "Sí: los elementos anidados se convierten en objetos JSON anidados."
             },
             {
-                "q": "¿Mis archivos se suben a un servidor?",
-                "a": "No. Todo el procesamiento ocurre en tu navegador. Los archivos nunca salen de tu dispositivo."
+                "q": "¿Para qué se usa?",
+                "a": "Para consumir feeds o servicios XML desde JavaScript y otras plataformas donde JSON es el formato nativo."
+            },
+            {
+                "q": "¿Sube mis archivos?",
+                "a": "No. La conversión se realiza en tu navegador."
             }
         ],
         "instructions": [
-            "Selecciona o arrastra un archivo XML.",
+            "Selecciona un archivo .xml.",
             "Haz clic en Procesar.",
-            "Descarga el archivo JSON resultante."
+            "Descarga el .json resultante o cópialo para tu proyecto."
         ],
         "limitations": [
-            "XMLs con namespaces complejos pueden perder prefijos",
-            "Elementos con el mismo nombre se agrupan en arrays",
-            "El orden de atributos puede no preservarse"
+            "Los atributos de cada elemento se guardan como propiedades con prefijo @.",
+            "Los elementos que se repiten se agrupan en arrays JSON.",
+            "Los namespaces con prefijos pueden simplificarse en la salida."
         ],
         "ogImage": "/assets/icon-512.png",
-        "lastModified": "2026-07-24",
+        "lastModified": "2026-09-08",
         "keywords": [
             "convertir",
             "json",
@@ -5587,7 +5613,7 @@
         "title": "Convertir XLS a XLSX online gratis | Toolisto",
         "description": "Convierte archivos Excel antiguos (XLS) al formato moderno y compatible (XLSX).",
         "h1": "Convertir XLS a XLSX",
-        "summary": "Convierte archivos Excel antiguos (XLS) al formato moderno (XLSX).",
+        "summary": "Moderniza libros antiguos .xls (Excel 97-2003) al formato XLSX actual.",
         "inputFormats": [
             "XLS"
         ],
@@ -5610,30 +5636,34 @@
         "enabledInSitemap": true,
         "faq": [
             {
-                "q": "¿Se pierde información al convertir?",
-                "a": "No. Todas las hojas, datos, fórmulas y formatos se preservan en el formato XLSX."
+                "q": "¿Por qué convertir un .xls antiguo?",
+                "a": "El XLSX es el estándar actual: ocupa menos espacio, admite más filas y lo exigen la mayoría de sistemas y versiones nuevas de Office."
+            },
+            {
+                "q": "¿Se pierde información?",
+                "a": "Las celdas, fórmulas, formatos y hojas se conservan. Solo quedan fuera las macros y algunas protecciones del formato antiguo."
             },
             {
                 "q": "¿Puedo convertir varios archivos a la vez?",
-                "a": "Actualmente solo convierte un archivo por vez."
+                "a": "Actualmente la herramienta procesa un archivo por vez."
             },
             {
-                "q": "¿Mis archivos se suben a un servidor?",
-                "a": "No. Todo el procesamiento ocurre en tu navegador. Los archivos nunca salen de tu dispositivo."
+                "q": "¿Sube mi archivo a un servidor?",
+                "a": "No. La conversión ocurre localmente en tu navegador."
             }
         ],
         "instructions": [
-            "Selecciona o arrastra un archivo .xls.",
-            "Haz clic en Procesar.",
-            "Descarga el archivo .xlsx resultante."
+            "Selecciona un archivo .xls, el formato binario de Excel 97-2003.",
+            "Haz clic en Procesar para migrar el libro a XLSX.",
+            "Descarga el .xlsx resultante y verifica que las hojas y fórmulas siguen intactas."
         ],
         "limitations": [
-            "Solo acepta archivos .xls (formato binario antiguo)",
-            "Macros VBA no se migran al formato XLSX",
-            "Protecciones de hoja o libro pueden no transferirse"
+            "No se migran las macros VBA incrustadas en el libro original.",
+            "Las protecciones de hoja o libro y los formularios antiguos pueden no transferirse.",
+            "El límite de filas pasa de 65.536 (XLS) a 1.048.576 (XLSX), útil para libros antiguos truncados."
         ],
         "ogImage": "/assets/icon-512.png",
-        "lastModified": "2026-07-24",
+        "lastModified": "2026-09-08",
         "keywords": [
             "convertir",
             "excel",
@@ -5653,7 +5683,7 @@
         "title": "Convertir XLSX a ODS online gratis | Toolisto",
         "description": "Convierte archivos Excel al formato OpenDocument Spreadsheet compatible con LibreOffice.",
         "h1": "Convertir XLSX a ODS",
-        "summary": "Convierte archivos Excel al formato OpenDocument Spreadsheet (ODS).",
+        "summary": "Convierte libros XLSX de Excel al formato abierto ODS que usa LibreOffice Calc.",
         "inputFormats": [
             "XLSX"
         ],
@@ -5677,29 +5707,33 @@
         "faq": [
             {
                 "q": "¿Qué es ODS?",
-                "a": "OpenDocument Spreadsheet, formato estándar usado por LibreOffice Calc y otras hojas de cálculo."
+                "a": "OpenDocument Spreadsheet, un formato abierto y estándar que LibreOffice Calc usa sin depender de licencias de Microsoft."
             },
             {
-                "q": "¿Se pierde información?",
-                "a": "Se preservan datos, fórmulas y formatos básicos. Algunas funciones Excel específicas pueden no tener equivalente."
+                "q": "¿Por qué convertir de Excel a ODS?",
+                "a": "Para seguir editando el archivo en LibreOffice o en programas de código abierto, sin cerrar el documento a quienes no tienen Excel."
             },
             {
-                "q": "¿Mis archivos se suben a un servidor?",
-                "a": "No. Todo el procesamiento ocurre en tu navegador. Los archivos nunca salen de tu dispositivo."
+                "q": "¿Pierdo algo en la conversión?",
+                "a": "Los datos y formatos básicos se preservan. Las funciones o gráficos exclusivos de versiones recientes de Excel pueden requerir una revisión."
+            },
+            {
+                "q": "¿Sube mis archivos?",
+                "a": "No. La conversión se realiza íntegramente en tu navegador."
             }
         ],
         "instructions": [
-            "Selecciona o arrastra un archivo .xlsx.",
+            "Selecciona un archivo .xlsx para convertirlo a OpenDocument Spreadsheet.",
             "Haz clic en Procesar.",
-            "Descarga el archivo .ods resultante."
+            "Descarga el .ods y ábrelo en LibreOffice, OnlyOffice u otra aplicación compatible con ODS."
         ],
         "limitations": [
-            "Funciones Excel específicas (XLOOKUP, etc.) pueden no convertirse correctamente",
-            "Formatos condicionales avanzados se simplifican",
-            "Gráficos complejos pueden no preservarse"
+            "Funciones modernas de Excel (XLOOKUP, matrices dinámicas) pueden no tener equivalente en ODS y quedar como texto.",
+            "Los formatos condicionales avanzados y gráficos complejos se simplifican.",
+            "Las tablas dinámicas y segmentadores modernos no siempre se mantienen."
         ],
         "ogImage": "/assets/icon-512.png",
-        "lastModified": "2026-07-24",
+        "lastModified": "2026-09-08",
         "keywords": [
             "convertir",
             "ods",
@@ -5718,7 +5752,7 @@
         "title": "Convertir ODS a XLSX online gratis | Toolisto",
         "description": "Convierte archivos LibreOffice Calc al formato Excel (XLSX) compatible universalmente.",
         "h1": "Convertir ODS a XLSX",
-        "summary": "Convierte archivos ODS de LibreOffice al formato Excel (XLSX).",
+        "summary": "Convierte libros ODS de LibreOffice Calc a XLSX para abrirlos sin fricción en Microsoft Excel.",
         "inputFormats": [
             "ODS"
         ],
@@ -5741,30 +5775,34 @@
         "enabledInSitemap": true,
         "faq": [
             {
-                "q": "¿Qué es ODS?",
-                "a": "OpenDocument Spreadsheet, formato estándar de LibreOffice Calc."
+                "q": "¿Para qué se usa ODS a XLSX?",
+                "a": "Para enviar un libro hecho en LibreOffice a alguien que trabaja con Microsoft Excel sin obligarle a instalar un lector de ODS."
             },
             {
-                "q": "¿Se pierde información?",
-                "a": "Se preservan datos, fórmulas y formatos básicos. Funciones ODS específicas pueden no tener equivalente en Excel."
+                "q": "¿Se conservan las fórmulas?",
+                "a": "En su mayoría sí: las compatibles con Excel se traducen al XLSX; las que no tienen equivalente se mantienen como texto."
+            },
+            {
+                "q": "¿Qué pasa con las varias hojas del libro?",
+                "a": "Todas las hojas se conservan en el XLSX resultante."
             },
             {
                 "q": "¿Mis archivos se suben a un servidor?",
-                "a": "No. Todo el procesamiento ocurre en tu navegador. Los archivos nunca salen de tu dispositivo."
+                "a": "No. Todo se procesa en tu navegador y los archivos no salen de tu dispositivo."
             }
         ],
         "instructions": [
-            "Selecciona o arrastra un archivo .ods.",
+            "Selecciona o arrastra un archivo .ods creado en LibreOffice Calc.",
             "Haz clic en Procesar.",
-            "Descarga el archivo .xlsx resultante."
+            "Descarga el .xlsx resultante y ábrelo en Excel o cualquier suite compatible."
         ],
         "limitations": [
-            "Funciones ODS específicas (FIND, etc.) pueden no convertirse",
-            "Gráficos ODS pueden no preservarse",
-            "Formatos de celda específicos de LibreOffice se simplifican"
+            "Las funciones específicas de Calc sin equivalente en Excel pueden conservarse como texto.",
+            "Los gráficos, imágenes y formatos condicionales avanzados de ODS pueden aparecer simplificados.",
+            "Con hojas de datos muy extensas la conversión puede tardar unos segundos más."
         ],
         "ogImage": "/assets/icon-512.png",
-        "lastModified": "2026-07-24",
+        "lastModified": "2026-09-08",
         "keywords": [
             "convertir",
             "xlsx",
@@ -8747,7 +8785,7 @@
         "title": "Comprimir video online gratis | Toolisto",
         "description": "Reduce el tamaño de archivos de video cambiando calidad, resolución o formato.",
         "h1": "Comprimir video",
-        "summary": "Reduce el peso de tus videos ajustando calidad y resolución directamente en el navegador.",
+        "summary": "Reduce el peso de un video ajustando calidad, resolución y formato de salida sin instalar nada.",
         "inputFormats": [
             "MP4",
             "WebM",
@@ -8774,25 +8812,30 @@
         "faq": [
             {
                 "q": "¿Cuánto puedo reducir el tamaño?",
-                "a": "Depende de la configuración. Puedes reducir entre un 30% y 90% según la calidad elegida."
+                "a": "Depende del contenido y la configuración: en la práctica entre un 30% y un 90% del peso original."
             },
             {
-                "q": "¿Qué formatos de salida puedo usar?",
-                "a": "MP4 (H.264) o WebM (VP8)."
+                "q": "¿Qué formatos de salida hay?",
+                "a": "MP4 con códec H.264 (máxima compatibilidad) o WebM con VP8 (más ligero en web)."
+            },
+            {
+                "q": "¿Puedo usarlo sin subir el video?",
+                "a": "Sí: el procesamiento ocurre en tu navegador y el archivo nunca sale de tu dispositivo."
             }
         ],
         "instructions": [
             "Selecciona el archivo de video.",
-            "Elige calidad, resolución y formato de salida.",
+            "Elige la calidad, resolución y formato de salida (MP4 o WebM).",
             "Haz clic en Procesar.",
-            "Descarga el video comprimido."
+            "Descarga el video comprimido y compara el tamaño con el original."
         ],
         "limitations": [
-            "Peso máximo: 100 MB.",
-            "La compresión puede tardar varios minutos según el tamaño del archivo."
+            "Peso máximo de entrada: 100 MB.",
+            "La compresión puede tardar varios minutos en archivos largos o con mucha resolución.",
+            "Reducir demasiado la calidad provoca artefactos visibles en escenas con movimiento."
         ],
         "ogImage": "/assets/icon-512.png",
-        "lastModified": "2026-07-25",
+        "lastModified": "2026-09-08",
         "keywords": [
             "comprimir",
             "video",
@@ -8812,7 +8855,7 @@
         "title": "Recortar video online gratis | Toolisto",
         "description": "Recorta un video seleccionando el segmento de tiempo que necesitas.",
         "h1": "Recortar video",
-        "summary": "Elimina partes no deseadas de tus videos seleccionando inicio y fin.",
+        "summary": "Elimina partes no deseadas de un video indicando el inicio y el fin exactos.",
         "inputFormats": [
             "MP4",
             "WebM",
@@ -8838,25 +8881,31 @@
         "enabledInSitemap": true,
         "faq": [
             {
-                "q": "¿Puedo previsualizar el video antes de recortar?",
-                "a": "Sí, puedes ver una vista previa del video."
+                "q": "¿Puedo previsualizar antes de recortar?",
+                "a": "Sí, la herramienta muestra una vista previa para elegir el inicio y el fin con precisión."
             },
             {
-                "q": "¿Se pierde calidad al recortar?",
-                "a": "Si el codec lo permite, se usa stream copy sin pérdida. Si no, se re-codifica."
+                "q": "¿Se pierde calidad?",
+                "a": "Si el codec lo permite se usa stream copy sin pérdida; si no, se re-codifica el fragmento con la misma calidad aproximada."
+            },
+            {
+                "q": "¿Sube mi video a un servidor?",
+                "a": "No. El recorte se realiza localmente en tu navegador."
             }
         ],
         "instructions": [
             "Selecciona el archivo de video.",
-            "Establece los tiempos de inicio y fin.",
+            "Establece el tiempo de inicio y de fin (o usa la vista previa para marcar el momento).",
             "Haz clic en Procesar.",
             "Descarga el video recortado."
         ],
         "limitations": [
-            "Los tiempos deben estar dentro de la duración del archivo."
+            "Los tiempos indicados deben estar dentro de la duración total del archivo.",
+            "Si el recorte no coincide con un keyframe, puede ser necesario re-codificar el fragmento.",
+            "Solo se genera un segmento por ejecución."
         ],
         "ogImage": "/assets/icon-512.png",
-        "lastModified": "2026-07-25",
+        "lastModified": "2026-09-08",
         "keywords": [
             "recortar",
             "video",
@@ -11212,7 +11261,7 @@
         "title": "Filtrar CSV online gratis | Toolisto",
         "description": "Filtra filas de un CSV por una condición de columna con operadores de comparación.",
         "h1": "Filtrar CSV",
-        "summary": "Conserva solo las filas que cumplen la condición que elijas.",
+        "summary": "Conserva solo las filas de un CSV que cumplen la condición que elijas, con operadores y comparación de texto configurables.",
         "inputFormats": [
             "CSV",
             "TSV"
@@ -11240,22 +11289,31 @@
                 "a": "Igual, distinto, mayor, mayor o igual, menor, menor o igual, contiene y no contiene."
             },
             {
-                "q": "¿Funciona con texto?",
-                "a": "Sí, los operadores contiene e igual funcionan con texto sensible a mayúsculas o no."
+                "q": "¿Distingue mayúsculas?",
+                "a": "Puedes elegir comparación sensible a mayúsculas o no para los operadores de texto."
+            },
+            {
+                "q": "¿Qué se conserva del archivo?",
+                "a": "La fila de encabezado siempre permanece y las filas restantes conservan su formato original."
+            },
+            {
+                "q": "¿Se sube mi archivo?",
+                "a": "No. El procesado ocurre por completo en tu navegador."
             }
         ],
         "instructions": [
             "Selecciona el archivo CSV.",
             "Elige la columna a filtrar.",
-            "Selecciona el operador y escribe el valor.",
-            "Descarga el CSV filtrado."
+            "Selecciona el operador (igual, mayor que, contiene, etc.) y escribe el valor.",
+            "Haz clic en Procesar y descarga el CSV con las filas que cumplen."
         ],
         "limitations": [
-            "Los valores numéricos se comparan como números si ambos son numéricos.",
-            "Las filas sin valor en la columna se excluyen del resultado."
+            "Los valores numéricos se comparan como números cuando ambos son numéricos; si no, como texto.",
+            "Las filas sin valor en la columna filtrada se descartan del resultado.",
+            "El filtro aplica una sola condición por ejecución."
         ],
         "ogImage": "/assets/icon-512.png",
-        "lastModified": "2026-08-01",
+        "lastModified": "2026-09-08",
         "keywords": [
             "csv",
             "filtrar",
@@ -11274,7 +11332,7 @@
         "title": "Ordenar CSV online gratis | Toolisto",
         "description": "Ordena las filas de un CSV por una columna en orden ascendente o descendente.",
         "h1": "Ordenar CSV",
-        "summary": "Ordena tus datos CSV por cualquier columna.",
+        "summary": "Reordena las filas de un CSV por una columna, detectando si los valores son números o texto.",
         "inputFormats": [
             "CSV",
             "TSV"
@@ -11298,25 +11356,35 @@
         "enabledInSitemap": true,
         "faq": [
             {
-                "q": "¿Cómo ordena números y texto?",
-                "a": "Detecta automáticamente si la columna es numérica y ordena en consecuencia."
+                "q": "¿Cómo distingue números y texto?",
+                "a": "Detecta automáticamente si la columna es numérica: si todos los valores lo son, ordena numéricamente; si no, alfabéticamente."
+            },
+            {
+                "q": "¿Qué diferencia hay con Filtrar CSV?",
+                "a": "Filtrar elimina filas según una condición. Ordenar conserva todas las filas y solo cambia su posición."
             },
             {
                 "q": "¿Mantiene el encabezado?",
-                "a": "Sí, la fila de encabezado siempre permanece en la primera posición."
+                "a": "Sí. La fila de cabecera siempre queda en la primera posición del resultado."
+            },
+            {
+                "q": "¿Se sube el archivo a un servidor?",
+                "a": "No. Todo se procesa en tu navegador."
             }
         ],
         "instructions": [
             "Selecciona el archivo CSV.",
             "Elige la columna de ordenación.",
             "Selecciona ascendente o descendente.",
-            "Descarga el CSV ordenado."
+            "Descarga el CSV ordenado con el encabezado en la primera posición."
         ],
         "limitations": [
-            "La ordenación es estable, conservando el orden relativo de filas con valores iguales."
+            "La ordenación es estable: las filas con valores repetidos mantienen su orden relativo original.",
+            "Si la columna mezcla números y texto, la herramienta ordena como texto.",
+            "Las celdas vacías se colocan al final del resultado."
         ],
         "ogImage": "/assets/icon-512.png",
-        "lastModified": "2026-08-01",
+        "lastModified": "2026-09-08",
         "keywords": [
             "csv",
             "ordenar",

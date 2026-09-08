@@ -20,36 +20,11 @@
   },
   "charDefects": [],
   "originality": {
-    "globalBoilerplateRatio": 0.034,
+    "globalBoilerplateRatio": 0.029,
     "leastOriginal": [
-      {
-        "cat": "pdf",
-        "slug": "jpg-a-pdf",
-        "uniquePct": 0.364
-      },
-      {
-        "cat": "pdf",
-        "slug": "png-a-pdf",
-        "uniquePct": 0.4
-      },
-      {
-        "cat": "pdf",
-        "slug": "pdf-a-png",
-        "uniquePct": 0.455
-      },
-      {
-        "cat": "spreadsheets",
-        "slug": "json-a-csv",
-        "uniquePct": 0.5
-      },
       {
         "cat": "images",
         "slug": "jpg-a-webp",
-        "uniquePct": 0.545
-      },
-      {
-        "cat": "pdf",
-        "slug": "pdf-a-jpg",
         "uniquePct": 0.545
       },
       {
@@ -58,52 +33,77 @@
         "uniquePct": 0.556
       },
       {
-        "cat": "spreadsheets",
-        "slug": "excel-a-json",
-        "uniquePct": 0.6
-      },
-      {
-        "cat": "pdf",
-        "slug": "pdf-a-imagenes",
-        "uniquePct": 0.636
-      },
-      {
         "cat": "images",
         "slug": "webp-a-jpg",
         "uniquePct": 0.636
+      },
+      {
+        "cat": "pdf",
+        "slug": "invertir-orden-pdf",
+        "uniquePct": 0.636
+      },
+      {
+        "cat": "pdf",
+        "slug": "varias-paginas-por-hoja-pdf",
+        "uniquePct": 0.643
+      },
+      {
+        "cat": "images",
+        "slug": "png-a-jpg",
+        "uniquePct": 0.667
+      },
+      {
+        "cat": "images",
+        "slug": "webp-a-png",
+        "uniquePct": 0.667
+      },
+      {
+        "cat": "documents",
+        "slug": "word-a-jpg",
+        "uniquePct": 0.667
+      },
+      {
+        "cat": "pdf",
+        "slug": "duplicar-paginas-pdf",
+        "uniquePct": 0.667
+      },
+      {
+        "cat": "pdf",
+        "slug": "insertar-paginas-en-blanco-pdf",
+        "uniquePct": 0.667
       }
     ],
     "medianUniquePct": 1,
-    "minUniquePct": 0.364
+    "minUniquePct": 0.545
   },
   "pairwise": {
-    "maxSimilarity": 0.145,
+    "maxSimilarity": 0,
     "nearDuplicatePairs": [],
     "nearDuplicateThreshold": 0.45,
-    "pairsAbove010": 4
+    "pairsAbove010": 0
   },
   "scope": "src/data/tools.json strict editorial (instructions + limitations + faq)",
   "sharedSentences": {
     "byFrequency": [
       {
-        "n": 26,
+        "n": 19,
         "pages": [
-          "excel-a-csv",
-          "excel-a-json",
-          "json-a-excel",
           "csv-a-json",
-          "json-a-csv"
+          "json-a-xml",
+          "unir-excel",
+          "dividir-excel",
+          "comparar-excel"
         ],
         "sentence": "mis archivos se suben a un servidor"
       },
       {
-        "n": 20,
+        "n": 12,
         "pages": [
-          "excel-a-csv",
-          "excel-a-json",
-          "json-a-excel",
           "csv-a-json",
-          "json-a-csv"
+          "json-a-xml",
+          "unir-excel",
+          "dividir-excel",
+          "comparar-excel"
         ],
         "sentence": "no todo el procesamiento ocurre en tu navegador los archivos nunca salen de tu dispositivo"
       },
@@ -141,13 +141,13 @@
         "sentence": "selecciona uno o varios archivos word"
       },
       {
-        "n": 6,
+        "n": 7,
         "pages": [
+          "excel-a-json",
           "girar-pdf",
           "eliminar-paginas-pdf",
           "invertir-orden-pdf",
-          "duplicar-paginas-pdf",
-          "insertar-paginas-en-blanco-pdf"
+          "duplicar-paginas-pdf"
         ],
         "sentence": "no todo el procesamiento ocurre en tu navegador"
       },
@@ -160,16 +160,6 @@
           "txt-a-pdf"
         ],
         "sentence": "haz clic en crear pdf"
-      },
-      {
-        "n": 4,
-        "pages": [
-          "pdf-a-imagenes",
-          "pdf-a-jpg",
-          "pdf-a-png",
-          "word-a-jpg"
-        ],
-        "sentence": "que resolucion tienen las imagenes"
       },
       {
         "n": 4,
@@ -193,15 +183,6 @@
       {
         "n": 3,
         "pages": [
-          "imagenes-a-pdf",
-          "jpg-a-pdf",
-          "png-a-pdf"
-        ],
-        "sentence": "que tamano de pagina se genera"
-      },
-      {
-        "n": 3,
-        "pages": [
           "pdf-a-imagenes",
           "extraer-portada-epub",
           "extraer-imagenes-epub"
@@ -213,45 +194,9 @@
         "pages": [
           "pdf-a-imagenes",
           "pdf-a-jpg",
-          "pdf-a-png"
+          "word-a-jpg"
         ],
-        "sentence": "ajusta la escala si lo deseas"
-      },
-      {
-        "n": 3,
-        "pages": [
-          "pdf-a-imagenes",
-          "pdf-a-jpg",
-          "pdf-a-png"
-        ],
-        "sentence": "solo acepta un archivo pdf"
-      },
-      {
-        "n": 3,
-        "pages": [
-          "jpg-a-png",
-          "jpg-a-webp",
-          "jpg-a-pdf"
-        ],
-        "sentence": "selecciona una o varias imagenes jpg"
-      },
-      {
-        "n": 3,
-        "pages": [
-          "jpg-a-png",
-          "jpg-a-webp",
-          "jpg-a-pdf"
-        ],
-        "sentence": "solo acepta archivos jpg jpeg"
-      },
-      {
-        "n": 3,
-        "pages": [
-          "png-a-jpg",
-          "png-a-webp",
-          "png-a-pdf"
-        ],
-        "sentence": "selecciona una o varias imagenes png"
+        "sentence": "que resolucion tienen las imagenes"
       },
       {
         "n": 3,
@@ -274,14 +219,62 @@
       {
         "n": 3,
         "pages": [
-          "excel-a-json",
-          "csv-a-json",
-          "xml-a-json"
+          "girar-pdf",
+          "duplicar-paginas-pdf",
+          "insertar-paginas-en-blanco-pdf"
         ],
-        "sentence": "descarga el archivo json resultante"
+        "sentence": "haz clic en procesar y descarga el resultado"
+      },
+      {
+        "n": 2,
+        "pages": [
+          "redimensionar-imagen",
+          "recortar-imagen-para-redes-sociales"
+        ],
+        "sentence": "solo acepta una imagen a la vez"
+      },
+      {
+        "n": 2,
+        "pages": [
+          "convertir-imagen",
+          "eliminar-metadatos-de-imagen"
+        ],
+        "sentence": "selecciona una o varias imagenes"
+      },
+      {
+        "n": 2,
+        "pages": [
+          "eliminar-metadatos-de-imagen",
+          "eliminar-metadatos-word"
+        ],
+        "sentence": "haz clic en eliminar metadatos"
+      },
+      {
+        "n": 2,
+        "pages": [
+          "imagenes-a-pdf",
+          "png-a-pdf"
+        ],
+        "sentence": "configura el tamano de pagina y la orientacion"
+      },
+      {
+        "n": 2,
+        "pages": [
+          "dividir-pdf",
+          "organizar-pdf"
+        ],
+        "sentence": "solo acepta un archivo pdf a la vez"
+      },
+      {
+        "n": 2,
+        "pages": [
+          "jpg-a-png",
+          "jpg-a-webp"
+        ],
+        "sentence": "selecciona una o varias imagenes jpg"
       }
     ],
-    "distinctSharedOn2Plus": 65,
+    "distinctSharedOn2Plus": 56,
     "trustWhitelisted": 3
   },
   "sharednessPerTool": {
@@ -289,45 +282,10 @@
     "overHard": [],
     "worst": [
       {
-        "cat": "pdf",
-        "n": 7,
-        "shared": 0.636,
-        "slug": "jpg-a-pdf",
-        "total": 11
-      },
-      {
-        "cat": "pdf",
-        "n": 6,
-        "shared": 0.6,
-        "slug": "png-a-pdf",
-        "total": 10
-      },
-      {
-        "cat": "pdf",
-        "n": 6,
-        "shared": 0.545,
-        "slug": "pdf-a-png",
-        "total": 11
-      },
-      {
-        "cat": "spreadsheets",
-        "n": 5,
-        "shared": 0.5,
-        "slug": "json-a-csv",
-        "total": 10
-      },
-      {
         "cat": "images",
         "n": 5,
         "shared": 0.455,
         "slug": "jpg-a-webp",
-        "total": 11
-      },
-      {
-        "cat": "pdf",
-        "n": 5,
-        "shared": 0.455,
-        "slug": "pdf-a-jpg",
         "total": 11
       },
       {
@@ -338,30 +296,65 @@
         "total": 9
       },
       {
-        "cat": "spreadsheets",
-        "n": 4,
-        "shared": 0.4,
-        "slug": "excel-a-json",
-        "total": 10
-      },
-      {
-        "cat": "pdf",
-        "n": 4,
-        "shared": 0.364,
-        "slug": "pdf-a-imagenes",
-        "total": 11
-      },
-      {
         "cat": "images",
         "n": 4,
         "shared": 0.364,
         "slug": "webp-a-jpg",
         "total": 11
+      },
+      {
+        "cat": "pdf",
+        "n": 4,
+        "shared": 0.364,
+        "slug": "invertir-orden-pdf",
+        "total": 11
+      },
+      {
+        "cat": "pdf",
+        "n": 5,
+        "shared": 0.357,
+        "slug": "varias-paginas-por-hoja-pdf",
+        "total": 14
+      },
+      {
+        "cat": "images",
+        "n": 3,
+        "shared": 0.333,
+        "slug": "png-a-jpg",
+        "total": 9
+      },
+      {
+        "cat": "images",
+        "n": 3,
+        "shared": 0.333,
+        "slug": "webp-a-png",
+        "total": 9
+      },
+      {
+        "cat": "documents",
+        "n": 4,
+        "shared": 0.333,
+        "slug": "word-a-jpg",
+        "total": 12
+      },
+      {
+        "cat": "pdf",
+        "n": 5,
+        "shared": 0.333,
+        "slug": "duplicar-paginas-pdf",
+        "total": 15
+      },
+      {
+        "cat": "pdf",
+        "n": 5,
+        "shared": 0.333,
+        "slug": "insertar-paginas-en-blanco-pdf",
+        "total": 15
       }
     ]
   },
   "shortTools": {
-    "count": 30,
+    "count": 27,
     "list": [
       {
         "faq": 2,
@@ -369,13 +362,6 @@
         "lim": 1,
         "slug": "decodificar-url",
         "words": 57
-      },
-      {
-        "faq": 2,
-        "instr": 4,
-        "lim": 1,
-        "slug": "ordenar-csv",
-        "words": 60
       },
       {
         "faq": 2,
@@ -484,13 +470,6 @@
       },
       {
         "faq": 2,
-        "instr": 4,
-        "lim": 1,
-        "slug": "recortar-video",
-        "words": 66
-      },
-      {
-        "faq": 2,
         "instr": 3,
         "lim": 2,
         "slug": "excel-a-html",
@@ -509,13 +488,6 @@
         "lim": 2,
         "slug": "tablas-html-a-excel",
         "words": 66
-      },
-      {
-        "faq": 2,
-        "instr": 4,
-        "lim": 2,
-        "slug": "comprimir-video",
-        "words": 67
       },
       {
         "faq": 2,
