@@ -5152,15 +5152,92 @@ function tableSelectionBounds(selection) {
   };
 }
 
+const _tableSelectionMarks = new WeakMap();
+const _gridRowIndex = new WeakMap();
+
+function sameSelectionRect(a, b) {
+  return a.top === b.top && a.bottom === b.bottom && a.left === b.left && a.right === b.right;
+}
+
+// Diferencia simetrica de dos rectangulos de seleccion (old vs new) como
+// bandas disjuntas con su estado objetivo. Solo las celdas que cambian de
+// estado aparecen en el resultado: O(perimetro del cambio), no O(area total).
+function tableSelectionDiff(prev, curr) {
+  const out = [];
+  const top = Math.max(prev.top, curr.top);
+  const bottom = Math.min(prev.bottom, curr.bottom);
+  const left = Math.max(prev.left, curr.left);
+  const right = Math.min(prev.right, curr.right);
+  const overlap = top <= bottom && left <= right;
+  if (!overlap) {
+    out.push({ top: prev.top, bottom: prev.bottom, left: prev.left, right: prev.right, active: false });
+    out.push({ top: curr.top, bottom: curr.bottom, left: curr.left, right: curr.right, active: true });
+    return out;
+  }
+  if (prev.top < top) out.push({ top: prev.top, bottom: top - 1, left: prev.left, right: prev.right, active: false });
+  if (prev.bottom > bottom) out.push({ top: bottom + 1, bottom: prev.bottom, left: prev.left, right: prev.right, active: false });
+  if (prev.left < left) out.push({ top, bottom, left: prev.left, right: left - 1, active: false });
+  if (prev.right > right) out.push({ top, bottom, left: right + 1, right: prev.right, active: false });
+  if (curr.top < top) out.push({ top: curr.top, bottom: top - 1, left: curr.left, right: curr.right, active: true });
+  if (curr.bottom > bottom) out.push({ top: bottom + 1, bottom: curr.bottom, left: curr.left, right: curr.right, active: true });
+  if (curr.left < left) out.push({ top, bottom, left: curr.left, right: left - 1, active: true });
+  if (curr.right > right) out.push({ top, bottom, left: right + 1, right: curr.right, active: true });
+  return out;
+}
+
+function gridRowLookup(tableEl, row) {
+  const tbody = tableEl.querySelector('tbody');
+  if (!tbody) return null;
+  const rowMap = _gridRowIndex.get(tbody);
+  return rowMap ? rowMap.get(row) || null : null;
+}
+
+function gridCellAt(tableEl, row, col) {
+  if (row < 0 || col < 0) return null;
+  const tr = gridRowLookup(tableEl, row);
+  if (!tr) return null;
+  return tr.querySelector('td[data-row="' + row + '"][data-col="' + col + '"]') || null;
+}
+
+function forEachGridCellInRect(tableEl, rect, fn) {
+  for (let r = rect.top; r <= rect.bottom; r++) {
+    const tr = gridRowLookup(tableEl, r);
+    if (!tr) continue;
+    tr.querySelectorAll('td[data-row][data-col]').forEach(cell => {
+      const col = Number(cell.dataset.col);
+      if (col >= rect.left && col <= rect.right) fn(cell, r, col);
+    });
+  }
+}
+
 function markTableSelection(tableEl, selection) {
   const bounds = tableSelectionBounds(selection);
-  $$('td[data-row][data-col]', tableEl).forEach(cell => {
-    const row = Number(cell.dataset.row);
-    const col = Number(cell.dataset.col);
-    const active = row >= bounds.top && row <= bounds.bottom && col >= bounds.left && col <= bounds.right;
-    cell.classList.toggle('selected', active);
-    cell.classList.toggle('selected-focus', row === selection.focusRow && col === selection.focusCol);
-  });
+  const prev = _tableSelectionMarks.get(tableEl) || null;
+  const tbody = tableEl.querySelector('tbody');
+  if (prev && prev.body === tbody && !sameSelectionRect(prev.bounds, bounds)) {
+    // Ruta incremental: solo se tocan las celdas cuyo estado cambia entre la
+    // marca anterior y la nueva (navegacion con flechas/Tab/Home/End, Ctrl+A,
+    // extension con Shift). La ruta completa queda reservada al primer marcado
+    // o a un tbody recien reinstalado (rerender con DOM nuevo).
+    tableSelectionDiff(prev.bounds, bounds).forEach(rect => {
+      forEachGridCellInRect(tableEl, rect, (cell) => {
+        cell.classList.toggle('selected', rect.active);
+      });
+    });
+    const prevFocus = gridCellAt(tableEl, prev.focusRow, prev.focusCol);
+    const nextFocus = gridCellAt(tableEl, selection.focusRow, selection.focusCol);
+    if (prevFocus && prevFocus !== nextFocus) prevFocus.classList.remove('selected-focus');
+    if (nextFocus && prevFocus !== nextFocus) nextFocus.classList.add('selected-focus');
+  } else {
+    $$('td[data-row][data-col]', tableEl).forEach(cell => {
+      const row = Number(cell.dataset.row);
+      const col = Number(cell.dataset.col);
+      const active = row >= bounds.top && row <= bounds.bottom && col >= bounds.left && col <= bounds.right;
+      cell.classList.toggle('selected', active);
+      cell.classList.toggle('selected-focus', row === selection.focusRow && col === selection.focusCol);
+    });
+  }
+  _tableSelectionMarks.set(tableEl, { bounds, focusRow: selection.focusRow, focusCol: selection.focusCol, body: tbody });
 }
 
 function selectedTableTsv(table, selection) {
@@ -5708,6 +5785,7 @@ function renderDataTableView(container) {
   const tbody = h('tbody');
   const colFilters = table._colFilters || {};
   const hasFilters = Object.keys(colFilters).length > 0;
+  const gridRowMap = new Map();
   (table.rows || []).forEach((row, ri) => {
     if (hasFilters) {
       for (const fci in colFilters) {
@@ -5716,6 +5794,7 @@ function renderDataTableView(container) {
       }
     }
     const tr = h('tr');
+    gridRowMap.set(ri, tr);
     tr.appendChild(h('td', { className: 'row-number' }, String(ri + 1)));
     row.forEach((cell, ci) => {
       const rawCell = cell == null ? '' : String(cell);
@@ -5735,6 +5814,7 @@ function renderDataTableView(container) {
     });
     tbody.appendChild(tr);
   });
+  _gridRowIndex.set(tbody, gridRowMap);
   return { head: thead, body: tbody };
 };
   const mountedGrid = renderGrid();

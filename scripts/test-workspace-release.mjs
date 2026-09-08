@@ -251,6 +251,12 @@ run('data-table-rerender-scope (el re-render de la vista de tabla no reconstruye
 // rerenderTable fuera de su closure; usan el helper de modulo rerenderActiveTable()
 run('data-table-undo-scope (undo/redo global no rompe el scope de rerenderTable, D-14)', 'node', ['tests/workspace/data-table-undo-scope-test.mjs']);
 
+// D-15 (CE-145 R4): markTableSelection pasa de barrer TODA la grilla a marcado
+// incremental O(celdas cambiadas) con tableSelectionDiff + forEachGridCellInRect,
+// usando _gridRowIndex para localizar filas en O(1); el barrido completo queda
+// como fallback para primera seleccion o tbody recien reinstalado
+run('table-selection-incremental (seleccion de tabla incremental sin barrido O(N) por tecla, CE-145 D-15)', 'node', ['tests/workspace/table-selection-incremental-test.mjs']);
+
 // 4. Manifest de evidencia
 const evidence = {
   sha: head,
