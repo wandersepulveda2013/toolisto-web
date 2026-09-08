@@ -3,9 +3,29 @@
 > Cada ciclo de OpenCode LEE este archivo antes de actuar y lo ACTUALIZA antes de terminar.
 > Registro historico de ciclos de la mision Evolucion Continua.
 > Modo activo SOLO despues de la transicion (cuando `workspace/PRODUCTION_READINESS_DONE` exista).
-> Updated: 2026-09-08 (D-16 fijado — queryRunOperation sin barrido triple + queryApplyStep incremental, CE-149 R3)
+> Updated: 2026-09-08 (D-17 fijado — Ctrl+A selecciona y copia toda la tabla en la vista de tabla, CE-148)
 
 ---
+
+## Cycle D-17 — Fix: Ctrl+A en la vista de tabla selecciona y copia TODA la tabla (CE-148)
+
+| Field | Value |
+|-------|-------|
+| **Date** | 2026-09-08 |
+| **Branch** | main |
+| **HEAD inicial** | 2c944e1 (docs D-16) |
+| **HEAD final** | 3ad2fdd (fix CE-148 + suite + registro gate); docs de este ciclo en commit aparte |
+| **Task** | D-17 (BUG_FIX, P2): CE-148 — Ctrl+A en la vista de tabla no seleccionaba toda la tabla. El handler del keydown de la tabla (~L5627) hacia `setSelection(0,0,false)` (que fija anchor Y focus en (0,0)) y luego rellenaba `selection.endRow/endCol`, pero `tableSelectionBounds` (L5146) solo lee `anchorRow/focusRow/anchorCol/focusCol`: la seleccion quedaba de 1 celda y el Ctrl+C posterior copiaba 1 celda en vez de toda la tabla. `selection.endRow/endCol` era un mecanismo muerto (2 escrituras, 0 lecturas). El handler global de workflow (L1268-1270) se desactiva fuera de la vista `flujos`, asi que no interferia. Bug pre-existente, hallado en D-15. |
+| **Hypothesis** | Si la rama Ctrl+A mueve el focus REAL al final de la grilla — `setSelection(0,0,false)` para anclar la esquina como anchor y `setSelection(rows-1, cols-1, true)` para extender el focus a la ultima celda — `tableSelectionBounds` devuelve (0,0)-(rows-1,cols-1) y `selectedTableTsv` copia todas las celdas. setSelection ya invoca markTableSelection, asi que la llamada manual sobra. |
+| **Change** | `workspace/workspace.js` (+15/−3): la rama Ctrl+A pasa a `setSelection(0, 0, false);` + guard (`if (table.rows.length >= 1 && table.headers.length >= 1)`) + `setSelection(table.rows.length - 1, table.headers.length - 1, true);`. Se eliminaron las escrituras muertas `selection.endRow/endCol` y la llamada manual a `markTableSelection`. Sin filas: bounds seguros de 1 celda (sin indices -1), hasValue activo igual que antes. |
+| **Bugs encontrados** | Ninguno nuevo. El fix elimina el mecanismo muerto `endRow/endCol` (2 escrituras, 0 lecturas). |
+| **Tests ejecutados** | Suite nueva `tests/workspace/table-select-all-test.mjs` 16/16: 7 anclas estaticas (rama Ctrl+A, guard de tabla vacia, endRow/endCol eliminado, preventDefault, sin markTableSelection manual) + 1 regresion que demuestra por que el mecanismo muerto no agrandaba el rectangulo + comportamiento REAL de `tableSelectionBounds`/`selectedTableTsv` extraidos con grabFn: 3x4 bounds (0,0)-(2,3), anchor (0,0), focus (2,3), TSV de 12 celdas, caso 1x1, tabla sin filas sin extender a indices -1. Registrada en el gate. Regresion enfocada: table-selection-incremental 28/28, data-table-rerender-scope 35/35, data-table-undo-scope 10/10, workspace-test 157/157 (dist 1192KB < 1200KB). Censo CE-125 OK (146 archivos = 133 registradas + 13 deferidas). RELEASE GATE completo `node scripts/test-workspace-release.mjs` **134 suites PASS 0 fail** (build + sync source→dist OK, manifest `release-gate-2c944e1...json`). |
+| **Tests PASS** | 16 (D-17) + 28 + 35 + 10 + 157 + RELEASE GATE 134/134 suites = 0 fail. |
+| **Tests FAIL** | 0. |
+| **Commits** | `3ad2fdd` fix(ce): Ctrl+A en la vista de tabla selecciona y copia toda la tabla (CE-148 D-17) (workspace.js + suite 16/16 + registro en el gate). Docs (STATUS/QUEUE D-17) en commit aparte. Evidence churn (PNGs/JSONs de artifacts y screenshots del gate) NO se commitea (anti-churn). |
+| **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL` (harness niega `git push*`); sin push. El runner no se re-lanza desde esta sesion (el harness niega la invocacion del `.ps1`); el usuario puede relanzarlo con `.\RUN-OPENCODE-AUTONOMOUS.ps1 -Resume -Unlimited` (runtime safemode off, streak 0). |
+| **Limitaciones** | El test es de anclas estaticas + comportamiento puro de los helpers reales (sin presionar Ctrl+A en navegador); la semantica de la vista queda cubierta por data-table-rerender-scope + workspace-stability-e2e en el gate. La seleccion completa usa el barrido completo de markTableSelection una sola vez al pulsar Ctrl+A (fallback para rectangulo nuevo); seguirlo con Ctrl+C copia en TSV via selectedTableTsv. |
+| **Proxima prioridad** | TODO mas alto de la QUEUE: CE-137 (P2, `faithfulOcrText` muerto / resaltado de baja confianza), o CE-143 (P2, cerrar con suite dedicada), o DISCOVERED nuevos. |
 
 ## Cycle D-16 — Perf: queryRunOperation pasa de 3 barridos a 2 y queryApplyStep aplica O(filas) por paso (CE-149 R3)
 
