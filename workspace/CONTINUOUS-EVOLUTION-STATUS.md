@@ -3,9 +3,29 @@
 > Cada ciclo de OpenCode LEE este archivo antes de actuar y lo ACTUALIZA antes de terminar.
 > Registro historico de ciclos de la mision Evolucion Continua.
 > Modo activo SOLO despues de la transicion (cuando `workspace/PRODUCTION_READINESS_DONE` exista).
-> Updated: 2026-09-08 (D-17 fijado — Ctrl+A selecciona y copia toda la tabla en la vista de tabla, CE-148)
+> Updated: 2026-09-08 (D-18 fijado — cierre de CE-137: codigo muerto OCR verificado eliminado + cadena de confianza viva certificada)
 
 ---
+
+## Cycle D-18 — Closure: faithfulOcrText y .ws-ocr-low-confidence fuera del bundle + cadena de confianza viva (CE-137)
+
+| Field | Value |
+|-------|-------|
+| **Date** | 2026-09-08 |
+| **Branch** | main |
+| **HEAD inicial** | 3bed8d7 (docs D-17) |
+| **HEAD final** | 6893cff (cierre CE-137 + suite + registro gate); docs de este ciclo en commit aparte |
+| **Task** | D-18 (DEAD_CODE, P2): CE-137 llevaba DISCOVERED desde la 22va ronda («`faithfulOcrText` (workspace.js:3051/3158-3176) es código muerto: la promesa de resaltar palabras dudosas nunca renderiza; `doc.ocrWords` se persiste pero nada lo lee; la clase `.ws-ocr-low-confidence` solo existe en la funcion muerta»). La realidad en HEAD: la funcion `faithfulOcrText` y la regla CSS `.ws-ocr-low-confidence` YA se habian eliminado en `5a3629f` (recuperacion de presupuesto W6, 0 referencias en repo/tests) pero la tarea quedo abierta en la QUEUE. Ademas, la afirmacion «nada lo lee» quedaba OBSOLETA: `doc.ocrWords` es consumido por `ocrWordConfidenceMap` (L2396) -> `buildCellConfidenceMatrix` (L2425) -> `table.cellConfidence` que alimenta la revision de la tabla (OCR_LOW_CONFIDENCE). Quedaba un residuo: en `finalizeExtraction` (L3167-3168) la escritura `if (mode === 'faithful' && words && words.length) doc.ocrWords = words;` era REDUNDANTE (subsumida por la linea general `if (words && words.length) doc.ocrWords = words;`). |
+| **Hypothesis** | Cerrar CE-137 honestamente: (1) certificar con suite que el codigo muerto NO existe en el bundle fuente (cero ocurrencias de `faithfulOcrText` y de `.ws-ocr-low-confidence` en workspace.js y workspace.css); (2) deduplicar la escritura redundante de `doc.ocrWords` (la palabra se persiste en TODOS los modos de extraccion, no solo faithful); (3) fijar con anclas + funciones reales que la cadena VIVA confianza-por-palabra -> matriz de celda sigue cableada. Result type DEAD_CODE. |
+| **Change** | `workspace/workspace.js` (−1 linea): se elimina `if (mode === 'faithful' && words && words.length) doc.ocrWords = words;` de `finalizeExtraction` — queda `if (words && words.length) doc.ocrWords = words;` (una sola escritura). `mode === 'faithful'` sigue existiendo en L3152 como rama legitima de extraccion (preserva el texto crudo sin `cleanOcrText`); no era codigo muerto. |
+| **Bugs encontrados** | Ninguno nuevo. La escritura doble de `extensionMode` a `doc.ocrWords` era una redundancia inofensiva; el resto del hallazgo ya estaba resuelto en 5a3629f sin cerrarse. |
+| **Tests ejecutados** | Suite nueva `tests/workspace/ocr-low-confidence-dead-code-test.mjs` 23/23: 0 ocurrencias de `faithfulOcrText` (workspace.js) y `.ws-ocr-low-confidence` (workspace.js + workspace.css); anclas vivas (ocrWordConfidenceMap, buildCellConfidenceMatrix, `table.cellConfidence = buildCellConfidenceMatrix(table, doc)` en convertDocToTable, `doc.ocrWords = words`, escritura UNA sola vez, OCR_LOW_CONFIDENCE >= 3 usos); comportamiento REAL via grabFn (+parseLocaleNumber de locale-parser): `normalizeOcrNumber` 1-30→-30, `ocrWordConfidenceMap` fusiona claves normalizadas con MIN confianza / textos en blanco saltados / confianza redondeada / token duplicado→min, `buildCellConfidenceMatrix` con fallback `ocrConfidence`, celda vacia→null, sin ocrWords y fallback 0→null, equivalente numerico europeo (1.500,25 vs 1500,25)→70, multi-token (Enero 2026)→min(90,55)=55. Registrada en el gate tras table-select-all. Regresion enfocada OCR/revision: table-sort-confidence 27/27, doc-to-table-multispace 20/20, review-status-persistence 15/15, table-sort-locale 16/16, locale-parser 75/75. Censo CE-125 OK (147 archivos = 134 registradas + 13 deferidas). RELEASE GATE completo `node scripts/test-workspace-release.mjs` **135 suites PASS 0 fail** (build + sync source→dist OK; manifest `release-gate-3bed8d7...json`). |
+| **Tests PASS** | 23 (D-18) + 27 + 20 + 15 + 16 + 75 + RELEASE GATE 135/135 suites = 0 fail. |
+| **Tests FAIL** | 0. |
+| **Commits** | `6893cff` chore(ce): cierra CE-137 D-18 — verifica que faithfulOcrText y .ws-ocr-low-confidence ya no existen en el bundle y limpia la escritura redundante de doc.ocrWords (workspace.js + suite 23/23 + registro en el gate). Docs (STATUS/QUEUE D-18) en commit aparte. Evidence churn (PNGs/JSONs de artifacts y screenshots del gate) NO se commitea (anti-churn). |
+| **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL` (harness niega `git push*`); sin push. El runner no se re-lanza desde esta sesion (el harness niega la invocacion del `.ps1`); el usuario puede relanzarlo con `.\RUN-OPENCODE-AUTONOMOUS.ps1 -Resume -Unlimited` (runtime safemode off, streak 0). |
+| **Limitaciones** | La suite es de anclas estaticas + comportamiento puro de funciones reales (sin pulsar el modal de extraccion en navegador); la semantica del modal y la revision de tabla quedan cubiertas por phase3a-manual-verification + doc-to-table-multispace + table-sort-confidence en el gate. La clase CSS `.ws-ocr-low-confidence` se retiro junto a `faithfulOcrText` en 5a3629f; este ciclo solo la verifica (no hubo re-introduccion). |
+| **Proxima prioridad** | TODO mas alto de la QUEUE: CE-143 (P3, `numbered-list`/`code`/`callout` degradados a texto plano en el informe/PDF), o DISCOVERED nuevos / mejoras de producto de la regla de salud. |
 
 ## Cycle D-17 — Fix: Ctrl+A en la vista de tabla selecciona y copia TODA la tabla (CE-148)
 
@@ -25,7 +45,7 @@
 | **Commits** | `3ad2fdd` fix(ce): Ctrl+A en la vista de tabla selecciona y copia toda la tabla (CE-148 D-17) (workspace.js + suite 16/16 + registro en el gate). Docs (STATUS/QUEUE D-17) en commit aparte. Evidence churn (PNGs/JSONs de artifacts y screenshots del gate) NO se commitea (anti-churn). |
 | **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL` (harness niega `git push*`); sin push. El runner no se re-lanza desde esta sesion (el harness niega la invocacion del `.ps1`); el usuario puede relanzarlo con `.\RUN-OPENCODE-AUTONOMOUS.ps1 -Resume -Unlimited` (runtime safemode off, streak 0). |
 | **Limitaciones** | El test es de anclas estaticas + comportamiento puro de los helpers reales (sin presionar Ctrl+A en navegador); la semantica de la vista queda cubierta por data-table-rerender-scope + workspace-stability-e2e en el gate. La seleccion completa usa el barrido completo de markTableSelection una sola vez al pulsar Ctrl+A (fallback para rectangulo nuevo); seguirlo con Ctrl+C copia en TSV via selectedTableTsv. |
-| **Proxima prioridad** | TODO mas alto de la QUEUE: CE-137 (P2, `faithfulOcrText` muerto / resaltado de baja confianza), o CE-143 (P2, cerrar con suite dedicada), o DISCOVERED nuevos. |
+| **Proxima prioridad** | TODO/prioridad mas alto de la QUEUE: CE-143 (P3, `numbered-list`/`code`/`callout` degradados a texto plano en el informe/PDF), o DISCOVERED nuevos. |
 
 ## Cycle D-16 — Perf: queryRunOperation pasa de 3 barridos a 2 y queryApplyStep aplica O(filas) por paso (CE-149 R3)
 
