@@ -6453,25 +6453,31 @@ function queryRunOperation(shape, operation, config = {}) {
 
   if (['trim', 'clean', 'uppercase', 'lowercase', 'fill-down', 'fill-up', 'detect-type'].includes(operation)) {
     const selected = indexes.length ? indexes : [index];
-    result.rows = rows.map(row => [...row]);
-    selected.forEach(column => {
-      if (operation === 'fill-down') {
+    // CE-149 R3: result.rows YA es un clon profundo (queryCloneShape), asi que se
+    // transforma en sitio en UNA pasada en lugar de clonar de nuevo y recorrer
+    // por columna (detect-type del boton hacia 3 barridos: clone + copia + transform).
+    if (operation === 'fill-down') {
+      selected.forEach(column => {
         let previous = '';
         result.rows.forEach(row => {
           if (normalize(row[column]).trim() === '') row[column] = previous;
           else previous = normalize(row[column]);
         });
-        return;
-      }
-      if (operation === 'fill-up') {
+      });
+      return result;
+    }
+    if (operation === 'fill-up') {
+      selected.forEach(column => {
         let nextValue = '';
         [...result.rows].reverse().forEach(row => {
           if (normalize(row[column]).trim() === '') row[column] = nextValue;
           else nextValue = normalize(row[column]);
         });
-        return;
-      }
-      result.rows.forEach(row => {
+      });
+      return result;
+    }
+    result.rows.forEach(row => {
+      selected.forEach(column => {
         let value = normalize(row[column]);
         if (operation === 'trim') value = value.trim();
         if (operation === 'clean') value = value.replace(/[\u0000-\u001F]+/g, ' ').replace(/\s+/g, ' ').trim();
@@ -6572,6 +6578,15 @@ function queryRebuildModel(model) {
 
 function queryApplyStep(model, operation, config, summary) {
   const action = QUERY_ACTION_MAP[operation] || { label: operation };
+  // CE-149 R3: aplicar el paso NUEVO al modelo materializado (O(filas) por paso)
+  // en lugar de re-ejecutar toda la cadena desde la fuente (O(filas x pasos)).
+  // model.headers/rows ya son el resultado materializado de steps[0..n-1] y
+  // queryRunOperation es puro/determinista, asi que el resultado es identico a
+  // un replay completo. queryRebuildModel sigue siendo la autoridad para undo,
+  // reset y quitar un paso (donde la cadena SI cambia).
+  const result = queryRunOperation(model, operation, config);
+  model.headers = result.headers;
+  model.rows = result.rows;
   model.steps = [...(model.steps || []), {
     id: generateId(),
     operation,
@@ -6579,7 +6594,6 @@ function queryApplyStep(model, operation, config, summary) {
     summary: summary || '',
     config: { ...config },
   }];
-  queryRebuildModel(model);
   queryPersistState(model.projectId, queryReplaceModelInSheets(appStore.get('querySheets'), model), model).catch(e => reportError(e, 'persist', {}));
   toast('Paso aplicado: ' + action.label, 'success');
 }

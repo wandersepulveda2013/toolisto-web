@@ -145,6 +145,10 @@ run('query-date-to-iso (detect-type normaliza fechas sin corrimiento de zona hor
 run('div-by-zero-formula (la division por cero da #FORMULA, no escribe 0, CE-103)', 'node', ['tests/workspace/div-by-zero-formula-test.mjs']);
 run('thumbnail-guard (createThumbnail guarda contra dimensiones degradadas 0x0, CE-104)', 'node', ['tests/workspace/thumbnail-guard-test.mjs']);
 run('query-column-range-guard (choose/reorder-columns descartan indices fuera de rango, CE-105)', 'node', ['tests/workspace/query-column-range-guard-test.mjs']);
+
+// CE-149 R3: queryRunOperation/detect-type sin barridos redundantes + queryApplyStep
+// incremental == replay completo (single-pass, sin clon doble; undo/reset siguen autoritativos)
+run('query-single-pass (CE-149 R3: queryRunOperation 3 barridos -> 2/incremental, queryApplyStep O(filas) por paso)', 'node', ['tests/workspace/query-single-pass-test.mjs']);
 run('md-header-escape-and-replace (encabezados Markdown escapan pipe + replace-values find vacio no destruye, CE-106)', 'node', ['tests/workspace/md-header-escape-and-replace-test.mjs']);
 run('formula-unary-and-aggregates (unario negativo en formulas + agregados ignoran celdas no numericas, CE-109)', 'node', ['tests/workspace/formula-unary-and-aggregates-test.mjs']);
 run('table-sort-locale (orden de tablas usa parseLocaleNumber canonico, no ad-hoc, CE-110)', 'node', ['tests/workspace/table-sort-locale-test.mjs']);
