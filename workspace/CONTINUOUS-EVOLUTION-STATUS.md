@@ -3,7 +3,7 @@
 > Cada ciclo de OpenCode LEE este archivo antes de actuar y lo ACTUALIZA antes de terminar.
 > Registro historico de ciclos de la mision Evolucion Continua.
 > Modo activo SOLO despues de la transicion (cuando `workspace/PRODUCTION_READINESS_DONE` exista).
-> Updated: 2026-09-08 (D-19 fijado — cierre de CE-143: documentBlocksToSections conserva numbered-list/code/callout en informe/PDF + presupuesto dist recortado a 1194KB + mision SEO publica cerrada con audit PASS 15/15)
+> Updated: 2026-09-08 (SEO-03/SEO-04 fijado — Fase 2 y Fase 3 de la remediacion apluno.com: 16 tools con editorial diferenciado (max sim full-page 0.296→0.250, banda 0.20-0.35 78→24) y home con 12 categorias como `<a href="/{slug}">` crawlables; audit PASS 15/15, gate publico 24 PASS, validado en navegador)
 
 ---
 
@@ -26,6 +26,26 @@
 | **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL` (harness niega `git push*`); sin push. Los datos GSC (ZIP exportado en Downloads) quedaron consumidos por el analisis; la mision esta cerrada. |
 | **Limitaciones** | La suite D-19 es de anclas + comportamiento puro de `documentBlocksToSections` REAL via grabFn (sin render del informe en navegador); la semantica de bloque queda cubierta por las suites de export existentes en el gate. El recorte CSS no uso AST (verificacion por texto con busquedas en el repo); el peso se certifica con workspace-test (1194KB) y el sync source→dist del gate. El sitemap y el audit validan el sitio GENERADO (dist), no el despliegue real (sin autorizacion de push). |
 | **Proxima prioridad** | TODO mas alto de la QUEUE: D-13 (CE-141, P3 — `exportTableCSV` vierte formulas en bruto) u oportunidad nueva de DISCOVERY; regla de salud de producto activa. |
+
+## Cycle SEO-03/SEO-04 — Fase 2 + Fase 3 remediacion apluno.com: diferenciar tools similares + home con categorias crawlables
+
+| Field | Value |
+|-------|-------|
+| **Date** | 2026-09-08 |
+| **Branch** | main |
+| **HEAD inicial** | a9358c1 (docs SEO-02 Fase 1) |
+| **HEAD final** | commits de este ciclo (Fase 2+3 funcional + docs) |
+| **Task** | D-20/D-21 (FEATURE, P2), directiva del owner «haz fase 2 y fase 3» de la mision SEO apluno.com. **Fase 2**: diferenciar las herramientas con mayor similitud de contenido para bajar el riesgo de near-duplicate. **Fase 3**: el home era SOLO launcher JS + editorial; los chips de categoria eran botones sin `href` → las 12 categorias no eran rastreables desde la portada (hueco real para la categoria «Descubierta — aún no rastreada» de GSC). |
+| **Hypothesis** | (1) El editorial de `tools.json` estaba templado: el cluster de hojas de calculo (ods-a-xlsx, xls-a-xlsx, xlsx-a-ods, excel-a-json/xml-a-json/json-a-excel/json-a-csv/excel-a-csv, unir/dividir/ordenar/filtrar-csv) y los pares de conversion (jpg-a-pdf/png-a-pdf, pdf-a-jpg/pdf-a-png, comprimir/recortar-video) compartian pasos y FAQ casi identicos → similitud full-page alta (max 0.296). (2) Anadir `<a href="/{slug}">` reales a las 12 categorias en `renderHome()` baja la densidad de paginas «descubiertas pero no rastreadas» al dar rutas de descubrimiento crawlable. |
+| **Change** | (1) `src/data/tools.json`: 16 tools con summary/instructions/limitations/faq reescritos y especificos (cada uno con >=60 palabras estrictas, >=2 instrucciones, >=1 limitacion, >=1 FAQ; `lastModified` 2026-09-08). (2) `scripts/generate-apluno-pages.mjs` (`renderHome`): nueva seccion `<section class="apluno-home-categories">` con 12 `<a class="apluno-home-cat" href="/{slug}">` (nombre + descripcion real de `categories.json`) + pie con links a `/toolisto` y `/guia/`. (3) `src/apluno/styles.css`: estilos `.apluno-home-categories`/`.apluno-home-cat*` siguiendo el patron `.apluno-home-link` (grid auto-fill, hover accent). |
+| **Bugs encontrados** | Ninguno nuevo. El `.tool-content` del render no contiene el summary (va en el hero sobre el contenido): solo impacto en selectores del script de validacion manual (se validaron los textos a nivel de pagina). |
+| **Tests ejecutados** | `node scripts/audit-content-quality.mjs` → **FINAL PASS (pass=15, warn=0, fail=0)**: maxSimilarity full-page **0.296→0.250**, banda 0.20-0.35 de **78→24** pares, banda 0.35-0.50 en 0, top-1 restante avif↔heic 0.250 (no tocados, siguiente ronda de diferenciacion); internal links 10520/0 broken; guides 11/11; categories 12/12; JSON-LD 445 validos. `node scripts/audit-content-similarity.mjs` → PASS (strict editorial max sim 0.000, antes 0.145). Gate publico `node scripts/test-public-release.mjs` → **24 PASS / 0 FAIL** (seo 29, adsense 25, monetization 25, strict-editorial 3, content-similarity 5, remediation DoD 11, network-negative 413/413). Validacion en navegador (Playwright sobre dist): 12 links de categoria visibles con href limpio `/pdf`.., navegacion a /pdf OK, home sin errores de consola, `ods-a-xlsx`/`jpg-a-pdf` con editorial diferenciado. |
+| **Tests PASS** | 15/15 (audit publico) + 24/24 (gate publico) + 0 fail. |
+| **Tests FAIL** | 0. |
+| **Commits** | (1) funcional Fase 2+3: `src/data/tools.json` + `scripts/generate-apluno-pages.mjs` + `src/apluno/styles.css` + evidencia `artifacts/adsense-content-remediation/audit-content-quality.json` y `audit-content-similarity.json`; (2) docs: filas SEO-03/SEO-04 en QUEUE + ciclo en STATUS. Evidence churn (PNGs/JSONs de artifacts del gate) NO se commitea (anti-churn). |
+| **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL` (harness niega `git push*`); los fixes de contenido y el home con categorias NO llegarán a GSC hasta publicar. El runner no se re-lanza desde esta sesion; el owner puede relanzarlo con `.\RUN-OPENCODE-AUTONOMOUS.ps1 -Resume -Unlimited`. |
+| **Limitaciones** | La diferenciacion cubrio 16 tools (los pares top y el cluster de hojas de calculo); pares restantes (heic↔avif 0.250, html-a-imagen↔html-a-pdf 0.236, formatear↔validar-json 0.224, codificar↔decodificar-url 0.219) quedan para una siguiente ronda. La similitud se mide sobre `dist` generado (la fuente real de indexacion); el near-dup estricto ya era 0.000. La Fase 4 (informe final `final-report.md` con el plan GSC) sigue pendiente. |
+| **Proxima prioridad** | Fase 4 SEO (informe final + comprobacion de indexacion tras despliegue), luego D-13 (CE-141, P3) o DISCOVERY de la regla de salud de producto. |
 
 ## Cycle D-18 — Closure: faithfulOcrText y .ws-ocr-low-confidence fuera del bundle + cadena de confianza viva (CE-137)
 
