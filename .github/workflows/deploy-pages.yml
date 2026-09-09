@@ -32,6 +32,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Playwright browsers
+        run: npx playwright install chromium
+
       - name: Build
         run: npm run build
 
