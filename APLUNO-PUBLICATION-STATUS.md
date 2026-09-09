@@ -6,21 +6,19 @@ Estado REAL verificado por OpenCode el 2026-08-15 (cierre de infraestructura: HT
 Repositorio:                 wandersepulveda2013/toolisto-web
 Rama producción:             main
 Rama APLUNO:                 feature/apluno-ecosystem
-SHA publicado:               267ab5d8803cd350ca4006b40309049453ad87d3
-Método de publicación:       GitHub REST API (Git Data API)
-Push/API:                    API (git push bloqueado por opencode.json; alternativa segura, sin force)
-Merge/PR:                    No (fast-forward de main vía API; historia preservada)
-Workflow:                    .github/workflows/deploy-pages.yml
-GitHub Actions Run:          31887498035
-Build:                       PASS
-Tests:                       PASS
-Test APLUNO:                 PASS (45 pass, 0 fail)
-APLUNO Launcher:             PASS (34 checks, 0 fail)
-Public release gate:         PASS (npm run test:release, 13/13)
-Suites completas:            PASS (node tests/run-all.mjs, 45/45 — incluye SEO audits y evidencia determinista)
-SEO Production Audit:        PASS (2569/2569 contra producción, 190 URLs indexables)
+SHA publicado:               ed019a5e6386dbd385d4061d903b989887f73010
+Método de publicación:       git push (fast-forward de main, sin force; ruleset main-protection-ff)
+Workflow:                    .github/workflows/deploy-pages.yml (incluye `npx playwright install chromium`)
+GitHub Actions Run:          34352644263 (build; deploy 34352644333)
+Build:                       PASS (214 páginas Toolisto + APLUNO 237 URLs indexables)
+Tests:                       PASS (audit-count 202 tools)
+Test APLUNO:                 PASS (44 pass, 0 fail)
+Public release gate:         PASS (npm run test:release, 24/24 incl. SEO 29 + network-negative 413/413)
+SEO replantación completa:   PASS (Fase 1 GUIAS 11/11 + Fase 2 16 tools diferenciadas + Fase 3 home con 12 categorías crawlables + Fase 4 final-report.md)
 Deployment:                  PASS (deploy-pages@v4)
 GitHub Pages:                HABILITADO, build_type=workflow, public=true
+Custom domain:               apluno.com
+Obs. Cloudflare (2026-09-09): el edge de Cloudflare inyecta `/.webmcp/bridge.js` en HTML (first-party); `_headers` de GitHub Pages sigue ignorándose por defecto
 URL GitHub Pages:            https://wandersepulveda2013.github.io/toolisto-web/ (redirige 301 a https://apluno.com/)
 Custom domain:               apluno.com (configurado via API)
 DNS:                         OK — propagado (apex 4x A a GitHub Pages; www CNAME wandersepulveda2013.github.io)
@@ -35,15 +33,60 @@ Ruleset de main:             main-protection-ff (id 20888427, ACTIVE) — no_fas
 SEO canónico:                URLs limpias sin .html (canonical, og:url, schema, enlaces internos y sitemap) — /unir-pdf, no /unir-pdf.html;
                              las URLs .html siguen sirviendo (compatibilidad GitHub Pages)
 Redirects estáticos:         52 alias de redirects.json materializados como páginas noindex con canonical + meta refresh al destino
-Sitemap:                     190 URLs https://apluno.com/ limpias (0 .html)
-Fecha/hora de verificación:  2026-08-15 (cierre: URLs limpias + redirects + ruleset)
-Rutas verificadas:           200 en / (portada launcher), /toolisto, /ordia/, /workspace/, /about/, /contact/,
-                             /privacy/, /terms/, /unir-pdf (URL limpia) y /unir-pdf.html (compat); alias /merge-pdf.html →
-                             noindex → /unir-pdf; assets 200 (apluno-assets/apluno-tools-data.js 167 tools, manifest,
-                             sitemap, robots); canonical limpio verificado en vivo; navegador real 0 errores de consola
-Pendiente humano:            Google Search Console (verificar propiedad de dominio + sitemap para indexación) y Cloudflare
-                             (CLOUDFLARE_API_TOKEN para proxy/headers CSP-HSTS; GitHub Pages ignora _headers)
+Sitemap:                     237 URLs https://apluno.com/ limpias (0 .html)
+Fecha/hora de verificación:  2026-09-09 (publicación ed019a5: remediación SEO completa + home con categorías crawlables)
+Rutas verificadas:           200 en / (launcher con 12 enlaces de categoría `<a href="/{slug}">`), /toolisto, /pdf (categoría),
+                             /jpg-a-pdf, /xls-a-xlsx, /filtrar-csv; sitemap 237 URLs byte-idéntico al build local validado;
+                             robots.txt 200 con sitemap; Cloudflare proxy activo (inyecta /.webmcp/bridge.js)
+Pendiente humano:            Google Search Console — re-enviar sitemap.xml y solicitar indexación de home/toolisto/12 categorías/
+                             guía OCR (plan detallado en artifacts/adsense-content-remediation/final-report.md). Cloudflare:
+                             el proxy edge está activo y ya inyecta /.webmcp/bridge.js (primera party); CSP/HSTS/nosniff de
+                             _headers siguen sin aplicarse (GitHub Pages los ignora) — revisar configure tu Cloudflare si se quieren
 ```
+
+## Publicación del 2026-09-09 (ed019a5) — Remediación SEO completa (Fases 1–4) en producción
+
+Publicado vía `git push` fast-forward de `main` desde `cc2b571` (autorizado por
+el owner en esta sesión). Run **34352644263** (build+deploy): checkout, npm ci,
+**Playwright browsers** (nuevo paso), build, npm test (audit-count 202 tools),
+test:apluno (44/44), `npm run test:release` (**24 PASS / 0 FAIL**: SEO 29,
+AdSense 25, monetización 25, strict-editorial 3, content-similarity 5, DoD 11,
+network-negative 413/413) — TODO PASS; deployment `github-pages` para `ed019a5`.
+
+En producción (verificado por HTTPS 2026-09-09):
+
+- **Home con 12 categorías crawlables**: `<section class="apluno-home-categories">`
+  con 12 `<a class="apluno-home-cat" href="/{slug}">` (antes chips JS sin href)
+  + pie con links a `/toolisto` y `/guia/`. Verificado 200 y presencia de los 12
+  hrefs en `https://apluno.com/`.
+- **16 tools con editorial diferenciado** (`/jpg-a-pdf`, `/xls-a-xlsx`,
+  `/filtrar-csv`, …) con summary/instrucciones/limitaciones/FAQ específicos.
+- **Sitemap 237 URLs** byte-idéntico al build local validado (0 `.html`);
+  robots.txt 200; `/toolisto`, `/pdf` (categoría) 200.
+- Medición de la remediación (antes → después): maxSimilarity full-page
+  0.296 → 0.250; banda 0.20–0.35 de 78 → 24 pares; strict editorial max sim
+  0.145 → 0.000; audit `FINAL PASS 15/15` (236 indexables / 292 descubiertas).
+  Evidencia determinista: `artifacts/adsense-content-remediation/audit-content-quality.json`
+  y `audit-content-similarity.json`; informe final con plan GSC:
+  `artifacts/adsense-content-remediation/final-report.md`.
+
+### Incidente del primer run (34351893523) y fix
+
+El primer push (`c862635`) falló en `Public release gate`: la nueva imagen del
+runner `ubuntu-24.04` (20260831) ya no incluía el navegador preinstalado que
+pedía el lockfile (`chromium_headless_shell-1234`; package.json y lock sin
+cambios desde cc2b571). Fix determinista: paso `npx playwright install chromium`
+tras `npm ci` en el workflow (commit `ed019a5`) → CI independiente de la imagen.
+
+### Observación Cloudflare (NO bloqueante)
+
+`https://apluno.com/` responde `server: cloudflare` y el edge inyecta
+`<script src="https://apluno.com/.webmcp/bridge.js">` (200, ~47KB, primera
+party) antes del canonical. Indica que el dominio ya NO está en DNS-only: hay
+proxy Cloudflare activo con un managed component. El origen sigue siendo GitHub
+Pages (sitemap byte-idéntico al build). GitHub Pages continúa ignorando
+`_headers` (CSP/HSTS/nosniff); si se quieren, configura los headers en la regla
+de transformación de Cloudflare. Sin cambios de DNS hechos desde esta sesión.
 
 ## Publicación del 2026-08-15 (267ab5d) — URLs limpias canónicas + redirects estáticos + ruleset de main
 
