@@ -3,7 +3,7 @@
 > Cada ciclo de OpenCode LEE este archivo antes de actuar y lo ACTUALIZA antes de terminar.
 > Registro historico de ciclos de la mision Evolucion Continua.
 > Modo activo SOLO despues de la transicion (cuando `workspace/PRODUCTION_READINESS_DONE` exista).
-> Updated: 2026-09-08 (SEO-03/SEO-04 fijado — Fase 2 y Fase 3 de la remediacion apluno.com: 16 tools con editorial diferenciado (max sim full-page 0.296→0.250, banda 0.20-0.35 78→24) y home con 12 categorias como `<a href="/{slug}">` crawlables; audit PASS 15/15, gate publico 24 PASS, validado en navegador)
+> Updated: 2026-09-09 (SEO-05 fijado — Fase 4 + despliegue de la remediacion apluno.com: `final-report.md` con plan de indexacion GSC en 4 pasos; cadena CI local completa verde (build, audit-count, test:apluno 44/44, release gate 24 PASS 0 FAIL); push fast-forward `main` publicado en GitHub Pages; validacion en produccion pendiente de confirmar en este STATUS)
 
 ---
 
@@ -46,6 +46,26 @@
 | **Bloqueos** | Despliegue sigue `WAITING_FOR_OWNER_AUTHORIZATION_CHANNEL` (harness niega `git push*`); los fixes de contenido y el home con categorias NO llegarán a GSC hasta publicar. El runner no se re-lanza desde esta sesion; el owner puede relanzarlo con `.\RUN-OPENCODE-AUTONOMOUS.ps1 -Resume -Unlimited`. |
 | **Limitaciones** | La diferenciacion cubrio 16 tools (los pares top y el cluster de hojas de calculo); pares restantes (heic↔avif 0.250, html-a-imagen↔html-a-pdf 0.236, formatear↔validar-json 0.224, codificar↔decodificar-url 0.219) quedan para una siguiente ronda. La similitud se mide sobre `dist` generado (la fuente real de indexacion); el near-dup estricto ya era 0.000. La Fase 4 (informe final `final-report.md` con el plan GSC) sigue pendiente. |
 | **Proxima prioridad** | Fase 4 SEO (informe final + comprobacion de indexacion tras despliegue), luego D-13 (CE-141, P3) o DISCOVERY de la regla de salud de producto. |
+
+## Cycle SEO-05 — Fase 4 remediacion apluno.com: informe final + despliegue a GitHub Pages
+
+| Field | Value |
+|-------|-------|
+| **Date** | 2026-09-09 |
+| **Branch** | main |
+| **HEAD inicial** | 9697bbf (docs SEO-03/SEO-04) |
+| **HEAD final** | commit docs Fase 4 + SHA publicado del push (ver APLUNO-PUBLICATION-STATUS) |
+| **Task** | D-22 (FEATURE/DOCUMENTATION, P2), directiva del owner «haz la fase 4 y el despliegue». **Fase 4** = emitir el informe final de la remediacion de contenido (`final-report.md`) con el plan de indexacion GSC y **publicar** los 4 fases acumuladas en GitHub Pages (apluno.com) para que los fixes lleguen a Search Console. |
+| **Hypothesis** | El repo ya cumplia las puertas; el unico bloqueo restante era la autorizacion del owner para `git push`. Despliegue = push no-destructivo de `main` (fast-forward permitido por el ruleset main-protection-ff) que dispara el workflow `deploy-pages.yml` (npm ci + build + test + test:apluno + test:release + upload dist). |
+| **Change** | (1) `artifacts/adsense-content-remediation/final-report.md`: resumen de las 4 fases (SEO-01 cobertura GSC+hotfix offline, SEO-02 guia OCR, SEO-03 diferenciacion 16 tools con metricas antes/despues, SEO-04 home con 12 categorias crawlables), medicion final (audit 15/15: 292 paginas/236 indexables/237 sitemap/10520 internal links 0 broken/editorial min 63w; similarity: max estricto 0.000, peor sharedness 45% jpg-a-webp) y **plan de indexacion GSC en 4 pasos** (re-enviar sitemap, inspeccionar+solicitar indexacion en home/toolisto/guia-OCR/12 categorias/ejemplos por cluster, monitorizar Cobertura ~2 semanas, siguientes rondas de diferenciacion). (2) QUEUE: fila SEO-05 DONE + Updated line. (3) STATUS: este ciclo. (4) Despliegue: cadena CI completa local verde; `git push` fast-forward (cc2b571→9697bbf). |
+| **Bugs encontrados** | `gh` no esta logueado (se monitoriza el run via API publica/curl en vez de gh). El entorno tiene `CLOUDFLARE_API_TOKEN` pero NO se toco DNS/Cloudflare (no necesario para GitHub Pages; se documenta como pendiente opcional). |
+| **Tests ejecutados** | Cadena CI LOCAL idéntica al workflow ANTES del push: `npm run build` (214 paginas Toolisto + APLUNO 237 indexable URLs, 202 tools, 12 categorias, guias 11/11, 52 redirects) → `npm test` (audit-count PASS 202 tools) → `npm run test:apluno` (44/44) → `npm run test:release` (**24 PASS / 0 FAIL**: seo 29, adsense 25, monetization 25, strict-editorial 3, content-similarity 5, remediation DoD 11, network-negative 413/413). Escaneo de secretos en los 97 commits del rango -> 0 coincidencias. Dry-run `git push --dry-run origin main` OK. |
+| **Tests PASS** | build + audit-count + test:apluno 44/44 + release gate 24/24. |
+| **Tests FAIL** | 0. |
+| **Commits** | (1) docs Fase 4: `artifacts/adsense-content-remediation/final-report.md` + QUEUE (SEO-05) + STATUS (ciclo). (2) tras el deploy: APLUNO-PUBLICATION-STATUS con run ID + validacion en produccion. Push: `git push origin main` (fast-forward, sin force). |
+| **Bloqueos** | Ninguno para el despliegue (autorizado por el owner en esta sesion). Resta la confirmacion humana final en GSC (indexacion). |
+| **Limitaciones** | GitHub Pages ignora `_headers` (CSP/HSTS/nosniff): el artifact los incluye pero no se aplican (proxy Cloudflare opcional, pendiente). AdSense solo en 15 paginas de navegacion; 202 de procesamiento sin loader (requisito cumplido). Analisis del export GSC no disponible en el repo (cobertura de 2026-08-28 ya documentada en SEO-01). |
+| **Proxima prioridad** | Validar indexacion en GSC tras despliegue (humano), luego D-13 (CE-141, P3) o DISCOVERY de la regla de salud de producto. Siguientes rondas SEO opcionales (P2/P3): pares restantes avif↔heic, html-a-imagen↔html-a-pdf, formatear↔validar-json, codificar↔decodificar-url, unir↔dividir-excel. |
 
 ## Cycle D-18 — Closure: faithfulOcrText y .ws-ocr-low-confidence fuera del bundle + cadena de confianza viva (CE-137)
 
