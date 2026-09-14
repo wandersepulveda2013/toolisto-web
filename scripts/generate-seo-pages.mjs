@@ -55,6 +55,7 @@ const catalogUrl = `${site.siteUrl}${catalogPath}`;
 const tools = loadJSON('tools.json');
 const categories = loadJSON('categories.json');
 const redirects = loadJSON('redirects.json');
+const guides = (loadJSON('guides.json').guides) || [];
 const TODAY = site.buildDate || new Date().toISOString().slice(0, 10);
 
 const supportCfg = site.support || {};
@@ -204,6 +205,44 @@ function buildBreadcrumbs(items) {
   return `<nav aria-label="Ruta de navegación">\n  <ol class="breadcrumbs">\n    ${ol}\n  </ol>\n</nav>`;
 }
 
+function absoluteHref(href) {
+  const clean = String(href || '').replace(/^\.\//, '');
+  if (/^https?:\/\//.test(clean)) return clean;
+  if (clean.startsWith('/')) return `${site.siteUrl}${clean}`;
+  return `${site.siteUrl}/${clean}`;
+}
+
+function buildBreadcrumbJsonLd(items) {
+  if (!items || items.length < 2) return '';
+  const itemListElement = items.map((item, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    name: item.label,
+    item: absoluteHref(item.href)
+  }));
+  return JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement
+  });
+}
+
+function buildToolGuides(tool) {
+  const direct = guides.filter((g) => (g.relatedToolSlugs || []).includes(tool.slug));
+  const byCat = guides.filter((g) => g.category === tool.category && !(g.relatedToolSlugs || []).includes(tool.slug));
+  const chosen = [...direct, ...byCat].slice(0, 3);
+  if (!chosen.length) return '';
+  const links = chosen.map((g) => `<li><a href="/guia/${g.slug}/">${escHtml(g.title)}</a></li>`).join('\n');
+  return `<section class="related-guides"><h2>Guías relacionadas</h2><ul>${links}</ul></section>`;
+}
+
+function buildCategoryGuides(cat) {
+  const rel = guides.filter((g) => g.category === cat.id);
+  if (!rel.length) return '';
+  const links = rel.map((g) => `<li><a href="/guia/${g.slug}/">${escHtml(g.title)}</a></li>`).join('\n');
+  return `<section class="category-guides"><h2>Guías de ${escHtml(cat.name)}</h2><ul>${links}</ul></section>`;
+}
+
 function buildFAQ(faq) {
   if (!faq || !faq.length) return '';
   const items = faq.map(f => `
@@ -314,19 +353,22 @@ function buildToolPage(tool) {
 
   const faqSection = buildFAQ(tool.faq);
   const relatedGridHTML = buildRelatedToolGrid(tool);
+  const toolGuidesHTML = buildToolGuides(tool);
 
   const instructionsHTML = tool.instructions ? `<section class="instructions"><h2>Cómo funciona</h2><ol>${tool.instructions.map(i => `<li>${escHtml(i)}</li>`).join('\n')}</ol></section>` : '';
   const limitationsHTML = tool.limitations ? `<section class="limitations"><h2>Limitaciones</h2><ul>${tool.limitations.map(l => `<li>${escHtml(l)}</li>`).join('\n')}</ul></section>` : '';
+  const formatLabel = (Array.isArray(tool.outputFormats) && tool.outputFormats.length) ? tool.outputFormats.join(', ') : '';
+  const flowSteps = (Array.isArray(tool.instructions) ? tool.instructions : []).slice(0, 3);
+  const capabilityStripHTML = flowSteps.length
+    ? `<section class="tool-capability-strip" aria-label="Cómo se usa esta herramienta">
+    ${flowSteps.map((step, i) => `<div class="tool-capability-item"><span class="tool-capability-index">${String(i + 1).padStart(2, '0')}</span><span><strong>Paso ${i + 1}</strong><small>${escHtml(step)}</small></span></div>`).join('\n    ')}
+  </section>`
+    : '';
   const formatsHTML = `<section class="formats-info" aria-label="Resumen de la herramienta">
     <div><span>Entrada</span><strong>${escHtml(tool.inputFormats.join(', '))}</strong></div>
-    <div><span>Salida</span><strong>${escHtml(tool.outputFormats.join(', '))}</strong></div>
+    <div><span>Salida</span><strong>${escHtml(formatLabel)}</strong></div>
     <div><span>Privacidad</span><strong>Se procesa en tu navegador</strong></div>
-  </section>
-  <section class="tool-capability-strip" aria-label="Qué puedes hacer en esta herramienta">
-    <div class="tool-capability-item"><span class="tool-capability-index">01</span><span><strong>Prepara</strong><small>Arrastra uno o varios archivos y revisa el orden antes de empezar.</small></span></div>
-    <div class="tool-capability-item"><span class="tool-capability-index">02</span><span><strong>Ajusta</strong><small>Las opciones avanzadas aparecen solo cuando hacen falta.</small></span></div>
-    <div class="tool-capability-item"><span class="tool-capability-index">03</span><span><strong>Entrega</strong><small>Descarga el resultado y vuelve a intentarlo sin perder el contexto.</small></span></div>
-  </section>`;
+  </section>${capabilityStripHTML}`;
 
   const breadcrumbs = [
     { label: brandName, href: brandHref },
@@ -374,6 +416,7 @@ function buildToolPage(tool) {
     "operatingSystem": "Web Browser",
     "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
   })}</script>
+  <script type="application/ld+json">${buildBreadcrumbJsonLd(breadcrumbs)}</script>
   ${buildGoogleAnalyticsTag()}
 </head>
 <body>
@@ -441,6 +484,7 @@ function buildToolPage(tool) {
         ${limitationsHTML}
         ${faqSection}
         ${relatedGridHTML}
+        ${toolGuidesHTML}
       </section>
     </main>
 
@@ -466,6 +510,7 @@ function buildCategoryPage(cat) {
     : '';
 
   const faqHTML = buildFAQ(cat.faq);
+  const catGuidesHTML = buildCategoryGuides(cat);
 
   const toolListHTML = catTools.map(t => {
     return `<li class="category-tool-item"><a href="./${t.slug}"><strong>${escHtml(t.name)}</strong></a><p>${escHtml(t.summary)}</p></li>`;
@@ -483,6 +528,7 @@ function buildCategoryPage(cat) {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>${escHtml(cat.name)} - Herramientas online | Toolisto</title>
+  <script type="application/ld+json">${buildBreadcrumbJsonLd(breadcrumbs)}</script>
   <meta name="description" content="${escAttr(cat.description)}">
   <link rel="canonical" href="${site.siteUrl}/${cat.slug}">
   <meta name="robots" content="index, follow">
@@ -520,6 +566,7 @@ function buildCategoryPage(cat) {
         <h2>Herramientas de ${escHtml(cat.name)}</h2>
         <ul class="category-tool-list">${toolListHTML}</ul>
         ${faqHTML}
+        ${catGuidesHTML}
       </section>
     </main>
     ${footerHTML}

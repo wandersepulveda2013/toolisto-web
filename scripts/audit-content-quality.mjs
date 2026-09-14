@@ -651,7 +651,7 @@ function classifyPhrase(s) {
   if (/\bherramientas\b|\bguias\b|\bacerca\b|\blegal\b|\bcategorias\b/.test(s)) return 'GLOBAL_NAV';
   if (/\btodos los derechos reservados\b|\bcopyright\b|(c) 20\d\d|toolisto es un producto/.test(s)) return 'FOOTER';
   if (/\bse procesa en tu navegador\b|\btodo el procesamiento ocurre en tu navegador\b|\bno se suben\b|\blos archivos nunca salen de tu dispositivo\b|\bno subimos\b|\bnada sale de tu dispositivo\b|\bprivacidad\b|\bno se envian\b|\bnunca salen\b|\barchivos se procesan\b|\bse suben a un servidor\b/.test(s)) return 'PRIVACY_TRUST';
-  if (/^\d\d?\s*(prepara|arrastra|elige|selecciona|sube|abre|introduce|anade|haz|ajusta|entrega|descarga|revisa|pulsa)/.test(s) || /^0[12]\s/.test(s) || /\bcomo funciona\b/.test(s)) return 'UI_INSTRUCTION';
+  if (/^\d\d?\s*(prepara|arrastra|elige|selecciona|sube|abre|introduce|anade|haz|ajusta|entrega|descarga|revisa|pulsa)/.test(s) || /^0[1-3]\s/.test(s) || /\bpaso\s+\d\b/.test(s) || /\bcomo funciona\b/.test(s)) return 'UI_INSTRUCTION';
   if (/\busa la herramienta directamente\b|\bresuelve tu tarea\b|\bdescarga el resultado\b|\bpruébalo ahora\b|\bempieza ahora\b|\bsin necesidad de\b|\bgratis\b|^\s*herramienta gratuita/i.test(s)) return 'CTA';
   // frases de cierre/html propias del build
   if (/\bsin instalar nada\b|\bno necesitas instalar\b|\bsin crear una cuenta\b/.test(s)) return 'CTA';

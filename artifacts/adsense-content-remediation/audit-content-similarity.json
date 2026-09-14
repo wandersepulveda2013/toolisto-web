@@ -20,7 +20,7 @@
   },
   "charDefects": [],
   "originality": {
-    "globalBoilerplateRatio": 0.029,
+    "globalBoilerplateRatio": 0.028,
     "leastOriginal": [
       {
         "cat": "images",
@@ -354,15 +354,8 @@
     ]
   },
   "shortTools": {
-    "count": 27,
+    "count": 22,
     "list": [
-      {
-        "faq": 2,
-        "instr": 3,
-        "lim": 1,
-        "slug": "decodificar-url",
-        "words": 57
-      },
       {
         "faq": 2,
         "instr": 3,
@@ -383,20 +376,6 @@
         "lim": 2,
         "slug": "comparar-csv",
         "words": 61
-      },
-      {
-        "faq": 2,
-        "instr": 3,
-        "lim": 2,
-        "slug": "html-a-pdf",
-        "words": 62
-      },
-      {
-        "faq": 2,
-        "instr": 3,
-        "lim": 2,
-        "slug": "validar-json",
-        "words": 63
       },
       {
         "faq": 2,
@@ -458,13 +437,6 @@
         "faq": 2,
         "instr": 4,
         "lim": 2,
-        "slug": "html-a-imagen",
-        "words": 65
-      },
-      {
-        "faq": 2,
-        "instr": 4,
-        "lim": 2,
         "slug": "convertir-codificacion-texto",
         "words": 65
       },
@@ -494,13 +466,6 @@
         "instr": 4,
         "lim": 2,
         "slug": "estadisticas-csv",
-        "words": 67
-      },
-      {
-        "faq": 2,
-        "instr": 3,
-        "lim": 2,
-        "slug": "formatear-json",
         "words": 67
       },
       {

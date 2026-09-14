@@ -230,6 +230,23 @@ function renderHome() {
       </div>
       <p class="apluno-home-cat-foot">¿Buscas algo concreto? <a href="/toolisto">Revisar las ${enabledTools.length} herramientas</a> o <a href="/guia/">leer las guías</a>.</p>
     </section>
+    <section class="apluno-section apluno-home-popular" aria-labelledby="home-popular-title">
+      <div class="apluno-section-heading" data-reveal>
+        <p class="apluno-eyebrow">Tareas frecuentes</p>
+        <h2 id="home-popular-title">Entra directo a la tarea que necesitas.</h2>
+        <p>Accesos rápidos a las herramientas con las que se resuelven las tareas de archivos más comunes.</p>
+      </div>
+      <div class="apluno-home-cat-grid">
+        ${POPULAR_SLUGS.map((slug) => {
+          const tool = enabledTools.find((t) => t.slug === slug);
+          if (!tool) return '';
+          return `<a class="apluno-home-cat" href="/${escapeHtml(tool.slug)}">
+          <span class="apluno-home-cat-name">${escapeHtml(tool.name)}</span>
+          <span class="apluno-home-cat-desc">${escapeHtml(tool.summary)}</span>
+        </a>`;
+        }).join('')}
+      </div>
+    </section>
     <section class="apluno-section apluno-home-editorial" aria-label="Qué es Apluno">
       <div class="apluno-home-editorial-copy">
         <p class="apluno-eyebrow">Qué es Apluno</p>

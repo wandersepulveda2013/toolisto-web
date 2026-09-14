@@ -5447,6 +5447,10 @@
             {
                 "q": "¿Mis archivos se suben a un servidor?",
                 "a": "No. Todo el procesamiento ocurre en tu navegador. Los archivos nunca salen de tu dispositivo."
+            },
+            {
+                "q": "¿Qué diferencia hay con Dividir archivo Excel?",
+                "a": "Unir combina varios libros en uno solo conservando todas sus hojas. Dividir hace la operación inversa: separa un libro en varios archivos, por hojas, por filas o por rangos."
             }
         ],
         "instructions": [
@@ -5513,6 +5517,10 @@
             {
                 "q": "¿Mis archivos se suben a un servidor?",
                 "a": "No. Todo el procesamiento ocurre en tu navegador. Los archivos nunca salen de tu dispositivo."
+            },
+            {
+                "q": "¿Qué diferencia hay con Unir archivos Excel?",
+                "a": "Dividir separa un solo libro en varios archivos, por hojas, por filas o por rangos. Unir hace lo contrario: junta varios libros en uno solo con todas sus hojas."
             }
         ],
         "instructions": [
@@ -10724,6 +10732,10 @@
             {
                 "q": "¿Se conservan las letras y números?",
                 "a": "Sí, los caracteres alfanuméricos se mantienen sin codificar."
+            },
+            {
+                "q": "¿Codificar o decodificar?",
+                "a": "Codifica cuando vayas a insertar texto con espacios, acentos o símbolos dentro de una URL. Decodifica cuando tengas una URL con secuencias %XX y quieras leerla como texto normal."
             }
         ],
         "instructions": [
@@ -10784,6 +10796,10 @@
             {
                 "q": "¿Qué pasa con contenido mal codificado?",
                 "a": "Si el formato es inválido se muestra un mensaje de error claro."
+            },
+            {
+                "q": "¿Decodificar o codificar?",
+                "a": "Decodifica cuando tengas texto url-encoded (con %XX) y quieras recuperar los caracteres originales. Codifica cuando necesites el proceso inverso: preparar un texto para usarlo de forma segura dentro de una URL."
             }
         ],
         "instructions": [
@@ -11494,6 +11510,10 @@
             {
                 "q": "¿Puedo ordenar las claves?",
                 "a": "Sí, con la opción de ordenar claves alfabéticamente."
+            },
+            {
+                "q": "¿Qué diferencia hay con Validar JSON?",
+                "a": "Formatear embellece o compacta el documento para que sea legible, sin cambiar su contenido. Validar, en cambio, comprueba si el JSON es correcto y señala dónde está el error de sintaxis. Esta página también detecta errores al leer el archivo, pero su objetivo es el formato."
             }
         ],
         "instructions": [
@@ -11615,6 +11635,10 @@
             {
                 "q": "¿Genera un informe?",
                 "a": "Sí, puedes descargar un informe TXT con el resultado y la posición del error."
+            },
+            {
+                "q": "¿Qué diferencia hay con Formatear JSON?",
+                "a": "Validar solo comprueba la sintaxis y reporta errores con su ubicación. Formatear reorganiza el documento con indentación para facilitar su lectura; no es una herramienta de validación."
             }
         ],
         "instructions": [
@@ -11678,6 +11702,10 @@
             {
                 "q": "¿Se envía mi foto a un servidor?",
                 "a": "No. Todo el procesamiento ocurre en tu navegador, sin conexión a internet."
+            },
+            {
+                "q": "¿Por qué convertir fotos HEIC?",
+                "a": "HEIC es el formato por defecto en iPhones y iPads recientes. Al convertirlo a JPG, PNG o WebP puedes abrirlo en programas y plataformas que no lo soportan, como muchos formularios en línea o editores antiguos."
             }
         ],
         "instructions": [
@@ -11743,6 +11771,10 @@
             {
                 "q": "¿Mantiene la transparencia?",
                 "a": "Sí, al convertir a PNG o WebP se conserva la transparencia."
+            },
+            {
+                "q": "¿Cuándo aparece un archivo AVIF y por qué convertirlo?",
+                "a": "AVIF aparece cada vez más en sitios web por su buena compresión. Al convertirlo a JPG, PNG o WebP obtienes un archivo compatible con editores, imprentas y plataformas que aún no aceptan AVIF."
             }
         ],
         "instructions": [
@@ -12264,6 +12296,10 @@
             {
                 "q": "¿Qué formato debo elegir?",
                 "a": "PNG para transparencia, JPG para fotos, WebP para mejor compresión."
+            },
+            {
+                "q": "¿Cuándo me conviene generar una imagen en lugar de un PDF?",
+                "a": "Una imagen (PNG, JPG o WebP) es mejor para incluir en un sitio web, un correo o un mensaje como captura fija. Un PDF es más adecuado si necesitas un documento imprimible con texto seleccionable."
             }
         ],
         "instructions": [
@@ -12637,6 +12673,10 @@
             {
                 "q": "¿Qué tamaño de página puedo elegir?",
                 "a": "A4, Carta, orientación horizontal o vertical."
+            },
+            {
+                "q": "¿Cuándo me conviene generar un PDF en lugar de una imagen?",
+                "a": "El PDF es ideal cuando necesitas un documento imprimible con control de tamaño de página, orientación, márgenes y texto seleccionable. Para una captura fija ligera pensada para web o correo, usa HTML a imagen."
             }
         ],
         "instructions": [
