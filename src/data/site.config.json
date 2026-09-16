@@ -1,8 +1,8 @@
 {
   "siteName": "APLUNO",
   "brandName": "APLUNO",
-  "productName": "Toolisto Herramientas",
-  "productShortName": "Toolisto",
+  "productName": "Herramientas",
+  "productShortName": "APLUNO",
   "catalogPath": "/toolisto",
   "siteUrl": "https://apluno.com",
   "productionDomain": "https://apluno.com",
@@ -16,7 +16,7 @@
     "provider": "paypal",
     "url": "https://www.paypal.com/donate/?hosted_button_id=ZSSG3LJQRW3EQ",
     "buttonText": "Apoyar con PayPal",
-    "message": "Si Toolisto te ha sido útil, considera apoyarnos con una donación.",
+    "message": "Si APLUNO te ha sido útil, considera apoyarnos con una donación.",
     "logo": ""
   },
   "analytics": {

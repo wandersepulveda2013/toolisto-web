@@ -37,7 +37,7 @@ ok('Mobile menu toggle has aria-label', html.includes('aria-label="Abrir menú"'
 ok('Theme toggle has aria-label', html.includes('aria-label="Cambiar tema"'));
 ok('Density toggle has aria-label', html.includes('aria-label="Cambiar densidad"'));
 ok('Sidebar collapse has aria-label', html.includes('aria-label="Colapsar barra lateral"'));
-ok('Home link has aria-label', html.includes('aria-label="Volver a Toolisto principal"'));
+ok('Home link has aria-label', html.includes('aria-label="Volver a APLUNO principal"'));
 ok('lang="es" set on html', html.includes('lang="es"'));
 ok('viewport meta present', html.includes('viewport'));
 ok('meta description present', html.includes('name="description"'));
@@ -143,9 +143,9 @@ const modules = [
   ['Universal Intake', 'handleFiles', 'analyzeFile', 'readFileAsDataUrl'],
   ['Document Editor', 'renderDocEditor', 'addBlock', 'setupBlockEditor', 'exportDocument'],
   ['Data Grid', 'renderData', 'importCSVData', 'parseCSVLine', 'exportCSV'],
-  ['Toolisto Query', 'renderQuery', 'showAddQueryStepModal', 'executeQuery'],
+  ['Query', 'renderQuery', 'showAddQueryStepModal', 'executeQuery'],
   ['Dashboards', 'renderDashboards'],
-  ['Toolisto Flow', 'renderFlow', 'setupFlowCanvas', 'addFlowNode', 'renderFlowEdges'],
+  ['Flow', 'renderFlow', 'setupFlowCanvas', 'addFlowNode', 'renderFlowEdges'],
   ['Tools', 'renderTools', 'renderToolView', 'toggleFavoriteTool', 'addToRecentTools'],
   ['Ctrl+K Palette', 'togglePalette', 'openPalette', 'closePalette', 'getPaletteCommands'],
   ['Modals', 'showModal', 'closeModal', 'closeTopModal'],

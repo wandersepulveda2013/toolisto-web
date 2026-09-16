@@ -39,7 +39,7 @@ function startServer() {
 const manifestPath = join(dist, 'assets', 'manifest.webmanifest');
 check(existsSync(manifestPath), 'Falta el manifest de producción');
 const manifest = existsSync(manifestPath) ? JSON.parse(readFileSync(manifestPath, 'utf8')) : {};
-check(manifest.name === 'Toolisto' && manifest.short_name === 'Toolisto', 'El manifest no identifica Toolisto');
+check(manifest.name === 'APLUNO' && manifest.short_name === 'APLUNO', 'El manifest no identifica APLUNO');
 check(manifest.start_url === '/toolisto', 'El manifest no inicia en /toolisto');
 check(manifest.id === '/toolisto', 'El identificador PWA no es /toolisto');
 check(manifest.scope === '/', 'El scope PWA no cubre el origen APLUNO');

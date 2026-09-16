@@ -453,7 +453,7 @@ function createStudioArtwork() {
     class: 'ws-hero-drawing',
     viewBox: '0 0 520 430',
     role: 'img',
-    'aria-label': 'Ilustración abstracta de Toolisto',
+    'aria-label': 'Ilustración abstracta de APLUNO',
   });
   const paper = '#F3EBDD';
   const ink = '#111111';
@@ -632,7 +632,7 @@ function updateTopbar(view, project) {
   const viewNames = {
     projects: 'Proyectos', intake: 'Captura Universal', dashboard: 'Panel',
     capture: 'Captura', documents: 'Documentos', data: 'Datos',
-    query: 'Toolisto Query', dashboards: 'Dashboards', flujos: 'Flujos', flow: 'Toolisto Flow', tools: 'Herramientas',
+    query: 'Query', dashboards: 'Dashboards', flujos: 'Flujos', flow: 'Flow', tools: 'Herramientas',
     'doc-editor': 'Editor', 'data-table': 'Tabla de Datos', 'design': 'Diseño'
   };
   if (project) {
@@ -704,7 +704,7 @@ function openWorkspaceSettings() {
       queryFormField('Celdas máximas por pegado', maxClipboard, 'Protege el navegador al pegar bloques grandes desde Excel.'),
       queryFormField('Bloques máximos por documento', maxBlocks, 'Incluye texto, títulos, listas, imágenes y tablas.')
     ),
-    h('p', { className: 'ws-settings-footnote' }, 'Toolisto funciona localmente en este navegador. El límite real depende del espacio disponible del dispositivo y del navegador.')
+    h('p', { className: 'ws-settings-footnote' }, 'APLUNO funciona localmente en este navegador. El límite real depende del espacio disponible del dispositivo y del navegador.')
   ];
   showModal({
     title: 'Ajustes y capacidades',
@@ -1657,7 +1657,7 @@ function renderProjectsView(container) {
     h('div', { className: 'ws-studio-copy' },
       h('div', { className: 'ws-studio-overline' },
         h('span', { className: 'ws-studio-mark' }, svgIcon('sparkle', 13)),
-        h('span', null, 'TOOLISTO / WORKSPACE')
+        h('span', null, 'APLUNO / WORKSPACE')
       ),
       h('h1', null, 'Haz espacio para ', h('span', { className: 'ws-stroke-word' }, 'lo importante.')),
       h('p', null, 'Una mesa de trabajo para convertir archivos, ideas y datos en algo que puedas usar.'),
@@ -1869,7 +1869,7 @@ function renderDashboardView(container, project) {
     { icon: 'doc', color: 'green', title: 'Documentos', desc: documents + ' documentos', span: false, onClick: () => navigateTo('documents') },
     { icon: 'table', color: 'violet', title: 'Datos', desc: tables + ' tablas', span: false, onClick: () => navigateTo('data') },
     { icon: 'chart', color: 'orange', title: 'Dashboards', desc: 'Visualiza metricas', span: false, onClick: () => navigateTo('dashboards') },
-    { icon: 'flow', color: 'blue', title: 'Toolisto Flow', desc: 'Automatiza procesos', span: false, onClick: () => navigateTo('flow') },
+    { icon: 'flow', color: 'blue', title: 'Flow', desc: 'Automatiza procesos', span: false, onClick: () => navigateTo('flow') },
     { icon: 'tool', color: 'blue', title: 'Flujos por lotes', desc: 'Operaciones encadenadas', span: false, onClick: () => navigateTo('flujos') },
     { icon: 'wrench', color: 'green', title: TOOLS_DATA.length + ' Herramientas', desc: 'Herramientas de productividad', span: false, onClick: () => navigateTo('tools') },
   ];
@@ -1882,7 +1882,7 @@ function renderDashboardView(container, project) {
     ));
   });
   el.appendChild(h('section', { className: 'ws-dashboard-tools' },
-    h('div', { className: 'ws-dashboard-panel-heading' }, h('div', null, h('span', { className: 'ws-dashboard-kicker' }, 'SUPERFICIES TOOLISTO'), h('h2', null, 'Todo lo que puedes hacer aquí')), h('button', { className: 'ws-text-link', onClick: () => navigateTo('tools') }, 'Ver las ' + TOOLS_DATA.length + ' herramientas ↗')),
+    h('div', { className: 'ws-dashboard-panel-heading' }, h('div', null, h('span', { className: 'ws-dashboard-kicker' }, 'SUPERFICIES APLUNO'), h('h2', null, 'Todo lo que puedes hacer aquí')), h('button', { className: 'ws-text-link', onClick: () => navigateTo('tools') }, 'Ver las ' + TOOLS_DATA.length + ' herramientas ↗')),
     bento
   ));
   container.appendChild(el);
@@ -4449,7 +4449,7 @@ function openDataTableInsights(table) {
 
 function sendDataTableToQuery() {
   navigateTo('query');
-  toast('Tabla abierta en Toolisto Query', 'info');
+  toast('Tabla abierta en Query', 'info');
 }
 
 function dataWorkbookId(table) {
@@ -6031,7 +6031,7 @@ function renderQueryView(container, project) {
   const el = h('div', { className: 'ws-query-layout', style: 'animation:fadeIn 0.3s ease' });
   const editor = h('div', { className: 'ws-query-editor' });
   const headingRow = h('div', { className: 'ws-query-heading-row' });
-  headingRow.appendChild(h('div', { className: 'ws-module-title ws-query-title' }, 'Toolisto Query'));
+  headingRow.appendChild(h('div', { className: 'ws-module-title ws-query-title' }, 'Query'));
   headingRow.appendChild(h('span', { className: 'ws-status-chip ws-status-limited' }, 'FUNCIONAL CON LIMITACIONES'));
   editor.appendChild(headingRow);
   editor.appendChild(h('div', { className: 'ws-query-desc' }, 'Crea pasos de consulta para transformar y analizar tus datos.'));
@@ -7397,7 +7397,7 @@ function renderQueryStudio(container, project, tables, model, inputSheets) {
   const header = h('header', { className: 'ws-query-studio-header' },
     h('div', { className: 'ws-query-title-block' },
       h('span', { className: 'ws-query-kicker' }, 'DATA PREPARATION / 01'),
-      h('h1', null, 'Toolisto Query'),
+      h('h1', null, 'Query'),
       h('p', null, 'Limpia, transforma y prepara datos con un cajón de herramientas al alcance.')
     ),
     h('div', { className: 'ws-query-header-actions' },
@@ -8443,7 +8443,7 @@ function renderFlowView(container, project, initialSelectedId = null) {
   const edgeLayer = sv('svg', { class: 'ws-flow-edges', 'aria-hidden': 'true', preserveAspectRatio: 'none' });
   const flowStatusText = h('span', null, nodes.length ? 'Selecciona un nodo para editarlo.' : 'Añade un nodo y configúralo en el panel lateral.');
   const statusChip = h('span', { className: 'ws-status-chip ws-status-limited' }, nodes.length ? 'EDITABLE' : 'LISTO');
-  const canvas = h('div', { className: 'ws-flow-canvas', role: 'application', ariaLabel: 'Lienzo visual de Toolisto Flow' });
+  const canvas = h('div', { className: 'ws-flow-canvas', role: 'application', ariaLabel: 'Lienzo visual de Flow' });
   const inspector = h('aside', { className: 'ws-flow-inspector', 'aria-label': 'Inspector de nodo' });
   const el = h('div', { className: 'ws-flow', style: 'height:100%;position:relative' });
   const scheduleFlowSave = () => {
@@ -8666,7 +8666,7 @@ function renderToolsView(container) {
   const el = h('div', { className: 'ws-start', style: 'animation:fadeIn 0.3s ease' });
   el.appendChild(h('div', { className: 'hero' },
     h('h1', null, TOOLS_DATA.length + ' Herramientas'),
-    h('p', null, 'Todas las herramientas de Toolisto en un solo lugar')
+    h('p', null, 'Todas las herramientas de APLUNO en un solo lugar')
   ));
   const search = h('input', {
     className: 'ws-tools-search',

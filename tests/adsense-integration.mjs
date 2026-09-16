@@ -153,7 +153,7 @@ if (existsSync(join(dist, 'ads.txt'))) {
 // Privacy (Apluno /privacy/) menciona Google AdSense y no afirma falsamente ausencia de publicidad/cookies de terceros.
 const privacy = read(join('privacy', 'index.html'));
 check(/Google AdSense/.test(privacy), 'Privacy (/privacy/) menciona Google AdSense');
-check(/no se incluye en las páginas donde Toolisto procesa archivos/.test(privacy), 'Privacy aclara que AdSense no se incluye en las páginas de procesamiento de archivos');
+check(/no se incluye en las páginas donde APLUNO procesa archivos/.test(privacy), 'Privacy aclara que AdSense no se incluye en las páginas de procesamiento de archivos');
 check(/no envía a Google el contenido de los archivos/.test(privacy), 'Privacy aclara que no se envía a Google el contenido de los archivos');
 check(/Google Analytics no está activo/.test(privacy), 'Privacy no afirma Google Analytics activo (no lo está)');
 // No debe quedar la afirmación falsa de que el sitio no usa cookies de seguimiento en la configuración actual.

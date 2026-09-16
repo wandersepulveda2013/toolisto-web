@@ -285,7 +285,7 @@ function renderAbout() {
       <p class="apluno-section-number">01 / Por qué</p>
       <div>
         <h2>No estamos construyendo una historia corporativa. Estamos construyendo productos útiles.</h2>
-        <p>Toolisto ya resuelve tareas cotidianas con archivos. Workspace y Ordía siguen en desarrollo. Apluno existe para darles una dirección común sin fingir que el trabajo pendiente ya está terminado.</p>
+        <p>Las herramientas de APLUNO ya resuelven tareas cotidianas con archivos. Workspace y Ordía siguen en desarrollo. APLUNO existe para reunir todo bajo una dirección común, sin fingir que el trabajo pendiente ya está terminado.</p>
       </div>
     </section>
     <section class="apluno-section apluno-values" aria-labelledby="values-title">
@@ -301,7 +301,7 @@ function renderAbout() {
     </section>
     <section class="apluno-section apluno-page-cta" data-reveal>
       <h2>Empieza por lo que ya funciona.</h2>
-      <p>Toolisto está disponible ahora.</p>
+      <p>Las herramientas de APLUNO están disponibles ahora.</p>
       ${renderCta({ href: '/toolisto', label: 'Explorar herramientas', tone: 'dark' })}
     </section>`;
 
@@ -345,6 +345,7 @@ function renderOrdia() {
     pathname: '/ordia/',
     bodyClass: 'apluno-product-page apluno-ordia',
     content,
+    robots: 'noindex, follow',
     schemas: [{ '@context': 'https://schema.org', '@type': 'WebPage', name: 'Ordía', url: absoluteUrl('/ordia/'), description: product.description, isPartOf: websiteSchema }]
   }));
 }
@@ -353,7 +354,7 @@ function renderWorkspace() {
   const product = products.workspace;
   const content = `${renderProductHero({
       product,
-      eyebrow: 'Toolisto Workspace / Producto 02',
+      eyebrow: 'APLUNO Workspace / Producto 02',
       title: 'Tus archivos, herramientas y flujos. Juntos.',
       description: 'Estamos construyendo un espacio de trabajo para reunir procesos que hoy requieren abrir herramientas y archivos por separado.',
       note: 'Workspace sigue en desarrollo y su acceso público permanece cerrado.'
@@ -373,23 +374,23 @@ function renderWorkspace() {
     <section class="apluno-section apluno-development-note" data-reveal><span aria-hidden="true"></span><div><p class="apluno-eyebrow">Estado actual</p><h2>En desarrollo.</h2><p>No hay acceso público ni fecha de lanzamiento anunciada.</p></div></section>`;
 
   return renderPage(pageOptions({
-    title: 'Toolisto Workspace — Archivos, herramientas y flujos | Apluno',
-    description: 'Toolisto Workspace es un espacio de trabajo en desarrollo para reunir archivos, herramientas y flujos desde un mismo lugar.',
+    title: 'APLUNO Workspace — Archivos, herramientas y flujos | Apluno',
+    description: 'APLUNO Workspace es un espacio de trabajo en desarrollo para reunir archivos, herramientas y flujos desde un mismo lugar.',
     pathname: '/workspace-about/',
     bodyClass: 'apluno-product-page apluno-workspace',
     content,
-    schemas: [{ '@context': 'https://schema.org', '@type': 'WebPage', name: 'Toolisto Workspace', url: absoluteUrl('/workspace-about/'), description: product.description, isPartOf: websiteSchema }]
+    schemas: [{ '@context': 'https://schema.org', '@type': 'WebPage', name: 'APLUNO Workspace', url: absoluteUrl('/workspace-about/'), description: product.description, isPartOf: websiteSchema }]
   }));
 }
 
 function renderContact() {
   const email = escapeHtml(apluno.site.email);
-  const content = `<section class="apluno-page-hero apluno-section" data-reveal><p class="apluno-eyebrow">Contacto</p><h1>Hablemos con claridad.</h1><p>Para preguntas, comentarios o asuntos relacionados con Apluno y Toolisto, puedes escribirnos por correo.</p><div>${renderCta({ href: `mailto:${email}`, label: 'Escribir por correo', tone: 'dark', arrow: false })}</div></section>
+  const content = `<section class="apluno-page-hero apluno-section" data-reveal><p class="apluno-eyebrow">Contacto</p><h1>Hablemos con claridad.</h1><p>Para preguntas, comentarios o asuntos relacionados con Apluno y sus herramientas, puedes escribirnos por correo.</p><div>${renderCta({ href: `mailto:${email}`, label: 'Escribir por correo', tone: 'dark', arrow: false })}</div></section>
     <section class="apluno-section apluno-contact-card" data-reveal><div><p class="apluno-eyebrow">Correo</p><a href="mailto:${email}">${email}</a></div><p>Usamos esta dirección mientras consolidamos la identidad pública de Apluno. No hay oficinas, equipos de ventas ni canales corporativos adicionales que anunciar por ahora.</p></section>
     <section class="apluno-section apluno-contact-help">
       <h2>Para qué puedes usar este correo</h2>
       <div class="apluno-contact-grid">
-        <article data-reveal><h3>Preguntas sobre una herramienta</h3><p>Dudas sobre cómo funciona una herramienta de Toolisto: qué formatos admite, cómo interpretar un resultado o si puede hacer una tarea concreta.</p></article>
+        <article data-reveal><h3>Preguntas sobre una herramienta</h3><p>Dudas sobre cómo funciona una herramienta de APLUNO: qué formatos admite, cómo interpretar un resultado o si puede hacer una tarea concreta.</p></article>
         <article data-reveal><h3>Reportar un problema técnico</h3><p>Si una herramienta no abre, se queda cargando o devuelve un resultado incorrecto, escríbenos. Contribuye a que detectemos y corrijamos errores que no vemos en nuestras propias pruebas.</p></article>
         <article data-reveal><h3>Sugerencias y mejoras</h3><p>Ideas sobre nuevas herramientas, cambios en la interfaz o mejoras en los flujos existentes. Las leemos teniendo en cuenta que todo el procesamiento ocurre en tu navegador.</p></article>
         <article data-reveal><h3>Cuestiones de privacidad</h3><p>Preguntas sobre cómo se tratan tus archivos o sobre el tratamiento de datos de esta web. Te reenviamos a lo descrito en nuestra <a href="/privacy/">política de privacidad</a>; si algo no te queda claro, cuéntanoslo.</p></article>
@@ -412,37 +413,37 @@ function renderPrivacy() {
   const content = `<section class="apluno-page-hero apluno-section" data-reveal><p class="apluno-eyebrow">Legal / Privacidad</p><h1>Privacidad, explicada sin rodeos.</h1><p>Última actualización: 17 de agosto de 2026.</p></section>
     <section class="apluno-section apluno-legal-copy">
       <article data-reveal><h2>El sitio de Apluno</h2><p>Apluno no requiere una cuenta para visitar sus páginas públicas. En las páginas públicas de navegación y catálogo (portada, catálogo de herramientas y páginas de categorías) Apluno puede usar Google AdSense para mostrar anuncios. Google puede utilizar cookies u otros identificadores para la publicación y medición de anuncios, conforme a las opciones de consentimiento aplicables y a la configuración del navegador. Puedes consultar la <a href="https://policies.google.com/privacy">política de privacidad de Google</a> para más información.</p></article>
-      <article data-reveal><h2>Herramientas de archivos (Toolisto)</h2><p>Las herramientas de Toolisto están diseñadas para procesar los archivos en tu navegador. Apluno no recibe ni almacena el contenido que seleccionas para procesar. Por ahora, el código publicitario de Google AdSense no se incluye en las páginas donde Toolisto procesa archivos, y Apluno no envía a Google el contenido de los archivos que seleccionas para procesar. Algunas funciones pueden descargar librerías necesarias para operar, pero tus archivos no se envían con ese fin.</p></article>
-      <article data-reveal><h2>Almacenamiento local</h2><p>Toolisto y Toolisto Workspace pueden utilizar tecnologías de almacenamiento local del navegador, como IndexedDB y localStorage, para guardar preferencias, configuración y datos de sesión dentro de tu dispositivo. Estos datos permanecen en tu navegador y no se envían a ningún servidor externo.</p></article>
+      <article data-reveal><h2>Herramientas de archivos</h2><p>Las herramientas de APLUNO están diseñadas para procesar los archivos en tu navegador. Apluno no recibe ni almacena el contenido que seleccionas para procesar. Por ahora, el código publicitario de Google AdSense no se incluye en las páginas donde APLUNO procesa archivos, y Apluno no envía a Google el contenido de los archivos que seleccionas para procesar. Algunas funciones pueden descargar librerías necesarias para operar, pero tus archivos no se envían con ese fin.</p></article>
+      <article data-reveal><h2>Almacenamiento local</h2><p>APLUNO y APLUNO Workspace pueden utilizar tecnologías de almacenamiento local del navegador, como IndexedDB y localStorage, para guardar preferencias, configuración y datos de sesión dentro de tu dispositivo. Estos datos permanecen en tu navegador y no se envían a ningún servidor externo.</p></article>
       <article data-reveal><h2>Analítica</h2><p>Google Analytics no está activo en este sitio. Si se habilita en el futuro, se actualizará esta página antes de presentarlo como parte del servicio.</p></article>
       <article data-reveal><h2>Mensajes por correo</h2><p>Si nos escribes, recibiremos la dirección, el contenido y los adjuntos que decidas enviar. Usaremos esa información para responder a tu mensaje.</p></article>
       <article data-reveal><h2>Cambios</h2><p>Si incorporamos medición, cuentas u otro tratamiento de datos, actualizaremos esta página antes de presentarlo como parte del servicio.</p></article>
     </section>`;
-  return renderPage(pageOptions({ title: 'Privacidad — Apluno', description: 'Conoce cómo Apluno y Toolisto tratan la información y procesan archivos.', pathname: '/privacy/', bodyClass: 'apluno-legal', content }));
+  return renderPage(pageOptions({ title: 'Privacidad — Apluno', description: 'Conoce cómo Apluno trata la información y procesa sus archivos.', pathname: '/privacy/', bodyClass: 'apluno-legal', content }));
 }
 
 function renderTerms() {
   const content = `<section class="apluno-page-hero apluno-section" data-reveal><p class="apluno-eyebrow">Legal / Condiciones</p><h1>Condiciones de uso.</h1><p>Última actualización: 14 de agosto de 2026.</p></section>
     <section class="apluno-section apluno-legal-copy">
-      <article data-reveal><h2>Uso del sitio</h2><p>Apluno ofrece información sobre sus productos y acceso gratuito a las herramientas disponibles en Toolisto. Eres responsable de contar con autorización para procesar los archivos que utilices.</p></article>
+      <article data-reveal><h2>Uso del sitio</h2><p>Apluno ofrece información sobre sus productos y acceso gratuito a las herramientas disponibles en APLUNO. Eres responsable de contar con autorización para procesar los archivos que utilices.</p></article>
       <article data-reveal><h2>Productos en desarrollo</h2><p>Workspace y Ordía se presentan como productos en desarrollo. Sus conceptos, alcance y disponibilidad pueden cambiar. No anunciamos una descarga ni una fecha de lanzamiento.</p></article>
       <article data-reveal><h2>Disponibilidad</h2><p>Trabajamos para que las herramientas funcionen de forma fiable, pero se ofrecen tal como están y pueden cambiar para corregir errores, mejorar seguridad o simplificar su uso.</p></article>
       <article data-reveal><h2>Responsabilidad</h2><p>Debes conservar copias de tus archivos importantes y revisar cualquier resultado antes de usarlo en un contexto crítico.</p></article>
     </section>`;
-  return renderPage(pageOptions({ title: 'Condiciones de uso — Apluno', description: 'Condiciones aplicables al sitio de Apluno y a las herramientas disponibles en Toolisto.', pathname: '/terms/', bodyClass: 'apluno-legal', content }));
+  return renderPage(pageOptions({ title: 'Condiciones de uso — Apluno', description: 'Condiciones aplicables al sitio de Apluno y a las herramientas disponibles en APLUNO.', pathname: '/terms/', bodyClass: 'apluno-legal', content }));
 }
 
 function renderNotFound() {
-  const content = `<section class="apluno-not-found apluno-section" data-reveal><p class="apluno-eyebrow">Error 404</p><p class="apluno-not-found-code" aria-hidden="true">404</p><h1>Esta página no está aquí.</h1><p>Puede que la dirección haya cambiado o que el enlace esté incompleto.</p><div>${renderCta({ href: '/', label: 'Volver a Apluno', tone: 'dark', arrow: false })}${renderCta({ href: '/toolisto', label: 'Ir a Toolisto', tone: 'text', arrow: false })}</div></section>`;
+  const content = `<section class="apluno-not-found apluno-section" data-reveal><p class="apluno-eyebrow">Error 404</p><p class="apluno-not-found-code" aria-hidden="true">404</p><h1>Esta página no está aquí.</h1><p>Puede que la dirección haya cambiado o que el enlace esté incompleto.</p><div>${renderCta({ href: '/', label: 'Volver a Apluno', tone: 'dark', arrow: false })}${renderCta({ href: '/toolisto', label: 'Ir a Herramientas', tone: 'text', arrow: false })}</div></section>`;
   return renderPage(pageOptions({ title: 'Página no encontrada — Apluno', description: 'La página solicitada no existe.', pathname: '/404.html', bodyClass: 'apluno-404', content, robots: 'noindex, nofollow', schemas: [], socialImage: false, noCanonical: true }));
 }
 
 // ---------------------------------------------------------------------------
 // FASE 5 — Sección editorial "Guías" de APLUNO
-// Guías originales y útiles que enlazan a las herramientas reales de Toolisto.
+// Guías originales y útiles que enlazan a las herramientas reales de APLUNO.
 // ---------------------------------------------------------------------------
 const guidesSection = guidesDef.section || 'guia';
-const guidesTitle = guidesDef.title || 'Guías de Toolisto';
+const guidesTitle = guidesDef.title || 'Guías de APLUNO';
 const guidesDescription = guidesDef.description || '';
 
 const toolBySlug = Object.fromEntries(indexableTools.map((tool) => [tool.slug, tool]));
@@ -620,13 +621,10 @@ const sitemapUrls = [
   { path: '/', priority: '1.0', changefreq: 'weekly' },
   { path: '/toolisto', priority: '0.9', changefreq: 'weekly' },
   { path: '/about/', priority: '0.6', changefreq: 'monthly' },
-  { path: '/ordia/', priority: '0.6', changefreq: 'monthly' },
   { path: '/workspace-about/', priority: '0.6', changefreq: 'monthly' },
   { path: '/contact/', priority: '0.3', changefreq: 'yearly' },
   { path: '/privacy/', priority: '0.2', changefreq: 'yearly' },
   { path: '/terms/', priority: '0.2', changefreq: 'yearly' },
-  { path: '/privacidad', priority: '0.2', changefreq: 'yearly' },
-  { path: '/condiciones', priority: '0.2', changefreq: 'yearly' },
   { path: '/apoyar', priority: '0.3', changefreq: 'monthly' },
   { path: '/guia/', priority: '0.8', changefreq: 'weekly' },
   ...guides.map((guide) => ({ path: `/guia/${guide.slug}/`, priority: '0.7', changefreq: 'monthly', lastmod: guide.lastModified })),
@@ -702,4 +700,4 @@ if (missing.length) {
   process.exit(1);
 }
 
-console.log(`APLUNO build complete: ${sitemapUrls.length} indexable URLs, ${enabledTools.length} Toolisto tools, ${apluno.products.length} products.`);
+console.log(`APLUNO build complete: ${sitemapUrls.length} indexable URLs, ${enabledTools.length} herramientas, ${apluno.products.length} productos.`);

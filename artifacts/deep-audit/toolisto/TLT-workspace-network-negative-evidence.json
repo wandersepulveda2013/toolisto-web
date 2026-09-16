@@ -1,0 +1,299 @@
+{
+  "checks": [
+    {
+      "detail": "",
+      "name": "1. Home cargó (stats visibles)",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "1. cero egress externo en la carga",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "1: sin errores de consola no controlados",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "2. Modal de creación abierto",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "2. Botón crear proyecto visible",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "2: sin requests externos nuevos",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "2: sin errores de consola no controlados",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "3. Vista intake cargada (Captura Universal)",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "3. Selector de archivos del intake abierto",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "3. fixture de escaneo presente",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "3. Escáner abierto tras el archivo",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "3. Botón Confirmar del escáner visible",
+      "pass": true
+    },
+    {
+      "detail": "capturas: 1",
+      "name": "3. Captura guardada en IndexedDB (flujo real)",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "3: sin requests externos nuevos",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "3: sin errores de consola no controlados",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "4. Seed de proyecto + captura con marcador completado",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "4. Proyecto sembrado abierto",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "4. Vista dashboard navegada",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "4. Vista dashboard: sin requests externos nuevos",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "4. Vista dashboard: sin errores de consola no controlados",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "4. Vista capture navegada",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "4. Vista capture: sin requests externos nuevos",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "4. Vista capture: sin errores de consola no controlados",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "4. Vista documents navegada",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "4. Vista documents: sin requests externos nuevos",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "4. Vista documents: sin errores de consola no controlados",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "4. Vista data navegada",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "4. Vista data: sin requests externos nuevos",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "4. Vista data: sin errores de consola no controlados",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "4. Vista model navegada",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "4. Vista model: sin requests externos nuevos",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "4. Vista model: sin errores de consola no controlados",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "4. Vista query navegada",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "4. Vista query: sin requests externos nuevos",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "4. Vista query: sin errores de consola no controlados",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "4. Vista dashboards navegada",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "4. Vista dashboards: sin requests externos nuevos",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "4. Vista dashboards: sin errores de consola no controlados",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "4. Vista design navegada",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "4. Vista design: sin requests externos nuevos",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "4. Vista design: sin errores de consola no controlados",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "4. Vista flow navegada",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "4. Vista flow: sin requests externos nuevos",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "4. Vista flow: sin errores de consola no controlados",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "4. Vista tools navegada",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "4. Vista tools: sin requests externos nuevos",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "4. Vista tools: sin errores de consola no controlados",
+      "pass": true
+    },
+    {
+      "detail": "Saltar al contenido principal APLUNO WORKSPACE INICIO Proyectos Captura Universal PROYECTO RED NEGATIVA Panel 0 Captura 0 Documentos 0 Datos",
+      "name": "4. Captura con marcador visible en la vista Capturas",
+      "pass": true
+    },
+    {
+      "detail": "[]",
+      "name": "5. marcador ausente de URL, body y headers reales",
+      "pass": true
+    },
+    {
+      "detail": "local: 90",
+      "name": "5. requests reales totales registrados (>0)",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "6. cero primitivas fetch/XHR/beacon/WebSocket/EventSource con URL externa literal",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "7. control: fetch externo interceptado y bloqueado",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "7. control: sendBeacon externo interceptado",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "7. control: imagen externa interceptada",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "7. control: EventSource externo interceptado",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "7. control: WebSocket externo bloqueado por el stub",
+      "pass": true
+    },
+    {
+      "detail": "",
+      "name": "7. cero requests externos fuera de las sondas de control",
+      "pass": true
+    }
+  ],
+  "requests": {
+    "externalBlocked": 0,
+    "probes": 4,
+    "real": 90,
+    "secretLeak": false
+  },
+  "secret": "TLST-WORKSPACE-NET-CANARY-DETERMINISTIC",
+  "staticFindings": 0,
+  "suite": "workspace-network-negative",
+  "views": 10
+}

@@ -108,7 +108,8 @@ check(workspaceApp.includes('id="ws-app"'), 'El Workspace funcional (/workspace/
 check(workspaceApp.includes('noindex,nofollow'), 'El Workspace funcional conserva noindex,nofollow');
 
 check(sitemap.includes('<loc>https://apluno.com/toolisto</loc>'), 'Sitemap incluye /toolisto');
-['privacidad', 'condiciones'].forEach((route) => check(sitemap.includes(`https://apluno.com/${route}`), `Sitemap incluye /${route}`));
+check(sitemap.includes('<loc>https://apluno.com/privacy/</loc>') && sitemap.includes('<loc>https://apluno.com/terms/</loc>'), 'Sitemap incluye las páginas legales canónicas (/privacy/ y /terms/)');
+['privacidad', 'condiciones'].forEach((route) => check(!sitemap.includes(`https://apluno.com/${route}`), `Consolidación legal: /${route} fuera del sitemap (noindex + canonical a la versión canónica)`));
 check(robots.includes('Sitemap: https://apluno.com/sitemap.xml'), 'robots.txt declara el sitemap de Apluno');
 check(!robots.includes('Disallow'), 'robots.txt no bloquea ninguna ruta pública');
 check(redirects.includes('/toolisto /toolisto.html 200') && redirects.includes('/toolisto/ /toolisto 301'), 'Redirects resuelven la ruta limpia de Toolisto');

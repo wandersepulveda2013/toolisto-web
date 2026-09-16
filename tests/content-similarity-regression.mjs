@@ -19,10 +19,10 @@ const wrap = (title, body) => `<!doctype html><html><head><title>${title}</title
 <body>
 <header>APLUNO · Herramientas online gratuitas · Herramientas · Guías · Acerca de · Legal · Privacidad · Condiciones</header>
 ${body}
-<footer>© 2026 APLUNO · Toolisto es un producto de APLUNO · Todos los derechos reservados. Todos los archivos se procesan en tu navegador.</footer>
+<footer>© 2026 APLUNO · Todos los derechos reservados. Todos los archivos se procesan en tu navegador.</footer>
 </body></html>`;
 
-const chrome = '<header>APLUNO · Herramientas online gratuitas · Herramientas · Guías · Acerca de · Legal · Privacidad · Condiciones</header><footer>© 2026 APLUNO · Toolisto es un producto de APLUNO · Todos los derechos reservados. Todos los archivos se procesan en tu navegador.</footer>';
+const chrome = '<header>APLUNO · Herramientas online gratuitas · Herramientas · Guías · Acerca de · Legal · Privacidad · Condiciones</header><footer>© 2026 APLUNO · Todos los derechos reservados. Todos los archivos se procesan en tu navegador.</footer>';
 
 // CASO A — páginas exactamente iguales
 const bodyA = '<main><h1>Convertir JPG a PNG</h1><p>Convierte imágenes JPG al formato PNG conservando la transparencia de forma local, sin subir archivos a ningún servidor.</p><ol><li>Elige el archivo JPG.</li><li>Haz clic en convertir.</li><li>Descarga el PNG.</li></ol></main>';

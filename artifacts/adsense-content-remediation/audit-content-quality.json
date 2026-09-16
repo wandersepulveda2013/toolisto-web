@@ -16,8 +16,8 @@
   "duplicateContent": {
     "HIGH_DUP": 0.7,
     "highValuePairs": [],
-    "maxSimilarity": 0.215,
-    "pairCountAbove005": 1576,
+    "maxSimilarity": 0.194,
+    "pairCountAbove005": 1575,
     "reviewBandPairs": []
   },
   "final": "PASS",
@@ -29,11 +29,11 @@
     "sitemapBroken": 0,
     "sitemapNoindex": 0
   },
-  "indexable": 236,
+  "indexable": 233,
   "links": {
     "externalLinks": 225,
     "internalBroken": 0,
-    "internalChecked": 10826,
+    "internalChecked": 10391,
     "internalRedirectTargets": 4206,
     "samples": []
   },
@@ -44,11 +44,11 @@
     "emptyTitle": 0,
     "multiH1": 0
   },
-  "noindex": 56,
+  "noindex": 59,
   "orphans": [],
   "pagesDiscovered": 292,
   "placeholders": 0,
-  "sitemapUrls": 237,
+  "sitemapUrls": 234,
   "strictEditorial": {
     "b100_139": 92,
     "b70_99": 54,
@@ -69,7 +69,7 @@
   },
   "structuredData": {
     "invalid": 0,
-    "valid": 659
+    "valid": 658
   },
   "thinContent": {
     "flagged": [],

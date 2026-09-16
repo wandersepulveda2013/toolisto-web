@@ -1,6 +1,6 @@
 {
-  "name": "Toolisto",
-  "short_name": "Toolisto",
+  "name": "APLUNO",
+  "short_name": "APLUNO",
   "description": "Convierte, comprime y prepara imágenes, PDF, documentos y más directamente en tu navegador. Sin registro y sin subir tus archivos.",
   "start_url": "/toolisto",
   "scope": "/",

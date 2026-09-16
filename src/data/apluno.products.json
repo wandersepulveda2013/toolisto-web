@@ -10,8 +10,8 @@
   "products": [
     {
       "id": "toolisto",
-      "name": "Toolisto Herramientas",
-      "shortName": "Toolisto",
+      "name": "Herramientas de APLUNO",
+      "shortName": "Herramientas",
       "status": "Disponible",
       "statusTone": "available",
       "href": "/toolisto",
@@ -21,7 +21,7 @@
     },
     {
       "id": "workspace",
-      "name": "Toolisto Workspace",
+      "name": "APLUNO Workspace",
       "shortName": "Workspace",
       "status": "En desarrollo",
       "statusTone": "development",

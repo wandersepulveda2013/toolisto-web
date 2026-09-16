@@ -41,8 +41,8 @@ if (site.siteUrl.endsWith('.invalid')) {
 
 site.siteUrl = site.siteUrl.replace(/\/+$/, '');
 const brandName = site.brandName || site.siteName || 'APLUNO';
-const productName = site.productName || 'Toolisto Herramientas';
-const productShortName = site.productShortName || 'Toolisto';
+const productName = site.productName || 'Herramientas';
+const productShortName = site.productShortName || 'APLUNO';
 const catalogPath = site.catalogPath || '/toolisto';
 if (!/^\/[a-z0-9-]+$/.test(catalogPath)) {
   console.error('ERROR: catalogPath must be a clean absolute path such as "/toolisto":', catalogPath);
@@ -91,7 +91,7 @@ cpSync(join(ROOT, 'toolisto.html'), join(DIST, 'toolisto.html'));
 cpSync(join(ROOT, 'offline.html'), join(DIST, 'offline.html'));
 cpSync(join(ROOT, 'app.js'), join(DIST, 'app.js'));
 cpSync(join(ROOT, 'tool-processors.js'), join(DIST, 'tool-processors.js'));
-// El Service Worker de Toolisto se genera con la allowlist de rutas públicas de
+// El Service Worker de APLUNO se genera con la allowlist de rutas públicas de
 // APLUNO (portada, legal, contacto y productos) que NUNCA debe interceptar.
 const aplunoPublicRoutes = [
   '/',
@@ -167,7 +167,7 @@ html.intro-pending, html.intro-pending body { background: #1C1D21; }
 </style>
 <noscript><style>#toolisto-intro{display:none!important}.site-header,main,.site-footer{visibility:visible!important;opacity:1!important;pointer-events:auto!important}html,body{overflow:auto!important;background:initial}</style></noscript>`;
 
-const splashHTML = `<div id="toolisto-intro" aria-hidden="true"><img class="intro-mark" src="./assets/toolisto-mark.svg" alt="" width="80" height="80" /><span class="intro-name">Toolisto</span><span class="intro-accent"></span></div>`;
+const splashHTML = `<div id="toolisto-intro" aria-hidden="true"><img class="intro-mark" src="./assets/toolisto-mark.svg" alt="" width="80" height="80" /><span class="intro-name">${escHtml(brandName)}</span><span class="intro-accent"></span></div>`;
 
 const splashScript = `<script>(function(){var i=document.getElementById('toolisto-intro');if(!i)return;var h=document.documentElement;var r=false;function c(){if(r)return;r=true;if(i.parentNode)i.remove();h.classList.remove('intro-pending');h.classList.remove('intro-active')}var m=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;if(m){c()}else{i.addEventListener('animationend',function(e){if(e.animationName!=='introMaster')return;i.removeEventListener('animationend',c);c()});setTimeout(c,300)}})()</script>`;
 const pwaHead = `<link rel="manifest" href="./assets/manifest.webmanifest">\n  <link rel="apple-touch-icon" href="./assets/apple-touch-icon.png">`;
@@ -175,9 +175,9 @@ const pwaScript = `<script src="./js/pwa-register.js" defer></script>`;
 const ASSET_VERSION = '20260814-apluno';
 const appJsTag = (rel) => `<script src="${rel}app.js?v=${ASSET_VERSION}" defer></script>`;
 
-const headerNav = `<header class="site-header"><div class="header-inner"><a class="brand" href="${escAttr(catalogHref)}" aria-label="Ir al catálogo de ${escAttr(productName)}"><img class="brand-mark-img" src="./assets/toolisto-mark.svg" alt="" width="36" height="36" /><span class="brand-text">${escHtml(productShortName)}</span></a><a class="apluno-parent-link" href="${escAttr(brandHref)}" aria-label="Ir al inicio de ${escAttr(brandName)}">by ${escHtml(brandName)}</a><nav class="desktop-nav" aria-label="Categorías de herramientas"><a href="${escAttr(catalogHref)}" data-nav-filter="images">Imágenes</a><a href="${escAttr(catalogHref)}" data-nav-filter="pdf">PDF</a><a href="${escAttr(catalogHref)}" data-nav-filter="signatures">Firmas</a><a href="${escAttr(catalogHref)}" data-nav-filter="documents">Documentos</a><a href="${escAttr(catalogHref)}" data-nav-filter="spreadsheets">Hojas de cálculo</a><a href="${escAttr(catalogHref)}" data-nav-filter="all">Todas</a></nav><div class="header-actions"><a class="header-action-btn" href="${escAttr(catalogHref)}" aria-label="Buscar herramientas"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg></a><button class="header-action-btn" id="themeToggle" type="button" aria-label="Cambiar tema"><svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg><svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button><button class="menu-button" id="menuToggle" type="button" aria-expanded="false" aria-controls="mobileNav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button></div></div></header><nav class="mobile-nav" id="mobileNav" hidden><a href="${escAttr(catalogHref)}" data-nav-filter="images">Imágenes</a><a href="${escAttr(catalogHref)}" data-nav-filter="pdf">PDF</a><a href="${escAttr(catalogHref)}" data-nav-filter="signatures">Firmas</a><a href="${escAttr(catalogHref)}" data-nav-filter="all">Todas las herramientas</a><a href="${escAttr(brandHref)}">${escHtml(brandName)}</a></nav>`;
+const headerNav = `<header class="site-header"><div class="header-inner"><a class="brand" href="${escAttr(catalogHref)}" aria-label="Ir al catálogo de herramientas de ${escAttr(brandName)}"><img class="brand-mark-img" src="./assets/toolisto-mark.svg" alt="" width="36" height="36" /><span class="brand-text">${escHtml(brandName)}</span></a><nav class="desktop-nav" aria-label="Categorías de herramientas"><a href="${escAttr(catalogHref)}" data-nav-filter="images">Imágenes</a><a href="${escAttr(catalogHref)}" data-nav-filter="pdf">PDF</a><a href="${escAttr(catalogHref)}" data-nav-filter="signatures">Firmas</a><a href="${escAttr(catalogHref)}" data-nav-filter="documents">Documentos</a><a href="${escAttr(catalogHref)}" data-nav-filter="spreadsheets">Hojas de cálculo</a><a href="${escAttr(catalogHref)}" data-nav-filter="all">Todas</a></nav><div class="header-actions"><a class="header-action-btn" href="${escAttr(catalogHref)}" aria-label="Buscar herramientas"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg></a><button class="header-action-btn" id="themeToggle" type="button" aria-label="Cambiar tema"><svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg><svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button><button class="menu-button" id="menuToggle" type="button" aria-expanded="false" aria-controls="mobileNav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button></div></div></header><nav class="mobile-nav" id="mobileNav" hidden><a href="${escAttr(catalogHref)}" data-nav-filter="images">Imágenes</a><a href="${escAttr(catalogHref)}" data-nav-filter="pdf">PDF</a><a href="${escAttr(catalogHref)}" data-nav-filter="signatures">Firmas</a><a href="${escAttr(catalogHref)}" data-nav-filter="all">Todas las herramientas</a><a href="${escAttr(brandHref)}">${escHtml(brandName)}</a></nav>`;
 
-const footerHTML = `<footer class="site-footer"><div class="footer-inner"><div class="footer-top"><div class="footer-brand-col"><a class="brand" href="${escAttr(catalogHref)}" aria-label="Ir al catálogo de ${escAttr(productName)}"><img class="brand-mark-img" src="./assets/toolisto-mark.svg" alt="" width="28" height="28" /><span class="brand-text">${escHtml(productShortName)}</span></a><p>Herramientas de archivos directas, rápidas y privadas. Todo se procesa en tu navegador.</p><p>Un producto de <a href="${escAttr(brandHref)}">${escHtml(brandName)}</a>.</p></div><div class="footer-col"><h4>Herramientas</h4><nav aria-label="Categorías"><a href="${escAttr(catalogHref)}">Ver todas</a><a href="${escAttr(catalogHref)}" data-nav-filter="images">Imágenes</a><a href="${escAttr(catalogHref)}" data-nav-filter="pdf">PDF</a><a href="${escAttr(catalogHref)}" data-nav-filter="documents">Documentos</a></nav></div><div class="footer-col"><h4>Productos</h4><nav aria-label="Productos de ${escAttr(brandName)}"><a href="${escAttr(brandHref)}">${escHtml(brandName)}</a><a href="/workspace-about">Workspace</a><a href="/ordia">Ordía</a></nav></div><div class="footer-col"><h4>Legal</h4><nav aria-label="Legal"><a href="./privacidad">Política de privacidad</a><a href="./condiciones">Condiciones de uso</a><a href="./apoyar">Apoyar</a></nav></div><div class="footer-col"><h4>Contacto</h4><nav aria-label="Contacto"><a href="mailto:toolistoweb@gmail.com">toolistoweb@gmail.com</a></nav></div></div><div class="footer-bottom"><small>© 2026 ${escHtml(productShortName)} · Un producto de ${escHtml(brandName)}.</small><div class="footer-bottom-links"><a href="${escAttr(brandHref)}">${escHtml(brandName)}</a><a href="./privacidad">Privacidad</a><a href="./condiciones">Condiciones</a></div></div></div></footer>`;
+const footerHTML = `<footer class="site-footer"><div class="footer-inner"><div class="footer-top"><div class="footer-brand-col"><a class="brand" href="${escAttr(catalogHref)}" aria-label="Ir al catálogo de herramientas de ${escAttr(brandName)}"><img class="brand-mark-img" src="./assets/toolisto-mark.svg" alt="" width="28" height="28" /><span class="brand-text">${escHtml(brandName)}</span></a><p>Herramientas directas, rápidas y privadas para PDF, imágenes y archivos. Todo se procesa en tu navegador.</p></div><div class="footer-col"><h4>Herramientas</h4><nav aria-label="Categorías"><a href="${escAttr(catalogHref)}">Ver todas</a><a href="${escAttr(catalogHref)}" data-nav-filter="images">Imágenes</a><a href="${escAttr(catalogHref)}" data-nav-filter="pdf">PDF</a><a href="${escAttr(catalogHref)}" data-nav-filter="documents">Documentos</a></nav></div><div class="footer-col"><h4>Productos</h4><nav aria-label="Productos de ${escAttr(brandName)}"><a href="${escAttr(brandHref)}">${escHtml(brandName)}</a><a href="/workspace-about">Workspace</a><a href="/ordia">Ordía</a></nav></div><div class="footer-col"><h4>Legal</h4><nav aria-label="Legal"><a href="/privacy/">Política de privacidad</a><a href="/terms/">Condiciones de uso</a><a href="./apoyar">Apoyar</a></nav></div><div class="footer-col"><h4>Contacto</h4><nav aria-label="Contacto"><a href="mailto:toolistoweb@gmail.com">toolistoweb@gmail.com</a></nav></div></div><div class="footer-bottom"><small>© 2026 ${escHtml(brandName)}.</small><div class="footer-bottom-links"><a href="${escAttr(brandHref)}">${escHtml(brandName)}</a><a href="/privacy/">Privacidad</a><a href="/terms/">Condiciones</a></div></div></div></footer>`;
 
 function buildAccessibleHeaderNav() {
   return headerNav
@@ -527,19 +527,19 @@ function buildCategoryPage(cat) {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>${escHtml(cat.name)} - Herramientas online | Toolisto</title>
+  <title>${escHtml(cat.name)} - Herramientas online | ${escHtml(brandName)}</title>
   <script type="application/ld+json">${buildBreadcrumbJsonLd(breadcrumbs)}</script>
   <meta name="description" content="${escAttr(cat.description)}">
   <link rel="canonical" href="${site.siteUrl}/${cat.slug}">
   <meta name="robots" content="index, follow">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="${escAttr(brandName)}">
-  <meta property="og:title" content="${escAttr(cat.name)} - Herramientas online | Toolisto">
+  <meta property="og:title" content="${escAttr(cat.name)} - Herramientas online | ${escAttr(brandName)}">
   <meta property="og:description" content="${escAttr(cat.description)}">
   <meta property="og:url" content="${site.siteUrl}/${cat.slug}">
   <meta property="og:image" content="${site.siteUrl}${site.defaultOgImage}">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="${escAttr(cat.name)} - Herramientas online | Toolisto">
+  <meta name="twitter:title" content="${escAttr(cat.name)} - Herramientas online | ${escAttr(brandName)}">
   <meta name="twitter:description" content="${escAttr(cat.description)}">
   <meta name="twitter:image" content="${site.siteUrl}${site.defaultOgImage}">
   <meta name="theme-color" content="${site.themeColor}">
@@ -595,8 +595,8 @@ function build404Page() {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Página no encontrada | Toolisto</title>
-  <meta name="description" content="La página que buscas no existe. Explora las herramientas de Toolisto.">
+  <title>Página no encontrada | ${escHtml(brandName)}</title>
+  <meta name="description" content="La página que buscas no existe. Explora las herramientas de ${escHtml(brandName)}.">
   <meta name="robots" content="noindex, nofollow">
   <link rel="icon" type="image/svg+xml" href="./assets/toolisto-mark.svg">
   ${pwaHead}
@@ -612,7 +612,7 @@ function build404Page() {
       <section class="hero" id="inicio">
         <div class="hero-inner"><div class="hero-left">
           <h1>404 — Página no encontrada</h1>
-          <p>La página que buscas no existe o fue movida. Puedes volver a ${escHtml(brandName)} o explorar las herramientas de ${escHtml(productShortName)}.</p>
+          <p>La página que buscas no existe o fue movida. Puedes volver a ${escHtml(brandName)} o explorar las herramientas de ${escHtml(brandName)}.</p>
           <a class="primary-button" href="${escAttr(catalogHref)}" style="display:inline-block;margin-top:1rem;">Explorar herramientas</a>
           <a class="quiet-button" href="${escAttr(brandHref)}" style="display:inline-block;margin-top:1rem;">Ir a ${escHtml(brandName)}</a>
         </div></div>
@@ -649,23 +649,26 @@ function buildLegalPage(slug, title, description, sections) {
     { label: title, href: `./${slug}` }
   ];
 
+  const canonicalPaths = { privacidad: '/privacy/', condiciones: '/terms/' };
+  const canonicalPath = canonicalPaths[slug] || `/${slug}`;
+
   return `<!doctype html>
 <html lang="es-419" class="intro-pending">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>${escHtml(title)} | Toolisto</title>
+  <title>${escHtml(title)} | ${escHtml(brandName)}</title>
   <meta name="description" content="${escAttr(description)}">
-  <link rel="canonical" href="${site.siteUrl}/${slug}">
-  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="${site.siteUrl}${canonicalPath}">
+  <meta name="robots" content="noindex, follow">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="${escAttr(brandName)}">
-  <meta property="og:title" content="${escAttr(title)} | Toolisto">
+  <meta property="og:title" content="${escAttr(title)} | ${escAttr(brandName)}">
   <meta property="og:description" content="${escAttr(description)}">
-  <meta property="og:url" content="${site.siteUrl}/${slug}">
+  <meta property="og:url" content="${site.siteUrl}${canonicalPath}">
   <meta property="og:image" content="${site.siteUrl}${site.defaultOgImage}">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="${escAttr(title)} | Toolisto">
+  <meta name="twitter:title" content="${escAttr(title)} | ${escAttr(brandName)}">
   <meta name="twitter:description" content="${escAttr(description)}">
   <meta name="twitter:image" content="${site.siteUrl}${site.defaultOgImage}">
   <meta name="theme-color" content="${site.themeColor}">
@@ -702,7 +705,7 @@ function buildLegalPage(slug, title, description, sections) {
 
 function buildApoyarPage() {
   const paypalUrl = supportCfg.url || 'https://www.paypal.com/donate/?hosted_button_id=ZSSG3LJQRW3EQ';
-  const supportMsg = supportCfg.message || 'Si Toolisto te ha sido útil, considera apoyarnos con una donación.';
+  const supportMsg = supportCfg.message || 'Si APLUNO te ha sido útil, considera apoyarnos con una donación.';
 
   const breadcrumbs = [
     { label: brandName, href: brandHref },
@@ -715,19 +718,19 @@ function buildApoyarPage() {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Apoyar Toolisto | Donaciones</title>
-  <meta name="description" content="Apoya a Toolisto con una donación para seguir mejorando las herramientas.">
+  <title>Apoyar ${escHtml(brandName)} | Donaciones</title>
+  <meta name="description" content="Apoya a ${escHtml(brandName)} con una donación para seguir mejorando las herramientas.">
   <link rel="canonical" href="${site.siteUrl}/apoyar">
   <meta name="robots" content="index, follow">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="${escAttr(brandName)}">
-  <meta property="og:title" content="Apoyar Toolisto | Donaciones">
-  <meta property="og:description" content="Apoya a Toolisto con una donación para seguir mejorando las herramientas.">
+  <meta property="og:title" content="Apoyar ${escAttr(brandName)} | Donaciones">
+  <meta property="og:description" content="Apoya a ${escAttr(brandName)} con una donación para seguir mejorando las herramientas.">
   <meta property="og:url" content="${site.siteUrl}/apoyar">
   <meta property="og:image" content="${site.siteUrl}${site.defaultOgImage}">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Apoyar Toolisto | Donaciones">
-  <meta name="twitter:description" content="Apoya a Toolisto con una donación para seguir mejorando las herramientas.">
+  <meta name="twitter:title" content="Apoyar ${escAttr(brandName)} | Donaciones">
+  <meta name="twitter:description" content="Apoya a ${escAttr(brandName)} con una donación para seguir mejorando las herramientas.">
   <meta name="twitter:image" content="${site.siteUrl}${site.defaultOgImage}">
   <meta name="theme-color" content="${site.themeColor}">
   <link rel="icon" type="image/svg+xml" href="./assets/toolisto-mark.svg">
@@ -744,7 +747,7 @@ function buildApoyarPage() {
       <section class="hero" id="inicio">
         <div class="hero-inner"><div class="hero-left">
           ${buildBreadcrumbs(breadcrumbs)}
-          <h1>Apoyar Toolisto</h1>
+          <h1>Apoyar ${escHtml(brandName)}</h1>
           <p>${escHtml(supportMsg)}</p>
           <a class="support-donate-btn support-donate-btn--large" href="${escAttr(paypalUrl)}" target="_blank" rel="noopener noreferrer">Apoyar con PayPal</a>
         </div></div>
@@ -752,11 +755,11 @@ function buildApoyarPage() {
       <section class="legal-content">
         <section class="legal-section">
           <h2>¿Por qué donar?</h2>
-          <p>Toolisto es una herramienta gratuita que funciona directamente en tu navegador. No mostramos publicidad ni vendemos tus datos. Cada donación nos ayuda a seguir mejorando y manteniendo las herramientas.</p>
+          <p>APLUNO es una herramienta gratuita que funciona directamente en tu navegador. No mostramos publicidad ni vendemos tus datos. Cada donación nos ayuda a seguir mejorando y manteniendo las herramientas.</p>
         </section>
         <section class="legal-section">
           <h2>¿Cómo funciona?</h2>
-          <p>Haz clic en el botón de PayPal y completa la donación con la cantidad que prefieras. No necesitas crear una cuenta en Toolisto.</p>
+          <p>Haz clic en el botón de PayPal y completa la donación con la cantidad que prefieras. No necesitas crear una cuenta en APLUNO.</p>
         </section>
       </section>
     </main>
@@ -779,8 +782,6 @@ function buildSitemap() {
     { loc: `${site.siteUrl}/contact/`, changefreq: 'monthly', priority: '0.3' },
     { loc: `${site.siteUrl}/privacy/`, changefreq: 'monthly', priority: '0.2' },
     { loc: `${site.siteUrl}/terms/`, changefreq: 'monthly', priority: '0.2' },
-    { loc: `${site.siteUrl}/privacidad`, changefreq: 'monthly', priority: '0.3' },
-    { loc: `${site.siteUrl}/condiciones`, changefreq: 'monthly', priority: '0.3' },
     { loc: `${site.siteUrl}/apoyar`, changefreq: 'monthly', priority: '0.4' }
   ];
   categories.filter(c => c.enabled).forEach(c => {
@@ -835,26 +836,26 @@ writeFileSync(join(DIST, '404.html'), build404Page(), 'utf-8');
 console.log('  ✓ 404.html');
 
 const privacySections = [
-  { heading: 'Privacidad', body: '<p>Toolisto procesa todos los archivos directamente en tu navegador. Ningún archivo se sube a nuestros servidores ni se almacena en ningún lugar externo.</p><p>No recopilamos información personal identificable a menos que tú nos contactes directamente por correo electrónico.</p>' },
-  { heading: 'Publicidad (Google AdSense)', body: '<p>En las páginas públicas de navegación y catálogo (portada, catálogo de herramientas y páginas de categorías) Apluno puede usar Google AdSense. Google puede utilizar cookies u otros identificadores para la publicación y medición de anuncios, conforme a las opciones de consentimiento aplicables y a la configuración de tu navegador. Puedes consultar la <a href="https://policies.google.com/privacy">política de privacidad de Google</a> para más información. El código publicitario de Google AdSense no se incluye en las páginas donde Toolisto procesa archivos, y Apluno no envía a Google el contenido de los archivos que seleccionas para procesar.</p>' },
-  { heading: 'Almacenamiento local', body: '<p>Toolisto y Toolisto Workspace pueden utilizar tecnologías de almacenamiento local del navegador, como IndexedDB y localStorage, para guardar preferencias, configuración y datos de sesión dentro de tu dispositivo. Estos datos permanecen en tu navegador y no se envían a ningún servidor externo.</p>' },
-  { heading: 'Cookies y tecnologías de seguimiento', body: '<p>Toolisto no utiliza cookies propias. Google Analytics no está activo en este sitio. Si se habilita Google Analytics en el futuro, se utilizarán cookies de terceros para fines estadísticos y se actualizará esta página antes de presentarlo como parte del servicio. Puedes desactivar el seguimiento desde las configuraciones de tu navegador.</p>' },
-  { heading: 'Servicios de terceros', body: '<p>Toolisto puede utilizar servicios de terceros como Google Fonts para el diseño visual. Estos servicios pueden recopilar información de forma independiente según sus propias políticas de privacidad.</p>' },
+  { heading: 'Privacidad', body: '<p>APLUNO procesa todos los archivos directamente en tu navegador. Ningún archivo se sube a nuestros servidores ni se almacena en ningún lugar externo.</p><p>No recopilamos información personal identificable a menos que tú nos contactes directamente por correo electrónico.</p>' },
+  { heading: 'Publicidad (Google AdSense)', body: '<p>En las páginas públicas de navegación y catálogo (portada, catálogo de herramientas y páginas de categorías) Apluno puede usar Google AdSense. Google puede utilizar cookies u otros identificadores para la publicación y medición de anuncios, conforme a las opciones de consentimiento aplicables y a la configuración de tu navegador. Puedes consultar la <a href="https://policies.google.com/privacy">política de privacidad de Google</a> para más información. El código publicitario de Google AdSense no se incluye en las páginas donde APLUNO procesa archivos, y Apluno no envía a Google el contenido de los archivos que seleccionas para procesar.</p>' },
+  { heading: 'Almacenamiento local', body: '<p>APLUNO y APLUNO Workspace pueden utilizar tecnologías de almacenamiento local del navegador, como IndexedDB y localStorage, para guardar preferencias, configuración y datos de sesión dentro de tu dispositivo. Estos datos permanecen en tu navegador y no se envían a ningún servidor externo.</p>' },
+  { heading: 'Cookies y tecnologías de seguimiento', body: '<p>APLUNO no utiliza cookies propias. Google Analytics no está activo en este sitio. Si se habilita Google Analytics en el futuro, se utilizarán cookies de terceros para fines estadísticos y se actualizará esta página antes de presentarlo como parte del servicio. Puedes desactivar el seguimiento desde las configuraciones de tu navegador.</p>' },
+  { heading: 'Servicios de terceros', body: '<p>APLUNO puede utilizar servicios de terceros como Google Fonts para el diseño visual. Estos servicios pueden recopilar información de forma independiente según sus propias políticas de privacidad.</p>' },
   { heading: 'Contacto', body: '<p>Si tienes preguntas sobre esta política de privacidad, puedes escribirnos a <a href="mailto:toolistoweb@gmail.com">toolistoweb@gmail.com</a>.</p>' },
   { heading: 'Última actualización', body: `<p>Esta política fue última vez actualizada el ${TODAY}.</p>` }
 ];
-writeFileSync(join(DIST, 'privacidad.html'), buildLegalPage('privacidad', 'Política de Privacidad', 'Conoce cómo Toolisto procesa tus archivos localmente en tu navegador y protege tu privacidad.', privacySections), 'utf-8');
+writeFileSync(join(DIST, 'privacidad.html'), buildLegalPage('privacidad', 'Política de Privacidad', 'Conoce cómo APLUNO procesa tus archivos localmente en tu navegador y protege tu privacidad.', privacySections), 'utf-8');
 console.log('  ✓ privacidad.html');
 
 const conditionsSections = [
-  { heading: 'Condiciones de uso', body: '<p>El uso de Toolisto implica la aceptación de las siguientes condiciones. Toolisto proporciona herramientas gratuitas de procesamiento de archivos que funcionan directamente en el navegador del usuario.</p>' },
-  { heading: 'Uso del servicio', body: '<p>Toolisto es gratuito y no requiere registro. El usuario es responsable del contenido que procesa. Toolisto no se hace responsable del uso que se haga de las herramientas proporcionadas.</p>' },
-  { heading: 'Propiedad intelectual', body: '<p>El código fuente de Toolisto es de código abierto. Las herramientas se proporcionan "tal cual" sin garantías de ningún tipo.</p>' },
-  { heading: 'Limitación de responsabilidad', body: '<p>En ningún caso Toolisto será responsable por daños directos, indirectos, incidentales o consecuentes derivados del uso o la imposibilidad de uso de las herramientas.</p>' },
-  { heading: 'Cambios en las condiciones', body: '<p>Toolisto se reserva el derecho de modificar estas condiciones en cualquier momento. Los cambios serán efectivos desde su publicación en esta página.</p>' },
+  { heading: 'Condiciones de uso', body: '<p>El uso de APLUNO implica la aceptación de las siguientes condiciones. APLUNO proporciona herramientas gratuitas de procesamiento de archivos que funcionan directamente en el navegador del usuario.</p>' },
+  { heading: 'Uso del servicio', body: '<p>APLUNO es gratuito y no requiere registro. El usuario es responsable del contenido que procesa. APLUNO no se hace responsable del uso que se haga de las herramientas proporcionadas.</p>' },
+  { heading: 'Propiedad intelectual', body: '<p>El código fuente de APLUNO es de código abierto. Las herramientas se proporcionan "tal cual" sin garantías de ningún tipo.</p>' },
+  { heading: 'Limitación de responsabilidad', body: '<p>En ningún caso APLUNO será responsable por daños directos, indirectos, incidentales o consecuentes derivados del uso o la imposibilidad de uso de las herramientas.</p>' },
+  { heading: 'Cambios en las condiciones', body: '<p>APLUNO se reserva el derecho de modificar estas condiciones en cualquier momento. Los cambios serán efectivos desde su publicación en esta página.</p>' },
   { heading: 'Última actualización', body: `<p>Estas condiciones fueron última vez actualizadas el ${TODAY}.</p>` }
 ];
-writeFileSync(join(DIST, 'condiciones.html'), buildLegalPage('condiciones', 'Condiciones de Uso', 'Consulta las condiciones de uso de las herramientas gratuitas y locales de Toolisto.', conditionsSections), 'utf-8');
+writeFileSync(join(DIST, 'condiciones.html'), buildLegalPage('condiciones', 'Condiciones de Uso', 'Consulta las condiciones de uso de las herramientas gratuitas y locales de APLUNO.', conditionsSections), 'utf-8');
 console.log('  ✓ condiciones.html');
 
 writeFileSync(join(DIST, 'apoyar.html'), buildApoyarPage(), 'utf-8');

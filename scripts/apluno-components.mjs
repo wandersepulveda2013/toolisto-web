@@ -91,7 +91,7 @@ export function renderAplunoHeader({ active = '', variant = '' } = {}) {
       <a href="/privacy/">Privacidad</a>
       <a href="/terms/">Condiciones</a>
       <p class="apluno-launcher-nav-label">Productos de Apluno</p>
-      <a href="/toolisto">Toolisto <span>Disponible</span></a>
+      <a href="/toolisto">Herramientas <span>Disponible</span></a>
       <a href="/workspace-about/">Workspace <span>En desarrollo</span></a>
       <a href="/ordia/">Ordía <span>En desarrollo</span></a>
     </nav>
@@ -139,7 +139,7 @@ export function renderAplunoFooter({ minimal = false } = {}) {
         <a href="/terms/">Condiciones</a>
       </nav>
       <nav class="apluno-footer-minimal-products" aria-label="Productos de Apluno">
-        <a href="/toolisto">Toolisto</a>
+        <a href="/toolisto">Herramientas</a>
         <a href="/workspace-about/">Workspace</a>
         <a href="/ordia/">Ordía</a>
       </nav>
@@ -156,7 +156,7 @@ export function renderAplunoFooter({ minimal = false } = {}) {
       <div class="apluno-footer-grid">
         <div>
           <h2>Productos</h2>
-          <a href="/toolisto">Toolisto</a>
+          <a href="/toolisto">Herramientas</a>
           <a href="/workspace-about/">Workspace</a>
           <a href="/ordia/">Ordía</a>
         </div>

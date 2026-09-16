@@ -1,6 +1,6 @@
 {
   "ocrMode": "ocr",
-  "ocrDuration": 3092,
+  "ocrDuration": 2064,
   "ocrExpected": "Nombre Valor Estado\nVentas Q1 150 Completado\nVentas Q2 80 En progreso\nDevoluciones -30 Pendiente\nCostos fijos -200 Pagado\nGanancia neta 0 Calculado\n",
   "ocrActual": "Nombre Valor Estado\nVentas Q1 150 Completado\nVentas Q2 80 En progreso\nDevoluciones -30 Pendiente\nCostos fijos -200 Pagado\nGanancia neta 0 Calculado",
   "ocrCharAccuracy": {
@@ -150,15 +150,31 @@
   "relationCount": 10,
   "executions": [
     {
-      "id": "775e645f-02dd-40c4-9825-266a6d9af745",
-      "toolId": "text-to-table",
+      "id": "1eba1a69-fedd-4883-af61-287bd1d0318f",
+      "toolId": "chart-create",
       "status": "completed",
-      "toolName": "Texto a tabla",
-      "resultType": "table-document",
-      "resultAssetId": "76547f1d-d182-4f8b-9ac7-ac388d6a49c3"
+      "toolName": "Crear grafico",
+      "resultType": "chart",
+      "resultAssetId": "59ab134e-c2e2-4abc-82a8-5ff72e6c3e80"
     },
     {
-      "id": "a1daa4c7-ad70-4f7a-97e2-a78cae8c4211",
+      "id": "2abc1f56-d83f-4a2b-a570-027adf9ecb27",
+      "toolId": "perspective-correction",
+      "status": "completed",
+      "toolName": "Corrección de perspectiva",
+      "resultType": "scan-document",
+      "resultAssetId": "32fad9fe-1c1b-4b33-ad3a-6c8d2e16cceb"
+    },
+    {
+      "id": "49b7c726-4c29-4fa2-9aa0-c2cdc83b4c13",
+      "toolId": "ocr-extract",
+      "status": "completed",
+      "toolName": "Extraccion de texto (OCR)",
+      "resultType": "text-document",
+      "resultAssetId": "e2501394-04a6-40ac-8d17-464740ee139a"
+    },
+    {
+      "id": "62005dfc-ae71-4d4b-b5f4-4b06ff00414a",
       "toolId": "pdf-export",
       "status": "completed",
       "toolName": "Exportar PDF",
@@ -166,36 +182,20 @@
       "resultAssetId": null
     },
     {
-      "id": "a26fc38a-8a9d-46ec-98dc-1ddf8402ed16",
-      "toolId": "perspective-correction",
-      "status": "completed",
-      "toolName": "Corrección de perspectiva",
-      "resultType": "scan-document",
-      "resultAssetId": "665b51f9-52f5-4431-ad3c-2d270c3d0970"
-    },
-    {
-      "id": "a7b23181-aef1-409d-bbfe-75e1a11771af",
+      "id": "b006c795-df55-493a-a63c-505a915dd2a3",
       "toolId": "design-create",
       "status": "completed",
       "toolName": "Crear diseno",
       "resultType": "design-document",
-      "resultAssetId": "2dea8d14-f12d-4095-bd25-ef34b4c307d0"
+      "resultAssetId": "1bec7606-f838-4bbe-a1a5-96d9210fc21c"
     },
     {
-      "id": "e7a3e14f-fc56-498c-9992-52e8c131d756",
-      "toolId": "ocr-extract",
+      "id": "c272c6b1-d71b-403f-b024-f891800e2d82",
+      "toolId": "text-to-table",
       "status": "completed",
-      "toolName": "Extraccion de texto (OCR)",
-      "resultType": "text-document",
-      "resultAssetId": "ba643b75-a0da-4d93-96d4-e8475a8723c1"
-    },
-    {
-      "id": "f745abc3-85d5-47e2-ab29-909f0601aa80",
-      "toolId": "chart-create",
-      "status": "completed",
-      "toolName": "Crear grafico",
-      "resultType": "chart",
-      "resultAssetId": "317d5892-40c8-4fc8-92db-bf756388e5a8"
+      "toolName": "Texto a tabla",
+      "resultType": "table-document",
+      "resultAssetId": "6a4fb316-dc5a-43e8-bc4e-e91c0f83441a"
     }
   ],
   "bundle": {
@@ -215,13 +215,13 @@
       "assets": 10,
       "executions": 13
     },
-    "newProjectId": "cb46efdf-1f4c-4c85-92bb-2b097cbfc8e4",
-    "origProjId": "57175680-f0fb-4028-b852-5754e154f801",
+    "newProjectId": "0c7c22fb-5810-47b4-805b-193efbdc8a6e",
+    "origProjId": "3104fd42-b74f-49e6-b964-20e54be82419",
     "projChanged": true,
     "hasOldIds": false,
     "importedDocCount": 1
   },
-  "timestamp": "2026-08-26T14:19:27.993Z",
+  "timestamp": "2026-09-08T18:36:58.761Z",
   "pass": 85,
   "fail": 0,
   "failures": [],

@@ -6,7 +6,7 @@
       "pass": true
     },
     {
-      "detail": "@axe-core/playwright, @ffmpeg/core, @ffmpeg/ffmpeg, @ffmpeg/util, @playwright/test, playwright, tesseract.js",
+      "detail": "@axe-core/playwright, @ffmpeg/core, @ffmpeg/ffmpeg, @ffmpeg/util, @playwright/test, fake-indexeddb, lighthouse, playwright, tesseract.js",
       "name": "dependencias de desarrollo: lista revisada",
       "pass": true
     },

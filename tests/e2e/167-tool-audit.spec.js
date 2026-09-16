@@ -97,7 +97,7 @@ test.describe('167-Tool Functional Audit', () => {
       await page.goto(`/${tool.slug}`, { waitUntil: 'domcontentloaded' });
       
       const title = await page.title();
-      expect(title).toContain('Toolisto');
+      expect(title).toContain('APLUNO');
       
       const description = page.locator('meta[name="description"]');
       await expect(description).toBeAttached();

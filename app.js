@@ -1589,7 +1589,7 @@
         <div class="control" style="grid-column:1/-1" id="removeObjectsDisclaimer">
           <label style="display:flex;gap:8px;align-items:flex-start;cursor:pointer;font-size:.85rem;line-height:1.4">
             <input type="checkbox" id="removeObjectsConfirm" style="margin-top:3px;flex-shrink:0" />
-            <span>Confirmo que soy propietario de esta imagen o que tengo autorización para modificarla. No utilizaré Toolisto para ocultar la autoría ni infringir derechos de terceros.</span>
+            <span>Confirmo que soy propietario de esta imagen o que tengo autorización para modificarla. No utilizaré APLUNO para ocultar la autoría ni infringir derechos de terceros.</span>
           </label>
           <p style="margin:6px 0 0;font-size:.78rem;color:var(--muted);line-height:1.4">Algunas marcas o textos identifican al autor o las condiciones de licencia. Verifica que tengas permiso antes de eliminarlos.</p>
         </div>
@@ -2304,7 +2304,7 @@
       `,
       mergeEpub: `
         ${controlText('title', 'Título del libro unificado', '', 'Ej.: Antología de prueba')}
-        ${controlText('author', 'Autor', '', 'Ej.: Toolisto')}
+        ${controlText('author', 'Autor', '', 'Ej.: APLUNO')}
         ${controlText('language', 'Idioma', '', 'Ej.: es')}
       `,
       editMetadataEpub: `

@@ -5510,8 +5510,8 @@
         censoredDoc.setAuthor('');
         censoredDoc.setSubject('');
         censoredDoc.setKeywords([]);
-        censoredDoc.setProducer('Toolisto');
-        censoredDoc.setCreator('Toolisto');
+        censoredDoc.setProducer('APLUNO');
+        censoredDoc.setCreator('APLUNO');
         var finalBytes = await censoredDoc.save();
         var blob = new Blob([finalBytes], { type: 'application/pdf' });
         return makeSingleResult(blob, getBaseName(file.name) + '-censurado.pdf', 'PDF censurado permanentemente. ' + redactedPages.reduce(function(s, p) { return s + p.redactions; }, 0) + ' zona(s) censurada(s) en ' + redactedPages.length + ' página(s). Metadatos eliminados.');
@@ -5817,14 +5817,14 @@
     var statsHtml = stats.rows.map(function(r) {
       return '<tr><td>' + r[0] + '</td><td>' + r[1] + '</td><td style="color:#666;font-size:.85em">' + (r[2] || '') + '</td></tr>';
     }).join('\n');
-    var html = '<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Toolisto Report - ' + fileName + '</title>';
+    var html = '<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>APLUNO Report - ' + fileName + '</title>';
     html += '<style>@page{margin:1.5cm}body{font-family:Inter,-apple-system,system-ui,sans-serif;color:#17191C;max-width:700px;margin:0 auto;padding:24px;line-height:1.5}';
     html += '.brand{display:flex;align-items:center;gap:8px;margin-bottom:8px}.brand-mark{width:28px;height:28px;background:#FF6542;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px}';
     html += '.brand-name{font-size:13px;color:#888;letter-spacing:.5px}h1{font-size:22px;margin:16px 0 4px;font-weight:700}h2{font-size:16px;margin:20px 0 8px;border-bottom:1px solid #e5e5e5;padding-bottom:4px}';
     html += 'table{width:100%;border-collapse:collapse;margin:8px 0 16px}th,td{border:1px solid #e5e5e5;padding:6px 10px;text-align:left;font-size:13px}th{background:#f5f5f5;font-weight:600}';
     html += '.summary{background:#f8f8f4;border-radius:8px;padding:14px;margin:12px 0;font-size:14px;border-left:3px solid #FF6542}';
     html += '.footer{margin-top:24px;padding-top:12px;border-top:1px solid #e5e5e5;font-size:11px;color:#999;text-align:center}@media print{body{padding:0}}</style></head><body>';
-    html += '<div class="brand"><div class="brand-mark">T</div><span class="brand-name">TOOLISTO by Apluno</span></div>';
+    html += '<div class="brand"><div class="brand-mark">T</div><span class="brand-name">APLUNO</span></div>';
     html += '<h1>Reporte de analisis de texto</h1>';
     html += '<p style="color:#666;font-size:13px">Archivo: ' + fileName + ' | Generado: ' + new Date().toLocaleDateString('es-CL') + ' | Procesamiento local</p>';
     html += '<div class="summary">' + summary + '</div>';
@@ -5833,7 +5833,7 @@
     html += '<h2>Palabras mas frecuentes (Top 20)</h2>';
     html += '<table><thead><tr><th>#</th><th>Palabra</th><th>Frecuencia</th><th>%</th></tr></thead><tbody>' + freqRows + '</tbody></table>';
     if (longest.length) html += '<h2>Palabras mas largas</h2><p style="font-size:13px;color:#555">' + longest.join(' | ') + '</p>';
-    html += '<div class="footer">Toolisto by Apluno | apluno.com | Este reporte fue generado localmente en tu navegador. Ningun dato salio de tu dispositivo.</div>';
+    html += '<div class="footer">APLUNO | apluno.com | Este reporte fue generado localmente en tu navegador. Ningun dato salio de tu dispositivo.</div>';
     html += '</body></html>';
     return html;
   }
@@ -5914,7 +5914,7 @@
     var baseName = getBaseName(file.name);
     var txtReport = [
       '===================================================',
-      '  TOOLISTO - Reporte de analisis de texto',
+      '  APLUNO - Reporte de analisis de texto',
       '===================================================',
       '',
       'Archivo: ' + file.name,
@@ -5934,7 +5934,7 @@
       a.longest.join(', '),
       '',
       '===================================================',
-      'Toolisto by Apluno - apluno.com',
+      'APLUNO - apluno.com',
       'Este reporte fue generado localmente.',
       '==================================================='
     ]);
@@ -5959,7 +5959,7 @@
     var baseName = getBaseName(file.name);
     var txtReport = [
       '===================================================',
-      '  TOOLISTO - Conteo de palabras',
+      '  APLUNO - Conteo de palabras',
       '===================================================',
       '',
       'Archivo: ' + file.name,
@@ -5973,7 +5973,7 @@
     ].concat(a.statsRows.map(function(r) { return r[0] + ': ' + r[1]; })).concat([
       '',
       '===================================================',
-      'Toolisto by Apluno - apluno.com',
+      'APLUNO - apluno.com',
       '==================================================='
     ]);
     var txtBlob = new Blob([txtReport.join('\n')], { type: 'text/plain;charset=utf-8' });
@@ -7662,9 +7662,9 @@
     onProgress(2, 3, 'Aplicando conversiones PDF/A...');
     var title = pdfDoc.getTitle() || getBaseName(file.name);
     pdfDoc.setTitle(title);
-    pdfDoc.setAuthor(pdfDoc.getAuthor() || 'Toolisto');
-    pdfDoc.setProducer('Toolisto - Conversión PDF/A-1b');
-    pdfDoc.setCreator('Toolisto');
+    pdfDoc.setAuthor(pdfDoc.getAuthor() || 'APLUNO');
+    pdfDoc.setProducer('APLUNO - Conversión PDF/A-1b');
+    pdfDoc.setCreator('APLUNO');
     pdfDoc.setCreationDate(new Date());
     var now = new Date();
     var xmpDate = now.toISOString().replace(/\.\d{3}Z$/, 'Z');
@@ -7678,10 +7678,10 @@
       '  xmlns:pdf="http://ns.adobe.com/pdf/1.3/"\n' +
       '  xmlns:pdfaid="http://www.aiim.org/pdfa/ns/id/">\n' +
       '  <dc:title><rdf:Alt><rdf:li xml:lang="es">' + _esc(title) + '</rdf:li></rdf:Alt></dc:title>\n' +
-      '  <dc:creator><rdf:Seq><rdf:li>Toolisto</rdf:li></rdf:Seq></dc:creator>\n' +
+      '  <dc:creator><rdf:Seq><rdf:li>APLUNO</rdf:li></rdf:Seq></dc:creator>\n' +
       '  <xmp:CreateDate>' + xmpDate + '</xmp:CreateDate>\n' +
-      '  <xmp:CreatorTool>Toolisto</xmp:CreatorTool>\n' +
-      '  <pdf:Producer>Toolisto - Conversi\u00f3n PDF/A-1b</pdf:Producer>\n' +
+      '  <xmp:CreatorTool>APLUNO</xmp:CreatorTool>\n' +
+      '  <pdf:Producer>APLUNO - Conversi\u00f3n PDF/A-1b</pdf:Producer>\n' +
       '  <pdfaid:part>1</pdfaid:part>\n' +
       '  <pdfaid:conformance>b</pdfaid:conformance>\n' +
       '</rdf:Description>\n' +

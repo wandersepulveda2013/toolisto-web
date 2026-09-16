@@ -864,6 +864,53 @@ else fail('quality-D', `${D} indexable pages are duplicated`);
 if (F === 0) pass('quality-F', `0 indexable pages with hard defects: broken links/metadata/schema (F=0)`);
 else fail('quality-F', `${F} indexable pages have defects (${[...fPages].slice(0, 10).join(', ')})`);
 
+/* ---- M. Editorial ratio signal (strict editorial vs total visible main words) ---- */
+console.log('\n--- Editorial ratio signal ---');
+const toolRatios = toolReviewsAll.map((r) => ({
+  page: r.page,
+  strictWords: r.mainWords,
+  mainWords: r.mainWordsTotal,
+  ratio: r.mainWordsTotal > 0 ? r.mainWords / r.mainWordsTotal : 0,
+  tier: r.tier
+}));
+toolRatios.sort((a, b) => a.ratio - b.ratio);
+const ratioValues = toolRatios.map((r) => r.ratio).filter((v) => isFinite(v));
+const rQ = (p) => ratioValues[Math.min(ratioValues.length - 1, Math.floor((p / 100) * (ratioValues.length - 1)))];
+const suspiciousRatio = toolRatios.filter((r) => r.ratio < 0.30 && r.strictWords < 80);
+console.log(`Editorial ratio distribution (n=${ratioValues.length}): min=${ratioValues.length ? ratioValues[0].toFixed(3) : 'N/A'} p25=${ratioValues.length ? rQ(25).toFixed(3) : 'N/A'} p50=${ratioValues.length ? rQ(50).toFixed(3) : 'N/A'} p75=${ratioValues.length ? rQ(75).toFixed(3) : 'N/A'} max=${ratioValues.length ? ratioValues[ratioValues.length - 1].toFixed(3) : 'N/A'}`);
+console.log(`Suspicious ratio (ratio<0.30 AND strictWords<80): ${suspiciousRatio.length}`);
+for (const r of suspiciousRatio) console.log(`  /${r.page} [${r.tier}] ratio=${r.ratio.toFixed(3)} strict=${r.strictWords} main=${r.mainWords}`);
+warn('editorial-ratio', `${suspiciousRatio.length} tools with suspicious editorial ratio (ratio<0.30 AND strictWords<80) out of ${toolRatios.length} tools`);
+
+/* ---- N. Coming-soon / placeholder detection ---- */
+console.log('\n--- Coming-soon / placeholder detection ---');
+const placeholderPatterns = [
+  /en\s+desarrollo/i,
+  /pr[óo]ximamente/i,
+  /coming\s+soon/i,
+  /disponible\s+pronto/i,
+  /a[uú]n\s+no\s+est[áa]\s+disponible/i,
+  /no\s+est[áa]\s+disponible/i
+];
+const comingSoonHits = [];
+for (const p of editorialPages) {
+  const visible = stripTags(p.html).replace(/\s+/g, ' ').trim();
+  const totalWords = wordCount(visible);
+  for (const re of placeholderPatterns) {
+    if (re.test(visible)) {
+      comingSoonHits.push({ page: p.canonicalPath, signal: re.source, totalWords });
+      break;
+    }
+  }
+  if (totalWords < 50 && !comingSoonHits.some((h) => h.page === p.canonicalPath)) {
+    comingSoonHits.push({ page: p.canonicalPath, signal: `thin-visible (${totalWords} words)`, totalWords });
+  }
+}
+console.log(`Pages with coming-soon/placeholder signals: ${comingSoonHits.length}`);
+for (const h of comingSoonHits) console.log(`  ${h.page} -> ${h.signal} (${h.totalWords} visible words)`);
+if (comingSoonHits.length === 0) pass('coming-soon', 'no indexable pages with coming-soon or placeholder signals');
+else warn('coming-soon', `${comingSoonHits.length} indexable pages with coming-soon/placeholder signals`);
+
 /* ================================================================== *
  * FINAL
  * ================================================================== */

@@ -1,6 +1,6 @@
 {
   "section": "guia",
-  "title": "Guías de Toolisto",
+  "title": "Guías de APLUNO",
   "description": "Guías prácticas, originales y verificadas sobre el trabajo con PDF, imágenes, documentos, datos y privacidad. Explicamos qué hace cada formato, cuándo conviene cada herramienta y cómo obtener buenos resultados sin subir tus archivos a ningún servidor.",
   "guides": [
     {
@@ -17,7 +17,7 @@
         },
         {
           "heading": "Cómo comprimir el PDF",
-          "body": "<p>En Toolisto puedes usar la herramienta <a href=\"/comprimir-pdf\">Comprimir PDF</a>. El proceso es así:</p><ol><li>Selecciona el archivo PDF.</li><li>Elige el nivel de compresión. A mayor compresión, menor tamaño pero también menor nitidez en las imágenes.</li><li>Descarga el resultado y compáralo con el original.</li></ol><p>La clave está en encontrar el punto justo: que el PDF siga siendo legible tanto en pantalla como impreso. No hace falta comprimir al máximo si no lo necesitas.</p>"
+          "body": "<p>En APLUNO puedes usar la herramienta <a href=\"/comprimir-pdf\">Comprimir PDF</a>. El proceso es así:</p><ol><li>Selecciona el archivo PDF.</li><li>Elige el nivel de compresión. A mayor compresión, menor tamaño pero también menor nitidez en las imágenes.</li><li>Descarga el resultado y compáralo con el original.</li></ol><p>La clave está en encontrar el punto justo: que el PDF siga siendo legible tanto en pantalla como impreso. No hace falta comprimir al máximo si no lo necesitas.</p>"
         },
         {
           "heading": "Otras situaciones y alternativas",
@@ -44,7 +44,7 @@
         },
         {
           "heading": "Cómo convertir entre formatos",
-          "body": "<p>En Toolisto puedes usar <a href=\"/convertir-imagen\">Convertir imagen</a> para cambiar el formato de una imagen, o las herramientas dedicadas como <a href=\"/jpg-a-png\">JPG a PNG</a>, <a href=\"/png-a-webp\">PNG a WebP</a> y <a href=\"/webp-a-jpg\">WebP a JPG</a>. Elige la que coincida con tu par de formatos.</p>"
+          "body": "<p>En APLUNO puedes usar <a href=\"/convertir-imagen\">Convertir imagen</a> para cambiar el formato de una imagen, o las herramientas dedicadas como <a href=\"/jpg-a-png\">JPG a PNG</a>, <a href=\"/png-a-webp\">PNG a WebP</a> y <a href=\"/webp-a-jpg\">WebP a JPG</a>. Elige la que coincida con tu par de formatos.</p>"
         },
         {
           "heading": "¿Cuál elegir para una página web?",
@@ -165,14 +165,14 @@
     {
       "slug": "trabajar-privado-sin-subir-archivos",
       "title": "Cómo trabajar con archivos sin subirlos a servicios externos",
-      "description": "La privacidad del procesamiento local dentro del navegador: cómo funciona, qué herramientas de Toolisto lo hacen y qué significa para tus datos.",
+      "description": "La privacidad del procesamiento local dentro del navegador: cómo funciona, qué herramientas de APLUNO lo hacen y qué significa para tus datos.",
       "category": "files",
       "lastModified": "2026-08-27",
-      "lead": "No todos los conversores y editores de archivos suben tus documentos a un servidor. Toolisto procesa los archivos directamente en tu navegador: el documento que seleccionas no sale de tu dispositivo. Entender esta diferencia te ayuda a elegir dónde procesar lo que prefieres mantener privado.",
+      "lead": "No todos los conversores y editores de archivos suben tus documentos a un servidor. APLUNO procesa los archivos directamente en tu navegador: el documento que seleccionas no sale de tu dispositivo. Entender esta diferencia te ayuda a elegir dónde procesar lo que prefieres mantener privado.",
       "sections": [
         {
           "heading": "Qué significa procesar en el navegador",
-          "body": "<p>Cuando arrastras un archivo a una herramienta de Toolisto, el procesamiento ocurre en tu equipo mediante código que se ejecuta en el navegador. El archivo no se envía a un servidor de APLUNO, así que no se almacena ni se usa en ningún lugar externo.</p><p>Esto hace que Toolisto sea una opción útil para documentos personales, contratos o archivos que no quieres que salgan de tu control.</p>"
+          "body": "<p>Cuando arrastras un archivo a una herramienta de APLUNO, el procesamiento ocurre en tu equipo mediante código que se ejecuta en el navegador. El archivo no se envía a un servidor de APLUNO, así que no se almacena ni se usa en ningún lugar externo.</p><p>Esto hace que APLUNO sea una opción útil para documentos personales, contratos o archivos que no quieres que salgan de tu control.</p>"
         },
         {
           "heading": "Qué se guarda y qué no",
@@ -180,13 +180,13 @@
         },
         {
           "heading": "Límites del procesamiento local",
-          "body": "<p>El procesamiento local depende de la capacidad de tu ordenador y de tu navegador. Por eso algunos formatos o archivos muy grandes tienen límites. Además, por ahora Toolisto no ofrece trabajo en equipo ni sincronización entre dispositivos.</p>"
+          "body": "<p>El procesamiento local depende de la capacidad de tu ordenador y de tu navegador. Por eso algunos formatos o archivos muy grandes tienen límites. Además, por ahora APLUNO no ofrece trabajo en equipo ni sincronización entre dispositivos.</p>"
         }
       ],
       "relatedToolSlugs": ["inspeccionar-archivo", "calcular-hash", "cifrar-descifrar-archivo"],
       "relatedGuideSlugs": ["proteger-documentos-antes-de-compartir"],
       "faq": [
-        { "q": "¿Toolisto guarda mis archivos?", "a": "No. Tus archivos se procesan en tu navegador y no se envían ni se guardan en servidores externos. Solo algunas preferencias pueden guardarse localmente en tu dispositivo." }
+        { "q": "¿APLUNO guarda mis archivos?", "a": "No. Tus archivos se procesan en tu navegador y no se envían ni se guardan en servidores externos. Solo algunas preferencias pueden guardarse localmente en tu dispositivo." }
       ]
     },
     {
@@ -219,7 +219,7 @@
     {
       "slug": "que-contiene-un-codigo-qr",
       "title": "Qué información contiene un código QR y cómo leerlo",
-      "description": "Qué puede guardar un QR, cómo leerlo desde una imagen y qué opciones ofrece Toolisto para generarlos y usarlos en distintos casos.",
+      "description": "Qué puede guardar un QR, cómo leerlo desde una imagen y qué opciones ofrece APLUNO para generarlos y usarlos en distintos casos.",
       "category": "qrcodes",
       "lastModified": "2026-08-27",
       "lead": "Un código QR no es más que una matriz que almacena información legible por una cámara. Puede contener texto, una URL, datos de contacto, credenciales de una red WiFi o casi cualquier cadena de texto. Entender qué guarda te ayuda a crear el QR correcto y a leer otros con seguridad.",

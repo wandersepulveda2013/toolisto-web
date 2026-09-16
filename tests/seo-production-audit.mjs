@@ -37,7 +37,7 @@ function pageFor(url) {
 
 const expectedToolistoUrls = [
   `${site.siteUrl}/toolisto`,
-  ...['privacidad', 'condiciones', 'apoyar'].map(slug => `${site.siteUrl}/${slug}`),
+  ...['apoyar'].map(slug => `${site.siteUrl}/${slug}`),
   ...categories.filter(category => category.enabled).map(category => `${site.siteUrl}/${category.slug}`),
   ...tools.filter(tool => tool.enabled && tool.indexable && tool.enabledInSitemap).map(tool => `${site.siteUrl}/${tool.slug}`)
 ];
@@ -74,6 +74,24 @@ for (const url of expectedToolistoUrls) {
   assert(meta(html, 'twitter:title') === title, `twitter:title no coincide con title en ${url}`);
   assert(meta(html, 'twitter:description') === description, `twitter:description no coincide con description en ${url}`);
   assert(meta(html, 'twitter:image') === meta(html, 'og:image'), `twitter:image no coincide con og:image en ${url}`);
+}
+
+// Consolidación legal: las versiones legadas (privacidad/condiciones) se mantienen
+// servidas (200) pero NO deben indexarse ni aparecer en el sitemap; su canonical
+// apunta a las páginas canónicas /privacy/ y /terms/.
+const legacyLegal = {
+  'privacidad': '/privacy/',
+  'condiciones': '/terms/'
+};
+for (const [slug, canonicalPath] of Object.entries(legacyLegal)) {
+  const url = `${site.siteUrl}/${slug}`;
+  assert(!sitemapUrls.includes(url), `La página legada ${url} no debe estar en el sitemap`);
+  const file = join(dist, `${slug}.html`);
+  assert(existsSync(file), `La página legada ${url} debe seguir servida (200)`);
+  if (!existsSync(file)) continue;
+  const html = readFileSync(file, 'utf8');
+  assert(meta(html, 'robots').toLowerCase() === 'noindex, follow', `robots noindex incorrecto en ${url}`);
+  assert(canonical(html) === `${site.siteUrl}${canonicalPath}`, `Canonical de ${url} debe apuntar a ${canonicalPath}`);
 }
 
 const evidence = {

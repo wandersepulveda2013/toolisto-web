@@ -29,10 +29,6 @@
       "pass": true
     },
     {
-      "name": "fixture JPEG: PhotoLocation extrae GPS",
-      "pass": true
-    },
-    {
       "name": "pdfTablesToExcel: control outputFormat visible (fix id)",
       "pass": true
     },
@@ -154,6 +150,10 @@
     },
     {
       "name": "cameraDocumentScanner: salida PNG con el select (fix id)",
+      "pass": true
+    },
+    {
+      "name": "fixture JPEG: PhotoLocation extrae GPS",
       "pass": true
     },
     {
